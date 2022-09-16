@@ -19,27 +19,27 @@
 
             axi_dma_0 { // uio0
                 compatible = "generic-uio";
-		reg = <0x40400000 0x00001000>;
-		dma-coherent;
+		        reg = <0x40400000 0x00001000>;
+		        dma-coherent;
             };
 
             top_0 { // uio1
                 compatible = "generic-uio";
-		reg = <0x40000000 0x00001000>;
+		        reg = <0x40000000 0x00001000>;
             };
 
             udmabuf@0 {
                 compatible = "ikwzm,u-dma-buf";
                 device-name = "udmabuf0";
                 size = <0x080000>; // 512KB
-		dma-coherent;
+		        dma-coherent;
             };
 
             udmabuf@1 {
                 compatible = "ikwzm,u-dma-buf";
-		device-name = "udmabuf1";
+		        device-name = "udmabuf1";
                 size = <0x080000>; // 512KB
-		dma-coherent;
+		        dma-coherent;
             };
         };
     };

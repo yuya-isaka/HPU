@@ -41,22 +41,22 @@ void main()
 
   if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
   {
-    perror("open");
+    perror("open1");
     return;
   }
   if ((fd1 = open("/dev/udmabuf1", O_RDWR)) < 0)
   {
-    perror("open");
+    perror("open2");
     return;
   }
   if ((dmaf = open("/dev/uio0", O_RDWR | O_SYNC)) < 0)
   {
-    perror("open");
+    perror("open3");
     return;
   }
   if ((topf = open("/dev/uio1", O_RDWR | O_SYNC)) < 0)
   {
-    perror("open");
+    perror("open4");
     return;
   }
 
