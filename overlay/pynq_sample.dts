@@ -1,7 +1,7 @@
 /dts-v1/; /plugin/;
 
 / {
-    fragment@0 {  
+    fragment@0 {
         target = <&fpga_full>;
         __overlay__ {
             #address-cells = <1>;
@@ -16,7 +16,7 @@
         __overlay__ {
             #address-cells = <0x1>;
             #size-cells = <0x1>;
-            
+
             axi_dma_0 { // uio0
                 compatible = "generic-uio";
 		reg = <0x40400000 0x00001000>;
