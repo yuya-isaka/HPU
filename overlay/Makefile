@@ -1,10 +1,8 @@
-first:
+test:
 	sudo mount -t configfs configfs /configfs
 	sudo mkdir -p /configfs/device-tree/overlays/full
 	bootgen -image pynq_sample.bif -arch zynq -process_bitstream bin
 	dtc -I dts -O dtb -o pynq_sample.dtbo pynq_sample.dts
-
-second:
 	sudo cp -f design_1_wrapper.bit.bin /lib/firmware
 	sudo cp pynq_sample.dtbo /configfs/device-tree/overlays/full/dtbo
 	sudo sh -c "echo 1 > /configfs/device-tree/overlays/full/status"
