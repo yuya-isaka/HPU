@@ -3,7 +3,7 @@ test_run_dir
 ### XilinxISE template
 # intermediate build files
 *.bgn
-*.bit
+# *.bit
 *.bld
 *.cmd_log
 *.drc
@@ -353,7 +353,7 @@ rtl
 
 
 *.dump
-*.bin
+# *.bin
 
 vivado_prj
 kako
