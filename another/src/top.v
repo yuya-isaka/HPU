@@ -24,7 +24,7 @@
 // k_fin -> out_period
 //       -> out_busy
 //       -> out_addr
-//                     -> out_fin
+//                     -> out_fin -> s_fin
 // update -> result
 
 // 最後のout_fin -> s_fin

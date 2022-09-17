@@ -3,7 +3,7 @@ module dst_ctrl
         input wire        clk,
         input wire        run,
         input wire        dst_ready,
-        input wire        s_fin_in,
+        input wire        s_fin_in, // 次のsrcがあるなら、もしくは最後なら送り返す (送る側を完全に信用、まあ今回のCGRAなら問題ないね)
 
         output wire       dst_valid,
         output wire       stream_v,

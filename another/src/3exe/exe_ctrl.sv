@@ -37,8 +37,9 @@ module exe_ctrl
     dff #(.W(1)) d_start (.in(k_init), .data(start), .clk(clk), .rst(rst), .en(1'b1));
     ////////////////////////////////////////////////////////////
 
-    assign exec_src_addr = i*64 + j;
-    assign exec_mat_addr = j;
+
+    // 32bitデータを64回出力
+    // ってのを４回する
 
     // i loop
     agu_next #(.W(2)) l_i (.ini(2'd0), .fin(3), .data(i), .start(s_init), .last(last_i),
@@ -48,11 +49,16 @@ module exe_ctrl
     agu_next #(.W(6)) l_j (.ini(3'd0), .fin(63), .data(j), .start(start), .last(last_j),
                            .clk(clk),  .rst(rst), .next(next_j), .en(1'b1));
 
+    assign exec_src_addr = i*64 + j;
+    assign exec_mat_addr = j;
+
     // last_jの次にスタート /////////////////////////////////////////////////
     // last_j -> next_i と k_fin -> k_init_next　と k_init -> exec と start
     // k_fin
     dff #(.W(1)) d_k_fin (.in(last_j), .data(k_fin), .clk(clk), .rst(rst), .en(1'b1));
     // k_init_next (最初以外のk_initを駆動)
+    // そのためにnext_iが必要 (最初じゃないことの判断)
+    // next_jで０にする
     dff #(.W(1)) d_k_init_next (.in(next_i&!s_init), .data(k_init_next), .clk(clk),
                                 .rst(rst), .en(!out_busy|next_j));
     //////////////////////////////////////////////////////////////////////

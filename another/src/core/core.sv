@@ -56,6 +56,7 @@ module core
                   exec_next_next <= exec_next;
               end;
 
+    // 周波数をあげるためにレジスタを間に挟む (ここがクリティカルパスになるっぽい)
     reg [31:0]        m2,d2;
     always_ff @(posedge clk)begin
                   if(exec_next)begin

@@ -24,6 +24,7 @@ module out_ctrl
     reg               out_period_pre;
     reg               update_after_start;
 
+    // outが先に終わってて、kが終わった次 or kが先に終わってて、outが終わった次
     wire start = (k_fin&!j_period) | (last_j_next&k_fin_retention);
 
     // always_ff @(posedge clk)begin
