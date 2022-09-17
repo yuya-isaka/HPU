@@ -274,6 +274,10 @@ module top
 
     wire [31:0] acc [0:4];
     assign acc[4] = 0;
+
+    // updateで一気に8個のコアのaccが更新される
+    // 次のサイクルから, 各コアのaccが次のコアのaccで更新されていく
+    // だから先頭のaccを見ていれば、８個のコアの結果が順にわかって、それをdst_bufに入れられる
     wire [31:0] result = acc[0];
 
     generate

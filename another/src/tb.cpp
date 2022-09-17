@@ -2,6 +2,18 @@
 #include "verilated_vcd_c.h"
 #include "Vtop.h"
 
+///////////////////////////////////////////////////////////////
+
+union
+{
+  struct
+  {
+    int32_t d0;
+    int32_t d1;
+  };
+  uint64_t wd;
+} conv;
+
 ////////////////////////////////////////////////////////////////
 
 vluint64_t main_time = 0;
@@ -82,13 +94,13 @@ int main(int argc, char **argv)
 
   ////////////////////// Set Matrix /////////////////////////////
 
-  int matrix[4][64];
+  int matrix[8][128];
 
-  // 32bitを64個（2048bit）、４つのコアに格納
+  // 32bitを128個、8つのコアに格納
   printf("\n--- Set Matrix ---\n");
-  for (int j = 0; j < 4; j++)
+  for (int j = 0; j < 8; j++)
   {
-    for (int i = 0; i < 64; i++) // 2048 bit
+    for (int i = 0; i < 128; i++)
     {
       matrix[j][i] = rand() & 0x000000ff;
       printf("%3d ", matrix[j][i]);
@@ -126,44 +138,20 @@ int main(int argc, char **argv)
 
   // TVALIDの次から送信していく
   // 32個を想定
-  // 32bitを32個ずつ順番に送信
+  // 32bitを2個ずつ順番に送信
   verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 0; i < 8; i++)
+  int pp = 0;
+  for (int i = 0; i < 512; i++)
   {
-    verilator_top->S_AXIS_TDATA[0] = matrix[i * 2 / 4][(i * 32 % 64) + 0];
-    verilator_top->S_AXIS_TDATA[1] = matrix[i * 2 / 4][(i * 32 % 64) + 1];
-    verilator_top->S_AXIS_TDATA[2] = matrix[i * 2 / 4][(i * 32 % 64) + 2];
-    verilator_top->S_AXIS_TDATA[3] = matrix[i * 2 / 4][(i * 32 % 64) + 3];
-    verilator_top->S_AXIS_TDATA[4] = matrix[i * 2 / 4][(i * 32 % 64) + 4];
-    verilator_top->S_AXIS_TDATA[5] = matrix[i * 2 / 4][(i * 32 % 64) + 5];
-    verilator_top->S_AXIS_TDATA[6] = matrix[i * 2 / 4][(i * 32 % 64) + 6];
-    verilator_top->S_AXIS_TDATA[7] = matrix[i * 2 / 4][(i * 32 % 64) + 7];
-    verilator_top->S_AXIS_TDATA[8] = matrix[i * 2 / 4][(i * 32 % 64) + 8];
-    verilator_top->S_AXIS_TDATA[9] = matrix[i * 2 / 4][(i * 32 % 64) + 9];
-    verilator_top->S_AXIS_TDATA[10] = matrix[i * 2 / 4][(i * 32 % 64) + 10];
-    verilator_top->S_AXIS_TDATA[11] = matrix[i * 2 / 4][(i * 32 % 64) + 11];
-    verilator_top->S_AXIS_TDATA[12] = matrix[i * 2 / 4][(i * 32 % 64) + 12];
-    verilator_top->S_AXIS_TDATA[13] = matrix[i * 2 / 4][(i * 32 % 64) + 13];
-    verilator_top->S_AXIS_TDATA[14] = matrix[i * 2 / 4][(i * 32 % 64) + 14];
-    verilator_top->S_AXIS_TDATA[15] = matrix[i * 2 / 4][(i * 32 % 64) + 15];
-    verilator_top->S_AXIS_TDATA[16] = matrix[i * 2 / 4][(i * 32 % 64) + 16];
-    verilator_top->S_AXIS_TDATA[17] = matrix[i * 2 / 4][(i * 32 % 64) + 17];
-    verilator_top->S_AXIS_TDATA[18] = matrix[i * 2 / 4][(i * 32 % 64) + 18];
-    verilator_top->S_AXIS_TDATA[19] = matrix[i * 2 / 4][(i * 32 % 64) + 19];
-    verilator_top->S_AXIS_TDATA[20] = matrix[i * 2 / 4][(i * 32 % 64) + 20];
-    verilator_top->S_AXIS_TDATA[21] = matrix[i * 2 / 4][(i * 32 % 64) + 21];
-    verilator_top->S_AXIS_TDATA[22] = matrix[i * 2 / 4][(i * 32 % 64) + 22];
-    verilator_top->S_AXIS_TDATA[23] = matrix[i * 2 / 4][(i * 32 % 64) + 23];
-    verilator_top->S_AXIS_TDATA[24] = matrix[i * 2 / 4][(i * 32 % 64) + 24];
-    verilator_top->S_AXIS_TDATA[25] = matrix[i * 2 / 4][(i * 32 % 64) + 25];
-    verilator_top->S_AXIS_TDATA[26] = matrix[i * 2 / 4][(i * 32 % 64) + 26];
-    verilator_top->S_AXIS_TDATA[27] = matrix[i * 2 / 4][(i * 32 % 64) + 27];
-    verilator_top->S_AXIS_TDATA[28] = matrix[i * 2 / 4][(i * 32 % 64) + 28];
-    verilator_top->S_AXIS_TDATA[29] = matrix[i * 2 / 4][(i * 32 % 64) + 29];
-    verilator_top->S_AXIS_TDATA[30] = matrix[i * 2 / 4][(i * 32 % 64) + 30];
-    verilator_top->S_AXIS_TDATA[31] = matrix[i * 2 / 4][(i * 32 % 64) + 31];
+    conv.d0 = matrix[i * 2 / 128][pp];
+    conv.d1 = matrix[i * 2 / 128][pp + 1];
+    verilator_top->S_AXIS_TDATA = conv.wd;
+    pp += 2;
+    if (pp >= 128)
+      pp = 0;
     eval();
   }
+  // 00,01  02,03  04,05 .... 0126,0127(63回)  10,11
   verilator_top->S_AXIS_TVALID = 0;
 
   // matw <- 0;
@@ -222,13 +210,13 @@ int main(int argc, char **argv)
   eval();
   eval();
 
-  int sample[4][64];
+  int sample[8][128];
 
   // 同じく32bitを64個、４コア分渡す
   printf("\n--- Sample %d Input ---\n", 0);
-  for (int j = 0; j < 4; j++)
+  for (int j = 0; j < 8; j++)
   {
-    for (int i = 0; i < 64; i++)
+    for (int i = 0; i < 128; i++)
     {
       sample[j][i] = rand() & 0x000000ff;
       printf("%3d ", sample[j][i]);
@@ -238,46 +226,21 @@ int main(int argc, char **argv)
 
   // 16個を想定
   verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 0; i < 8; i++)
+  pp = 0;
+  for (int i = 0; i < 512; i++)
   {
-    verilator_top->S_AXIS_TDATA[0] = sample[i * 2 / 4][(i * 32 % 64) + 0];
-    verilator_top->S_AXIS_TDATA[1] = sample[i * 2 / 4][(i * 32 % 64) + 1];
-    verilator_top->S_AXIS_TDATA[2] = sample[i * 2 / 4][(i * 32 % 64) + 2];
-    verilator_top->S_AXIS_TDATA[3] = sample[i * 2 / 4][(i * 32 % 64) + 3];
-    verilator_top->S_AXIS_TDATA[4] = sample[i * 2 / 4][(i * 32 % 64) + 4];
-    verilator_top->S_AXIS_TDATA[5] = sample[i * 2 / 4][(i * 32 % 64) + 5];
-    verilator_top->S_AXIS_TDATA[6] = sample[i * 2 / 4][(i * 32 % 64) + 6];
-    verilator_top->S_AXIS_TDATA[7] = sample[i * 2 / 4][(i * 32 % 64) + 7];
-    verilator_top->S_AXIS_TDATA[8] = sample[i * 2 / 4][(i * 32 % 64) + 8];
-    verilator_top->S_AXIS_TDATA[9] = sample[i * 2 / 4][(i * 32 % 64) + 9];
-    verilator_top->S_AXIS_TDATA[10] = sample[i * 2 / 4][(i * 32 % 64) + 10];
-    verilator_top->S_AXIS_TDATA[11] = sample[i * 2 / 4][(i * 32 % 64) + 11];
-    verilator_top->S_AXIS_TDATA[12] = sample[i * 2 / 4][(i * 32 % 64) + 12];
-    verilator_top->S_AXIS_TDATA[13] = sample[i * 2 / 4][(i * 32 % 64) + 13];
-    verilator_top->S_AXIS_TDATA[14] = sample[i * 2 / 4][(i * 32 % 64) + 14];
-    verilator_top->S_AXIS_TDATA[15] = sample[i * 2 / 4][(i * 32 % 64) + 15];
-    verilator_top->S_AXIS_TDATA[16] = sample[i * 2 / 4][(i * 32 % 64) + 16];
-    verilator_top->S_AXIS_TDATA[17] = sample[i * 2 / 4][(i * 32 % 64) + 17];
-    verilator_top->S_AXIS_TDATA[18] = sample[i * 2 / 4][(i * 32 % 64) + 18];
-    verilator_top->S_AXIS_TDATA[19] = sample[i * 2 / 4][(i * 32 % 64) + 19];
-    verilator_top->S_AXIS_TDATA[20] = sample[i * 2 / 4][(i * 32 % 64) + 20];
-    verilator_top->S_AXIS_TDATA[21] = sample[i * 2 / 4][(i * 32 % 64) + 21];
-    verilator_top->S_AXIS_TDATA[22] = sample[i * 2 / 4][(i * 32 % 64) + 22];
-    verilator_top->S_AXIS_TDATA[23] = sample[i * 2 / 4][(i * 32 % 64) + 23];
-    verilator_top->S_AXIS_TDATA[24] = sample[i * 2 / 4][(i * 32 % 64) + 24];
-    verilator_top->S_AXIS_TDATA[25] = sample[i * 2 / 4][(i * 32 % 64) + 25];
-    verilator_top->S_AXIS_TDATA[26] = sample[i * 2 / 4][(i * 32 % 64) + 26];
-    verilator_top->S_AXIS_TDATA[27] = sample[i * 2 / 4][(i * 32 % 64) + 27];
-    verilator_top->S_AXIS_TDATA[28] = sample[i * 2 / 4][(i * 32 % 64) + 28];
-    verilator_top->S_AXIS_TDATA[29] = sample[i * 2 / 4][(i * 32 % 64) + 29];
-    verilator_top->S_AXIS_TDATA[30] = sample[i * 2 / 4][(i * 32 % 64) + 30];
-    verilator_top->S_AXIS_TDATA[31] = sample[i * 2 / 4][(i * 32 % 64) + 31];
+    conv.d0 = sample[i * 2 / 128][pp];
+    conv.d1 = sample[i * 2 / 128][pp + 1];
+    verilator_top->S_AXIS_TDATA = conv.wd;
+    pp += 2;
+    if (pp >= 128)
+      pp = 0;
     eval();
   }
   verilator_top->S_AXIS_TVALID = 0;
   eval();
 
-  int result[4][4];
+  int result[8][8];
 
   for (int num = 0; num < 3; num++)
   {
@@ -288,43 +251,19 @@ int main(int argc, char **argv)
       {
         eval();
       }
+      int d[64];
       printf("\n--- Sample %d Output ---\n", num - 1);
-      int d0 = verilator_top->M_AXIS_TDATA[0];
-      int d1 = verilator_top->M_AXIS_TDATA[1];
-      int d2 = verilator_top->M_AXIS_TDATA[2];
-      int d3 = verilator_top->M_AXIS_TDATA[3];
-      int d4 = verilator_top->M_AXIS_TDATA[4];
-      int d5 = verilator_top->M_AXIS_TDATA[5];
-      int d6 = verilator_top->M_AXIS_TDATA[6];
-      int d7 = verilator_top->M_AXIS_TDATA[7];
-      int d8 = verilator_top->M_AXIS_TDATA[8];
-      int d9 = verilator_top->M_AXIS_TDATA[9];
-      int d10 = verilator_top->M_AXIS_TDATA[10];
-      int d11 = verilator_top->M_AXIS_TDATA[11];
-      int d12 = verilator_top->M_AXIS_TDATA[12];
-      int d13 = verilator_top->M_AXIS_TDATA[13];
-      int d14 = verilator_top->M_AXIS_TDATA[14];
-      int d15 = verilator_top->M_AXIS_TDATA[15];
-      printf("%6d ", d0);
-      printf("%6d ", d1);
-      printf("%6d ", d2);
-      printf("%6d ", d3);
-      printf("\n");
-      printf("%6d ", d4);
-      printf("%6d ", d5);
-      printf("%6d ", d6);
-      printf("%6d ", d7);
-      printf("\n");
-      printf("%6d ", d8);
-      printf("%6d ", d9);
-      printf("%6d ", d10);
-      printf("%6d ", d11);
-      printf("\n");
-      printf("%6d ", d12);
-      printf("%6d ", d13);
-      printf("%6d ", d14);
-      printf("%6d ", d15);
-      printf("\n");
+      for (int i = 0; i < 8; i++)
+      {
+        for (int j = 0; j < 8; j++)
+        {
+          int d0 = verilator_top->M_AXIS_TDATA[0];
+          int d1 = verilator_top->M_AXIS_TDATA[1];
+          printf("%6d %6d ", d0, d1);
+          eval();
+        }
+        printf("\n");
+      }
       eval();
 
       int d[16] = {d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15};
@@ -362,9 +301,9 @@ int main(int argc, char **argv)
         }
       }
       printf("\n--- Sample %d Input ---\n", num + 1);
-      for (int j = 0; j < 4; j++)
+      for (int j = 0; j < 8; j++)
       {
-        for (int i = 0; i < 64; i++)
+        for (int i = 0; i < 128; i++)
         {
           sample[j][i] = rand() & 0x000000ff;
           printf("%3d ", sample[j][i]);
@@ -374,40 +313,15 @@ int main(int argc, char **argv)
 
       // データ送る
       verilator_top->S_AXIS_TVALID = 1;
-      for (int i = 0; i < 8; i++)
+      pp = 0;
+      for (int i = 0; i < 512; i++)
       {
-        verilator_top->S_AXIS_TDATA[0] = sample[i * 2 / 4][(i * 32 % 64) + 0];
-        verilator_top->S_AXIS_TDATA[1] = sample[i * 2 / 4][(i * 32 % 64) + 1];
-        verilator_top->S_AXIS_TDATA[2] = sample[i * 2 / 4][(i * 32 % 64) + 2];
-        verilator_top->S_AXIS_TDATA[3] = sample[i * 2 / 4][(i * 32 % 64) + 3];
-        verilator_top->S_AXIS_TDATA[4] = sample[i * 2 / 4][(i * 32 % 64) + 4];
-        verilator_top->S_AXIS_TDATA[5] = sample[i * 2 / 4][(i * 32 % 64) + 5];
-        verilator_top->S_AXIS_TDATA[6] = sample[i * 2 / 4][(i * 32 % 64) + 6];
-        verilator_top->S_AXIS_TDATA[7] = sample[i * 2 / 4][(i * 32 % 64) + 7];
-        verilator_top->S_AXIS_TDATA[8] = sample[i * 2 / 4][(i * 32 % 64) + 8];
-        verilator_top->S_AXIS_TDATA[9] = sample[i * 2 / 4][(i * 32 % 64) + 9];
-        verilator_top->S_AXIS_TDATA[10] = sample[i * 2 / 4][(i * 32 % 64) + 10];
-        verilator_top->S_AXIS_TDATA[11] = sample[i * 2 / 4][(i * 32 % 64) + 11];
-        verilator_top->S_AXIS_TDATA[12] = sample[i * 2 / 4][(i * 32 % 64) + 12];
-        verilator_top->S_AXIS_TDATA[13] = sample[i * 2 / 4][(i * 32 % 64) + 13];
-        verilator_top->S_AXIS_TDATA[14] = sample[i * 2 / 4][(i * 32 % 64) + 14];
-        verilator_top->S_AXIS_TDATA[15] = sample[i * 2 / 4][(i * 32 % 64) + 15];
-        verilator_top->S_AXIS_TDATA[16] = sample[i * 2 / 4][(i * 32 % 64) + 16];
-        verilator_top->S_AXIS_TDATA[17] = sample[i * 2 / 4][(i * 32 % 64) + 17];
-        verilator_top->S_AXIS_TDATA[18] = sample[i * 2 / 4][(i * 32 % 64) + 18];
-        verilator_top->S_AXIS_TDATA[19] = sample[i * 2 / 4][(i * 32 % 64) + 19];
-        verilator_top->S_AXIS_TDATA[20] = sample[i * 2 / 4][(i * 32 % 64) + 20];
-        verilator_top->S_AXIS_TDATA[21] = sample[i * 2 / 4][(i * 32 % 64) + 21];
-        verilator_top->S_AXIS_TDATA[22] = sample[i * 2 / 4][(i * 32 % 64) + 22];
-        verilator_top->S_AXIS_TDATA[23] = sample[i * 2 / 4][(i * 32 % 64) + 23];
-        verilator_top->S_AXIS_TDATA[24] = sample[i * 2 / 4][(i * 32 % 64) + 24];
-        verilator_top->S_AXIS_TDATA[25] = sample[i * 2 / 4][(i * 32 % 64) + 25];
-        verilator_top->S_AXIS_TDATA[26] = sample[i * 2 / 4][(i * 32 % 64) + 26];
-        verilator_top->S_AXIS_TDATA[27] = sample[i * 2 / 4][(i * 32 % 64) + 27];
-        verilator_top->S_AXIS_TDATA[28] = sample[i * 2 / 4][(i * 32 % 64) + 28];
-        verilator_top->S_AXIS_TDATA[29] = sample[i * 2 / 4][(i * 32 % 64) + 29];
-        verilator_top->S_AXIS_TDATA[30] = sample[i * 2 / 4][(i * 32 % 64) + 30];
-        verilator_top->S_AXIS_TDATA[31] = sample[i * 2 / 4][(i * 32 % 64) + 31];
+        conv.d0 = sample[i * 2 / 128][pp];
+        conv.d1 = sample[i * 2 / 128][pp + 1];
+        verilator_top->S_AXIS_TDATA = conv.wd;
+        pp += 2;
+        if (pp >= 128)
+          pp = 0;
         eval();
       }
       verilator_top->S_AXIS_TVALID = 0;

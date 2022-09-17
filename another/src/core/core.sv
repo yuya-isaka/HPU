@@ -23,6 +23,8 @@ module core
 
     reg [31:0]        acc_right, acc_left;
 
+    // updateで一気に8個のコアのaccが更新される
+    // 次のサイクルから, 各コアのaccが次のコアのaccで更新されていく
     assign acc  = (update) ? acc_left  : acc_right;
 
     generate
