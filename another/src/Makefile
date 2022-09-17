@@ -20,14 +20,14 @@ VERILATOR_MAKE_OPTS = OPT="-O3 -I ../../../"
 
 DESIGN_SRCS = \
 ./top.v \
-./mat/mat_ctrl.sv \
-./source/p_ctrl.sv \
-./source/src_ctrl.sv \
-./source/src_en_ctrl.sv \
-./source/s_ctrl.sv \
-./exe/exe_ctrl.sv \
-./exe/out_ctrl.sv \
-./dst/dst_ctrl.sv \
+./1mat/mat_ctrl.sv \
+./2src/p_ctrl.sv \
+./2src/src_ctrl.sv \
+./2src/src_en_ctrl.sv \
+./2src/s_ctrl.sv \
+./3exe/exe_ctrl.sv \
+./3exe/out_ctrl.sv \
+./4dst/dst_ctrl.sv \
 ./buf/src_buf.sv \
 ./buf/dst_buf.sv \
 ./core/core.sv \
