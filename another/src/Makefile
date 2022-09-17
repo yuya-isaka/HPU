@@ -1,0 +1,60 @@
+SHELL = /bin/bash
+
+SIM_DIR = sim
+
+TARGET_ARCH = linux64
+VERILATOR   = verilator
+
+VERILATOR_OPTS = \
+	-Wall \
+	-Wno-WIDTH \
+	-Wno-UNUSED \
+	-Wno-BLKSEQ \
+	--cc \
+	+1364-2001ext+v \
+	-Wno-fatal \
+	--Mdir sim \
+	--trace \
+
+VERILATOR_MAKE_OPTS = OPT="-O3 -I ../../../"
+
+DESIGN_SRCS = \
+./top.v \
+./mat/mat_ctrl.sv \
+./source/p_ctrl.sv \
+./source/src_ctrl.sv \
+./source/src_en_ctrl.sv \
+./source/s_ctrl.sv \
+./exe/exe_ctrl.sv \
+./exe/out_ctrl.sv \
+./dst/dst_ctrl.sv \
+./buf/src_buf.sv \
+./buf/dst_buf.sv \
+./core/core.sv \
+./param/agu.sv \
+./param/agu_param.sv \
+./param/agu_next.sv \
+./param/dff.sv \
+
+VERILATOR_CPP_TB = tb.cpp
+
+default: $(SIM_DIR)/Vtop
+	./sim/Vtop
+
+sim: $(SIM_DIR)/Vtop
+
+$(SIM_DIR)/Vtop: $(DESIGN_SRCS) $(VERILATOR_CPP_TB)
+	$(VERILATOR) $(VERILATOR_OPTS) $(DESIGN_SRCS) --exe ../$(VERILATOR_CPP_TB)
+	cd sim; make $(VERILATOR_MAKE_OPTS) -f Vtop.mk Vtop__ALL.a
+	cd sim; make $(VERILATOR_MAKE_OPTS) -f Vtop.mk Vtop
+
+clean:
+	rm -rf sim/ tmp.vcd
+
+run :
+	./sim/Vtop
+
+format :
+	../bin/iStyle --style=kr -n $(DESIGN_SRCS)
+
+.PHONY:
