@@ -251,33 +251,23 @@ int main(int argc, char **argv)
       {
         eval();
       }
-      int d[64];
       printf("\n--- Sample %d Output ---\n", num - 1);
       for (int i = 0; i < 8; i++)
       {
-        for (int j = 0; j < 8; j++)
+        for (int j = 0; j < 4; j++)
         {
-          int d0 = verilator_top->M_AXIS_TDATA[0];
-          int d1 = verilator_top->M_AXIS_TDATA[1];
-          printf("%6d %6d ", d0, d1);
-          eval();
-        }
-        printf("\n");
-      }
-      eval();
-
-      int d[16] = {d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15};
-
-      int kk = 0;
-      for (int j = 0; j < 4; j++)
-      {
-        for (int i = 0; i < 4; i++)
-        {
-          if (d[kk] != result[j][i])
+          conv.wd = verilator_top->M_AXIS_TDATA;
+          printf("%6d ", conv.d0);
+          if (conv.d0 != result[i][j * 2 + 0])
           {
-            printf("(Error Expecetd = %6d) ", result[j][i]);
+            printf("(Error Expecetd = %6d) ", result[i][j * 2 + 0]);
           }
-          kk += 1;
+          printf("%6d ", conv.d1);
+          if (conv.d1 != result[i][j * 2 + 1])
+          {
+            printf("(Error Expecetd = %6d) ", result[i][j * 2 + 1]);
+          }
+          eval();
         }
         printf("\n");
       }
@@ -285,17 +275,17 @@ int main(int argc, char **argv)
 
     if ((num + 1) != 3)
     {
-      for (int j = 0; j < 4; j++)
+      for (int j = 0; j < 8; j++)
       {
-        int sum[4] = {};
-        for (int k = 0; k < 64; k++)
+        int sum[8] = {};
+        for (int k = 0; k < 128; k++)
         {
-          for (int i = 0; i < 4; i++)
+          for (int i = 0; i < 8; i++)
           {
             sum[i] += matrix[i][k] * sample[j][k];
           }
         }
-        for (int oa = 0; oa < 4; oa++)
+        for (int oa = 0; oa < 8; oa++)
         {
           result[j][oa] = sum[oa];
         }
@@ -364,73 +354,38 @@ int main(int argc, char **argv)
   {
     eval();
   }
-  printf("\n--- Sample %d Output ---\n", 2);
-  int d0 = verilator_top->M_AXIS_TDATA[0];
-  int d1 = verilator_top->M_AXIS_TDATA[1];
-  int d2 = verilator_top->M_AXIS_TDATA[2];
-  int d3 = verilator_top->M_AXIS_TDATA[3];
-  int d4 = verilator_top->M_AXIS_TDATA[4];
-  int d5 = verilator_top->M_AXIS_TDATA[5];
-  int d6 = verilator_top->M_AXIS_TDATA[6];
-  int d7 = verilator_top->M_AXIS_TDATA[7];
-  int d8 = verilator_top->M_AXIS_TDATA[8];
-  int d9 = verilator_top->M_AXIS_TDATA[9];
-  int d10 = verilator_top->M_AXIS_TDATA[10];
-  int d11 = verilator_top->M_AXIS_TDATA[11];
-  int d12 = verilator_top->M_AXIS_TDATA[12];
-  int d13 = verilator_top->M_AXIS_TDATA[13];
-  int d14 = verilator_top->M_AXIS_TDATA[14];
-  int d15 = verilator_top->M_AXIS_TDATA[15];
-  printf("%6d ", d0);
-  printf("%6d ", d1);
-  printf("%6d ", d2);
-  printf("%6d ", d3);
-  printf("\n");
-  printf("%6d ", d4);
-  printf("%6d ", d5);
-  printf("%6d ", d6);
-  printf("%6d ", d7);
-  printf("\n");
-  printf("%6d ", d8);
-  printf("%6d ", d9);
-  printf("%6d ", d10);
-  printf("%6d ", d11);
-  printf("\n");
-  printf("%6d ", d12);
-  printf("%6d ", d13);
-  printf("%6d ", d14);
-  printf("%6d ", d15);
-  printf("\n");
-  eval();
-
-  int d[16] = {d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15};
-
-  for (int j = 0; j < 4; j++)
+  for (int j = 0; j < 8; j++)
   {
-    int sum[4] = {};
-    for (int k = 0; k < 64; k++)
+    int sum[8] = {};
+    for (int k = 0; k < 128; k++)
     {
-      for (int i = 0; i < 4; i++)
+      for (int i = 0; i < 8; i++)
       {
         sum[i] += matrix[i][k] * sample[j][k];
       }
     }
-    for (int oa = 0; oa < 4; oa++)
+    for (int oa = 0; oa < 8; oa++)
     {
       result[j][oa] = sum[oa];
     }
   }
-
-  int kk = 0;
-  for (int j = 0; j < 4; j++)
+  printf("\n--- Sample %d Output ---\n", 2);
+  for (int i = 0; i < 8; i++)
   {
-    for (int i = 0; i < 4; i++)
+    for (int j = 0; j < 4; j++)
     {
-      if (d[kk] != result[j][i])
+      conv.wd = verilator_top->M_AXIS_TDATA;
+      printf("%6d ", conv.d0);
+      if (conv.d0 != result[i][j * 2 + 0])
       {
-        printf("(Error Expecetd = %6d) ", result[j][i]);
+        printf("(Error Expecetd = %6d) ", result[i][j * 2 + 0]);
       }
-      kk += 1;
+      printf("%6d ", conv.d1);
+      if (conv.d1 != result[i][j * 2 + 1])
+      {
+        printf("(Error Expecetd = %6d) ", result[i][j * 2 + 1]);
+      }
+      eval();
     }
     printf("\n");
   }
