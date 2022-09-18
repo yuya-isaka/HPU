@@ -49,11 +49,6 @@ module core
                   end
               end;
 
-    always_ff @(posedge clk)begin
-                  if(exec)begin
-                  end
-              end;
-
     reg               init_next, init_next_next;
     reg               exec_next, exec_next_next;
 
