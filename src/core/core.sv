@@ -39,12 +39,9 @@ module core
               end;
 
     always_ff @(posedge clk)begin
-                  if(mat_v2)begin
+                  if(mat_v)begin
                       matrix[mat_a+1'b1] <= mat_d[63:32];
                   end
-              end;
-
-    always_ff @(posedge clk)begin
                   if(exec)begin
                       exec_mat_data <= matrix[exec_mat_addr];
                   end

@@ -17,9 +17,6 @@ module src_buf
 
     // buff0とbuff1はp_ctrlで選択するやつ
 
-    wire src_v2;
-    assign src_v2 = src_v;
-
     // buff0----------------------------------------------------------
     reg [31:0]        buff0 [0:1023];
 
@@ -30,12 +27,9 @@ module src_buf
               end;
 
     always_ff @(posedge clk) begin
-                  if(src_v2 & ~src_a[10]) begin
+                  if(src_v & ~src_a[10]) begin
                       buff0[src_a[9:0]+1'b1] <= src_d[63:32];
                   end
-              end;
-
-    always_ff @(posedge clk) begin
                   if(exec & ~exec_src_addr[10]) begin
                       exec_src_data <= buff0[exec_src_addr[9:0]];
                   end
@@ -51,12 +45,9 @@ module src_buf
               end;
 
     always_ff @(posedge clk) begin
-                  if(src_v2 & src_a[10]) begin
+                  if(src_v & src_a[10]) begin
                       buff1[src_a[9:0]+1'b1] <= src_d[63:32];
                   end
-              end;
-
-    always_ff @(posedge clk) begin
                   if(exec & exec_src_addr[10]) begin
                       exec_src_data <= buff1[exec_src_addr[9:0]];
                   end
