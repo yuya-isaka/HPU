@@ -25,20 +25,19 @@ module src_buf
                   if(src_v & ~src_a[9]) begin
                       buff0even[src_a[8:0]] <= src_d[31:0];
                   end
+                  if(exec & ~exec_src_addr[10]) begin
+                      if (~exec_src_addr[0]) begin // 偶数
+                          exec_src_data <= buff0even[exec_src_addr[9:1]];
+                      end
+                  end
               end;
 
     always_ff @(posedge clk) begin
                   if(src_v & ~src_a[9]) begin
                       buff0odd[src_a[8:0]] <= src_d[63:32];
                   end
-              end;
-
-    always_ff @(posedge clk) begin
                   if(exec & ~exec_src_addr[10]) begin
-                      if (~exec_src_addr[0]) begin //偶数
-                          exec_src_data <= buff0even[exec_src_addr[9:1]];
-                      end
-                      else begin
+                      if (exec_src_addr[0]) begin // 奇数
                           exec_src_data <= buff0odd[exec_src_addr[9:1]];
                       end
                   end
@@ -52,20 +51,19 @@ module src_buf
                   if(src_v & src_a[9]) begin
                       buff1even[src_a[8:0]] <= src_d[31:0];
                   end
+                  if(exec & exec_src_addr[10]) begin
+                      if (~exec_src_addr[0]) begin // 偶数
+                          exec_src_data <= buff1even[exec_src_addr[9:1]];
+                      end
+                  end
               end;
 
     always_ff @(posedge clk) begin
                   if(src_v & src_a[9]) begin
                       buff1odd[src_a[8:0]] <= src_d[63:32];
                   end
-              end;
-
-    always_ff @(posedge clk) begin
                   if(exec & exec_src_addr[10]) begin
-                      if (~exec_src_addr[0]) begin //偶数
-                          exec_src_data <= buff1even[exec_src_addr[9:1]];
-                      end
-                      else begin
+                      if (exec_src_addr[0]) begin // 奇数
                           exec_src_data <= buff1odd[exec_src_addr[9:1]];
                       end
                   end
