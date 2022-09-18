@@ -29,6 +29,9 @@ module core
     // 次のサイクルから, 各コアのaccが次のコアのaccで更新されていく
     assign acc  = (update) ? acc_left  : acc_right;
 
+    wire mat_v2;
+    assign mat_v2 = mat_v;
+
     always_ff @(posedge clk)begin
                   if(mat_v)begin
                       matrix[mat_a] <= mat_d[31:0];
@@ -36,7 +39,7 @@ module core
               end;
 
     always_ff @(posedge clk)begin
-                  if(mat_v)begin
+                  if(mat_v2)begin
                       matrix[mat_a+1'b1] <= mat_d[63:32];
                   end
               end;
