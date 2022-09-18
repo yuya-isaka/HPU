@@ -1,3 +1,5 @@
+`default_nettype none
+
 module dst_buf
     (
         input wire         clk,
@@ -93,3 +95,5 @@ module dst_buf
               end;
 
 endmodule
+
+`default_nettype wire

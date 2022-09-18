@@ -33,6 +33,7 @@
 //                          -> p反転（新しい計算）
 //                          -> stream_v
 //                          -> stream_a
+`default_nettype none
 
 module top
     (
@@ -437,3 +438,5 @@ module top
         end
     end
 endmodule
+
+`default_nettype wire

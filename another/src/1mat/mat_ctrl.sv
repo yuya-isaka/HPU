@@ -1,3 +1,5 @@
+`default_nettype none
+
 module mat_ctrl
     (
         input wire clk,             // AXIS_ACLK
@@ -37,3 +39,5 @@ module mat_ctrl
               end;
 
 endmodule
+
+`default_nettype wire

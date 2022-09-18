@@ -1,3 +1,4 @@
+`default_nettype none
 
 module agu_param
     #(
@@ -40,3 +41,5 @@ module agu_param
     end;
 
 endmodule
+
+`default_nettype wire

@@ -1,3 +1,5 @@
+`default_nettype none
+
 module p_ctrl
     (
         input wire        clk,
@@ -22,3 +24,5 @@ module p_ctrl
               end;
 
 endmodule
+
+`default_nettype wire

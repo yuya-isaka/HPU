@@ -1,3 +1,5 @@
+`default_nettype none
+
 module agu_next
     #(
          parameter W = 32
@@ -42,3 +44,5 @@ module agu_next
     end;
 
 endmodule
+
+`default_nettype wire

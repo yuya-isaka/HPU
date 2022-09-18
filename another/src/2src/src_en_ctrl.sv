@@ -1,3 +1,5 @@
+`default_nettype none
+
 module src_en_ctrl
     (
 
@@ -25,3 +27,5 @@ module src_en_ctrl
               end;
 
 endmodule
+
+`default_nettype wire

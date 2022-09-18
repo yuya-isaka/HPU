@@ -1,3 +1,4 @@
+`default_nettype none
 
 module out_ctrl
     (
@@ -124,3 +125,5 @@ module out_ctrl
     //        -> out_fin
 
 endmodule
+
+`default_nettype wire

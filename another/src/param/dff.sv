@@ -1,3 +1,4 @@
+`default_nettype none
 
 module dff
     #(
@@ -21,3 +22,5 @@ module dff
     end;
 
 endmodule
+
+`default_nettype wire

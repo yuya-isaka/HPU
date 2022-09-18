@@ -1,3 +1,5 @@
+`default_nettype none
+
 module src_buf
     (
         input wire        clk,
@@ -58,3 +60,5 @@ module src_buf
               end;
 
 endmodule
+
+`default_nettype wire

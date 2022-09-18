@@ -1,3 +1,5 @@
+`default_nettype none
+
 module src_ctrl
     (
         input wire        clk,          // AXIS_ACLK
@@ -22,10 +24,12 @@ module src_ctrl
     wire              last_i;
     reg [9:0]         i;
     agu_param #(.W(10)) l_i (.ini(4'd0), .fin(1022), .param(2), .data(i), .start(start),
-                      .last(last_i), .clk(clk), .rst(~src_ready|~run), .en(sen));
+                             .last(last_i), .clk(clk), .rst(~src_ready|~run), .en(sen));
 
     assign src_a = i;
     assign src_v = start;
     assign src_fin = last_i;
 
 endmodule
+
+`default_nettype wire

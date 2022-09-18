@@ -1,3 +1,5 @@
+`default_nettype none
+
 module exe_ctrl
     (
         input wire        clk,
@@ -72,3 +74,5 @@ module exe_ctrl
     dff #(.W(1)) d_s_fin (.in(s_fin_period&out_fin), .data(s_fin), .clk(clk), .rst(rst), .en(1'b1));
 
 endmodule
+
+`default_nettype wire

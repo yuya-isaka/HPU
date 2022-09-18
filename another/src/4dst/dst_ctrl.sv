@@ -1,3 +1,5 @@
+`default_nettype none
+
 module dst_ctrl
     (
         input wire        clk,
@@ -41,3 +43,5 @@ module dst_ctrl
     // last_i が立って、stream_active_preが落ちる -> stream_activeが落ちる, stream_vも落ちる -> dst_validが落ちる
 
 endmodule
+
+`default_nettype wire

@@ -1,3 +1,5 @@
+`default_nettype none
+
 module core
     (
         input wire        clk,
@@ -77,3 +79,5 @@ module core
               end;
 
 endmodule
+
+`default_nettype wire
