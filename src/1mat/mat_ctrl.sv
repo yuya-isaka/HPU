@@ -8,7 +8,7 @@ module mat_ctrl
         input wire src_valid,       // S_AXIS_TVALID
 
         output wire [7:0] mat_v,    // 8個のコアの選択
-        output reg [6:0]  mat_a     // アドレス
+        output reg [5:0]  mat_a     // アドレス
     );
 
     // 一回最初送って終わりだからsrc_readyはあまりつかわない？
@@ -30,10 +30,9 @@ module mat_ctrl
                       mat_a <= 0;
                   end
                   else if(src_valid)begin
-                      mat_a <= mat_a + 2;
-                      if(mat_a == 126)begin
+                      mat_a <= mat_a + 1;
+                      if(mat_a == 63)begin
                           core_sel <= core_sel + 1;
-                          mat_a <= 0;
                       end
                   end
               end;

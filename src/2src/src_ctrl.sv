@@ -10,7 +10,7 @@ module src_ctrl
 
         output wire       src_ready,    // S_AXIS_TREADY
         output wire       src_v,        // アドレスが生成されているか否か
-        output wire [9:0] src_a,        // アドレス
+        output wire [8:0] src_a,        // アドレス
         output wire		  src_fin       // アドレスの生成が最後か否か
     );
 
@@ -22,9 +22,9 @@ module src_ctrl
     assign src_ready = (src_en!=2'b11); // 両方埋まってる時はだめ
 
     wire              last_i;
-    reg [9:0]         i;
-    agu_param #(.W(10)) l_i (.ini(4'd0), .fin(1022), .param(2), .data(i), .start(start),
-                             .last(last_i), .clk(clk), .rst(~src_ready|~run), .en(sen));
+    reg [8:0]         i;
+    agu_param #(.W(9)) l_i (.ini(4'd0), .fin(511), .param(1), .data(i), .start(start),
+                            .last(last_i), .clk(clk), .rst(~src_ready|~run), .en(sen));
 
     assign src_a = i;
     assign src_v = start;

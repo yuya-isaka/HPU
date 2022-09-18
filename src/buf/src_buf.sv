@@ -4,7 +4,7 @@ module src_buf
     (
         input wire        clk,
         input wire        src_v,
-        input wire [10:0]  src_a,
+        input wire [9:0]  src_a,
         input wire [63:0] src_d,
         input wire        exec,
         input wire [10:0]  exec_src_addr,
@@ -18,50 +18,56 @@ module src_buf
     // buff0とbuff1はp_ctrlで選択するやつ
 
     // buff0----------------------------------------------------------
-    reg [31:0]        buff0 [0:1023];
-
-    wire [31:0] src_d1;
-    assign src_d1 = src_d[31:0];
+    reg [31:0]        buff0even [0:511];
+    reg [31:0]        buff0odd [0:511];
 
     always_ff @(posedge clk) begin
-                  if(src_v & ~src_a[10]) begin
-                      buff0[src_a[9:0]] <= src_d1;
+                  if(src_v & ~src_a[9]) begin
+                      buff0even[src_a[8:0]] <= src_d[31:0];
                   end
               end;
 
-    wire [31:0] src_d2;
-    assign src_d2 = src_d[63:32];
-
     always_ff @(posedge clk) begin
-                  if(src_v & ~src_a[10]) begin
-                      buff0[src_a[9:0]+1'b1] <= src_d2;
+                  if(src_v & ~src_a[9]) begin
+                      buff0odd[src_a[8:0]] <= src_d[63:32];
                   end
               end;
 
     always_ff @(posedge clk) begin
                   if(exec & ~exec_src_addr[10]) begin
-                      exec_src_data <= buff0[exec_src_addr[9:0]];
+                      if (~exec_src_addr[0]) begin //偶数
+                          exec_src_data <= buff0even[exec_src_addr[9:1]];
+                      end
+                      else begin
+                          exec_src_data <= buff0odd[exec_src_addr[9:1]];
+                      end
                   end
               end;
 
     // buff1----------------------------------------------------------
-    reg [31:0]        buff1 [0:1023];
+    reg [31:0]        buff1even [0:511];
+    reg [31:0]        buff1odd [0:511];
 
     always_ff @(posedge clk) begin
-                  if(src_v & src_a[10]) begin
-                      buff1[src_a[9:0]] <= src_d[31:0];
+                  if(src_v & src_a[9]) begin
+                      buff1even[src_a[8:0]] <= src_d[31:0];
                   end
               end;
 
     always_ff @(posedge clk) begin
-                  if(src_v & src_a[10]) begin
-                      buff1[src_a[9:0]+1'b1] <= src_d[63:32];
+                  if(src_v & src_a[9]) begin
+                      buff1odd[src_a[8:0]] <= src_d[63:32];
                   end
               end;
 
     always_ff @(posedge clk) begin
                   if(exec & exec_src_addr[10]) begin
-                      exec_src_data <= buff1[exec_src_addr[9:0]];
+                      if (~exec_src_addr[0]) begin //偶数
+                          exec_src_data <= buff1even[exec_src_addr[9:1]];
+                      end
+                      else begin
+                          exec_src_data <= buff1odd[exec_src_addr[9:1]];
+                      end
                   end
               end;
 

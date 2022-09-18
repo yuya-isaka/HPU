@@ -99,7 +99,7 @@ module top
 
 
     wire [7:0]        mat_v;
-    wire [6:0]        mat_a;
+    wire [5:0]        mat_a;
     mat_ctrl mat_ctrl
              (
                  .clk(AXIS_ACLK),
@@ -108,7 +108,7 @@ module top
                  .src_valid(S_AXIS_TVALID),
 
                  .mat_v(mat_v[7:0]),
-                 .mat_a(mat_a[6:0])
+                 .mat_a(mat_a[5:0])
              );
 
 
@@ -116,7 +116,7 @@ module top
 
 
     wire              src_v;   // アドレス生成をしているか否か
-    wire [9:0]        src_a;   // アドレス
+    wire [8:0]        src_a;   // アドレス
     wire              src_fin; // アドレスの生成が最後か否か (s_init駆動、p変更, src_enを埋める)
     src_ctrl src_ctrl
              (
@@ -128,7 +128,7 @@ module top
 
                  .src_ready(S_AXIS_TREADY),
                  .src_v(src_v),
-                 .src_a(src_a[9:0]),
+                 .src_a(src_a[8:0]),
                  .src_fin(src_fin)
              );
 
@@ -230,7 +230,7 @@ module top
             (
                 .clk(AXIS_ACLK),
                 .src_v(src_v),
-                .src_a({~p,src_a[9:0]}),
+                .src_a({~p,src_a[8:0]}),
                 .src_d(S_AXIS_TDATA),
                 .exec(exec),
                 .exec_src_addr({p,exec_src_addr[9:0]}),
@@ -290,7 +290,7 @@ module top
                      .init(k_init),
 
                      .mat_v(mat_v[i]),
-                     .mat_a(mat_a[6:0]),
+                     .mat_a(mat_a[5:0]),
                      .mat_d(S_AXIS_TDATA),
 
                      .exec(exec),

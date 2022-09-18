@@ -6,7 +6,7 @@ module core
         input wire        init,
 
         input wire        mat_v,
-        input wire [6:0]  mat_a,
+        input wire [5:0]  mat_a,
         input wire [64:0] mat_d,
 
         input wire        exec,
@@ -20,7 +20,9 @@ module core
     );
 
     // 各コアにつき32bitのデータを128個集める
-    reg [31:0]        matrix [0:127];
+    reg [31:0]        matrix_even [0:63];
+    reg [31:0]        matrix_odd [0:63];
+
     reg [31:0]        exec_mat_data;
 
     reg [31:0]        acc_right, acc_left;
@@ -31,19 +33,24 @@ module core
 
     always_ff @(posedge clk)begin
                   if(mat_v)begin
-                      matrix[mat_a] <= mat_d[31:0];
+                      matrix_even[mat_a] <= mat_d[31:0];
                   end
               end;
 
     always_ff @(posedge clk)begin
                   if(mat_v)begin
-                      matrix[mat_a+1'b1] <= mat_d[63:32];
+                      matrix_odd[mat_a] <= mat_d[63:32];
                   end
               end;
 
     always_ff @(posedge clk)begin
                   if(exec)begin
-                      exec_mat_data <= matrix[exec_mat_addr];
+                      if (~exec_mat_addr[0]) begin
+                          exec_mat_data <= matrix_even[exec_mat_addr[6:1]];
+                      end
+                      else begin
+                          exec_mat_data <= matrix_odd[exec_mat_addr[6:1]];
+                      end
                   end
               end;
 
