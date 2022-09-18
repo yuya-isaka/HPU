@@ -34,15 +34,10 @@ module core
     always_ff @(posedge clk)begin
                   if(mat_v)begin
                       matrix_even[mat_a] <= mat_d[31:0];
+                      matrix_odd[mat_a] <= mat_d[63:32];
                   end
                   if (exec & ~exec_mat_addr[0]) begin // 偶数
                       exec_mat_data <= matrix_even[exec_mat_addr[6:1]];
-                  end
-              end;
-
-    always_ff @(posedge clk)begin
-                  if(mat_v)begin
-                      matrix_odd[mat_a] <= mat_d[63:32];
                   end
                   if (exec & exec_mat_addr[0]) begin // 奇数
                       exec_mat_data <= matrix_odd[exec_mat_addr[6:1]];
