@@ -179,9 +179,9 @@ void main()
   // sampleの場合は問題ないが
   // matrixの場合はまとめて送られる設定にしていないので、ちょっと困ると
   printf("\n--- Sample %d Input ---\n", 0);
-  for (int j = 0; j < 4; j++)
+  for (int j = 0; j < 8; j++)
   {
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 128; i++)
     {
       sample[j][i] = rand() & 0x000000ff;
       printf("%3d ", sample[j][i]);
@@ -194,7 +194,7 @@ void main()
   dma_reset();
   dma[0x00 / 4] = 1;
   dma[0x18 / 4] = src_phys;
-  dma[0x28 / 4] = 8 * 4 * 4;
+  dma[0x28 / 4] = 8 * 128 * 4; // 4095 (64bit 64ビート　のバースト転送)
 
   // Wait for the tx to finish
   while ((dma[0x04 / 4] & 0x1000) != 0x1000)
