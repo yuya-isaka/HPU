@@ -2,58 +2,58 @@ module src_buf
     (
         input wire        clk,
         input wire        src_v,
-        input wire [8:0]  src_a,
-        input wire [1023:0] src_d,
+        input wire [10:0]  src_a,
+        input wire [63:0] src_d,
         input wire        exec,
-        input wire [8:0]  exec_src_addr,
+        input wire [10:0]  exec_src_addr,
 
         output reg [31:0] exec_src_data
     );
 
-    // 32bitのデータを64*4個（256個）格納
-    // つまり４コア分のデータをゲット
-    reg [31:0]        buff0 [0:255];
-    reg [31:0]        buff1 [0:255];
+    // 32bitのデータを128個 各コアに格納
+    // つまり128*8=1024確保
 
-    generate
-        genvar i;
-        for (i = 0; i < 32; i = i + 1) begin
-            always_ff @(posedge clk) begin
-                          if(src_v&~src_a[8]) begin
-                              buff0[src_a+i] <= src_d[((i+1)*32)-1:0+(i*32)];
-                              // 31:0
-                              // 63:32
-                              // ...
-                              // 1023:992
-                          end
-                      end;
-        end
-    endgenerate
+    // buff0とbuff1はp_ctrlで選択するやつ
+
+    // buff0----------------------------------------------------------
+    reg [31:0]        buff0 [0:1023];
 
     always_ff @(posedge clk) begin
-                  if(exec & ~exec_src_addr[8]) begin
-                      exec_src_data <= buff0[exec_src_addr[7:0]];
+                  if(src_v & ~src_a[10]) begin
+                      buff0[src_a] <= src_d[31:0];
                   end
               end;
 
-    generate
-        genvar j;
-        for (j = 0; j < 32; j = j + 1) begin
-            always_ff @(posedge clk) begin
-                          if(src_v& src_a[8]) begin
-                              buff1[src_a+j] <= src_d[((j+1)*32)-1:0+(j*32)];
-                              // 31:0
-                              // 63:32
-                              // ...
-                              // 1023:992
-                          end
-                      end;
-        end
-    endgenerate
+    always_ff @(posedge clk) begin
+                  if(src_v & ~src_a[10]) begin
+                      buff0[src_a+1'b1] <= src_d[63:32];
+                  end
+              end;
 
     always_ff @(posedge clk) begin
-                  if(exec & exec_src_addr[8]) begin
-                      exec_src_data <= buff1[exec_src_addr[7:0]];
+                  if(exec & ~exec_src_addr[10]) begin
+                      exec_src_data <= buff0[exec_src_addr[9:0]];
+                  end
+              end;
+
+    // buff1----------------------------------------------------------
+    reg [31:0]        buff1 [0:1023];
+
+    always_ff @(posedge clk) begin
+                  if(src_v & src_a[10]) begin
+                      buff1[src_a] <= src_d[31:0];
+                  end
+              end;
+
+    always_ff @(posedge clk) begin
+                  if(src_v & src_a[10]) begin
+                      buff1[src_a+1'b1] <= src_d[63:32];
+                  end
+              end;
+
+    always_ff @(posedge clk) begin
+                  if(exec & exec_src_addr[10]) begin
+                      exec_src_data <= buff1[exec_src_addr[9:0]];
                   end
               end;
 

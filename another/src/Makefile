@@ -32,9 +32,9 @@ DESIGN_SRCS = \
 ./buf/dst_buf.sv \
 ./core/core.sv \
 ./param/agu.sv \
-./param/agu_param.sv \
 ./param/agu_next.sv \
 ./param/dff.sv \
+./param/agu_param.sv \
 
 VERILATOR_CPP_TB = tb.cpp
 

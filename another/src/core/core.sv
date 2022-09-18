@@ -4,21 +4,21 @@ module core
         input wire        init,
 
         input wire        mat_v,
-        input wire [5:0]  mat_a,
-        input wire [1023:0] mat_d,
+        input wire [6:0]  mat_a,
+        input wire [64:0] mat_d,
 
         input wire        exec,
         input wire        out_period,
         input wire        update,
-        input wire [5:0]  exec_mat_addr,
+        input wire [6:0]  exec_mat_addr,
         input wire [31:0] exec_src_data,
         input wire [31:0] acc_next,
 
         output reg [31:0] acc
     );
 
-    // 各コアにつき32bitのデータを64個集める
-    reg [31:0]        matrix [0:63];
+    // 各コアにつき32bitのデータを128個集める
+    reg [31:0]        matrix [0:127];
     reg [31:0]        exec_mat_data;
 
     reg [31:0]        acc_right, acc_left;
@@ -27,20 +27,17 @@ module core
     // 次のサイクルから, 各コアのaccが次のコアのaccで更新されていく
     assign acc  = (update) ? acc_left  : acc_right;
 
-    generate
-        genvar i;
-        for (i = 0; i < 32; i = i + 1) begin
-            always_ff @(posedge clk)begin
-                          if(mat_v)begin
-                              matrix[mat_a+i] <= mat_d[((i+1)*32)-1:0+(i*32)];
-                              // 31:0
-                              // 63:32
-                              // ...
-                              // 1023:992
-                          end
-                      end
-                  end;
-    endgenerate
+    always_ff @(posedge clk)begin
+                  if(mat_v)begin
+                      matrix[mat_a] <= mat_d[31:0];
+                  end
+              end;
+
+    always_ff @(posedge clk)begin
+                  if(mat_v)begin
+                      matrix[mat_a+1'b1] <= mat_d[63:32];
+                  end
+              end;
 
     always_ff @(posedge clk)begin
                   if(exec)begin

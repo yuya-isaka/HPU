@@ -12,14 +12,14 @@ module out_ctrl
         output reg       out_busy,
         output reg       out_period,
         output reg       out_fin,
-        output reg [3:0] out_addr,
+        output reg [5:0] out_addr,
         output reg       update
     );
 
-    reg [3:0]         out_addr_pre;
+    reg [5:0]         out_addr_pre; // 最大64
 
     wire              last_i, last_j;
-    wire [1:0]        i, j;
+    wire [2:0]        i, j;
     reg               last_j_next;
     reg               out_period_pre;
     reg               update_after_start;
@@ -79,10 +79,12 @@ module out_ctrl
     dff #(.W(1)) d_j_period (.in(start), .data(j_period), .clk(clk), .rst(rst), .en(start|last_j));
 
 
-    agu #(.W(2)) l_i (.ini(2'd0), .fin(3), .data(i), .start(s_init), .last(last_i),
+    // jの終わりに更新される
+    agu #(.W(3)) l_i (.ini(2'd0), .fin(7), .data(i), .start(s_init), .last(last_i),
                       .clk(clk), .rst(rst), .en(last_j));
 
-    agu #(.W(2)) l_j (.ini(2'd0), .fin(3), .data(j), .start(start), .last(last_j),
+    // kが終わるたびに新しいのが始まる
+    agu #(.W(3)) l_j (.ini(2'd0), .fin(7), .data(j), .start(start), .last(last_j),
                       .clk(clk), .rst(rst), .en(1'b1));
 
     always_ff @(posedge clk)begin
@@ -96,7 +98,7 @@ module out_ctrl
                       last_j_next <= 1'b0;
                   end
                   else begin
-                      out_addr_pre <= i*4 + j;
+                      out_addr_pre <= i*8 + j;
                       out_addr <= out_addr_pre;
 
                       out_period_pre <= j_period|start; // startの次に始まり、j_periodの次まで生き残る

@@ -7,10 +7,10 @@ module dst_ctrl
 
         output wire       dst_valid,
         output wire       stream_v,
-        output wire [2:0] stream_a
+        output wire [4:0] stream_a
     );
 
-    reg [2:0]         i;
+    reg [4:0]         i;
     wire              last_i;
 
     wire              start, start_check;
@@ -27,7 +27,7 @@ module dst_ctrl
 
     assign start = dst_ready & start_check;
 
-    agu #(.W(3)) l_da(.ini(3'd0), .fin(0),  .data(i), .start(start),  .last(last_i),
+    agu #(.W(5)) l_da(.ini(3'd0), .fin(31),  .data(i), .start(start),  .last(last_i),
                       .clk(clk),   .rst(~run), .en(dst_ready) );
 
     assign stream_a = i;

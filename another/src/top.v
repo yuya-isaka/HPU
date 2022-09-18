@@ -67,7 +67,7 @@ module top
         ////////////////////////////////////////////////////////////////////////////
         // AXI Stream Master Interface
         output wire        M_AXIS_TVALID,
-        output wire [1023:0] M_AXIS_TDATA,
+        output wire [63:0] M_AXIS_TDATA,
         output wire [7:0]  M_AXIS_TSTRB,
         output wire        M_AXIS_TLAST, // データの区切り、最後のデータの時に立たせる, // 必須らしい
         // https://www.acri.c.titech.ac.jp/wordpress/archives/11585
@@ -79,7 +79,7 @@ module top
         ////////////////////////////////////////////////////////////////////////////
         // AXI Stream Slave Interface
         output wire        S_AXIS_TREADY,
-        input wire [1023:0]  S_AXIS_TDATA,
+        input wire [63:0]  S_AXIS_TDATA,
         input wire [7:0]   S_AXIS_TSTRB,
         input wire         S_AXIS_TLAST, // データの区切り、最後のデータの時にたつ, 次のクロックにはデータがこない
         input wire         S_AXIS_TVALID
@@ -97,8 +97,8 @@ module top
     /////////////////////////////////////////////////////////////////////////////////
 
 
-    wire [3:0]        mat_v;
-    wire [5:0]        mat_a;
+    wire [7:0]        mat_v;
+    wire [6:0]        mat_a;
     mat_ctrl mat_ctrl
              (
                  .clk(AXIS_ACLK),
@@ -106,8 +106,8 @@ module top
                  .matw(matw),
                  .src_valid(S_AXIS_TVALID),
 
-                 .mat_v(mat_v[3:0]),
-                 .mat_a(mat_a[5:0])
+                 .mat_v(mat_v[7:0]),
+                 .mat_a(mat_a[6:0])
              );
 
 
@@ -115,7 +115,7 @@ module top
 
 
     wire              src_v;   // アドレス生成をしているか否か
-    wire [7:0]        src_a;   // アドレス
+    wire [9:0]        src_a;   // アドレス
     wire              src_fin; // アドレスの生成が最後か否か (s_init駆動、p変更, src_enを埋める)
     src_ctrl src_ctrl
              (
@@ -127,7 +127,7 @@ module top
 
                  .src_ready(S_AXIS_TREADY),
                  .src_v(src_v),
-                 .src_a(src_a[7:0]),
+                 .src_a(src_a[9:0]),
                  .src_fin(src_fin)
              );
 
@@ -184,8 +184,8 @@ module top
     wire              k_init;
     wire              k_fin;
     wire              exec;
-    wire [7:0]        exec_src_addr;
-    wire [5:0]        exec_mat_addr;
+    wire [9:0]        exec_src_addr;
+    wire [6:0]        exec_mat_addr;
     exe_ctrl exe_ctrl
              (
                  .clk(AXIS_ACLK),
@@ -198,15 +198,15 @@ module top
                  .k_init(k_init),
                  .k_fin(k_fin),
                  .exec(exec),
-                 .exec_src_addr(exec_src_addr[7:0]),
-                 .exec_mat_addr(exec_mat_addr[5:0])
+                 .exec_src_addr(exec_src_addr[9:0]),
+                 .exec_mat_addr(exec_mat_addr[6:0])
              );
 
 
     wire              out_busy;
     wire              out_period;
     wire              out_fin;
-    wire [3:0]        out_addr;
+    wire [5:0]        out_addr;
     wire              update;
     out_ctrl out_ctrl
              (
@@ -219,7 +219,7 @@ module top
 
                  .out_period(out_period),
                  .out_fin(out_fin),
-                 .out_addr(out_addr[3:0]),
+                 .out_addr(out_addr[5:0]),
                  .update(update)
              );
 
@@ -229,10 +229,10 @@ module top
             (
                 .clk(AXIS_ACLK),
                 .src_v(src_v),
-                .src_a({~p,src_a[7:0]}),
+                .src_a({~p,src_a[9:0]}),
                 .src_d(S_AXIS_TDATA),
                 .exec(exec),
-                .exec_src_addr({p,exec_src_addr[7:0]}),
+                .exec_src_addr({p,exec_src_addr[9:0]}),
 
                 .exec_src_data(exec_src_data)
             );
@@ -242,7 +242,7 @@ module top
 
 
     wire              stream_v;
-    wire [2:0]        stream_a;
+    wire [4:0]        stream_a;
     dst_ctrl dst_ctrl
              (
                  .clk(AXIS_ACLK),
@@ -252,7 +252,7 @@ module top
 
                  .dst_valid(M_AXIS_TVALID),
                  .stream_v(stream_v),
-                 .stream_a(stream_a[2:0])
+                 .stream_a(stream_a[4:0])
              );
 
 
@@ -260,9 +260,9 @@ module top
             (
                 .clk(AXIS_ACLK),
                 .stream_v(stream_v),
-                .stream_a({~p,stream_a[2:0]}), // 計算していない方なので~p
+                .stream_a({~p,stream_a[4:0]}), // 計算していない方なので~p
                 .out_period(out_period),
-                .out_addr({p,out_addr[3:0]}), // 計算している方なのでp
+                .out_addr({p,out_addr[5:0]}), // 計算している方なのでp
                 .result(result),
 
                 .stream_d(M_AXIS_TDATA)
@@ -272,8 +272,8 @@ module top
     //////////////////////////////////////////////////////////////////////////////////
 
 
-    wire [31:0] acc [0:4];
-    assign acc[4] = 0;
+    wire [31:0] acc [0:8];
+    assign acc[8] = 0;
 
     // updateで一気に8個のコアのaccが更新される
     // 次のサイクルから, 各コアのaccが次のコアのaccで更新されていく
@@ -282,20 +282,20 @@ module top
 
     generate
         genvar         i;
-        for (i = 0; i < 4; i = i + 1)begin
+        for (i = 0; i < 8; i = i + 1)begin
             core core
                  (
                      .clk(AXIS_ACLK),
                      .init(k_init),
 
                      .mat_v(mat_v[i]),
-                     .mat_a(mat_a[5:0]),
+                     .mat_a(mat_a[6:0]),
                      .mat_d(S_AXIS_TDATA),
 
                      .exec(exec),
                      .out_period(out_period),
                      .update(update),
-                     .exec_mat_addr(exec_mat_addr[5:0]),
+                     .exec_mat_addr(exec_mat_addr[6:0]),
                      .exec_src_data(exec_src_data),
                      .acc_next(acc[i+1]),
 

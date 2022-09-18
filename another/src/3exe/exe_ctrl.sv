@@ -11,14 +11,14 @@ module exe_ctrl
         output wire       k_init,       // jループの始まりの前 (s_initの次)
         output wire       k_fin,        // jループが終わった次に駆動
         output wire       exec,         // 演算の始まり(jループの始まり)
-        output wire [7:0] exec_src_addr,    // src_buffから読み出すアドレス
-        output wire [5:0] exec_mat_addr // matrixから読み出すアドレス
+        output wire [9:0] exec_src_addr,    // src_buffから読み出すアドレス
+        output wire [6:0] exec_mat_addr // matrixから読み出すアドレス
     );
 
     wire                    last_i, last_j;
     wire                    next_i, next_j;
-    wire [1:0]                           i;
-    wire [5:0]                           j;
+    wire [3:0]                           i;
+    wire [6:0]                           j;
     wire         s_init_delay, k_init_next;
     wire                             start;
     wire                      s_fin_period;
@@ -42,15 +42,15 @@ module exe_ctrl
     // ってのを４回する
 
     // i loop
-    agu_next #(.W(2)) l_i (.ini(2'd0), .fin(3), .data(i), .start(s_init), .last(last_i),
+    agu_next #(.W(4)) l_i (.ini(2'd0), .fin(7), .data(i), .start(s_init), .last(last_i),
                            .clk(clk),  .rst(rst),  .next(next_i),  .en(last_j));
 
     // j loop
-    agu_next #(.W(6)) l_j (.ini(3'd0), .fin(63), .data(j), .start(start), .last(last_j),
+    agu_next #(.W(7)) l_j (.ini(3'd0), .fin(127), .data(j), .start(start), .last(last_j),
                            .clk(clk),  .rst(rst), .next(next_j), .en(1'b1));
 
-    assign exec_src_addr = i*64 + j;
-    assign exec_mat_addr = j;
+    assign exec_src_addr = i*128 + j; // 最大1023
+    assign exec_mat_addr = j; // 最大127
 
     // last_jの次にスタート /////////////////////////////////////////////////
     // last_j -> next_i と k_fin -> k_init_next　と k_init -> exec と start
