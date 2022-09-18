@@ -8,7 +8,8 @@
 #include "verilated.h"
 
 class Vtop__Syms;
-VL_MODULE(Vtop___024root) {
+
+class Vtop___024root final : public VerilatedModule {
   public:
 
     // DESIGN SPECIFIC STATE
@@ -43,7 +44,7 @@ VL_MODULE(Vtop___024root) {
         CData/*0:0*/ top__DOT__matw;
         CData/*0:0*/ top__DOT__last;
         CData/*3:0*/ top__DOT__mat_v;
-        CData/*2:0*/ top__DOT__mat_a;
+        CData/*5:0*/ top__DOT__mat_a;
         CData/*1:0*/ top__DOT__src_en;
         CData/*0:0*/ top__DOT__p;
         CData/*0:0*/ top__DOT__s_fin_in;
@@ -56,9 +57,7 @@ VL_MODULE(Vtop___024root) {
         CData/*0:0*/ top__DOT__out_period;
         CData/*0:0*/ top__DOT__out_fin;
         CData/*3:0*/ top__DOT__out_addr;
-        CData/*0:0*/ top__DOT__sum_update;
-        CData/*5:0*/ top__DOT____Vcellinp__src_buf__exec_src_addr;
-        CData/*4:0*/ top__DOT____Vcellinp__src_buf__src_a;
+        CData/*0:0*/ top__DOT__update;
         CData/*0:0*/ top__DOT__stream_v;
         CData/*4:0*/ top__DOT____Vcellinp__dst_buf__out_addr;
         CData/*3:0*/ top__DOT____Vcellinp__dst_buf__stream_a;
@@ -74,15 +73,15 @@ VL_MODULE(Vtop___024root) {
         CData/*0:0*/ top__DOT__src_ctrl__DOT__sen;
         CData/*0:0*/ top__DOT__src_ctrl__DOT__start;
         CData/*0:0*/ top__DOT__src_ctrl__DOT__last_i;
-        CData/*3:0*/ top__DOT__src_ctrl__DOT__i;
+        CData/*7:0*/ top__DOT__src_ctrl__DOT__i;
         CData/*0:0*/ top__DOT__src_ctrl__DOT__l_i__DOT__run;
         CData/*0:0*/ top__DOT__s_ctrl__DOT__s_fin_dayo;
         CData/*0:0*/ top__DOT__exe_ctrl__DOT__last_i;
-    };
-    struct {
         CData/*0:0*/ top__DOT__exe_ctrl__DOT__last_j;
         CData/*1:0*/ top__DOT__exe_ctrl__DOT__i;
-        CData/*2:0*/ top__DOT__exe_ctrl__DOT__j;
+    };
+    struct {
+        CData/*5:0*/ top__DOT__exe_ctrl__DOT__j;
         CData/*0:0*/ top__DOT__exe_ctrl__DOT__s_init_delay;
         CData/*0:0*/ top__DOT__exe_ctrl__DOT__k_init_next;
         CData/*0:0*/ top__DOT__exe_ctrl__DOT__start;
@@ -105,7 +104,6 @@ VL_MODULE(Vtop___024root) {
         CData/*0:0*/ top__DOT__out_ctrl__DOT__j_period;
         CData/*0:0*/ top__DOT__out_ctrl__DOT__l_i__DOT__run;
         CData/*0:0*/ top__DOT__out_ctrl__DOT__l_j__DOT__run;
-        CData/*1:0*/ top__DOT__src_buf__DOT__ia_;
         CData/*2:0*/ top__DOT__dst_ctrl__DOT__i;
         CData/*0:0*/ top__DOT__dst_ctrl__DOT__last_i;
         CData/*0:0*/ top__DOT__dst_ctrl__DOT__start;
@@ -131,21 +129,27 @@ VL_MODULE(Vtop___024root) {
         CData/*0:0*/ top__DOT__genblk1__BRA__3__KET____DOT__core__DOT__exec_next_next;
         CData/*0:0*/ __Vclklast__TOP__AXIS_ACLK;
         CData/*0:0*/ __Vclklast__TOP__S_AXI_ACLK;
+        SData/*8:0*/ top__DOT____Vcellinp__src_buf__exec_src_addr;
+        SData/*8:0*/ top__DOT____Vcellinp__src_buf__src_a;
         SData/*9:0*/ top__DOT__write_addr;
         SData/*9:0*/ top__DOT__read_addr;
         VL_IN(S_AXI_AWADDR,31,0);
         VL_IN(S_AXI_WDATA,31,0);
         VL_IN(S_AXI_ARADDR,31,0);
         VL_OUT(S_AXI_RDATA,31,0);
+        VL_OUTW(M_AXIS_TDATA,1023,0,32);
+        VL_INW(S_AXIS_TDATA,1023,0,32);
         IData/*31:0*/ top__DOT__exec_src_data;
         IData/*31:0*/ top__DOT__write_data;
         IData/*31:0*/ top__DOT__control;
+        VlWide<32>/*1023:0*/ top__DOT__dst_buf__DOT__stream_0;
+        VlWide<32>/*1023:0*/ top__DOT__dst_buf__DOT__stream_1;
         IData/*31:0*/ top__DOT__genblk1__BRA__0__KET____DOT__core__DOT__exec_mat_data;
+    };
+    struct {
         IData/*31:0*/ top__DOT__genblk1__BRA__0__KET____DOT__core__DOT__acc_right;
         IData/*31:0*/ top__DOT__genblk1__BRA__0__KET____DOT__core__DOT__acc_left;
         IData/*31:0*/ top__DOT__genblk1__BRA__0__KET____DOT__core__DOT__m2;
-    };
-    struct {
         IData/*31:0*/ top__DOT__genblk1__BRA__0__KET____DOT__core__DOT__d2;
         IData/*31:0*/ top__DOT__genblk1__BRA__1__KET____DOT__core__DOT__exec_mat_data;
         IData/*31:0*/ top__DOT__genblk1__BRA__1__KET____DOT__core__DOT__acc_right;
@@ -162,23 +166,17 @@ VL_MODULE(Vtop___024root) {
         IData/*31:0*/ top__DOT__genblk1__BRA__3__KET____DOT__core__DOT__acc_left;
         IData/*31:0*/ top__DOT__genblk1__BRA__3__KET____DOT__core__DOT__m2;
         IData/*31:0*/ top__DOT__genblk1__BRA__3__KET____DOT__core__DOT__d2;
-        VL_OUT64(M_AXIS_TDATA,63,0);
-        VL_IN64(S_AXIS_TDATA,63,0);
-        QData/*63:0*/ top__DOT__src_buf__DOT__wd0;
-        QData/*63:0*/ top__DOT__src_buf__DOT__wd1;
-        QData/*63:0*/ top__DOT__dst_buf__DOT__stream_0;
-        QData/*63:0*/ top__DOT__dst_buf__DOT__stream_1;
         VlUnpacked<IData/*31:0*/, 5> top__DOT__acc;
-        VlUnpacked<QData/*63:0*/, 16> top__DOT__src_buf__DOT__buff0;
-        VlUnpacked<QData/*63:0*/, 16> top__DOT__src_buf__DOT__buff1;
+        VlUnpacked<IData/*31:0*/, 256> top__DOT__src_buf__DOT__buff0;
+        VlUnpacked<IData/*31:0*/, 256> top__DOT__src_buf__DOT__buff1;
         VlUnpacked<IData/*31:0*/, 8> top__DOT__dst_buf__DOT__buff0;
         VlUnpacked<IData/*31:0*/, 8> top__DOT__dst_buf__DOT__buff1;
         VlUnpacked<IData/*31:0*/, 8> top__DOT__dst_buf__DOT__buff2;
         VlUnpacked<IData/*31:0*/, 8> top__DOT__dst_buf__DOT__buff3;
-        VlUnpacked<IData/*31:0*/, 8> top__DOT__genblk1__BRA__0__KET____DOT__core__DOT__matrix;
-        VlUnpacked<IData/*31:0*/, 8> top__DOT__genblk1__BRA__1__KET____DOT__core__DOT__matrix;
-        VlUnpacked<IData/*31:0*/, 8> top__DOT__genblk1__BRA__2__KET____DOT__core__DOT__matrix;
-        VlUnpacked<IData/*31:0*/, 8> top__DOT__genblk1__BRA__3__KET____DOT__core__DOT__matrix;
+        VlUnpacked<IData/*31:0*/, 64> top__DOT__genblk1__BRA__0__KET____DOT__core__DOT__matrix;
+        VlUnpacked<IData/*31:0*/, 64> top__DOT__genblk1__BRA__1__KET____DOT__core__DOT__matrix;
+        VlUnpacked<IData/*31:0*/, 64> top__DOT__genblk1__BRA__2__KET____DOT__core__DOT__matrix;
+        VlUnpacked<IData/*31:0*/, 64> top__DOT__genblk1__BRA__3__KET____DOT__core__DOT__matrix;
         VlUnpacked<CData/*0:0*/, 4> __Vm_traceActivity;
     };
 

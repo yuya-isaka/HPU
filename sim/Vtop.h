@@ -15,7 +15,7 @@ class Vtop___024root;
 class VerilatedVcdC;
 
 // This class is the main interface to the Verilated model
-class Vtop VL_NOT_FINAL {
+class Vtop VL_NOT_FINAL : public VerilatedModel {
   private:
     // Symbol table holding complete model state (owned by this class)
     Vtop__Syms* const vlSymsp;
@@ -54,8 +54,8 @@ class Vtop VL_NOT_FINAL {
     VL_IN(&S_AXI_WDATA,31,0);
     VL_IN(&S_AXI_ARADDR,31,0);
     VL_OUT(&S_AXI_RDATA,31,0);
-    VL_OUT64(&M_AXIS_TDATA,63,0);
-    VL_IN64(&S_AXIS_TDATA,63,0);
+    VL_OUTW(&M_AXIS_TDATA,1023,0,32);
+    VL_INW(&S_AXIS_TDATA,1023,0,32);
 
     // CELLS
     // Public to allow access to /* verilator public */ items.
@@ -90,11 +90,14 @@ class Vtop VL_NOT_FINAL {
     void final();
     /// Trace signals in the model; called by application code
     void trace(VerilatedVcdC* tfp, int levels, int options = 0);
-    /// Return current simulation context for this model.
-    /// Used to get to e.g. simulation time via contextp()->time()
-    VerilatedContext* contextp() const;
     /// Retrieve name of this model instance (as passed to constructor).
     const char* name() const;
+
+    // Abstract methods from VerilatedModel
+    const char* hierName() const override final;
+    const char* modelName() const override final;
+    unsigned threads() const override final;
+    std::unique_ptr<VerilatedTraceConfig> traceConfig() const override final;
 } VL_ATTR_ALIGNED(VL_CACHE_LINE_BYTES);
 
 #endif  // guard

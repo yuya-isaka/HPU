@@ -9,7 +9,8 @@
 // Constructors
 
 Vtop::Vtop(VerilatedContext* _vcontextp__, const char* _vcname__)
-    : vlSymsp{new Vtop__Syms(_vcontextp__, _vcname__, this)}
+    : VerilatedModel{*_vcontextp__}
+    , vlSymsp{new Vtop__Syms(contextp(), _vcname__, this)}
     , S_AXI_ACLK{vlSymsp->TOP.S_AXI_ACLK}
     , AXIS_ACLK{vlSymsp->TOP.AXIS_ACLK}
     , S_AXI_ARESETN{vlSymsp->TOP.S_AXI_ARESETN}
@@ -43,10 +44,12 @@ Vtop::Vtop(VerilatedContext* _vcontextp__, const char* _vcname__)
     , S_AXIS_TDATA{vlSymsp->TOP.S_AXIS_TDATA}
     , rootp{&(vlSymsp->TOP)}
 {
+    // Register model with the context
+    contextp()->addModel(this);
 }
 
 Vtop::Vtop(const char* _vcname__)
-    : Vtop(nullptr, _vcname__)
+    : Vtop(Verilated::threadContextp(), _vcname__)
 {
 }
 
@@ -100,10 +103,6 @@ void Vtop::eval_step() {
 //============================================================
 // Utilities
 
-VerilatedContext* Vtop::contextp() const {
-    return vlSymsp->_vm_contextp__;
-}
-
 const char* Vtop::name() const {
     return vlSymsp->name();
 }
@@ -114,6 +113,16 @@ const char* Vtop::name() const {
 VL_ATTR_COLD void Vtop::final() {
     Vtop___024root___final(&(vlSymsp->TOP));
 }
+
+//============================================================
+// Implementations of abstract methods from VerilatedModel
+
+const char* Vtop::hierName() const { return vlSymsp->name(); }
+const char* Vtop::modelName() const { return "Vtop"; }
+unsigned Vtop::threads() const { return 1; }
+std::unique_ptr<VerilatedTraceConfig> Vtop::traceConfig() const {
+    return std::unique_ptr<VerilatedTraceConfig>{new VerilatedTraceConfig{false, false, false}};
+};
 
 //============================================================
 // Trace configuration
@@ -140,6 +149,7 @@ VL_ATTR_COLD void Vtop___024root__trace_register(Vtop___024root* vlSelf, Verilat
 
 VL_ATTR_COLD void Vtop::trace(VerilatedVcdC* tfp, int levels, int options) {
     if (false && levels && options) {}  // Prevent unused
+    tfp->spTrace()->addModel(this);
     tfp->spTrace()->addInitCb(&trace_init, &(vlSymsp->TOP));
     Vtop___024root__trace_register(&(vlSymsp->TOP), tfp->spTrace());
 }

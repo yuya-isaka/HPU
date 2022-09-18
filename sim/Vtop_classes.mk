@@ -19,10 +19,6 @@ VM_TRACE = 1
 VM_TRACE_VCD = 1
 # Tracing output mode in FST format?  0/1 (from --trace-fst)
 VM_TRACE_FST = 0
-# Tracing threaded output mode?  0/1/N threads (from --threads/--trace-thread)
-VM_TRACE_THREADS = 0
-# Separate FST writer thread? 0/1 (from --trace-fst with --trace-thread > 0)
-VM_TRACE_FST_WRITER_THREAD = 0
 
 ### Object file lists...
 # Generated module classes, fast-path, compile with highest optimization
