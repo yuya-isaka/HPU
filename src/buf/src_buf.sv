@@ -20,16 +20,25 @@ module src_buf
     // buff0----------------------------------------------------------
     reg [31:0]        buff0 [0:1023];
 
+    wire [31:0] src_d1;
+    assign src_d1 = src_d[31:0];
+
     always_ff @(posedge clk) begin
                   if(src_v & ~src_a[10]) begin
-                      buff0[src_a[9:0]] <= src_d[31:0];
+                      buff0[src_a[9:0]] <= src_d1;
+                  end
+              end;
+
+    wire [31:0] src_d2;
+    assign src_d2 = src_d[63:32];
+
+    always_ff @(posedge clk) begin
+                  if(src_v & ~src_a[10]) begin
+                      buff0[src_a[9:0]+1'b1] <= src_d2;
                   end
               end;
 
     always_ff @(posedge clk) begin
-                  if(src_v & ~src_a[10]) begin
-                      buff0[src_a[9:0]+1'b1] <= src_d[63:32];
-                  end
                   if(exec & ~exec_src_addr[10]) begin
                       exec_src_data <= buff0[exec_src_addr[9:0]];
                   end
@@ -48,6 +57,9 @@ module src_buf
                   if(src_v & src_a[10]) begin
                       buff1[src_a[9:0]+1'b1] <= src_d[63:32];
                   end
+              end;
+
+    always_ff @(posedge clk) begin
                   if(exec & exec_src_addr[10]) begin
                       exec_src_data <= buff1[exec_src_addr[9:0]];
                   end
