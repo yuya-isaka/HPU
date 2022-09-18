@@ -285,9 +285,9 @@ void main()
   for (int j = 0; j < 8; j++)
   {
     int sum[8] = {};
-    for (int k = 0; k < 8; k++)
+    for (int k = 0; k < 128; k++)
     {
-      for (int i = 0; i < 128; i++)
+      for (int i = 0; i < 8; i++)
       {
         sum[i] += matrix[i][k] * sample[j][k];
       }
