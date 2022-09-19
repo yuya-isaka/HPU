@@ -1,0 +1,46 @@
+/dts-v1/; /plugin/;
+
+/ {
+    fragment@0 {
+        target = <&fpga_full>;
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <1>;
+
+            firmware-name = "design_1_wrapper.bit.bin";
+        };
+    };
+
+    fragment@1 {
+        target-path = "/amba";
+        __overlay__ {
+            #address-cells = <0x1>;
+            #size-cells = <0x1>;
+
+            axi_dma_0 { // uio0
+                compatible = "generic-uio";
+		        reg = <0x40400000 0x00001000>;
+		        dma-coherent;
+            };
+
+            top_0 { // uio1
+                compatible = "generic-uio";
+		        reg = <0x40000000 0x00001000>;
+            };
+
+            udmabuf@0 {
+                compatible = "ikwzm,u-dma-buf";
+                device-name = "udmabuf0";
+                size = <0x080000>; // 512KB
+		        dma-coherent;
+            };
+
+            udmabuf@1 {
+                compatible = "ikwzm,u-dma-buf";
+		        device-name = "udmabuf1";
+                size = <0x080000>; // 512KB
+		        dma-coherent;
+            };
+        };
+    };
+};
