@@ -2,13 +2,13 @@
 
 module mat_ctrl
     (
-        input wire clk,             // AXIS_ACLK
-        input wire rst,             // ~AXIS_ARESETN
-        input wire matw,            // 開始
-        input wire src_valid,       // S_AXIS_TVALID
+        input wire              clk,             // AXIS_ACLK
+        input wire              rst,             // ~AXIS_ARESETN
+        input wire              matw,            // 開始
+        input wire              src_valid,       // S_AXIS_TVALID
 
-        output wire [7:0] mat_v,    // 8個のコアの選択
-        output reg [5:0]  mat_a     // アドレス
+        output logic [7:0]      mat_v,    // 8個のコアの選択 // wire
+        output reg [5:0]        mat_a     // アドレス
     );
 
     // 一回最初送って終わりだからsrc_readyはあまりつかわない？
@@ -19,21 +19,34 @@ module mat_ctrl
     reg [3:0]         core_sel;
 
     // コアの選択
-    assign mat_v = (src_valid & matw) ? 1<<(core_sel) : 7'h0;
+    // mat_v
+    always_comb begin
+                    mat_v = 8'd0;
 
-    // koko
+                    if(src_valid & matw)begin
+                        mat_v = 8'd1 << (core_sel);
+                    end
+                end;
+
     // ここの０とか１とか直したい
     // 32bitが32個ずつ送信されるので、２回ぽんぽんとしたら、コアをシフト
+    // mat_a
     always_ff @(posedge clk)begin
                   if(rst|~matw)begin
-                      core_sel <= 4'h0;
-                      mat_a <= 0;
+                      mat_a <= 6'd0;
                   end
                   else if(src_valid)begin
-                      mat_a <= mat_a + 1;
-                      if(mat_a == 63)begin
-                          core_sel <= core_sel + 1;
-                      end
+                      mat_a <= mat_a + 6'd1;
+                  end
+              end;
+
+    // core_sel
+    always_ff @(posedge clk) begin
+                  if(rst|~matw)begin
+                      core_sel <= 4'd0;
+                  end
+                  else if(src_valid & mat_a == 63)begin
+                      core_sel <= core_sel + 4'd1;
                   end
               end;
 

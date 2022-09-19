@@ -2,22 +2,28 @@
 
 module dst_buf
     (
-        input wire         clk,
-        input wire         stream_v,
-        input wire [4:0]   stream_a,
-        input wire         out_period,
-        input wire [5:0]   out_addr,
-        input wire [31:0]  result,
-        input wire p,
+        input wire              clk,
+        input wire              stream_v,
+        input wire [4:0]        stream_a,
+        input wire              out_period,
+        input wire [5:0]        out_addr,
+        input wire [31:0]       result,
+        input wire              p,
 
-        output wire [63:0] stream_d
+        output logic [63:0]     stream_d
     );
 
     reg [63:0]        stream_0;
     reg [63:0]        stream_1;
 
     // steram_aの最上位ビットで、今計算していない方（送り出す方）がどちらかを判断
-    assign stream_d = (~p) ? stream_1 : stream_0;
+    always_comb begin
+                    stream_d = stream_1;
+
+                    if (p) begin
+                        stream_d = stream_0;
+                    end
+                end;
 
     // out_addrの最上位ビットで、今計算している方がどちらかを判断
 
@@ -41,14 +47,16 @@ module dst_buf
     reg [31:0]        buff1 [0:31]; // アドレス奇数
 
     // out_addrの最下位ビットを見て、偶数か奇数か判断
-    always_ff @(posedge clk) begin
-                  if(out_period & ~p) begin
-                      if (~out_addr[0]) begin // 偶数
-                          buff0[out_addr[5:1]] <= result;
-                      end
-                      if (out_addr[0]) begin // 奇数
-                          buff1[out_addr[5:1]] <= result;
-                      end
+
+    always_ff @(posedge clk) begin // 偶数
+                  if(out_period & ~p & ~out_addr[0]) begin
+                      buff0[out_addr[5:1]] <= result;
+                  end
+              end;
+
+    always_ff @(posedge clk) begin // 奇数
+                  if(out_period & ~p & out_addr[0]) begin
+                      buff1[out_addr[5:1]] <= result;
                   end
               end;
 
@@ -65,17 +73,17 @@ module dst_buf
     reg [31:0]        buff2 [0:31]; // アドレス偶数
     reg [31:0]        buff3 [0:31]; // アドレス奇数
 
-    always_ff @(posedge clk) begin
-                  if(out_period & p) begin
-                      if (~out_addr[0]) begin // 偶数
-                          buff2[out_addr[5:1]] <= result;
-                      end
-                      if (out_addr[0]) begin // 奇数
-                          buff3[out_addr[5:1]] <= result;
-                      end
+    always_ff @(posedge clk) begin // 偶数
+                  if(out_period & p & ~out_addr[0]) begin
+                      buff2[out_addr[5:1]] <= result;
                   end
               end;
 
+    always_ff @(posedge clk) begin // 奇数
+                  if(out_period & p & out_addr[0]) begin
+                      buff3[out_addr[5:1]] <= result;
+                  end
+              end;
 
     always_ff @(posedge clk) begin
                   if (stream_v & ~p) begin

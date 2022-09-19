@@ -2,15 +2,15 @@
 
 module src_buf
     (
-        input wire        clk,
-        input wire        src_v,
-        input wire [8:0]  src_a,
-        input wire [63:0] src_d,
-        input wire        exec,
-        input wire [9:0]  exec_src_addr,
-        input wire p,
+        input wire          clk,
+        input wire          src_v,
+        input wire [8:0]    src_a,
+        input wire [63:0]   src_d,
+        input wire          exec,
+        input wire [9:0]    exec_src_addr,
+        input wire          p,
 
-        output reg [31:0] exec_src_data
+        output reg [31:0]   exec_src_data
     );
 
     // 32bitのデータを128個 各コアに格納

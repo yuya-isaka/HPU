@@ -2,13 +2,13 @@
 
 module p_ctrl
     (
-        input wire        clk,
-        input wire        run,
-        input wire        src_fin, // srcから送られてくるのが終了したよ
-        input wire [1:0]  src_en, // 2種類格納
-        input wire        s_fin_in,
+        input wire          clk,
+        input wire          run,
+        input wire          src_fin, // srcから送られてくるのが終了したよ
+        input wire [1:0]    src_en, // 2種類格納
+        input wire          s_fin_in,
 
-        output reg        p // 計算している方
+        output reg          p // 計算している方
     );
 
     always_ff @(posedge clk)begin

@@ -3,13 +3,13 @@
 module src_en_ctrl
     (
 
-        input wire        clk,
-        input wire        run,
-        input wire        src_fin, // srcから送られてくるのが終了したよ
-        input wire        p,
-        input wire        s_fin_in,
+        input wire          clk,
+        input wire          run,
+        input wire          src_fin, // srcから送られてくるのが終了したよ
+        input wire          p,
+        input wire          s_fin_in,
 
-        output reg [1:0] src_en
+        output reg [1:0]    src_en
     );
 
     // src_en
