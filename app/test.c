@@ -225,6 +225,7 @@ void main()
     }
 
     // AXI DMA transfer rx
+    // 1
     dma_reset();
     // 受信チャネルを設定する前に送信チャネルを設定すると、先頭の4ワード分データが消える。
     // なんのための FIFO なんだろうか？ DMA も自前で作っちゃうのが早いのだろうか…
@@ -263,6 +264,8 @@ void main()
         printf("\n");
       }
       // AXI DMA transfer tx
+      // 上のrxの設定でresetしてるからここで入らない
+      // 2
       dma[0x00 / 4] = 1;
       dma[0x18 / 4] = src_phys;
       dma[0x28 / 4] = 8 * 128 * 4;
