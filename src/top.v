@@ -90,7 +90,6 @@ module top
 
 
     assign M_AXIS_TSTRB = 8'hff;
-    assign M_AXIS_TLAST = 1'b0; // 最後のところで１にしないといけないらしいけど？？（必須って書いてるけど？んん？）
 
     reg               run, matw, last;
 
@@ -317,12 +316,12 @@ module top
     reg [11:2]        read_addr;
     reg [31:0]        write_data;
 
-    wire INI = (state == 4'b0000);
-    wire AW = (state == 4'b0001);
-    wire W = (state == 4'b0010);
-    wire AWW = (state == 4'b0011);
-    wire AR1 = (state==4'b0100);
-    wire AR2 = (state==4'b1000);
+    wire INI =  (state == 4'b0000);
+    wire AW =   (state == 4'b0001);
+    wire W =    (state == 4'b0010);
+    wire AWW =  (state == 4'b0011);
+    wire AR1 =  (state == 4'b0100);
+    wire AR2 =  (state == 4'b1000);
 
     assign S_AXI_BRESP = 2'b00; // スレーブからの結果の成否
     // bresp[1:0] は上位１ビットがゼロなら成功、１なら失敗になります
