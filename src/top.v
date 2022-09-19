@@ -230,10 +230,11 @@ module top
             (
                 .clk(AXIS_ACLK),
                 .src_v(src_v),
-                .src_a({~p,src_a[8:0]}),
+                .src_a(src_a[8:0]),
                 .src_d(S_AXIS_TDATA),
                 .exec(exec),
-                .exec_src_addr({p,exec_src_addr[9:0]}),
+                .exec_src_addr(exec_src_addr[9:0]),
+                .p(p),
 
                 .exec_src_data(exec_src_data)
             );
@@ -252,6 +253,7 @@ module top
                  .s_fin_in(s_fin_in),
 
                  .dst_valid(M_AXIS_TVALID),
+                 .dst_last(M_AXIS_TLAST),
                  .stream_v(stream_v),
                  .stream_a(stream_a[4:0])
              );
@@ -261,10 +263,11 @@ module top
             (
                 .clk(AXIS_ACLK),
                 .stream_v(stream_v),
-                .stream_a({~p,stream_a[4:0]}), // 計算していない方なので~p
+                .stream_a(stream_a[4:0]), // 計算していない方なので~p
                 .out_period(out_period),
-                .out_addr({p,out_addr[5:0]}), // 計算している方なのでp
+                .out_addr(out_addr[5:0]), // 計算している方なのでp
                 .result(result),
+                .p(p),
 
                 .stream_d(M_AXIS_TDATA)
             );

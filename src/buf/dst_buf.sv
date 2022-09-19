@@ -4,10 +4,11 @@ module dst_buf
     (
         input wire         clk,
         input wire         stream_v,
-        input wire [5:0]   stream_a,
+        input wire [4:0]   stream_a,
         input wire         out_period,
-        input wire [6:0]   out_addr,
+        input wire [5:0]   out_addr,
         input wire [31:0]  result,
+        input wire p,
 
         output wire [63:0] stream_d
     );
@@ -16,7 +17,7 @@ module dst_buf
     reg [63:0]        stream_1;
 
     // steram_aの最上位ビットで、今計算していない方（送り出す方）がどちらかを判断
-    assign stream_d = (stream_a[5]) ? stream_1 : stream_0;
+    assign stream_d = (~p) ? stream_1 : stream_0;
 
     // out_addrの最上位ビットで、今計算している方がどちらかを判断
 
@@ -41,26 +42,20 @@ module dst_buf
 
     // out_addrの最下位ビットを見て、偶数か奇数か判断
     always_ff @(posedge clk) begin
-                  if(out_period & ~out_addr[0] & ~out_addr[6]) begin
-                      buff0[out_addr[5:1]] <= result;
+                  if(out_period & ~p) begin
+                      if (~out_addr[0]) begin // 偶数
+                          buff0[out_addr[5:1]] <= result;
+                      end
+                      if (out_addr[0]) begin // 奇数
+                          buff1[out_addr[5:1]] <= result;
+                      end
                   end
               end;
 
     always_ff @(posedge clk) begin
-                  if(out_period & out_addr[0] & ~out_addr[6]) begin
-                      buff1[out_addr[5:1]] <= result;
-                  end
-              end;
-
-    always_ff @(posedge clk) begin
-                  if (stream_v & ~stream_a[5]) begin
-                      stream_0[31:0] <= buff0[stream_a[4:0]];
-                  end
-              end;
-
-    always_ff @(posedge clk) begin
-                  if (stream_v & ~stream_a[5]) begin
-                      stream_0[63:32] <= buff1[stream_a[4:0]];
+                  if (stream_v & p) begin
+                      stream_0[31:0] <= buff0[stream_a];
+                      stream_0[63:32] <= buff1[stream_a];
                   end
               end;
 
@@ -71,26 +66,21 @@ module dst_buf
     reg [31:0]        buff3 [0:31]; // アドレス奇数
 
     always_ff @(posedge clk) begin
-                  if(out_period & ~out_addr[0] & out_addr[6]) begin
-                      buff2[out_addr[5:1]] <= result;
+                  if(out_period & p) begin
+                      if (~out_addr[0]) begin // 偶数
+                          buff2[out_addr[5:1]] <= result;
+                      end
+                      if (out_addr[0]) begin // 奇数
+                          buff3[out_addr[5:1]] <= result;
+                      end
                   end
               end;
 
-    always_ff @(posedge clk) begin
-                  if(out_period & out_addr[0] & out_addr[6]) begin
-                      buff3[out_addr[5:1]] <= result;
-                  end
-              end;
 
     always_ff @(posedge clk) begin
-                  if (stream_v & stream_a[5]) begin
-                      stream_1[31:0] <= buff2[stream_a[4:0]];
-                  end
-              end;
-
-    always_ff @(posedge clk) begin
-                  if (stream_v & stream_a[5]) begin
-                      stream_1[63:32] <= buff3[stream_a[4:0]];
+                  if (stream_v & ~p) begin
+                      stream_1[31:0] <= buff2[stream_a];
+                      stream_1[63:32] <= buff3[stream_a];
                   end
               end;
 

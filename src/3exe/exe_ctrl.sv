@@ -28,7 +28,7 @@ module exe_ctrl
     // s_initの次にスタート //////////////////////////////////////////////////
     // s_init_delay
     dff #(.W(1)) d_s_init_delay (.in(s_init), .data(s_init_delay), .clk(clk), .rst(rst), .en(1'b1));
-    // k_init (s_initの次に駆動)
+    // k_init (s_initの次に駆動, その後はk_init_nextが駆動)
     assign k_init = (s_init_delay | k_init_next) & !out_busy;
     //////////////////////////////////////////////////////////////////////
 

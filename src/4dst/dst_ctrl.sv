@@ -8,6 +8,7 @@ module dst_ctrl
         input wire        s_fin_in, // 次のsrcがあるなら、もしくは最後なら送り返す (送る側を完全に信用、まあ今回のCGRAなら問題ないね)
 
         output wire       dst_valid,
+        output wire       dst_last,
         output wire       stream_v,
         output wire [4:0] stream_a
     );
@@ -36,6 +37,7 @@ module dst_ctrl
     assign stream_v = stream_active & dst_ready;
 
     dff #(.W(1)) d_dst_valid (.in(stream_active), .data(dst_valid), .clk(clk), .rst(~run), .en(dst_ready));
+    dff #(.W(1)) d_dst_last (.in(stream_active & last_i), .data(dst_last), .clk(clk), .rst(~run), .en(dst_ready));
 
     // s_fin_inが立つ（同時にstream_active_preもたつ） -> start_checkが立つ、startもたつ -> アドレス生成が始まる (実際はstartの時点で０だから既に始まっている『)
     //                                  -> stream_active, stream_vが始まる -> dst_validが立つ
