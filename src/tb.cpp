@@ -2,7 +2,7 @@
 #include "verilated_vcd_c.h"
 #include "Vtop.h"
 
-///////////////////////////////////////////////////////////////
+// ====================================================================================================================================================================================
 
 union
 {
@@ -14,48 +14,52 @@ union
   uint64_t wd;
 } conv;
 
-////////////////////////////////////////////////////////////////
-
 vluint64_t main_time = 0;
-vluint64_t vcdstart = 0;
-vluint64_t vcdend = vcdstart + 300000;
+vluint64_t sim_start = 0;
+vluint64_t sim_end = sim_start + 300000;
 
 VerilatedVcdC *tfp;
 Vtop *verilator_top;
 
-////////////////////////////////////////////////////////////////
+// ====================================================================================================================================================================================
 
 void eval()
 {
-  // negedge clk /////////////////////////////
+  // Neg edge
   verilator_top->S_AXI_ACLK = 0;
   verilator_top->AXIS_ACLK = 0;
-
+  // 立ち下がりの評価
   verilator_top->eval();
 
-  if ((main_time >= vcdstart) & ((main_time < vcdend) | (vcdend == 0)))
+  if ((sim_start <= main_time) & ((main_time < sim_end) | (sim_end == 0)))
+  {
     tfp->dump(main_time);
+  }
   main_time += 5;
 
-  // posegedge clk /////////////////////////////
+  // --------------------------------------------------------------------
+
+  // Pos edge
   verilator_top->S_AXI_ACLK = 1;
   verilator_top->AXIS_ACLK = 1;
-
+  // 立ち上がりの評価
   verilator_top->eval();
 
-  if ((main_time >= vcdstart) & ((main_time < vcdend) | (vcdend == 0)))
+  if ((main_time >= sim_start) & ((main_time < sim_end) | (sim_end == 0)))
+  {
     tfp->dump(main_time);
+  }
   main_time += 5;
 
   return;
 }
 
-////////////////////////////////////////////////////////////////
+// ====================================================================================================================================================================================
 
 int main(int argc, char **argv)
 {
 
-  // Verilator setup /////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////// Verilator setup /////////////////////////////////////////////////////////////////////////////////////////
 
   Verilated::commandArgs(argc, argv);
   Verilated::traceEverOn(true);
@@ -65,7 +69,9 @@ int main(int argc, char **argv)
   tfp->open("tmp.vcd");
   main_time = 0;
 
-  // initial begin /////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////// initial begin ///////////////////////////////////////////////////////////////////////////////////////////
+
+  printf("\n ---------------------------- 開始 ----------------------------- \n");
 
   verilator_top->S_AXI_BREADY = 1;
   verilator_top->S_AXI_WSTRB = 15; // ストローブ信号,wstrb は wdata のうち実際に書き込む部位をバイト単位で指定します
@@ -92,12 +98,12 @@ int main(int argc, char **argv)
   eval();
   eval();
 
-  ////////////////////// Set Matrix /////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////// Set Matrix ////////////////////////////////////////////////////////////////////////////////////////////
 
   int matrix[8][128];
 
   // 32bitを128個、8つのコアに格納
-  printf("\n--- Set Matrix ---\n");
+  printf("\n ------------------------- Set Matrix -------------------------- \n\n");
   for (int j = 0; j < 8; j++)
   {
     for (int i = 0; i < 128; i++)
@@ -107,6 +113,7 @@ int main(int argc, char **argv)
     }
     printf("\n");
   }
+
   // matw <- 1;
   verilator_top->S_AXI_AWADDR = 0;
   verilator_top->S_AXI_WDATA = 1;
@@ -116,29 +123,27 @@ int main(int argc, char **argv)
   verilator_top->S_AXI_AWVALID = 0;
   verilator_top->S_AXI_WVALID = 0;
   eval();
-  eval();
-  // 2個でも一個でも変わらん
 
-  // アドレスを指定せずにデータを取ってたけど、これは、アドレスの初期値が０だからたまたまうまくできていた。
+  // 読み出し (書き込みより読み出しの方が１サイクル多い)
   verilator_top->S_AXI_ARVALID = 1;
-  eval();
-  eval();
+  verilator_top->S_AXI_ARADDR = 0;
+  eval(); // 読み出しリクエスト
+  eval(); // 格納完了
+  // アドレス０に１を書き込んでいるので、１が出力されるはず
   if (1 != verilator_top->S_AXI_RDATA)
   {
     printf("(Error Expecetd = %d) ", 1);
   }
   else
   {
-
     printf("\n S_AXI_RDATA: %d \n", verilator_top->S_AXI_RDATA);
   }
   verilator_top->S_AXI_ARVALID = 0;
   eval();
-  eval();
 
-  // TVALIDの次から送信していく
-  // 32個を想定
-  // 32bitを2個ずつ順番に送信
+  // 送信
+  // 8 * 128 * 32 = 32768bit
+  // 32768bit / 64bit = 512回
   verilator_top->S_AXIS_TVALID = 1;
   int pp = 0;
   for (int i = 0; i < 512; i++)
@@ -151,7 +156,6 @@ int main(int argc, char **argv)
       pp = 0;
     eval();
   }
-  // 00,01  02,03  04,05 .... 0126,0127(63回)  10,11
   verilator_top->S_AXIS_TVALID = 0;
 
   // matw <- 0;
@@ -163,25 +167,37 @@ int main(int argc, char **argv)
   verilator_top->S_AXI_AWVALID = 0;
   verilator_top->S_AXI_WVALID = 0;
   eval();
-  eval();
 
+  // 読み込んで確認
   verilator_top->S_AXI_ARVALID = 1;
-  eval();
-  eval();
+  eval(); // 読み出しリクエスト
+  eval(); // 格納完了
   if (0 != verilator_top->S_AXI_RDATA)
   {
     printf("(Error Expecetd = %d) ", 0);
   }
   else
   {
-
     printf("\n S_AXI_RDATA: %d \n", verilator_top->S_AXI_RDATA);
   }
   verilator_top->S_AXI_ARVALID = 0;
   eval();
-  eval();
 
-  ////////////////////// run ////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////// run ///////////////////////////////////////////////////////////////////////////////////////////////
+
+  int sample[8][128];
+
+  // 32bitを128個、8つのコアに格納
+  printf("\n ------------------------- Sample %d Input -------------------------- \n\n", 0);
+  for (int j = 0; j < 8; j++)
+  {
+    for (int i = 0; i < 128; i++)
+    {
+      sample[j][i] = rand() & 0x000000ff;
+      printf("%3d ", sample[j][i]);
+    }
+    printf("\n");
+  }
 
   // run <- 1;
   verilator_top->S_AXI_AWADDR = 0;
@@ -191,7 +207,6 @@ int main(int argc, char **argv)
   eval();
   verilator_top->S_AXI_AWVALID = 0;
   verilator_top->S_AXI_WVALID = 0;
-  eval();
   eval();
 
   verilator_top->S_AXI_ARVALID = 1;
@@ -203,28 +218,14 @@ int main(int argc, char **argv)
   }
   else
   {
-
     printf("\n S_AXI_RDATA: %d \n", verilator_top->S_AXI_RDATA);
   }
   verilator_top->S_AXI_ARVALID = 0;
   eval();
-  eval();
 
-  int sample[8][128];
-
-  // 同じく32bitを64個、４コア分渡す
-  printf("\n--- Sample %d Input ---\n", 0);
-  for (int j = 0; j < 8; j++)
-  {
-    for (int i = 0; i < 128; i++)
-    {
-      sample[j][i] = rand() & 0x000000ff;
-      printf("%3d ", sample[j][i]);
-    }
-    printf("\n");
-  }
-
-  // 16個を想定
+  // 送信
+  // 8 * 128 * 32 = 32768bit
+  // 32768bit / 64bit = 512回
   verilator_top->S_AXIS_TVALID = 1;
   pp = 0;
   for (int i = 0; i < 512; i++)
@@ -240,18 +241,24 @@ int main(int argc, char **argv)
   verilator_top->S_AXIS_TVALID = 0;
   eval();
 
+  /////////////////////////////////////////////////////////////////////////////////////// 結果確認 //////////////////////////////////////////////////////////////////////////////////
+
   int result[8][8];
 
   for (int num = 0; num < 3; num++)
   {
+
+    // 0回目以外実行 ---------------------------------------------------------------
     if (num != 0)
     {
+
       // 演算終わって送られてくるの待つ
       while (!verilator_top->M_AXIS_TVALID)
       {
         eval();
       }
-      printf("\n--- Sample %d Output ---\n", num - 1);
+
+      printf("\n ------------------------- Sample %d Output -------------------------- \n\n", num - 1);
       for (int i = 0; i < 8; i++)
       {
         for (int j = 0; j < 4; j++)
@@ -272,9 +279,13 @@ int main(int argc, char **argv)
         printf("\n");
       }
     }
+    // ---------------------------------------------------------------------------
 
+    // 2回目（最後）以外実行 ---------------------------------------------------------
     if ((num + 1) != 3)
     {
+
+      // 理想の計算
       for (int j = 0; j < 8; j++)
       {
         int sum[8] = {};
@@ -290,7 +301,8 @@ int main(int argc, char **argv)
           result[j][oa] = sum[oa];
         }
       }
-      printf("\n--- Sample %d Input ---\n", num + 1);
+
+      printf("\n ------------------------- Sample %d Input -------------------------- \n\n", num + 1);
       for (int j = 0; j < 8; j++)
       {
         for (int i = 0; i < 128; i++)
@@ -301,7 +313,9 @@ int main(int argc, char **argv)
         printf("\n");
       }
 
-      // データ送る
+      // 送信
+      // 8 * 128 * 32 = 32768bit
+      // 32768bit / 64bit = 512回
       verilator_top->S_AXIS_TVALID = 1;
       pp = 0;
       for (int i = 0; i < 512; i++)
@@ -316,9 +330,11 @@ int main(int argc, char **argv)
       }
       verilator_top->S_AXIS_TVALID = 0;
       eval();
-    }
-    else
+
+    }    // --------------------------------------------------------------------------------
+    else // 最後に実行 ----------------------------------------------------------------------
     {
+
       // last <- 1;
       verilator_top->S_AXI_AWADDR = 0;
       verilator_top->S_AXI_WDATA = 6;
@@ -328,9 +344,7 @@ int main(int argc, char **argv)
       verilator_top->S_AXI_AWVALID = 0;
       verilator_top->S_AXI_WVALID = 0;
       eval();
-      eval();
 
-      // check
       verilator_top->S_AXI_ARVALID = 1;
       eval();
       eval();
@@ -340,20 +354,21 @@ int main(int argc, char **argv)
       }
       else
       {
-
         printf("\n S_AXI_RDATA: %d \n", verilator_top->S_AXI_RDATA);
       }
       verilator_top->S_AXI_ARVALID = 0;
       eval();
-      eval();
     }
+    // ------------------------------------------------------------------------------------
   }
-  // 演算おワテ送られてくるの待つ
-  // ここではlast信号が立っているので，次の演算はもう実行されていない
+
+  // 演算終わるの待つ
   while (!verilator_top->M_AXIS_TVALID)
   {
     eval();
   }
+
+  // 理想の計算
   for (int j = 0; j < 8; j++)
   {
     int sum[8] = {};
@@ -369,7 +384,8 @@ int main(int argc, char **argv)
       result[j][oa] = sum[oa];
     }
   }
-  printf("\n--- Sample %d Output ---\n", 2);
+
+  printf("\n ------------------------- Sample %d Output -------------------------- \n\n", 2);
   for (int i = 0; i < 8; i++)
   {
     for (int j = 0; j < 4; j++)
@@ -390,7 +406,7 @@ int main(int argc, char **argv)
     printf("\n");
   }
 
-  // run <- 0; last <- 0; ////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
 
   verilator_top->S_AXI_AWADDR = 0;
   verilator_top->S_AXI_WDATA = 0;
@@ -399,7 +415,6 @@ int main(int argc, char **argv)
   eval();
   verilator_top->S_AXI_AWVALID = 0;
   verilator_top->S_AXI_WVALID = 0;
-  eval();
   eval();
 
   verilator_top->S_AXI_ARVALID = 1;
@@ -411,11 +426,9 @@ int main(int argc, char **argv)
   }
   else
   {
-
     printf("\n S_AXI_RDATA: %d \n", verilator_top->S_AXI_RDATA);
   }
   verilator_top->S_AXI_ARVALID = 0;
-  eval();
   eval();
 
   eval();
@@ -425,7 +438,9 @@ int main(int argc, char **argv)
   eval();
   eval();
 
-  // $finish; end /////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////  終了 ////////////////////////////////////////////////////////////////////////////////////
+
+  printf("\n ----------------------------- 終了 --------------------------------- \n");
   delete verilator_top;
   tfp->close();
   return 0;
