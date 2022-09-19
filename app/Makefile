@@ -2,4 +2,4 @@
 	arm-linux-gnueabihf-gcc $@.c -o $@
 
 clean:
-	rm test test_lasT
+	rm test test_last
