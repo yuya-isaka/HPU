@@ -1,6 +1,6 @@
 `default_nettype none
 
-module agu
+module agu_param
     #(
          parameter W = 32
      )

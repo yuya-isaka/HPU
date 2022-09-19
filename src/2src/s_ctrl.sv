@@ -31,24 +31,31 @@ module s_ctrl
                 end;
 
     // s_init ... srcの受信が終了した次(最初なら)　or 前の計算が終わった次（次のデータがあるなら）
-    // s_fin_dayo ... 計算が終わったという情報を保持 (次のを駆動できそうなら０になる)
     always_ff @(posedge clk)begin
                   if(~run)begin
                       s_init <= 1'b0;
-                      s_fin_dayo <= 1'b0;
                   end
                   else if(src_fin & src_en[1:0]==2'b00)begin // 何もない時、始める
                       s_init <= 1'b1;
                   end
                   else if(s_fin_in)begin // 計算が終わった時、次があるなら, もしくは最後なら
                       s_init <= ~last;
+                  end
+                  else begin
+                      s_init <= 1'b0;
+                  end
+              end;
+
+    // s_fin_dayo ... 計算が終わったという情報を保持 (次のを駆動できそうなら０になる)
+    always_ff @(posedge clk)begin
+                  if(~run)begin
+                      s_fin_dayo <= 1'b0;
+                  end
+                  else if(s_fin_in)begin // 計算が終わった時、次があるなら, もしくは最後なら
                       s_fin_dayo <= 1'b0;
                   end
                   else if(s_fin)begin
                       s_fin_dayo <= 1'b1; // 計算が終わってるよーってのを保持
-                  end
-                  else begin
-                      s_init <= 1'b0;
                   end
               end;
 
