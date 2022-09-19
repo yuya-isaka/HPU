@@ -1,5 +1,5 @@
-all:
-	arm-linux-gnueabihf-gcc test.c -o test
+%: %.c
+	arm-linux-gnueabihf-gcc $@.c -o $@
 
 clean:
-	rm test
+	rm test1 test2
