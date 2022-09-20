@@ -248,7 +248,7 @@ void encoding(HDC *HDCascii, const char *path, uint8_t *values)
 				// Rotate (右シフト)
 				HyperVector tmp_vector;
 				allocateMemoryHyperVector(&tmp_vector);
-				int rotatenum = LENGTH - (NGRAM - 1) % LENGTH;
+				int rotatenum = (LENGTH - (NGRAM - 1) + j) % LENGTH;
 				int basenum = 0;
 				for (int k = rotatenum; k < LENGTH; k++, basenum++)
 				{
