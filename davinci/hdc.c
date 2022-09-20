@@ -15,10 +15,10 @@ __attribute__((destructor)) static void destructor()
 // -------------------------------------------  パラメータ設定 ---------------------------------------------------
 
 // n-gram
-const int NGRAM = 3;
+const int NGRAM = 4;
 
 // 次元数
-const int LENGTH = 1000;
+const int LENGTH = 10000;
 
 // 学習対象の個数（英語、フランス語）
 int train_num = 2;
@@ -248,7 +248,7 @@ void encoding(HDC *HDCascii, const char *path, uint8_t *values)
 				// Rotate (右シフト)
 				HyperVector tmp_vector;
 				allocateMemoryHyperVector(&tmp_vector);
-				int rotatenum = LENGTH - (NGRAM - 1) % LENGTH;
+				int rotatenum = (LENGTH - (NGRAM - 1) + j) % LENGTH;
 				int basenum = 0;
 				for (int k = rotatenum; k < LENGTH; k++, basenum++)
 				{
