@@ -24,8 +24,8 @@ const int LENGTH = 10000;
 int train_num = 2;
 
 // 訓練データ指定
-const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"}; // 文字数少なめ
-// const char *train_path[] = {"data/decorate/en2", "data/decorate/fr2"}; // 文字数少なめよりは多め
+// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"}; // 文字数少なめ
+const char *train_path[] = {"data/decorate/en2", "data/decorate/fr2"}; // 文字数少なめよりは多め
 // const char *train_path[] = {"data/decorate/en", "data/decorate/fr"}; // 文字数多め
 
 // テストの個数（英語、フランス語）
