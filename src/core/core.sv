@@ -22,7 +22,7 @@ module core
     integer i;
     initial begin
         for (i=0; i < 100; i++) begin
-            item_memory[i] = 1;
+            item_memory[i] = i;
         end
     end
 
