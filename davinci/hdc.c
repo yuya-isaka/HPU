@@ -419,6 +419,7 @@ int main(int argc, char const *argv[])
 
 	// ---------------------------------------- 類似度チェック （推論） ---------------------------------------
 
+	clock_t startSimilarity = clock();
 	// （cosine類似度チェック）
 	// distance = A・B/|A||B|
 	// |A| ... Aのnorm
@@ -479,6 +480,11 @@ int main(int argc, char const *argv[])
 			printf("  test %d → %s\n", i, train_lang[match]);
 		}
 	}
+
+	clock_t endSimilarity = clock();
+
+	const double time_similarity = ((double)(endSimilarity - startSimilarity)) / CLOCKS_PER_SEC * 1000.0;
+	printf("\n  Similarity time: %lf[ms]\n\n", time_similarity);
 
 	freeMemoryHDC(&HDCascii);
 	freeMemoryHDC(&HDCtrained);
