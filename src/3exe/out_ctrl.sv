@@ -25,10 +25,15 @@ module out_ctrl
 
     // outが先に終わってて、kが終わった次 or kが先に終わってて、outが終わった次
 
+    reg k_fin_fin;
+    always_ff @(posedge clk) begin
+                  k_fin_fin <= k_fin;
+              end;
+
     logic start;
     always_comb begin
                     start = 1'b0;
-                    if( (k_fin&!j_period) | (last_j_next&k_fin_retention) )begin
+                    if( (k_fin_fin&!j_period) | (last_j_next&k_fin_retention) )begin
                         start = 1'b1;
                     end
                 end;
@@ -56,7 +61,7 @@ module out_ctrl
                   if(rst)begin
                       k_fin_retention <= 1'b0;
                   end
-                  else if(k_fin&out_busy)begin
+                  else if(k_fin_fin&out_busy)begin
                       k_fin_retention <= 1'b1;
                   end
                   else if (last_j_next) begin
@@ -81,12 +86,15 @@ module out_ctrl
 
 
     // jの終わりに更新される
-    agu #(.W(3)) l_i (.ini(2'd0), .fin(7),  .start(s_init), .last(last_i), .clk(clk), .rst(rst),
+    agu #(.W(3)) l_i (.ini(0), .fin(0),  .start(s_init), .last(last_i), .clk(clk), .rst(rst),
                       .data(i), .en(last_j));
 
     // kが終わるたびに新しいのが始まる
-    agu #(.W(3)) l_j (.ini(2'd0), .fin(7),  .start(start), .last(last_j), .clk(clk), .rst(rst),
+    agu #(.W(3)) l_j (.ini(0), .fin(1),  .start(start), .last(last_j), .clk(clk), .rst(rst),
                       .data(j), .en(1'b1));
+
+    // なぜここを０にしたら止まるのか
+    // dst_bufの仕様的に、0,1の二つが必要だから（ここは偶数である必要が出ている）
 
     reg [5:0]         out_addr_pre; // 最大64
     always_ff @(posedge clk)begin

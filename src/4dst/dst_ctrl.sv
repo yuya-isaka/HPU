@@ -52,9 +52,9 @@ module dst_ctrl
                 end;
 
 
-    reg [4:0]         i;
+    wire [4:0]         i;
     wire              last_i;
-    agu #(.W(5)) l_da(.ini(3'd0), .fin(31), .start(start), .last(last_i), .clk(clk), .rst(~run),
+    agu #(.W(5)) l_da(.ini(3'd0), .fin(0), .start(start), .last(last_i), .clk(clk), .rst(~run),
                       .data(i), .en(dst_ready) );
 
 

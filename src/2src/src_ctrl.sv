@@ -3,7 +3,6 @@
 module src_ctrl
     (
         input wire              clk,          // AXIS_ACLK
-        input wire              matw,         // これたってたらやらないで
         input wire              run,          // 開始
         input wire              src_valid,    // S_AXIS_TVALID
         input wire [1:0]        src_en,       // ソースバッファが空いているか否か
@@ -27,7 +26,7 @@ module src_ctrl
     logic start;
     always_comb begin
                     start = 1'b0;
-                    if(sen & run & ~matw)begin
+                    if(sen & run)begin
                         start = 1'b1;
                     end
                 end;
@@ -41,9 +40,10 @@ module src_ctrl
                     end
                 end;
 
+    // 今回は24個
     wire              last_i;
     reg [8:0]         i;
-    agu #(.W(9)) l_i (.ini(4'd0), .fin(511), .start(start), .last(last_i), .clk(clk), .rst(~src_ready|~run),
+    agu #(.W(9)) l_i (.ini(4'd0), .fin(11), .start(start), .last(last_i), .clk(clk), .rst(~src_ready|~run),
                       .data(i), .en(sen));
 
     always_comb begin

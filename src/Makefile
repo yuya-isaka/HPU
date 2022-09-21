@@ -20,7 +20,6 @@ VERILATOR_MAKE_OPTS = OPT="-O3 -I ../../../"
 
 DESIGN_SRCS = \
 ./top.v \
-./1mat/mat_ctrl.sv \
 ./2src/p_ctrl.sv \
 ./2src/src_ctrl.sv \
 ./2src/src_en_ctrl.sv \
@@ -33,6 +32,7 @@ DESIGN_SRCS = \
 ./core/core.sv \
 ./param/agu.sv \
 ./param/agu_next.sv \
+# ./1mat/mat_ctrl.sv \
 # ./param/agu_param.sv \
 
 VERILATOR_CPP_TB = tb.cpp
@@ -55,5 +55,10 @@ run :
 
 format :
 	../bin/iStyle --style=kr -n $(DESIGN_SRCS)
+
+test: test.cpp
+	g++ test.cpp -o test
+	./test
+	rm test
 
 .PHONY:

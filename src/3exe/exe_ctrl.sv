@@ -13,8 +13,7 @@ module exe_ctrl
         output logic            k_init,       // jループの始まりの前 (s_initの次)
         output reg              k_fin,        // jループが終わった次に駆動
         output reg              exec,         // 演算の始まり(jループの始まり)
-        output logic [9:0]      exec_src_addr,    // src_buffから読み出すアドレス
-        output logic [6:0]      exec_mat_addr // matrixから読み出すアドレス
+        output logic [9:0]      exec_src_addr    // src_buffから読み出すアドレス
     );
 
     wire                        last_i, last_j;
@@ -72,19 +71,15 @@ module exe_ctrl
     // ってのを４回する
 
     // i loop
-    agu_next #(.W(4)) l_i (.ini(2'd0), .fin(7), .start(s_init), .last(last_i), .clk(clk),  .rst(rst),
+    agu_next #(.W(4)) l_i (.ini(2'd0), .fin(0), .start(s_init), .last(last_i), .clk(clk),  .rst(rst),
                            .next(next_i), .data(i), .en(last_j));
 
     // j loop
-    agu_next #(.W(7)) l_j (.ini(3'd0), .fin(127),  .start(start), .last(last_j), .clk(clk),  .rst(rst),
+    agu_next #(.W(7)) l_j (.ini(3'd0), .fin(23),  .start(start), .last(last_j), .clk(clk),  .rst(rst),
                            .next(next_j), .data(j), .en(1'b1));
 
     always_comb begin
                     exec_src_addr = i*128 + j;
-                end;
-
-    always_comb begin
-                    exec_mat_addr = j; // 最大127
                 end;
 
     // last_jの次にスタート /////////////////////////////////////////////////

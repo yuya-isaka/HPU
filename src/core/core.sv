@@ -3,16 +3,13 @@
 module core
     (
         input wire              clk,
-        input wire              init,
+        input wire              init, // k_init
 
-        input wire              mat_v,
-        input wire [5:0]        mat_a,
         input wire [64:0]       mat_d,
 
         input wire              exec,
         input wire              out_period,
         input wire              update,
-        input wire [6:0]        exec_mat_addr,
         input wire [31:0]       exec_src_data,
         input wire [31:0]       acc_next,
 
@@ -20,8 +17,14 @@ module core
     );
 
     // 各コアにつき32bitのデータを128個集める
-    reg [31:0]        matrix_even [0:63];
-    reg [31:0]        matrix_odd [0:63];
+    reg [31:0]        item_memory [0:100];
+
+    integer i;
+    initial begin
+        for (i=0; i < 100; i++) begin
+            item_memory[i] = 1;
+        end
+    end
 
     reg [31:0]        exec_mat_data;
 
@@ -39,18 +42,8 @@ module core
                 end;
 
     always_ff @(posedge clk)begin
-                  if(mat_v)begin
-                      matrix_even[mat_a] <= mat_d[31:0];
-                      matrix_odd[mat_a] <= mat_d[63:32];
-                  end
-              end;
-
-    always_ff @(posedge clk)begin
-                  if (exec & ~exec_mat_addr[0]) begin // 偶数
-                      exec_mat_data <= matrix_even[exec_mat_addr[6:1]];
-                  end
-                  if (exec & exec_mat_addr[0]) begin // 奇数
-                      exec_mat_data <= matrix_odd[exec_mat_addr[6:1]];
+                  if (exec_next) begin // 偶数
+                      exec_mat_data <= item_memory[exec_src_data[8:0]];
                   end
               end;
 
@@ -60,19 +53,19 @@ module core
                   init_next_next <= init_next;
               end;
 
-    reg               exec_next, exec_next_next;
+    reg               exec_next, exec_next_next, exec_next_next_next;
     always_ff @(posedge clk)begin
                   exec_next <= exec;
                   exec_next_next <= exec_next;
+                  exec_next_next_next <= exec_next_next;
               end;
 
 
     // 周波数をあげるためにレジスタを間に挟む (ここがクリティカルパスになるっぽい)
-    reg [31:0]        m2,d2;
+    reg [31:0]        m2;
     always_ff @(posedge clk)begin
-                  if(exec_next)begin
+                  if(exec_next_next)begin
                       m2 <= exec_mat_data;
-                      d2 <= exec_src_data;
                   end
               end;
 
@@ -80,8 +73,8 @@ module core
                   if(init_next_next)begin
                       acc_left <= 32'h0;
                   end
-                  else if(exec_next_next)begin
-                      acc_left <= acc_left + m2 * d2;
+                  else if(exec_next_next_next)begin
+                      acc_left <= acc_left + m2;
                   end
                   if(out_period)begin
                       acc_right <= acc_next;

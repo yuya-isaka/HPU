@@ -97,30 +97,12 @@ module top
     /////////////////////////////////////////////////////////////////////////////////
 
 
-    wire [7:0]        mat_v;
-    wire [5:0]        mat_a;
-    mat_ctrl mat_ctrl
-             (
-                 .clk(AXIS_ACLK),
-                 .rst(~AXIS_ARESETN),
-                 .matw(matw),
-                 .src_valid(S_AXIS_TVALID),
-
-                 .mat_v(mat_v[7:0]),
-                 .mat_a(mat_a[5:0])
-             );
-
-
-    /////////////////////////////////////////////////////////////////////////////////
-
-
     wire              src_v;   // アドレス生成をしているか否か
     wire [8:0]        src_a;   // アドレス
     wire              src_fin; // アドレスの生成が最後か否か (s_init駆動、p変更, src_enを埋める)
     src_ctrl src_ctrl
              (
                  .clk(AXIS_ACLK),
-                 .matw(matw),
                  .run(run),
                  .src_valid(S_AXIS_TVALID),
                  .src_en(src_en),
@@ -185,7 +167,6 @@ module top
     wire              k_fin;
     wire              exec;
     wire [9:0]        exec_src_addr;
-    wire [6:0]        exec_mat_addr;
     exe_ctrl exe_ctrl
              (
                  .clk(AXIS_ACLK),
@@ -198,8 +179,7 @@ module top
                  .k_init(k_init),
                  .k_fin(k_fin),
                  .exec(exec),
-                 .exec_src_addr(exec_src_addr[9:0]),
-                 .exec_mat_addr(exec_mat_addr[6:0])
+                 .exec_src_addr(exec_src_addr[9:0])
              );
 
 
@@ -275,8 +255,8 @@ module top
     //////////////////////////////////////////////////////////////////////////////////
 
 
-    wire [31:0] acc [0:8];
-    assign acc[8] = 0;
+    wire [31:0] acc [0:1];
+    assign acc[1] = 0;
 
     // updateで一気に8個のコアのaccが更新される
     // 次のサイクルから, 各コアのaccが次のコアのaccで更新されていく
@@ -285,20 +265,17 @@ module top
 
     generate
         genvar         i;
-        for (i = 0; i < 8; i = i + 1)begin
+        for (i = 0; i < 1; i = i + 1)begin
             core core
                  (
                      .clk(AXIS_ACLK),
                      .init(k_init),
 
-                     .mat_v(mat_v[i]),
-                     .mat_a(mat_a[5:0]),
                      .mat_d(S_AXIS_TDATA),
 
                      .exec(exec),
                      .out_period(out_period),
                      .update(update),
-                     .exec_mat_addr(exec_mat_addr[6:0]),
                      .exec_src_data(exec_src_data),
                      .acc_next(acc[i+1]),
 

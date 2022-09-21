@@ -10,7 +10,7 @@ module dst_buf
         input wire [31:0]       result,
         input wire              p,
 
-        output logic [63:0]     stream_d
+        output logic [63:0]     stream_d // M_AXIS_TDATA
     );
 
     reg [63:0]        stream_0;

@@ -1,6 +1,7 @@
 #include "verilated.h"
 #include "verilated_vcd_c.h"
 #include "Vtop.h"
+#include <string.h>
 
 // ====================================================================================================================================================================================
 
@@ -98,106 +99,9 @@ int main(int argc, char **argv)
   eval();
   eval();
 
-  /////////////////////////////////////////////////////////////////////////////////// Set Matrix ////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  int matrix[8][128];
-
-  // 32bitを128個、8つのコアに格納
-  printf("\n ------------------------- Set Matrix -------------------------- \n\n");
-  for (int j = 0; j < 8; j++)
-  {
-    for (int i = 0; i < 128; i++)
-    {
-      matrix[j][i] = rand() & 0x000000ff;
-      printf("%3d ", matrix[j][i]);
-    }
-    printf("\n");
-  }
-
-  // matw <- 1;
-  verilator_top->S_AXI_AWADDR = 0;
-  verilator_top->S_AXI_WDATA = 1;
-  verilator_top->S_AXI_AWVALID = 1;
-  verilator_top->S_AXI_WVALID = 1;
-  eval();
-  verilator_top->S_AXI_AWVALID = 0;
-  verilator_top->S_AXI_WVALID = 0;
-  eval();
-
-  // 読み出し (書き込みより読み出しの方が１サイクル多い)
-  verilator_top->S_AXI_ARVALID = 1;
-  verilator_top->S_AXI_ARADDR = 0;
-  eval(); // 読み出しリクエスト
-  eval(); // 格納完了
-  // アドレス０に１を書き込んでいるので、１が出力されるはず
-  if (1 != verilator_top->S_AXI_RDATA)
-  {
-    printf("(Error Expecetd = %d) ", 1);
-  }
-  else
-  {
-    printf("\n S_AXI_RDATA: %d \n", verilator_top->S_AXI_RDATA);
-  }
-  verilator_top->S_AXI_ARVALID = 0;
-  eval();
-
-  // 送信
-  // 8 * 128 * 32 = 32768bit
-  // 32768bit / 64bit = 512回
-  verilator_top->S_AXIS_TVALID = 1;
-  int pp = 0;
-  for (int i = 0; i < 512; i++)
-  {
-    conv.d0 = matrix[i * 2 / 128][pp];
-    conv.d1 = matrix[i * 2 / 128][pp + 1];
-    verilator_top->S_AXIS_TDATA = conv.wd;
-    pp += 2;
-    if (pp >= 128)
-      pp = 0;
-    eval();
-  }
-  verilator_top->S_AXIS_TVALID = 0;
-
-  // matw <- 0;
-  verilator_top->S_AXI_AWADDR = 0;
-  verilator_top->S_AXI_WDATA = 0;
-  verilator_top->S_AXI_AWVALID = 1;
-  verilator_top->S_AXI_WVALID = 1;
-  eval();
-  verilator_top->S_AXI_AWVALID = 0;
-  verilator_top->S_AXI_WVALID = 0;
-  eval();
-
-  // 読み込んで確認
-  verilator_top->S_AXI_ARVALID = 1;
-  eval(); // 読み出しリクエスト
-  eval(); // 格納完了
-  if (0 != verilator_top->S_AXI_RDATA)
-  {
-    printf("(Error Expecetd = %d) ", 0);
-  }
-  else
-  {
-    printf("\n S_AXI_RDATA: %d \n", verilator_top->S_AXI_RDATA);
-  }
-  verilator_top->S_AXI_ARVALID = 0;
-  eval();
-
-  //////////////////////////////////////////////////////////////////////////////////////// run ///////////////////////////////////////////////////////////////////////////////////////////////
-
-  int sample[8][128];
-
-  // 32bitを128個、8つのコアに格納
-  printf("\n ------------------------- Sample %d Input -------------------------- \n\n", 0);
-  for (int j = 0; j < 8; j++)
-  {
-    for (int i = 0; i < 128; i++)
-    {
-      sample[j][i] = rand() & 0x000000ff;
-      printf("%3d ", sample[j][i]);
-    }
-    printf("\n");
-  }
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // run <- 1;
   verilator_top->S_AXI_AWADDR = 0;
@@ -209,202 +113,76 @@ int main(int argc, char **argv)
   verilator_top->S_AXI_WVALID = 0;
   eval();
 
-  verilator_top->S_AXI_ARVALID = 1;
-  eval();
-  eval();
-  if (2 != verilator_top->S_AXI_RDATA)
-  {
-    printf("(Error Expecetd = %d) ", 2);
-  }
-  else
-  {
-    printf("\n S_AXI_RDATA: %d \n", verilator_top->S_AXI_RDATA);
-  }
-  verilator_top->S_AXI_ARVALID = 0;
-  eval();
-
   // 送信
-  // 8 * 128 * 32 = 32768bit
-  // 32768bit / 64bit = 512回
   verilator_top->S_AXIS_TVALID = 1;
-  pp = 0;
-  for (int i = 0; i < 512; i++)
+  for (int i = 0; i < 24; i += 2)
   {
-    conv.d0 = sample[i * 2 / 128][pp];
-    conv.d1 = sample[i * 2 / 128][pp + 1];
+    conv.d0 = i;
+    conv.d1 = i + 1;
     verilator_top->S_AXIS_TDATA = conv.wd;
-    pp += 2;
-    if (pp >= 128)
-      pp = 0;
     eval();
   }
   verilator_top->S_AXIS_TVALID = 0;
+
+  // last <- 1;
+  verilator_top->S_AXI_AWADDR = 0;
+  verilator_top->S_AXI_WDATA = 6;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
   eval();
 
-  /////////////////////////////////////////////////////////////////////////////////////// 結果確認 //////////////////////////////////////////////////////////////////////////////////
-
-  int result[8][8];
-
-  for (int num = 0; num < 3; num++)
-  {
-
-    // 0回目以外実行 ---------------------------------------------------------------
-    if (num != 0)
-    {
-
-      // 演算終わって送られてくるの待つ
-      while (!verilator_top->M_AXIS_TVALID)
-      {
-        eval();
-      }
-
-      printf("\n ------------------------- Sample %d Output -------------------------- \n\n", num - 1);
-      for (int i = 0; i < 8; i++)
-      {
-        for (int j = 0; j < 4; j++)
-        {
-          conv.wd = verilator_top->M_AXIS_TDATA;
-          printf("%6d ", conv.d0);
-          if (conv.d0 != result[i][j * 2 + 0])
-          {
-            printf("(Error Expecetd = %6d) ", result[i][j * 2 + 0]);
-          }
-          printf("%6d ", conv.d1);
-          if (conv.d1 != result[i][j * 2 + 1])
-          {
-            printf("(Error Expecetd = %6d) ", result[i][j * 2 + 1]);
-          }
-          eval();
-        }
-        printf("\n");
-      }
-    }
-    // ---------------------------------------------------------------------------
-
-    // 2回目（最後）以外実行 ---------------------------------------------------------
-    if ((num + 1) != 3)
-    {
-
-      // 理想の計算
-      for (int j = 0; j < 8; j++)
-      {
-        int sum[8] = {};
-        for (int k = 0; k < 128; k++)
-        {
-          for (int i = 0; i < 8; i++)
-          {
-            sum[i] += matrix[i][k] * sample[j][k];
-          }
-        }
-        for (int oa = 0; oa < 8; oa++)
-        {
-          result[j][oa] = sum[oa];
-        }
-      }
-
-      printf("\n ------------------------- Sample %d Input -------------------------- \n\n", num + 1);
-      for (int j = 0; j < 8; j++)
-      {
-        for (int i = 0; i < 128; i++)
-        {
-          sample[j][i] = rand() & 0x000000ff;
-          printf("%3d ", sample[j][i]);
-        }
-        printf("\n");
-      }
-
-      // 送信
-      // 8 * 128 * 32 = 32768bit
-      // 32768bit / 64bit = 512回
-      verilator_top->S_AXIS_TVALID = 1;
-      pp = 0;
-      for (int i = 0; i < 512; i++)
-      {
-        conv.d0 = sample[i * 2 / 128][pp];
-        conv.d1 = sample[i * 2 / 128][pp + 1];
-        verilator_top->S_AXIS_TDATA = conv.wd;
-        pp += 2;
-        if (pp >= 128)
-          pp = 0;
-        eval();
-      }
-      verilator_top->S_AXIS_TVALID = 0;
-      eval();
-
-    }    // --------------------------------------------------------------------------------
-    else // 最後に実行 ----------------------------------------------------------------------
-    {
-
-      // last <- 1;
-      verilator_top->S_AXI_AWADDR = 0;
-      verilator_top->S_AXI_WDATA = 6;
-      verilator_top->S_AXI_AWVALID = 1;
-      verilator_top->S_AXI_WVALID = 1;
-      eval();
-      verilator_top->S_AXI_AWVALID = 0;
-      verilator_top->S_AXI_WVALID = 0;
-      eval();
-
-      verilator_top->S_AXI_ARVALID = 1;
-      eval();
-      eval();
-      if (6 != verilator_top->S_AXI_RDATA)
-      {
-        printf("(Error Expecetd = %d) ", 6);
-      }
-      else
-      {
-        printf("\n S_AXI_RDATA: %d \n", verilator_top->S_AXI_RDATA);
-      }
-      verilator_top->S_AXI_ARVALID = 0;
-      eval();
-    }
-    // ------------------------------------------------------------------------------------
-  }
-
-  // 演算終わるの待つ
+  // 演算終わって送られてくるの待つ
   while (!verilator_top->M_AXIS_TVALID)
   {
     eval();
   }
 
-  // 理想の計算
-  for (int j = 0; j < 8; j++)
-  {
-    int sum[8] = {};
-    for (int k = 0; k < 128; k++)
-    {
-      for (int i = 0; i < 8; i++)
-      {
-        sum[i] += matrix[i][k] * sample[j][k];
-      }
-    }
-    for (int oa = 0; oa < 8; oa++)
-    {
-      result[j][oa] = sum[oa];
-    }
-  }
+  // int result;
 
-  printf("\n ------------------------- Sample %d Output -------------------------- \n\n", 2);
-  for (int i = 0; i < 8; i++)
-  {
-    for (int j = 0; j < 4; j++)
-    {
-      conv.wd = verilator_top->M_AXIS_TDATA;
-      printf("%6d ", conv.d0);
-      if (conv.d0 != result[i][j * 2 + 0])
-      {
-        printf("(Error Expecetd = %6d) ", result[i][j * 2 + 0]);
-      }
-      printf("%6d ", conv.d1);
-      if (conv.d1 != result[i][j * 2 + 1])
-      {
-        printf("(Error Expecetd = %6d) ", result[i][j * 2 + 1]);
-      }
-      eval();
-    }
-    printf("\n");
-  }
+  // // 理想の計算
+  // for (int j = 0; j < 8; j++)
+  // {
+  //   int sum[8] = {};
+  //   for (int k = 0; k < 128; k++)
+  //   {
+  //     for (int i = 0; i < 8; i++)
+  //     {
+  //       sum[i] += matrix[i][k] * sample[j][k];
+  //     }
+  //   }
+  //   for (int oa = 0; oa < 8; oa++)
+  //   {
+  //     result[j][oa] = sum[oa];
+  //   }
+  // }
+
+  printf("\n ------------------------- Output -------------------------- \n\n");
+  conv.wd = verilator_top->M_AXIS_TDATA;
+  printf("%6d ", conv.d0);
+  printf("%6d ", conv.d1);
+  printf("\n");
+  // for (int i = 0; i < 8; i++)
+  // {
+  //   for (int j = 0; j < 4; j++)
+  //   {
+  //     conv.wd = verilator_top->M_AXIS_TDATA;
+  //     printf("%6d ", conv.d0);
+  //     if (conv.d0 != result[i][j * 2 + 0])
+  //     {
+  //       printf("(Error Expecetd = %6d) ", result[i][j * 2 + 0]);
+  //     }
+  //     printf("%6d ", conv.d1);
+  //     if (conv.d1 != result[i][j * 2 + 1])
+  //     {
+  //       printf("(Error Expecetd = %6d) ", result[i][j * 2 + 1]);
+  //     }
+  //     eval();
+  //   }
+  //   printf("\n");
+  // }
 
   //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
 
@@ -415,20 +193,6 @@ int main(int argc, char **argv)
   eval();
   verilator_top->S_AXI_AWVALID = 0;
   verilator_top->S_AXI_WVALID = 0;
-  eval();
-
-  verilator_top->S_AXI_ARVALID = 1;
-  eval();
-  eval();
-  if (0 != verilator_top->S_AXI_RDATA)
-  {
-    printf("(Error Expecetd = %d) ", 0);
-  }
-  else
-  {
-    printf("\n S_AXI_RDATA: %d \n", verilator_top->S_AXI_RDATA);
-  }
-  verilator_top->S_AXI_ARVALID = 0;
   eval();
 
   eval();
