@@ -202,9 +202,10 @@ int main(int argc, char **argv)
   // putb(conv.d1);
   // printf("\n");
 
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < 1; i++)
   {
     conv.wd = verilator_top->M_AXIS_TDATA;
+    printf("%d\n", conv.d0);
     putb(conv.d0);
     putb(conv.d1);
     printf("\n");
@@ -259,9 +260,10 @@ int main(int argc, char **argv)
   // putb(conv.d1);
   // printf("\n");
 
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < 1; i++)
   {
     conv.wd = verilator_top->M_AXIS_TDATA;
+    printf("%d\n", conv.d0);
     putb(conv.d0);
     putb(conv.d1);
     printf("\n");

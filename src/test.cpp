@@ -32,6 +32,7 @@ unsigned int shifter(unsigned int v, unsigned int num)
 int main(int argc, char **argv)
 {
 
+	unsigned int result_real = 0;
 	unsigned int result = 0;
 	// 理想の計算
 	int tmp = 0;
@@ -42,14 +43,15 @@ int main(int argc, char **argv)
 		if (tmp == 3)
 		{
 			putb(result);
+			result_real += result;
 			tmp = 0;
 			result = 0;
 		}
 		// putb(result);
 	}
 
-	// printf("%d\n", result);
-	// putb(result);
+	printf("%d\n", result_real);
+	putb(result_real);
 
 	// // const int NGRAM = 3;
 

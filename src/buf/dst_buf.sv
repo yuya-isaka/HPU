@@ -7,8 +7,10 @@ module dst_buf
         input wire [4:0]        stream_a,
         input wire              out_period,
         input wire [5:0]        out_addr,
+        input wire              out_fin,
         input wire [31:0]       result,
         input wire              p,
+        input wire              s_fin,
 
         output logic [63:0]     stream_d // M_AXIS_TDATA
     );
@@ -43,54 +45,98 @@ module dst_buf
 
     // いやそもそもdualportメモリやからそれはないか
     // 32bitを64個格納（バンク化）
-    reg [31:0]        buff0 [0:31]; // アドレス偶数
+    reg [63:0]        buff0 [0:31]; // アドレス偶数
+    // reg [31:0]        buff0 [0:31]; // アドレス偶数
     reg [31:0]        buff1 [0:31]; // アドレス奇数
 
     // out_addrの最下位ビットを見て、偶数か奇数か判断
 
-    always_ff @(posedge clk) begin // 偶数
-                  if(out_period & ~p & ~out_addr[0]) begin
-                      buff0[out_addr[5:1]] <= result;
+    reg [63:0]      counter_1;
+    initial begin
+        counter_1 = 0;
+    end
+
+    always_ff @(posedge clk) begin
+                  if (s_fin) begin
+                      counter_1 <= 0;
+                  end
+                  else if(out_period & ~p & out_fin) begin
+                      counter_1 <= counter_1 + result;
                   end
               end;
 
-    always_ff @(posedge clk) begin // 奇数
-                  if(out_period & ~p & out_addr[0]) begin
-                      buff1[out_addr[5:1]] <= result;
+    always_ff @(posedge clk) begin
+                  if (s_fin) begin
+                      buff0[0] <= counter_1;
                   end
               end;
+
+    // always_ff @(posedge clk) begin // 偶数
+    //               if(out_period & ~p & ~out_addr[0]) begin
+    //                   buff0[out_addr[5:1]] <= result;
+    //               end
+    //           end;
+
+    // always_ff @(posedge clk) begin // 奇数
+    //               if(out_period & ~p & out_addr[0]) begin
+    //                   buff1[out_addr[5:1]] <= result;
+    //               end
+    //           end;
 
     // さっきまで計算してたやつを出力
     // s_fin_inでpが変わってるからこれでいける
     always_ff @(posedge clk) begin
                   if (stream_v & p) begin
-                      stream_0[31:0] <= buff0[stream_a];
-                      stream_0[63:32] <= buff1[stream_a];
+                      //   stream_0[31:0] <= buff0[stream_a];
+                      //   stream_0[63:32] <= buff1[stream_a];
+                      stream_0 <= buff0[0];
                   end
               end;
 
     // out_addrの最上位ビットが1
     ////////////////////////////////////////////////////////////////////////////
 
-    reg [31:0]        buff2 [0:31]; // アドレス偶数
+    reg [63:0]        buff2 [0:31]; // アドレス偶数
+    // reg [31:0]        buff2 [0:31]; // アドレス偶数
     reg [31:0]        buff3 [0:31]; // アドレス奇数
 
-    always_ff @(posedge clk) begin // 偶数
-                  if(out_period & p & ~out_addr[0]) begin
-                      buff2[out_addr[5:1]] <= result;
-                  end
-              end;
+    reg [63:0]      counter_2;
+    initial begin
+        counter_2 = 0;
+    end
 
-    always_ff @(posedge clk) begin // 奇数
-                  if(out_period & p & out_addr[0]) begin
-                      buff3[out_addr[5:1]] <= result;
+    always_ff @(posedge clk) begin
+                  if (s_fin) begin
+                      counter_2 <= 0;
+                  end
+                  else if(out_period & p & out_fin) begin
+                      counter_2 <= counter_2 + result;
                   end
               end;
 
     always_ff @(posedge clk) begin
+                  if (s_fin) begin
+                      buff2[0] <= counter_2;
+                  end
+              end;
+
+    // always_ff @(posedge clk) begin // 偶数
+    //               if(out_period & p & ~out_addr[0]) begin
+    //                   buff2[out_addr[5:1]] <= result;
+    //               end
+    //           end;
+
+    // always_ff @(posedge clk) begin // 奇数
+    //               if(out_period & p & out_addr[0]) begin
+    //                   buff3[out_addr[5:1]] <= result;
+    //               end
+    //           end;
+
+    always_ff @(posedge clk) begin
                   if (stream_v & ~p) begin
-                      stream_1[31:0] <= buff2[stream_a];
-                      stream_1[63:32] <= buff3[stream_a];
+                      //   stream_1[31:0] <= buff2[stream_a];
+                      //   stream_1[63:32] <= buff3[stream_a];
+                      stream_1 <= buff2[0];
                   end
               end;
 

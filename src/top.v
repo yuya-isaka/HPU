@@ -7,6 +7,10 @@
 * reg  0x010            32bit         control dummy register           *
 \**********************************************************************/
 
+// dst_ctrl ... stream_a
+// out_ctrl ... out_addr
+// exe_ctrl ... exe_src_addr
+
 // register_write -> matw -> mat_v
 //                        -> mat_a
 
@@ -245,8 +249,10 @@ module top
                 .stream_a(stream_a[4:0]), // 計算していない方なので~p
                 .out_period(out_period),
                 .out_addr(out_addr[5:0]), // 計算している方なのでp
+                .out_fin(out_fin),
                 .result(result),
                 .p(p),
+                .s_fin(s_fin),
 
                 .stream_d(M_AXIS_TDATA)
             );
