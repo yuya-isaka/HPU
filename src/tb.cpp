@@ -2,6 +2,7 @@
 #include "verilated_vcd_c.h"
 #include "Vtop.h"
 #include <string.h>
+#include <iostream>
 
 // ====================================================================================================================================================================================
 
@@ -53,6 +54,33 @@ void eval()
   main_time += 5;
 
   return;
+}
+
+void printb(unsigned int v)
+{
+  unsigned int mask = (int)1 << (sizeof(v) * 8 - 1);
+  // printf("%lu\n", sizeof(v));
+  do
+    putchar(mask & v ? '1' : '0');
+  while (mask >>= 1);
+}
+
+void putb(unsigned int v)
+{
+  putchar('0'), putchar('b'), printb(v), putchar('\n');
+}
+
+unsigned int shifter(unsigned int v, unsigned int num)
+{
+  // num回 論理右シフト
+  unsigned int tmp = v >> num;
+
+  // 右にシフトしたやつを取り出して、左に(32-num)回 論理左シフト
+  unsigned int tmp_num = (1 << num) - 1;
+  unsigned int tmp_v = (v & tmp_num) << ((sizeof(v) * 8) - num);
+
+  tmp_v = tmp_v | tmp;
+  return tmp_v;
 }
 
 // ====================================================================================================================================================================================
@@ -144,9 +172,34 @@ int main(int argc, char **argv)
 
   printf("\n ------------------------- Output -------------------------- \n\n");
 
+  unsigned int result2 = 0;
+  unsigned int aaa = 0;
+  for (unsigned int i = 0; i < 24; i++)
+  {
+    result2 ^= shifter(i, i);
+    putb(result2);
+    if (i == 23)
+    {
+      aaa = result2;
+      putb(aaa);
+    }
+  }
+  putb(result2);
+  putb(aaa);
+
+  // 確認
   conv.wd = verilator_top->M_AXIS_TDATA;
-  printf("%6d ", conv.d0);
-  printf("%6d ", conv.d1);
+  if (aaa != conv.d0)
+  {
+    printf("Error\n");
+  }
+  else
+  {
+    printf("Success\n");
+  }
+  putb(aaa);
+  putb(conv.d0);
+  putb(conv.d1);
   printf("\n");
 
   // last <- 1;
@@ -165,29 +218,36 @@ int main(int argc, char **argv)
     eval();
   }
 
-  // int result;
-
-  // // 理想の計算
-  // for (int j = 0; j < 8; j++)
-  // {
-  //   int sum[8] = {};
-  //   for (int k = 0; k < 128; k++)
-  //   {
-  //     for (int i = 0; i < 8; i++)
-  //     {
-  //       sum[i] += matrix[i][k] * sample[j][k];
-  //     }
-  //   }
-  //   for (int oa = 0; oa < 8; oa++)
-  //   {
-  //     result[j][oa] = sum[oa];
-  //   }
-  // }
-
   printf("\n ------------------------- Output -------------------------- \n\n");
+
+  result2 = 0;
+  aaa = 0;
+  for (unsigned int i = 0; i < 24; i++)
+  {
+    result2 ^= shifter(i, i);
+    putb(result2);
+    if (i == 23)
+    {
+      aaa = result2;
+      putb(aaa);
+    }
+  }
+  putb(result2);
+  putb(aaa);
+
+  // 確認
   conv.wd = verilator_top->M_AXIS_TDATA;
-  printf("%6d ", conv.d0);
-  printf("%6d ", conv.d1);
+  if (aaa != conv.d0)
+  {
+    printf("Error\n");
+  }
+  else
+  {
+    printf("Success\n");
+  }
+  putb(aaa);
+  putb(conv.d0);
+  putb(conv.d1);
   printf("\n");
   // for (int i = 0; i < 8; i++)
   // {

@@ -75,7 +75,8 @@ module core
                       acc_left <= 32'h0;
                   end
                   else if(exec_next_next_next)begin
-                      acc_left <= acc_left + m2;
+                    // クリティカルパスになりそう（なるなら分けてもいい）
+                      acc_left <= acc_left ^ (m2 >> m2 | ( ( m2 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
                   end
                   if(out_period)begin
                       acc_right <= acc_next;
