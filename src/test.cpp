@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 	for (unsigned int i = 0; i < 24; i++)
 	{
 		result ^= shifter(i, i);
-		putb(result);
+		// putb(result);
 	}
 
 	// printf("%d\n", result);
