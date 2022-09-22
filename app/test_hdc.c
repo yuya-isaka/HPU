@@ -217,22 +217,31 @@ void main()
   printf("\n ------------------------- Sample %d Output -------------------------- \n\n", 1);
   // 理想の計算
   unsigned int result = 0;
+  // 理想の計算
+  int addr = 0;
+  int tmp = 0;
   for (unsigned int i = 0; i < 24; i++)
   {
     result ^= shifter(i, i);
+    tmp += 1;
+    if (tmp == 3)
+    {
+      if (result != dst[addr])
+      {
+        printf("Error\n");
+      }
+      else
+      {
+        printf("Success\n");
+      }
+      putb(result);
+      putb(dst[addr]);
+      addr++;
+      tmp = 0;
+      result = 0;
+    }
+    // putb(result);
   }
-
-  // 確認 (result, dst[0])
-  if (result != dst[0])
-  {
-    printf("Error\n");
-  }
-  else
-  {
-    printf("Success\n");
-  }
-  putb(result);
-  putb(dst[0]);
   printf("\n");
 
   // 受信設定
@@ -251,25 +260,32 @@ void main()
     ;
 
   printf("\n ------------------------- Sample %d Output -------------------------- \n\n", 1);
-  // 理想の計算
   result = 0;
+  // 理想の計算
+  addr = 0;
+  tmp = 0;
   for (unsigned int i = 0; i < 24; i++)
   {
     result ^= shifter(i, i);
+    tmp += 1;
+    if (tmp == 3)
+    {
+      if (result != dst[addr])
+      {
+        printf("Error\n");
+      }
+      else
+      {
+        printf("Success\n");
+      }
+      putb(result);
+      putb(dst[addr]);
+      addr++;
+      tmp = 0;
+      result = 0;
+    }
+    // putb(result);
   }
-
-  // 確認 (result, dst[0])
-  if (result != dst[0])
-  {
-    printf("Error\n");
-  }
-  else
-  {
-    printf("Success\n");
-  }
-  putb(result);
-  putb(dst[0]);
-  printf("\n");
 
   //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
 
