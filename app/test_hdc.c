@@ -252,7 +252,7 @@ void main()
 
   printf("\n ------------------------- Sample %d Output -------------------------- \n\n", 1);
   // 理想の計算
-  unsigned int result = 0;
+  result = 0;
   for (unsigned int i = 0; i < 24; i++)
   {
     result ^= shifter(i, i);
