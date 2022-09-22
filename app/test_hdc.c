@@ -6,6 +6,35 @@
 
 // ====================================================================================================================================================================================
 
+void printb(unsigned int v)
+{
+  unsigned int mask = (int)1 << (sizeof(v) * 8 - 1);
+  // printf("%lu\n", sizeof(v));
+  do
+    putchar(mask & v ? '1' : '0');
+  while (mask >>= 1);
+}
+
+void putb(unsigned int v)
+{
+  putchar('0'), putchar('b'), printb(v), putchar('\n');
+}
+
+unsigned int shifter(unsigned int v, unsigned int num)
+{
+  // num回 論理右シフト
+  unsigned int tmp = v >> num;
+
+  // 右にシフトしたやつを取り出して、左に(32-num)回 論理左シフト
+  unsigned int tmp_num = (1 << num) - 1;
+  unsigned int tmp_v = (v & tmp_num) << ((sizeof(v) * 8) - num);
+
+  tmp_v = tmp_v | tmp;
+  return tmp_v;
+}
+
+// ====================================================================================================================================================================================
+
 volatile int *top;
 volatile int *dma;
 volatile int *src;
@@ -186,7 +215,24 @@ void main()
     ;
 
   printf("\n ------------------------- Sample %d Output -------------------------- \n\n", 1);
-  printf("%6d ", dst[0]);
+  // 理想の計算
+  unsigned int result = 0;
+  for (unsigned int i = 0; i < 24; i++)
+  {
+    result ^= shifter(i, i);
+  }
+
+  // 確認 (result, dst[0])
+  if (result != dst[0])
+  {
+    printf("Error\n");
+  }
+  else
+  {
+    printf("Success\n");
+  }
+  putb(result);
+  putb(dst[0]);
   printf("\n");
 
   // 受信設定
@@ -205,7 +251,24 @@ void main()
     ;
 
   printf("\n ------------------------- Sample %d Output -------------------------- \n\n", 1);
-  printf("%6d ", dst[0]);
+  // 理想の計算
+  unsigned int result = 0;
+  for (unsigned int i = 0; i < 24; i++)
+  {
+    result ^= shifter(i, i);
+  }
+
+  // 確認 (result, dst[0])
+  if (result != dst[0])
+  {
+    printf("Error\n");
+  }
+  else
+  {
+    printf("Success\n");
+  }
+  putb(result);
+  putb(dst[0]);
   printf("\n");
 
   //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
