@@ -79,7 +79,7 @@ module core
                       acc_left <= acc_left ^ (m2 >> m2 | ( ( m2 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
                   end
                   if(out_period)begin
-                    //   acc_right <= acc_next;
+                      //   acc_right <= acc_next;
                       acc_right <= acc_left;
                   end
               end;

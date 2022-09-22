@@ -256,13 +256,14 @@ module top
 
 
     // wire [31:0] acc [0:1];
-    wire [31:0] acc [0];
+    wire [31:0] acc;
     // assign acc[1] = 0;
 
     // updateで一気に8個のコアのaccが更新される
     // 次のサイクルから, 各コアのaccが次のコアのaccで更新されていく
     // だから先頭のaccを見ていれば、８個のコアの結果が順にわかって、それをdst_bufに入れられる
-    wire [31:0] result = acc[0];
+    // wire [31:0] result = acc[0];
+    wire [31:0] result = acc;
 
     generate
         genvar         i;
@@ -278,9 +279,10 @@ module top
                      .out_period(out_period),
                      .update(update),
                      .exec_src_data(exec_src_data),
-                    //  .acc_next(acc[i+1]),
+                     //  .acc_next(acc[i+1]),
 
-                     .acc(acc[i])
+                    //  .acc(acc[i])
+                     .acc(acc)
                  );
         end
     endgenerate
