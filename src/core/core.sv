@@ -78,6 +78,9 @@ module core
                       // クリティカルパスになりそう（なるなら分けてもいい）
                       acc_left <= acc_left ^ (m2 >> m2 | ( ( m2 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
                   end
+              end;
+
+    always_ff @(posedge clk) begin
                   if(out_period)begin
                       //   acc_right <= acc_next;
                       acc_right <= acc_left;

@@ -281,7 +281,7 @@ module top
                      .exec_src_data(exec_src_data),
                      //  .acc_next(acc[i+1]),
 
-                    //  .acc(acc[i])
+                     //  .acc(acc[i])
                      .acc(acc)
                  );
         end
