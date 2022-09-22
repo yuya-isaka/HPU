@@ -255,8 +255,9 @@ module top
     //////////////////////////////////////////////////////////////////////////////////
 
 
-    wire [31:0] acc [0:1];
-    assign acc[1] = 0;
+    // wire [31:0] acc [0:1];
+    wire [31:0] acc [0];
+    // assign acc[1] = 0;
 
     // updateで一気に8個のコアのaccが更新される
     // 次のサイクルから, 各コアのaccが次のコアのaccで更新されていく
@@ -277,7 +278,7 @@ module top
                      .out_period(out_period),
                      .update(update),
                      .exec_src_data(exec_src_data),
-                     .acc_next(acc[i+1]),
+                    //  .acc_next(acc[i+1]),
 
                      .acc(acc[i])
                  );

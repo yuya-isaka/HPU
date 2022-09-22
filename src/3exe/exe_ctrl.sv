@@ -71,15 +71,15 @@ module exe_ctrl
     // ってのを４回する
 
     // i loop
-    agu_next #(.W(4)) l_i (.ini(2'd0), .fin(0), .start(s_init), .last(last_i), .clk(clk),  .rst(rst),
+    agu_next #(.W(4)) l_i (.ini(2'd0), .fin(7), .start(s_init), .last(last_i), .clk(clk),  .rst(rst),
                            .next(next_i), .data(i), .en(last_j));
 
     // j loop
-    agu_next #(.W(7)) l_j (.ini(3'd0), .fin(23),  .start(start), .last(last_j), .clk(clk),  .rst(rst),
+    agu_next #(.W(7)) l_j (.ini(3'd0), .fin(2),  .start(start), .last(last_j), .clk(clk),  .rst(rst),
                            .next(next_j), .data(j), .en(1'b1));
 
     always_comb begin
-                    exec_src_addr = i*128 + j;
+                    exec_src_addr = i*3 + j;
                 end;
 
     // last_jの次にスタート /////////////////////////////////////////////////

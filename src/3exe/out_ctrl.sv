@@ -86,7 +86,7 @@ module out_ctrl
 
 
     // jの終わりに更新される
-    agu #(.W(3)) l_i (.ini(0), .fin(0),  .start(s_init), .last(last_i), .clk(clk), .rst(rst),
+    agu #(.W(3)) l_i (.ini(0), .fin(7),  .start(s_init), .last(last_i), .clk(clk), .rst(rst),
                       .data(i), .en(last_j));
 
     // kが終わるたびに新しいのが始まる
@@ -94,7 +94,6 @@ module out_ctrl
                       .data(j), .en(1'b1));
 
     // なぜここを０にしたら止まるのか
-    // dst_bufの仕様的に、0,1の二つが必要だから（ここは偶数である必要が出ている）
 
     reg [5:0]         out_addr_pre; // 最大64
     always_ff @(posedge clk)begin
@@ -103,7 +102,8 @@ module out_ctrl
                       out_addr <= 0;
                   end
                   else begin
-                      out_addr_pre <= i*8 + j;
+                      //   out_addr_pre <= i*8 + j;
+                      out_addr_pre <= i;
                       out_addr <= out_addr_pre;
                   end
               end;

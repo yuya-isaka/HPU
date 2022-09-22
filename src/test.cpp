@@ -34,14 +34,22 @@ int main(int argc, char **argv)
 
 	unsigned int result = 0;
 	// 理想の計算
+	int tmp = 0;
 	for (unsigned int i = 0; i < 24; i++)
 	{
 		result ^= shifter(i, i);
+		tmp += 1;
+		if (tmp == 3)
+		{
+			putb(result);
+			tmp = 0;
+			result = 0;
+		}
 		// putb(result);
 	}
 
 	// printf("%d\n", result);
-	putb(result);
+	// putb(result);
 
 	// // const int NGRAM = 3;
 

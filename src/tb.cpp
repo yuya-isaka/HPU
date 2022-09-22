@@ -172,35 +172,44 @@ int main(int argc, char **argv)
 
   printf("\n ------------------------- Output -------------------------- \n\n");
 
-  unsigned int result2 = 0;
-  unsigned int aaa = 0;
-  for (unsigned int i = 0; i < 24; i++)
-  {
-    result2 ^= shifter(i, i);
-    putb(result2);
-    if (i == 23)
-    {
-      aaa = result2;
-      putb(aaa);
-    }
-  }
-  putb(result2);
-  putb(aaa);
+  // unsigned int result2 = 0;
+  // unsigned int aaa = 0;
+  // for (unsigned int i = 0; i < 24; i++)
+  // {
+  //   result2 ^= shifter(i, i);
+  //   putb(result2);
+  //   if (i == 23)
+  //   {
+  //     aaa = result2;
+  //     putb(aaa);
+  //   }
+  // }
+  // putb(result2);
+  // putb(aaa);
 
   // 確認
-  conv.wd = verilator_top->M_AXIS_TDATA;
-  if (aaa != conv.d0)
+  // conv.wd = verilator_top->M_AXIS_TDATA;
+  // if (aaa != conv.d0)
+  // {
+  //   printf("Error\n");
+  // }
+  // else
+  // {
+  //   printf("Success\n");
+  // }
+  // putb(aaa);
+  // putb(conv.d0);
+  // putb(conv.d1);
+  // printf("\n");
+
+  for (int i = 0; i < 4; i++)
   {
-    printf("Error\n");
+    conv.wd = verilator_top->M_AXIS_TDATA;
+    putb(conv.d0);
+    putb(conv.d1);
+    printf("\n");
+    eval();
   }
-  else
-  {
-    printf("Success\n");
-  }
-  putb(aaa);
-  putb(conv.d0);
-  putb(conv.d1);
-  printf("\n");
 
   // last <- 1;
   verilator_top->S_AXI_AWADDR = 0;
@@ -220,54 +229,44 @@ int main(int argc, char **argv)
 
   printf("\n ------------------------- Output -------------------------- \n\n");
 
-  result2 = 0;
-  aaa = 0;
-  for (unsigned int i = 0; i < 24; i++)
-  {
-    result2 ^= shifter(i, i);
-    putb(result2);
-    if (i == 23)
-    {
-      aaa = result2;
-      putb(aaa);
-    }
-  }
-  putb(result2);
-  putb(aaa);
-
-  // 確認
-  conv.wd = verilator_top->M_AXIS_TDATA;
-  if (aaa != conv.d0)
-  {
-    printf("Error\n");
-  }
-  else
-  {
-    printf("Success\n");
-  }
-  putb(aaa);
-  putb(conv.d0);
-  putb(conv.d1);
-  printf("\n");
-  // for (int i = 0; i < 8; i++)
+  // result2 = 0;
+  // aaa = 0;
+  // for (unsigned int i = 0; i < 24; i++)
   // {
-  //   for (int j = 0; j < 4; j++)
+  //   result2 ^= shifter(i, i);
+  //   putb(result2);
+  //   if (i == 23)
   //   {
-  //     conv.wd = verilator_top->M_AXIS_TDATA;
-  //     printf("%6d ", conv.d0);
-  //     if (conv.d0 != result[i][j * 2 + 0])
-  //     {
-  //       printf("(Error Expecetd = %6d) ", result[i][j * 2 + 0]);
-  //     }
-  //     printf("%6d ", conv.d1);
-  //     if (conv.d1 != result[i][j * 2 + 1])
-  //     {
-  //       printf("(Error Expecetd = %6d) ", result[i][j * 2 + 1]);
-  //     }
-  //     eval();
+  //     aaa = result2;
+  //     putb(aaa);
   //   }
-  //   printf("\n");
   // }
+  // putb(result2);
+  // putb(aaa);
+
+  // // 確認
+  // conv.wd = verilator_top->M_AXIS_TDATA;
+  // if (aaa != conv.d0)
+  // {
+  //   printf("Error\n");
+  // }
+  // else
+  // {
+  //   printf("Success\n");
+  // }
+  // putb(aaa);
+  // putb(conv.d0);
+  // putb(conv.d1);
+  // printf("\n");
+
+  for (int i = 0; i < 4; i++)
+  {
+    conv.wd = verilator_top->M_AXIS_TDATA;
+    putb(conv.d0);
+    putb(conv.d1);
+    printf("\n");
+    eval();
+  }
 
   //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
 

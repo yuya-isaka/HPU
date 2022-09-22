@@ -11,7 +11,7 @@ module core
         input wire              out_period,
         input wire              update,
         input wire [31:0]       exec_src_data,
-        input wire [31:0]       acc_next,
+        // input wire [31:0]       acc_next,
 
         output logic [31:0]     acc
     );
@@ -75,11 +75,12 @@ module core
                       acc_left <= 32'h0;
                   end
                   else if(exec_next_next_next)begin
-                    // クリティカルパスになりそう（なるなら分けてもいい）
+                      // クリティカルパスになりそう（なるなら分けてもいい）
                       acc_left <= acc_left ^ (m2 >> m2 | ( ( m2 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
                   end
                   if(out_period)begin
-                      acc_right <= acc_next;
+                    //   acc_right <= acc_next;
+                      acc_right <= acc_left;
                   end
               end;
 
