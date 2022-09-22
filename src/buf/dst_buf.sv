@@ -60,6 +60,8 @@ module dst_buf
                   end
               end;
 
+    // さっきまで計算してたやつを出力
+    // s_fin_inでpが変わってるからこれでいける
     always_ff @(posedge clk) begin
                   if (stream_v & p) begin
                       stream_0[31:0] <= buff0[stream_a];

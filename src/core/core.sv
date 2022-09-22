@@ -47,6 +47,7 @@ module core
                   end
               end;
 
+    // initを適切なタイミングで１にする
     reg               init_next, init_next_next;
     always_ff @(posedge clk)begin
                   init_next <= init;

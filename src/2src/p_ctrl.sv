@@ -15,7 +15,7 @@ module p_ctrl
                   if(~run)begin
                       p <= 1'b1;
                   end
-                  else if(src_fin & src_en[1:0]==2'b00)begin // 何もない時
+                  else if(src_fin & src_en[1:0]==2'b00)begin // 何もない時, 最初
                       p <= ~p;
                   end
                   else if(s_fin_in)begin // 一つ計算が終わって次に進んでいいとき
