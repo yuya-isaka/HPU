@@ -44,30 +44,34 @@ module dst_buf
     //　一旦この方法で書いて、その後試してみようか
 
     // いやそもそもdualportメモリやからそれはないか
-    // 32bitを64個格納（バンク化）
-    reg [63:0]        buff0 [0:31]; // アドレス偶数
+    (* ram_style = "block" *)    reg [63:0]        buff0 [0:31]; // アドレス偶数
     // reg [31:0]        buff0 [0:31]; // アドレス偶数
-    reg [31:0]        buff1 [0:31]; // アドレス奇数
+    // reg [31:0]        buff1 [0:31]; // アドレス奇数
 
     // out_addrの最下位ビットを見て、偶数か奇数か判断
 
-    reg [63:0]      counter_1;
-    initial begin
-        counter_1 = 0;
-    end
+    wire [63:0]      sign_bit_1;
+
+    generate
+        genvar i;
+        for (i = 0; i < 32; i = i + 1) begin
+            counter counter
+                    (
+                        .clk(clk),
+                        .result_bit(result[i]),
+                        .s_fin(s_fin),
+                        .out_period(out_period),
+                        .p(p),
+                        .out_fin(out_fin),
+                        .sign_bit(sign_bit_1[i])
+                    );
+        end
+    endgenerate
+
 
     always_ff @(posedge clk) begin
                   if (s_fin) begin
-                      counter_1 <= 0;
-                  end
-                  else if(out_period & ~p & out_fin) begin
-                      counter_1 <= counter_1 + result;
-                  end
-              end;
-
-    always_ff @(posedge clk) begin
-                  if (s_fin) begin
-                      buff0[0] <= counter_1;
+                      buff0[0] <= sign_bit_1;
                   end
               end;
 
@@ -96,27 +100,34 @@ module dst_buf
     // out_addrの最上位ビットが1
     ////////////////////////////////////////////////////////////////////////////
 
-    reg [63:0]        buff2 [0:31]; // アドレス偶数
+    (* ram_style = "block" *)    reg [63:0]        buff2 [0:31]; // アドレス偶数
     // reg [31:0]        buff2 [0:31]; // アドレス偶数
-    reg [31:0]        buff3 [0:31]; // アドレス奇数
+    // reg [31:0]        buff3 [0:31]; // アドレス奇数
 
-    reg [63:0]      counter_2;
-    initial begin
-        counter_2 = 0;
-    end
+    wire [63:0]      sign_bit_2;
+    // initial begin
+    //     counter_2 = 0;
+    // end
+
+    generate
+        genvar j;
+        for (j = 0; j < 32; j = j + 1) begin
+            counter counter
+                    (
+                        .clk(clk),
+                        .result_bit(result[j]),
+                        .s_fin(s_fin),
+                        .out_period(out_period),
+                        .p(~p),
+                        .out_fin(out_fin),
+                        .sign_bit(sign_bit_2[j])
+                    );
+        end
+    endgenerate
 
     always_ff @(posedge clk) begin
                   if (s_fin) begin
-                      counter_2 <= 0;
-                  end
-                  else if(out_period & p & out_fin) begin
-                      counter_2 <= counter_2 + result;
-                  end
-              end;
-
-    always_ff @(posedge clk) begin
-                  if (s_fin) begin
-                      buff2[0] <= counter_2;
+                      buff2[0] <= sign_bit_2;
                   end
               end;
 

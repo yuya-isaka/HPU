@@ -29,29 +29,57 @@ unsigned int shifter(unsigned int v, unsigned int num)
 	return tmp_v;
 }
 
+unsigned int grab_bit(unsigned int result_array[], size_t size)
+{
+	unsigned int result = 0;
+
+	unsigned int mask = (int)1 << (sizeof(result_array[0]) * 8 - 1);
+	while (mask)
+	{
+		int tmp = 0;
+		for (int i = 0; i < size; i++)
+		{
+			tmp += (mask & result_array[i] ? 1 : 0);
+		}
+		if (tmp > (size / 2))
+		{
+			result += mask;
+		}
+		mask >>= 1;
+	}
+	return result;
+}
+
 int main(int argc, char **argv)
 {
 
-	unsigned int result_real = 0;
+	puts("\n");
+
+	unsigned int result_array[8];
 	unsigned int result = 0;
 	// 理想の計算
 	int tmp = 0;
+	int num = 0;
 	for (unsigned int i = 0; i < 24; i++)
 	{
-		result ^= shifter(i, i);
+		result ^= shifter(33215360, i);
 		tmp += 1;
 		if (tmp == 3)
 		{
 			putb(result);
-			result_real += result;
+			result_array[num] = result;
 			tmp = 0;
 			result = 0;
+			num += 1;
 		}
 		// putb(result);
 	}
 
+	unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
 	printf("%d\n", result_real);
 	putb(result_real);
+
+	puts("\n");
 
 	// // const int NGRAM = 3;
 
