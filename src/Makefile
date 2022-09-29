@@ -30,8 +30,8 @@ DESIGN_SRCS = \
 ./buf/src_buf.sv \
 ./buf/dst_buf.sv \
 ./core/core.sv \
-./param/agu.sv \
-./param/agu_next.sv \
+./util/agu.sv \
+./util/agu_next.sv \
 # ./1mat/mat_ctrl.sv \
 # ./param/agu_param.sv \
 
