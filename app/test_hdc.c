@@ -167,6 +167,32 @@ void main()
 
   printf("\n ------------------------- Sample %d Input -------------------------- \n\n", 0);
 
+  // // HelloWorld
+  // // 0122454729
+
+  // // CGRA
+  // //  BRAM
+  // // 0 aのハイパーベクトル
+  // // 1
+  // // 1
+
+  // // n=1の時
+  // int sample[10];
+  // for (int i = 0; i < 10; i++)
+  // {
+  //   sample[i] = i;
+  // }
+
+  // // n=2の時
+  // int tmp = 0;
+  // int sample[18];
+  // for (int i = 0; i < 10; i++)
+  // {
+  //   sample[tmp] = i;         // h e
+  //   sample[tmp + 1] = i + 1; // e l
+  //   tmp += 2;
+  // }
+
   int sample[24];
   for (int i = 0; i < 24; i++)
   {
