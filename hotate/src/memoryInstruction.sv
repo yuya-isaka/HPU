@@ -25,7 +25,8 @@ module memoryInstruction #(parameter ADDR_SIZE = 32'd7)
     // $readmemh("/Users/yuyaisaka/workspace/project/project-riscv/hotate/test/fib.hex", mem);
     // $readmemh("/Users/yuyaisaka/workspace/project/project-riscv/hotate/test_mac/fib.hex", mem);
     // $readmemh("/Users/yuyaisaka/workspace/project/project-riscv/hotate/test_mac/factorial.hex", mem);
-    $readmemh("/Users/yuyaisaka/workspace/project/project-zynq/zynq-project/src/sample/13_hdc/hotate/test_mac/fib.hex", mem);
+    // $readmemh("/Users/yuyaisaka/workspace/project/project-zynq/zynq-project/src/sample/13_hdc/hotate/test_mac/fib.hex", mem);
+    $readmemh("/Users/yuyaisaka/workspace/project/project-zynq/zynq-test/hotate/test_fib_out_rv.hex", mem);
   end
 
   // output (rstがfalseの時、クロックと同期して代入、最初のリセットだけ？)
