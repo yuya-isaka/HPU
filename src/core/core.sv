@@ -20,9 +20,11 @@ module core
     reg [31:0]        item_memory [0:100];
 
     integer i;
+    integer j = 33215360;
     initial begin
         for (i=0; i < 100; i++) begin
-            item_memory[i] = i;
+            item_memory[i] = j;
+            j = j + 180038;
         end
     end
 

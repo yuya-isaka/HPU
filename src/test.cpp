@@ -55,6 +55,14 @@ int main(int argc, char **argv)
 
 	puts("\n");
 
+	unsigned int sample_array[24];
+	unsigned int sample = 33215360;
+	for (int i = 0; i < 24; i++)
+	{
+		sample_array[i] = sample;
+		sample += 180038;
+	}
+
 	unsigned int result_array[8];
 	unsigned int result = 0;
 	// 理想の計算
@@ -62,7 +70,7 @@ int main(int argc, char **argv)
 	int num = 0;
 	for (unsigned int i = 0; i < 24; i++)
 	{
-		result ^= shifter(33215360, i);
+		result ^= shifter(sample_array[i], i);
 		tmp += 1;
 		if (tmp == 3)
 		{
