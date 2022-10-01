@@ -19,32 +19,27 @@ VERILATOR_OPTS = \
 VERILATOR_MAKE_OPTS = OPT="-O3 -I ../../../"
 
 DESIGN_SRCS = \
-./test.sv
+./sv_test.sv
 
-VERILATOR_CPP_TB = tb.cpp
+VERILATOR_CPP_TB = tb_sv_test.cpp
 
 default: $(SIM_DIR)/Vtop
-	./sim/Vtop
+	./sim/Vsv_test
 
 sim: $(SIM_DIR)/Vtop
 
 $(SIM_DIR)/Vtop: $(DESIGN_SRCS) $(VERILATOR_CPP_TB)
 	$(VERILATOR) $(VERILATOR_OPTS) $(DESIGN_SRCS) --exe ../$(VERILATOR_CPP_TB)
-	cd sim; make $(VERILATOR_MAKE_OPTS) -f Vtop.mk Vtop__ALL.a
-	cd sim; make $(VERILATOR_MAKE_OPTS) -f Vtop.mk Vtop
+	cd sim; make $(VERILATOR_MAKE_OPTS) -f Vsv_test.mk Vsv_test__ALL.a
+	cd sim; make $(VERILATOR_MAKE_OPTS) -f Vsv_test.mk Vsv_test
 
 clean:
 	rm -rf sim/ tmp.vcd
 
 run :
-	./sim/Vtop
+	./sim/Vsv_test
 
 format :
 	iStyle --style=kr -n $(DESIGN_SRCS)
-
-test: test.cpp
-	g++ test.cpp -o test
-	./test
-	rm test
 
 .PHONY:
