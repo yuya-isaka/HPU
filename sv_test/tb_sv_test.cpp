@@ -97,12 +97,11 @@ int main(int argc, char **argv)
   eval();
   eval();
 
-  for (unsigned int i = 0; i < 100; i++)
+  for (int i = 0; i < 10; i++)
   {
-    unsigned int tmp = verilator_top->rand_num;
-    printf("%u:%u\n", i, tmp);
-    putb(tmp);
-    printf("\n");
+    printf("%d:%llu\n", i, verilator_top->rand_num);
+    // putb(tmp);
+    // printf("\n");
     eval();
   }
 

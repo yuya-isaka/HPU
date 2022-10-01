@@ -50,6 +50,20 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 	return result;
 }
 
+unsigned long xor128()
+{
+	static unsigned long x = 123456789;
+	static unsigned long y = 362436069;
+	static unsigned long z = 521288629;
+	static unsigned long w = 88675123;
+
+	unsigned long t = (x ^ (x << 11));
+	x = y;
+	y = z;
+	z = w;
+	return (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)));
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char **argv)
@@ -57,43 +71,48 @@ int main(int argc, char **argv)
 
 	puts("\n////////////////////////////////////////////////////////////////////////////\n");
 
-	unsigned int sample_array[24];
-	unsigned int sample = 33215360;
-	for (int i = 0; i < 24; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		sample_array[i] = sample;
-		sample += 180038;
+		printf("%d:%lu\n", i, xor128());
 	}
 
-	unsigned int item_memory_array[100];
-	unsigned int item_memory_value = 33215360;
-	for (unsigned int i = 0; i < 100; i++)
-	{
-		item_memory_array[i] = item_memory_value;
-		item_memory_value += 18360;
-	}
+	// unsigned int sample_array[24];
+	// unsigned int sample = 33215360;
+	// for (int i = 0; i < 24; i++)
+	// {
+	// 	sample_array[i] = sample;
+	// 	sample += 180038;
+	// }
 
-	unsigned int result_array[8];
-	unsigned int result = 0;
-	int tmp = 0;
-	int num = 0;
-	for (unsigned int i = 0; i < 24; i++)
-	{
-		result ^= shifter(item_memory_array[i], tmp);
-		tmp += 1;
-		if (tmp == 3)
-		{
-			putb(result);
-			result_array[num] = result;
-			tmp = 0;
-			result = 0;
-			num += 1;
-		}
-	}
+	// unsigned int item_memory_array[100];
+	// unsigned int item_memory_value = 33215360;
+	// for (unsigned int i = 0; i < 100; i++)
+	// {
+	// 	item_memory_array[i] = item_memory_value;
+	// 	item_memory_value += 18360;
+	// }
 
-	unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
-	printf("%d\n", result_real);
-	putb(result_real);
+	// unsigned int result_array[8];
+	// unsigned int result = 0;
+	// int tmp = 0;
+	// int num = 0;
+	// for (unsigned int i = 0; i < 24; i++)
+	// {
+	// 	result ^= shifter(item_memory_array[i], tmp);
+	// 	tmp += 1;
+	// 	if (tmp == 3)
+	// 	{
+	// 		putb(result);
+	// 		result_array[num] = result;
+	// 		tmp = 0;
+	// 		result = 0;
+	// 		num += 1;
+	// 	}
+	// }
+
+	// unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
+	// printf("%d\n", result_real);
+	// putb(result_real);
 
 	puts("\n////////////////////////////////////////////////////////////////////////////\n");
 
