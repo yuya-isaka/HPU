@@ -33,6 +33,27 @@ unsigned int shifter(unsigned int v, unsigned int num)
   return tmp_v;
 }
 
+unsigned int grab_bit(unsigned int result_array[], size_t size)
+{
+  unsigned int result = 0;
+
+  unsigned int mask = (int)1 << (sizeof(result_array[0]) * 8 - 1);
+  while (mask)
+  {
+    int tmp = 0;
+    for (int i = 0; i < size; i++)
+    {
+      tmp += (mask & result_array[i] ? 1 : 0);
+    }
+    if (tmp > (size / 2))
+    {
+      result += mask;
+    }
+    mask >>= 1;
+  }
+  return result;
+}
+
 // ====================================================================================================================================================================================
 
 volatile int *top;
