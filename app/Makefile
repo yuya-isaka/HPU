@@ -1,5 +1,7 @@
 %: %.c
 	arm-linux-gnueabihf-gcc $@.c -o $@
+	sudo ./$@
+	rm $@
 
 clean:
-	rm test test_last test_hdc
+	rm test_hdc
