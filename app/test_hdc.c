@@ -264,6 +264,15 @@ void main()
   //   // putb(result);
   // }
   // printf("\n");
+
+  unsigned int item_memory_array[100];
+  unsigned int item_memory_value = 33215360;
+  for (unsigned int i = 0; i < 100; i++)
+  {
+    item_memory_array[i] = item_memory_value;
+    item_memory_value += 18360;
+  }
+
   unsigned int result_array[8];
   unsigned int result = 0;
   // 理想の計算
@@ -271,7 +280,7 @@ void main()
   int num = 0;
   for (unsigned int i = 0; i < 24; i++)
   {
-    result ^= shifter(33215360, tmp);
+    result ^= shifter(item_memory_array[i], tmp);
     tmp += 1;
     if (tmp == 3)
     {
@@ -348,7 +357,7 @@ void main()
   num = 0;
   for (unsigned int i = 0; i < 24; i++)
   {
-    result ^= shifter(33215360, tmp);
+    result ^= shifter(item_memory_array[i], tmp);
     tmp += 1;
     if (tmp == 3)
     {
