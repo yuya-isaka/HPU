@@ -193,6 +193,7 @@ void main()
   {
     sample[i] = i;
     printf("%3d ", sample[i]);
+
     src[i] = sample[i];
   }
 
@@ -211,12 +212,13 @@ void main()
   // 受信チャネルの設定前に送信チャネルを設定すると変になるっぽい
   dma[0x30 / 4] = 1;
   dma[0x48 / 4] = dst_phys;
-  dma[0x58 / 4] = 8 * 4;
+  dma[0x58 / 4] = 1 * 4;
 
   for (int i = 0; i < 24; i++)
   {
     sample[i] = i;
     printf("%3d ", sample[i]);
+
     src[i] = sample[i];
   }
 
@@ -235,41 +237,58 @@ void main()
   while ((dma[0x34 / 4] & 0x1000) != 0x1000)
     ;
 
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+
   printf("\n ------------------------- Sample %d Output -------------------------- \n\n", 1);
   // 理想の計算
+  unsigned int sample_array[24];
+  unsigned int sample_tmp = 33215360;
+  for (int i = 0; i < 24; i++)
+  {
+    sample_array[i] = sample_tmp;
+    sample_tmp += 180038;
+  }
+
+  unsigned int result_array[8];
   unsigned int result = 0;
   // 理想の計算
-  int addr = 0;
   int tmp = 0;
+  int num = 0;
   for (unsigned int i = 0; i < 24; i++)
   {
-    result ^= shifter(i, i);
+    result ^= shifter(sample_array[i], tmp);
     tmp += 1;
     if (tmp == 3)
     {
-      if (result != dst[addr])
-      {
-        printf("Error\n");
-      }
-      else
-      {
-        printf("Success\n");
-      }
       putb(result);
-      putb(dst[addr]);
-      addr++;
+      result_array[num] = result;
       tmp = 0;
       result = 0;
+      num += 1;
     }
-    // putb(result);
   }
-  printf("\n");
+  unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
+
+  if (result_real != dst[0])
+  {
+    printf("Error\n");
+  }
+  else
+  {
+    printf("Success\n");
+  }
+
+  printf("%d\n", result_real);
+  putb(result_real);
+  printf("////////////////////////");
+  printf("%d\n", dst[0]);
+  putb(dst[0]);
 
   // 受信設定
   // 受信チャネルの設定前に送信チャネルを設定すると変になるっぽい
   dma[0x30 / 4] = 1;
   dma[0x48 / 4] = dst_phys;
-  dma[0x58 / 4] = 8 * 4;
+  dma[0x58 / 4] = 1 * 4;
 
   /////////////////////////////////////////////////////////////////////////////////////// 結果確認 //////////////////////////////////////////////////////////////////////////////////
 
@@ -281,32 +300,40 @@ void main()
     ;
 
   printf("\n ------------------------- Sample %d Output -------------------------- \n\n", 1);
+
   result = 0;
   // 理想の計算
-  addr = 0;
   tmp = 0;
+  num = 0;
   for (unsigned int i = 0; i < 24; i++)
   {
-    result ^= shifter(i, i);
+    result ^= shifter(sample_array[i], tmp);
     tmp += 1;
     if (tmp == 3)
     {
-      if (result != dst[addr])
-      {
-        printf("Error\n");
-      }
-      else
-      {
-        printf("Success\n");
-      }
       putb(result);
-      putb(dst[addr]);
-      addr++;
+      result_array[num] = result;
       tmp = 0;
       result = 0;
+      num += 1;
     }
-    // putb(result);
   }
+  unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
+
+  if (result_real != dst[0])
+  {
+    printf("Error\n");
+  }
+  else
+  {
+    printf("Success\n");
+  }
+
+  printf("%d\n", result_real);
+  putb(result_real);
+  printf("////////////////////////");
+  printf("%d\n", dst[0]);
+  putb(dst[0]);
 
   //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
 
