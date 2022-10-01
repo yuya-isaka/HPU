@@ -6,5 +6,5 @@ test_hdc: test_hdc.c
 # %: %.c
 # 	arm-linux-gnueabihf-gcc $@.c -o $@
 
-# clean:
-# 	rm test_hdc
+clean:
+	rm test_hdc
