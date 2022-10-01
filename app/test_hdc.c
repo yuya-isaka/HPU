@@ -323,23 +323,6 @@ void main()
       num += 1;
     }
   }
-  result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
-
-  if (result_real != dst[0])
-  {
-    printf("Error\n");
-  }
-  else
-  {
-    printf("Success\n");
-  }
-
-  printf("%d\n", result_real);
-  putb(result_real);
-  printf("////////////////////////");
-  printf("%d\n", dst[0]);
-  printf("%d\n", dst[1]);
-  putb(dst[0]);
 
   result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
   printf("%d\n", result_real);
