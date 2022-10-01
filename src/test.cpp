@@ -53,7 +53,7 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 int main(int argc, char **argv)
 {
 
-	puts("\n");
+	puts("\n////////////////////////////////////////////////////////////////////////////\n");
 
 	unsigned int sample_array[24];
 	unsigned int sample = 33215360;
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 	int num = 0;
 	for (unsigned int i = 0; i < 24; i++)
 	{
-		result ^= shifter(sample_array[i], i);
+		result ^= shifter(sample_array[i], tmp);
 		tmp += 1;
 		if (tmp == 3)
 		{
@@ -80,14 +80,13 @@ int main(int argc, char **argv)
 			result = 0;
 			num += 1;
 		}
-		// putb(result);
 	}
 
 	unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
 	printf("%d\n", result_real);
 	putb(result_real);
 
-	puts("\n");
+	puts("\n////////////////////////////////////////////////////////////////////////////\n");
 
 	// // const int NGRAM = 3;
 

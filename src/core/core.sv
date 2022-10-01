@@ -72,14 +72,20 @@ module core
                   end
               end;
 
+    reg [2:0]         permutation; // 3-gramを想定
+    initial begin
+        permutation = 0;
+    end
     always_ff @(posedge clk)begin
                   if(init_next_next)begin
                       acc_left <= 32'h0;
+                      permutation <= 0;
                   end
                   else if(exec_next_next_next)begin
+                      permutation <= permutation + 1;
                       // クリティカルパスになりそう（なるなら分けてもいい）
-                    //   acc_left <= acc_left ^ (m2 >> m2 | ( ( m2 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
-                      acc_left <= acc_left ^ (32'd33215360 >> m2 | ( ( 32'd33215360 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
+                        // acc_left <= acc_left ^ (m2 >> m2 | ( ( m2 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
+                      acc_left <= acc_left ^ (m2 >> permutation | ( ( m2 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
                   end
               end;
 
