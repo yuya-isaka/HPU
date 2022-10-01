@@ -50,6 +50,8 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 	return result;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+
 int main(int argc, char **argv)
 {
 
@@ -63,14 +65,21 @@ int main(int argc, char **argv)
 		sample += 180038;
 	}
 
+	unsigned int item_memory_array[100];
+	unsigned int item_memory_value = 33215360;
+	for (unsigned int i = 0; i < 100; i++)
+	{
+		item_memory_array[i] = item_memory_value;
+		item_memory_value += 18360;
+	}
+
 	unsigned int result_array[8];
 	unsigned int result = 0;
-	// 理想の計算
 	int tmp = 0;
 	int num = 0;
 	for (unsigned int i = 0; i < 24; i++)
 	{
-		result ^= shifter(sample_array[i], tmp);
+		result ^= shifter(item_memory_array[i], tmp);
 		tmp += 1;
 		if (tmp == 3)
 		{

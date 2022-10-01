@@ -17,14 +17,15 @@ module core
     );
 
     // 各コアにつき32bitのデータを128個集める
-    reg [31:0]        item_memory [0:100];
+    reg [31:0]        item_memory [0:99];
 
     integer i;
-    integer j = 33215360;
+    integer j;
     initial begin
+        j = 33215360;
         for (i=0; i < 100; i++) begin
             item_memory[i] = j;
-            j = j + 180038;
+            j += 18360;
         end
     end
 
@@ -72,20 +73,21 @@ module core
                   end
               end;
 
-    reg [2:0]         permutation; // 3-gramを想定
-    initial begin
-        permutation = 0;
-    end
+    reg [31:0]     permutation;
     always_ff @(posedge clk)begin
                   if(init_next_next)begin
+                      permutation <= 32'h0;
                       acc_left <= 32'h0;
                       permutation <= 0;
                   end
                   else if(exec_next_next_next)begin
                       permutation <= permutation + 1;
                       // クリティカルパスになりそう（なるなら分けてもいい）
-                        // acc_left <= acc_left ^ (m2 >> m2 | ( ( m2 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
+                      //   acc_left <= acc_left ^ (m2 >> m2 | ( ( m2 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
+                      //   acc_left <= acc_left ^ (32'd33215360 >> m2 | ( ( 32'd33215360 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
+                    //   acc_left <= acc_left ^ (32'd33215360 >> permutation | ( ( 32'd33215360 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
                       acc_left <= acc_left ^ (m2 >> permutation | ( ( m2 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
+                      permutation <= permutation + 1;
                   end
               end;
 

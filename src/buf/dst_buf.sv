@@ -44,8 +44,7 @@ module dst_buf
     //　一旦この方法で書いて、その後試してみようか
 
     // いやそもそもdualportメモリやからそれはないか
-    // (* ram_style = "block" *)     reg [63:0]        buff0 [0:31]; // アドレス偶数
-    (* ram_style = "block" *)     reg [63:0]        buff0; // アドレス偶数
+    (* ram_style = "block" *)     reg [63:0]        buff0 [0:31]; // アドレス偶数
     // reg [31:0]        buff0 [0:31]; // アドレス偶数
     // reg [31:0]        buff1 [0:31]; // アドレス奇数
 
@@ -72,8 +71,7 @@ module dst_buf
 
     always_ff @(posedge clk) begin
                   if (s_fin) begin
-                      buff0[31:0] <= sign_bit_1[31:0];
-                      buff0[63:32] <= 0;
+                      buff0[0] <= sign_bit_1;
                   end
               end;
 
@@ -95,15 +93,14 @@ module dst_buf
                   if (stream_v & p) begin
                       //   stream_0[31:0] <= buff0[stream_a];
                       //   stream_0[63:32] <= buff1[stream_a];
-                      stream_0 <= buff0;
+                      stream_0 <= buff0[0];
                   end
               end;
 
     // out_addrの最上位ビットが1
     ////////////////////////////////////////////////////////////////////////////
 
-    // (* ram_style = "block" *)     reg [63:0]        buff2 [0:31]; // アドレス偶数
-    (* ram_style = "block" *)     reg [63:0]        buff2; // アドレス偶数
+    (* ram_style = "block" *)     reg [63:0]        buff2 [0:31]; // アドレス偶数
     // reg [31:0]        buff2 [0:31]; // アドレス偶数
     // reg [31:0]        buff3 [0:31]; // アドレス奇数
 
@@ -130,8 +127,7 @@ module dst_buf
 
     always_ff @(posedge clk) begin
                   if (s_fin) begin
-                      buff2[31:0] <= sign_bit_2[31:0];
-                      buff2[63:32] <= 0;
+                      buff2[0] <= sign_bit_2;
                   end
               end;
 
@@ -151,7 +147,7 @@ module dst_buf
                   if (stream_v & ~p) begin
                       //   stream_1[31:0] <= buff2[stream_a];
                       //   stream_1[63:32] <= buff3[stream_a];
-                      stream_1 <= buff2;
+                      stream_1 <= buff2[0];
                   end
               end;
 

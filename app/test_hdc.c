@@ -68,7 +68,7 @@ unsigned long dst_phys;
 void main()
 {
 
-  printf("\n ---------------------------- 開始 ----------------------------- \n");
+  printf("\n ------------------------------ 開始 -------------------------------- \n");
 
   ///////////////////////////////////////////////////////////////////////////////// initial, udmabuf, uio 設定 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -186,11 +186,13 @@ void main()
   // 起動
   top[0x00 / 4] = 2;
 
-  printf("\n ------------------------- Sample %d Input -------------------------- \n\n", 0);
+  printf("\n ------------------------- Sample %d Input --------------------------- \n\n", 0);
 
-  int sample[24];
-  for (int i = 0; i < 24; i++)
+  int sample[24];              // 動的
+  for (int i = 0; i < 24; i++) // 動的
   {
+    // ここにアドレスを指定
+    // ここでは0-23のアドレスを入力
     sample[i] = i;
     printf("%3d ", sample[i]);
 
@@ -202,7 +204,7 @@ void main()
   // 32768bit / 64bit = 512サイクル
   dma[0x00 / 4] = 1;
   dma[0x18 / 4] = src_phys;
-  dma[0x28 / 4] = 24 * 4;
+  dma[0x28 / 4] = 24 * 4; // 動的
 
   // 送信終了をUIO経由のビジーループで監視
   while ((dma[0x04 / 4] & 0x1000) != 0x1000)
@@ -214,8 +216,11 @@ void main()
   dma[0x48 / 4] = dst_phys;
   dma[0x58 / 4] = 2 * 4;
 
-  for (int i = 0; i < 24; i++)
+  for (int i = 0; i < 24; i++) // 動的
   {
+    // ここにアドレスを指定
+    // ここでは0-23のアドレスを入力
+    // 今回は２回ハイパーベクトルを求めている
     sample[i] = i;
     printf("%3d ", sample[i]);
 
@@ -227,7 +232,7 @@ void main()
   // 32768bit / 64bit = 512サイクル
   dma[0x00 / 4] = 1;
   dma[0x18 / 4] = src_phys;
-  dma[0x28 / 4] = 24 * 4;
+  dma[0x28 / 4] = 24 * 4; // 動的
 
   // 送信終了をUIO経由のビジーループで監視
   while ((dma[0x04 / 4] & 0x1000) != 0x1000)
@@ -240,25 +245,27 @@ void main()
   //////////////////////////////////////////////////////////////////////////////////////////////////
 
   printf("\n ------------------------- Sample %d Output -------------------------- \n\n", 1);
-  // 理想の計算
-  unsigned int sample_array[24];
-  unsigned int sample_tmp = 33215360;
-  for (int i = 0; i < 24; i++)
+
+  // 現状、乱数生成器がないので、33215360を起点に下ランダムな値をitem_memory_arrayに入力
+  // これはテスト用
+  unsigned int item_memory_array[100];
+  unsigned int item_memory_value = 33215360;
+  for (unsigned int i = 0; i < 100; i++)
   {
-    sample_array[i] = sample_tmp;
-    sample_tmp += 180038;
+    item_memory_array[i] = item_memory_value;
+    item_memory_value += 18360;
   }
 
-  unsigned int result_array[8];
+  unsigned int result_array[8]; // 動的 今回24個のアドレスで3-gramなので、24/3=8
   unsigned int result = 0;
   // 理想の計算
   int tmp = 0;
   int num = 0;
-  for (unsigned int i = 0; i < 24; i++)
+  for (unsigned int i = 0; i < 24; i++) // 動的
   {
-    result ^= shifter(sample_array[i], tmp);
+    result ^= shifter(item_memory_array[i], tmp);
     tmp += 1;
-    if (tmp == 3)
+    if (tmp == 3) // 将来的には動的、現状3-gram
     {
       putb(result);
       result_array[num] = result;
@@ -267,8 +274,10 @@ void main()
       num += 1;
     }
   }
-  unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
 
+  unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
+  printf("%d\n", result_real);
+  putb(result_real);
   if (result_real != dst[0])
   {
     printf("Error\n");
@@ -277,12 +286,7 @@ void main()
   {
     printf("Success\n");
   }
-
-  printf("%d\n", result_real);
-  putb(result_real);
-  printf("////////////////////////");
   printf("%d\n", dst[0]);
-  printf("%d\n", dst[1]);
   putb(dst[0]);
 
   // 受信設定
@@ -302,15 +306,15 @@ void main()
 
   printf("\n ------------------------- Sample %d Output -------------------------- \n\n", 1);
 
+  // unsigned int result_array[8];
   result = 0;
-  // 理想の計算
   tmp = 0;
   num = 0;
-  for (unsigned int i = 0; i < 24; i++)
+  for (unsigned int i = 0; i < 24; i++) // 動的
   {
-    result ^= shifter(sample_array[i], tmp);
+    result ^= shifter(item_memory_array[i], tmp);
     tmp += 1;
-    if (tmp == 3)
+    if (tmp == 3) // 将来的には動的
     {
       putb(result);
       result_array[num] = result;
@@ -337,6 +341,20 @@ void main()
   printf("%d\n", dst[1]);
   putb(dst[0]);
 
+  result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
+  printf("%d\n", result_real);
+  putb(result_real);
+  if (result_real != dst[0])
+  {
+    printf("Error\n");
+  }
+  else
+  {
+    printf("Success\n");
+  }
+  printf("%d\n", dst[0]);
+  putb(dst[0]);
+
   //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
 
   // run <- 0; last <- 0;
@@ -344,7 +362,7 @@ void main()
 
   /////////////////////////////////////////////////////////////////////////////////////////  終了 ////////////////////////////////////////////////////////////////////////////////////
 
-  printf("\n ----------------------------- 終了 --------------------------------- \n\n");
+  printf("\n ------------------------------ 終了 -------------------------------- \n\n");
 
   return;
 }
