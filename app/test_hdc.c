@@ -318,7 +318,7 @@ void main()
       num += 1;
     }
   }
-  unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
+  result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
 
   if (result_real != dst[0])
   {
