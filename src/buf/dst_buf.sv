@@ -71,8 +71,7 @@ module dst_buf
 
     always_ff @(posedge clk) begin
                   if (s_fin) begin
-                      buff0[31:0] <= sign_bit_1[31:0];
-                      buff0[63:32] <= 0;
+                      buff0[0] <= sign_bit_1;
                   end
               end;
 
@@ -94,7 +93,7 @@ module dst_buf
                   if (stream_v & p) begin
                       //   stream_0[31:0] <= buff0[stream_a];
                       //   stream_0[63:32] <= buff1[stream_a];
-                      stream_0 <= buff0;
+                      stream_0 <= buff0[0];
                   end
               end;
 
@@ -128,8 +127,7 @@ module dst_buf
 
     always_ff @(posedge clk) begin
                   if (s_fin) begin
-                      buff2[31:0] <= sign_bit_2[31:0];
-                      buff2[63:32] <= 0;
+                      buff2[0] <= sign_bit_2;
                   end
               end;
 
@@ -149,7 +147,7 @@ module dst_buf
                   if (stream_v & ~p) begin
                       //   stream_1[31:0] <= buff2[stream_a];
                       //   stream_1[63:32] <= buff3[stream_a];
-                      stream_1 <= buff2;
+                      stream_1 <= buff2[0];
                   end
               end;
 
