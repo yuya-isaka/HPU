@@ -188,9 +188,11 @@ void main()
 
   printf("\n ------------------------- Sample %d Input -------------------------- \n\n", 0);
 
-  int sample[24];
-  for (int i = 0; i < 24; i++)
+  int sample[24];              // 動的
+  for (int i = 0; i < 24; i++) // 動的
   {
+    // ここにアドレスを指定
+    // ここでは0-23のアドレスを入力
     sample[i] = i;
     printf("%3d ", sample[i]);
     src[i] = sample[i];
@@ -201,7 +203,7 @@ void main()
   // 32768bit / 64bit = 512サイクル
   dma[0x00 / 4] = 1;
   dma[0x18 / 4] = src_phys;
-  dma[0x28 / 4] = 24 * 4;
+  dma[0x28 / 4] = 24 * 4; // 動的
 
   // 送信終了をUIO経由のビジーループで監視
   while ((dma[0x04 / 4] & 0x1000) != 0x1000)
@@ -213,8 +215,11 @@ void main()
   dma[0x48 / 4] = dst_phys;
   dma[0x58 / 4] = 2 * 4;
 
-  for (int i = 0; i < 24; i++)
+  for (int i = 0; i < 24; i++) // 動的
   {
+    // ここにアドレスを指定
+    // ここでは0-23のアドレスを入力
+    // 今回は２回ハイパーベクトルを求めている
     sample[i] = i;
     printf("%3d ", sample[i]);
     src[i] = sample[i];
@@ -225,7 +230,7 @@ void main()
   // 32768bit / 64bit = 512サイクル
   dma[0x00 / 4] = 1;
   dma[0x18 / 4] = src_phys;
-  dma[0x28 / 4] = 24 * 4;
+  dma[0x28 / 4] = 24 * 4; // 動的
 
   // 送信終了をUIO経由のビジーループで監視
   while ((dma[0x04 / 4] & 0x1000) != 0x1000)
@@ -236,35 +241,9 @@ void main()
     ;
 
   printf("\n ------------------------- Sample %d Output -------------------------- \n\n", 1);
-  // 理想の計算
-  // unsigned int result = 0;
-  // // 理想の計算
-  // int addr = 0;
-  // int tmp = 0;
-  // for (unsigned int i = 0; i < 24; i++)
-  // {
-  //   result ^= shifter(i, i);
-  //   tmp += 1;
-  //   if (tmp == 3)
-  //   {
-  //     if (result != dst[addr])
-  //     {
-  //       printf("Error\n");
-  //     }
-  //     else
-  //     {
-  //       printf("Success\n");
-  //     }
-  //     putb(result);
-  //     putb(dst[addr]);
-  //     addr++;
-  //     tmp = 0;
-  //     result = 0;
-  //   }
-  //   // putb(result);
-  // }
-  // printf("\n");
 
+  // 現状、乱数生成器がないので、33215360を起点に下ランダムな値をitem_memory_arrayに入力
+  // これはテスト用
   unsigned int item_memory_array[100];
   unsigned int item_memory_value = 33215360;
   for (unsigned int i = 0; i < 100; i++)
@@ -273,16 +252,16 @@ void main()
     item_memory_value += 18360;
   }
 
-  unsigned int result_array[8];
+  unsigned int result_array[8]; // 動的 今回24個のアドレスで3-gramなので、24/3=8
   unsigned int result = 0;
   // 理想の計算
   int tmp = 0;
   int num = 0;
-  for (unsigned int i = 0; i < 24; i++)
+  for (unsigned int i = 0; i < 24; i++) // 動的
   {
     result ^= shifter(item_memory_array[i], tmp);
     tmp += 1;
-    if (tmp == 3)
+    if (tmp == 3) // 将来的には動的、現状3-gram
     {
       putb(result);
       result_array[num] = result;
@@ -290,7 +269,6 @@ void main()
       result = 0;
       num += 1;
     }
-    // putb(result);
   }
 
   unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
@@ -323,43 +301,16 @@ void main()
     ;
 
   printf("\n ------------------------- Sample %d Output -------------------------- \n\n", 1);
-  // result = 0;
-  // 理想の計算
-  // addr = 0;
-  // tmp = 0;
-  // for (unsigned int i = 0; i < 24; i++)
-  // {
-  //   result ^= shifter(33215360, i);
-  //   tmp += 1;
-  //   if (tmp == 3)
-  //   {
-  //     if (result != dst[addr])
-  //     {
-  //       printf("Error\n");
-  //     }
-  //     else
-  //     {
-  //       printf("Success\n");
-  //     }
-  //     putb(result);
-  //     putb(dst[addr]);
-  //     addr++;
-  //     tmp = 0;
-  //     result = 0;
-  //   }
-  //   // putb(result);
-  // }
 
   // unsigned int result_array[8];
   result = 0;
-  // 理想の計算
   tmp = 0;
   num = 0;
-  for (unsigned int i = 0; i < 24; i++)
+  for (unsigned int i = 0; i < 24; i++) // 動的
   {
     result ^= shifter(item_memory_array[i], tmp);
     tmp += 1;
-    if (tmp == 3)
+    if (tmp == 3) // 将来的には動的
     {
       putb(result);
       result_array[num] = result;
@@ -367,7 +318,6 @@ void main()
       result = 0;
       num += 1;
     }
-    // putb(result);
   }
 
   result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
