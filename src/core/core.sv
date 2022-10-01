@@ -70,14 +70,18 @@ module core
                   end
               end;
 
+    reg [31:0]     permutation;
     always_ff @(posedge clk)begin
                   if(init_next_next)begin
+                      permutation <= 32'h0;
                       acc_left <= 32'h0;
                   end
                   else if(exec_next_next_next)begin
                       // クリティカルパスになりそう（なるなら分けてもいい）
-                    //   acc_left <= acc_left ^ (m2 >> m2 | ( ( m2 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
-                      acc_left <= acc_left ^ (32'd33215360 >> m2 | ( ( 32'd33215360 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
+                      //   acc_left <= acc_left ^ (m2 >> m2 | ( ( m2 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
+                      //   acc_left <= acc_left ^ (32'd33215360 >> m2 | ( ( 32'd33215360 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
+                      acc_left <= acc_left ^ (32'd33215360 >> permutation | ( ( 32'd33215360 & ((1'b1 << permutation) - 1'b1) ) << (32 - m2) ) );
+                      permutation <= permutation + 1;
                   end
               end;
 

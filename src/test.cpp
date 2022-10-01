@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 	int num = 0;
 	for (unsigned int i = 0; i < 24; i++)
 	{
-		result ^= shifter(33215360, i);
+		result ^= shifter(33215360, tmp);
 		tmp += 1;
 		if (tmp == 3)
 		{
