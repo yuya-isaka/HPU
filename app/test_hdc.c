@@ -33,6 +33,27 @@ unsigned int shifter(unsigned int v, unsigned int num)
   return tmp_v;
 }
 
+unsigned int grab_bit(unsigned int result_array[], size_t size)
+{
+  unsigned int result = 0;
+
+  unsigned int mask = (int)1 << (sizeof(result_array[0]) * 8 - 1);
+  while (mask)
+  {
+    int tmp = 0;
+    for (int i = 0; i < size; i++)
+    {
+      tmp += (mask & result_array[i] ? 1 : 0);
+    }
+    if (tmp > (size / 2))
+    {
+      result += mask;
+    }
+    mask >>= 1;
+  }
+  return result;
+}
+
 // ====================================================================================================================================================================================
 
 volatile int *top;
@@ -166,32 +187,6 @@ void main()
   top[0x00 / 4] = 2;
 
   printf("\n ------------------------- Sample %d Input -------------------------- \n\n", 0);
-
-  // // HelloWorld
-  // // 0122454729
-
-  // // CGRA
-  // //  BRAM
-  // // 0 aのハイパーベクトル
-  // // 1
-  // // 1
-
-  // // n=1の時
-  // int sample[10];
-  // for (int i = 0; i < 10; i++)
-  // {
-  //   sample[i] = i;
-  // }
-
-  // // n=2の時
-  // int tmp = 0;
-  // int sample[18];
-  // for (int i = 0; i < 10; i++)
-  // {
-  //   sample[tmp] = i;         // h e
-  //   sample[tmp + 1] = i + 1; // e l
-  //   tmp += 2;
-  // }
 
   int sample[24];
   for (int i = 0; i < 24; i++)
