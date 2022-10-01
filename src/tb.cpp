@@ -70,19 +70,6 @@ void putb(unsigned int v)
   putchar('0'), putchar('b'), printb(v), putchar('\n');
 }
 
-unsigned int shifter(unsigned int v, unsigned int num)
-{
-  // num回 論理右シフト
-  unsigned int tmp = v >> num;
-
-  // 右にシフトしたやつを取り出して、左に(32-num)回 論理左シフト
-  unsigned int tmp_num = (1 << num) - 1;
-  unsigned int tmp_v = (v & tmp_num) << ((sizeof(v) * 8) - num);
-
-  tmp_v = tmp_v | tmp;
-  return tmp_v;
-}
-
 // ====================================================================================================================================================================================
 
 int main(int argc, char **argv)
@@ -172,36 +159,6 @@ int main(int argc, char **argv)
 
   printf("\n ------------------------- Output -------------------------- \n\n");
 
-  // unsigned int result2 = 0;
-  // unsigned int aaa = 0;
-  // for (unsigned int i = 0; i < 24; i++)
-  // {
-  //   result2 ^= shifter(i, i);
-  //   putb(result2);
-  //   if (i == 23)
-  //   {
-  //     aaa = result2;
-  //     putb(aaa);
-  //   }
-  // }
-  // putb(result2);
-  // putb(aaa);
-
-  // 確認
-  // conv.wd = verilator_top->M_AXIS_TDATA;
-  // if (aaa != conv.d0)
-  // {
-  //   printf("Error\n");
-  // }
-  // else
-  // {
-  //   printf("Success\n");
-  // }
-  // putb(aaa);
-  // putb(conv.d0);
-  // putb(conv.d1);
-  // printf("\n");
-
   for (int i = 0; i < 1; i++)
   {
     conv.wd = verilator_top->M_AXIS_TDATA;
@@ -229,36 +186,6 @@ int main(int argc, char **argv)
   }
 
   printf("\n ------------------------- Output -------------------------- \n\n");
-
-  // result2 = 0;
-  // aaa = 0;
-  // for (unsigned int i = 0; i < 24; i++)
-  // {
-  //   result2 ^= shifter(i, i);
-  //   putb(result2);
-  //   if (i == 23)
-  //   {
-  //     aaa = result2;
-  //     putb(aaa);
-  //   }
-  // }
-  // putb(result2);
-  // putb(aaa);
-
-  // // 確認
-  // conv.wd = verilator_top->M_AXIS_TDATA;
-  // if (aaa != conv.d0)
-  // {
-  //   printf("Error\n");
-  // }
-  // else
-  // {
-  //   printf("Success\n");
-  // }
-  // putb(aaa);
-  // putb(conv.d0);
-  // putb(conv.d1);
-  // printf("\n");
 
   for (int i = 0; i < 1; i++)
   {

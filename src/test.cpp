@@ -50,6 +50,8 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 	return result;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+
 int main(int argc, char **argv)
 {
 
@@ -65,7 +67,6 @@ int main(int argc, char **argv)
 
 	unsigned int result_array[8];
 	unsigned int result = 0;
-	// 理想の計算
 	int tmp = 0;
 	int num = 0;
 	for (unsigned int i = 0; i < 24; i++)
@@ -80,7 +81,6 @@ int main(int argc, char **argv)
 			result = 0;
 			num += 1;
 		}
-		// putb(result);
 	}
 
 	unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
