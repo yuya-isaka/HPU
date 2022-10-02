@@ -54,16 +54,24 @@ module sv_test
     always_ff @(posedge clk) begin
                   // Auto-reset if we're in the all-zero state
                   if (x_q == 0 && y_q == 0 && z_q == 0 && w_q == 0) begin
-                      x_q <= 32'h8de97cc5;
-                      y_q <= 32'h6144a7eb;
-                      z_q <= 32'h653f6dee;
-                      w_q <= 32'h8b49b282;
+                      //   x_q <= 32'h8de97cc5;
+                      //   y_q <= 32'h6144a7eb;
+                      //   z_q <= 32'h653f6dee;
+                      //   w_q <= 32'h8b49b282;
+                      x_q <= 32'd123456789;
+                      y_q <= 32'd362436069;
+                      z_q <= 32'd521288629;
+                      w_q <= 32'd88675123;
                   end
                   else if (!rstn) begin
-                      x_q <= 32'h8de97cc5;
-                      y_q <= 32'h6144a7eb;
-                      z_q <= 32'h653f6dee;
-                      w_q <= 32'h8b49b282;
+                      //   x_q <= 32'h8de97cc5;
+                      //   y_q <= 32'h6144a7eb;
+                      //   z_q <= 32'h653f6dee;
+                      //   w_q <= 32'h8b49b282;
+                      x_q <= 32'd123456789;
+                      y_q <= 32'd362436069;
+                      z_q <= 32'd521288629;
+                      w_q <= 32'd88675123;
                   end
                   else begin
                       x_q <= x_d;

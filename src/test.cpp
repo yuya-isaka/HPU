@@ -63,33 +63,37 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 // 	z = w;
 // 	return (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)));
 // }
-// unsigned int xor128()
-// {
-// 	static unsigned int x = 123456789;
-// 	static unsigned int y = 362436069;
-// 	static unsigned int z = 521288629;
-// 	static unsigned int w = 88675123;
 
-// 	unsigned int t = (x ^ (x << 11));
-// 	x = y;
-// 	y = z;
-// 	z = w;
-// 	return (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)));
-// }
-uint32_t xor128(void)
+// パターン１
+unsigned int xor128()
 {
-	static uint32_t x = 2380889285;
-	static uint32_t y = 1631889387;
-	static uint32_t z = 1698655726;
-	static uint32_t w = 2336862850;
-	uint32_t t;
+	static unsigned int x = 123456789;
+	static unsigned int y = 362436069;
+	static unsigned int z = 521288629;
+	static unsigned int w = 88675123;
 
-	t = x ^ (x << 11);
+	unsigned int t = (x ^ (x << 11));
 	x = y;
 	y = z;
 	z = w;
-	return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+	return (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)));
 }
+
+// パターン２
+// uint32_t xor128(void)
+// {
+// 	static uint32_t x = 2380889285;
+// 	static uint32_t y = 1631889387;
+// 	static uint32_t z = 1698655726;
+// 	static uint32_t w = 2336862850;
+// 	uint32_t t;
+
+// 	t = x ^ (x << 11);
+// 	x = y;
+// 	y = z;
+// 	z = w;
+// 	return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+// }
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
