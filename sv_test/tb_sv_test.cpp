@@ -95,11 +95,10 @@ int main(int argc, char **argv)
   eval();
   verilator_top->rstn = 1;
   eval();
-  eval();
 
   for (int i = 0; i < 10; i++)
   {
-    printf("%d:%llu\n", i, verilator_top->rand_num);
+    printf("%d:%u\n", i, verilator_top->rand_num);
     // putb(tmp);
     // printf("\n");
     eval();
