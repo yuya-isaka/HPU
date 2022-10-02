@@ -50,18 +50,45 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 	return result;
 }
 
-unsigned long xor128()
-{
-	static unsigned long x = 123456789;
-	static unsigned long y = 362436069;
-	static unsigned long z = 521288629;
-	static unsigned long w = 88675123;
+// unsigned long xor128()
+// {
+// 	static unsigned long x = 123456789;
+// 	static unsigned long y = 362436069;
+// 	static unsigned long z = 521288629;
+// 	static unsigned long w = 88675123;
 
-	unsigned long t = (x ^ (x << 11));
+// 	unsigned long t = (x ^ (x << 11));
+// 	x = y;
+// 	y = z;
+// 	z = w;
+// 	return (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)));
+// }
+// unsigned int xor128()
+// {
+// 	static unsigned int x = 123456789;
+// 	static unsigned int y = 362436069;
+// 	static unsigned int z = 521288629;
+// 	static unsigned int w = 88675123;
+
+// 	unsigned int t = (x ^ (x << 11));
+// 	x = y;
+// 	y = z;
+// 	z = w;
+// 	return (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)));
+// }
+uint32_t xor128(void)
+{
+	static uint32_t x = 2380889285;
+	static uint32_t y = 1631889387;
+	static uint32_t z = 1698655726;
+	static uint32_t w = 2336862850;
+	uint32_t t;
+
+	t = x ^ (x << 11);
 	x = y;
 	y = z;
 	z = w;
-	return (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)));
+	return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -73,7 +100,7 @@ int main(int argc, char **argv)
 
 	for (int i = 0; i < 10; i++)
 	{
-		printf("%d:%lu\n", i, xor128());
+		printf("%d:%u\n", i, xor128());
 	}
 
 	// unsigned int sample_array[24];
