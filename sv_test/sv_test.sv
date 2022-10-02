@@ -40,7 +40,8 @@ module sv_test
         output  wire [31:0]     rand_num
     );
 
-    reg [31:0] x_q, y_q, z_q, w_q, x_d, y_d, z_d, w_d;
+    reg [31:0] x_q, y_q, z_q, w_q;
+    logic [31:0] x_d, y_d, z_d, w_d;
     // wire [127:0] seed = 128'h8de97cc56144a7eb653f6dee8b49b282;
     assign rand_num = w_q;
 
