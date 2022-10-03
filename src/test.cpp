@@ -50,63 +50,44 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 	return result;
 }
 
-// unsigned long xor128()
-// {
-// 	static unsigned long x = 123456789;
-// 	static unsigned long y = 362436069;
-// 	static unsigned long z = 521288629;
-// 	static unsigned long w = 88675123;
-
-// 	unsigned long t = (x ^ (x << 11));
-// 	x = y;
-// 	y = z;
-// 	z = w;
-// 	return (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)));
-// }
-
-// パターン１
-unsigned int xor128()
+uint32_t xor128(void)
 {
-	static unsigned int x = 123456789;
-	static unsigned int y = 362436069;
-	static unsigned int z = 521288629;
-	static unsigned int w = 88675123;
+	// 内部で値を保持（seed） パターン１
+	static uint32_t x = 2380889285;
+	static uint32_t y = 1631889387;
+	static uint32_t z = 1698655726;
+	static uint32_t w = 2336862850;
 
-	unsigned int t = (x ^ (x << 11));
+	// 内部で値を保持（seed） パターン２
+	// static uint32_t x = 123456789;
+	// static uint32_t y = 362436069;
+	// static uint32_t z = 521288629;
+	// static uint32_t w = 88675123;
+
+	// 前回のxを使う
+	uint32_t t = x ^ (x << 11);
+	// 更新
 	x = y;
 	y = z;
 	z = w;
-	return (w = (w ^ (w >> 19)) ^ (t ^ (t >> 8)));
+
+	return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
 }
-
-// パターン２
-// uint32_t xor128(void)
-// {
-// 	static uint32_t x = 2380889285;
-// 	static uint32_t y = 1631889387;
-// 	static uint32_t z = 1698655726;
-// 	static uint32_t w = 2336862850;
-// 	uint32_t t;
-
-// 	t = x ^ (x << 11);
-// 	x = y;
-// 	y = z;
-// 	z = w;
-// 	return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
-// }
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char **argv)
 {
 
-	puts("\n////////////////////////////////////////////////////////////////////////////\n");
+	printf("\n ------------------------------- 開始 ------------------------------- \n\n");
 
+	// randomテスト
 	for (int i = 0; i < 10; i++)
 	{
-		printf("%d:%u\n", i, xor128());
+		printf("   %d:  %10u\n", i, xor128());
 	}
 
+	// hdcテスト
 	// unsigned int sample_array[24];
 	// unsigned int sample = 33215360;
 	// for (int i = 0; i < 24; i++)
@@ -145,8 +126,9 @@ int main(int argc, char **argv)
 	// printf("%d\n", result_real);
 	// putb(result_real);
 
-	puts("\n////////////////////////////////////////////////////////////////////////////\n");
+	printf("\n ------------------------------- 終了 ------------------------------- \n");
 
+	// n-gramテスト
 	// // const int NGRAM = 3;
 
 	// int ascii[26];
