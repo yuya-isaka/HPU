@@ -33,6 +33,7 @@ DESIGN_SRCS = \
 ./util/agu.sv \
 ./util/agu_next.sv \
 ./util/counter.sv \
+./util/xorshift.sv \
 # ./1mat/mat_ctrl.sv \
 # ./param/agu_param.sv \
 

@@ -107,6 +107,7 @@ module top
     src_ctrl src_ctrl
              (
                  .clk(AXIS_ACLK),
+                 .matw(matw),
                  .run(run),
                  .src_valid(S_AXIS_TVALID),
                  .src_en(src_en),
@@ -271,12 +272,29 @@ module top
     // wire [31:0] result = acc[0];
     wire [31:0] result = acc;
 
+    reg [6:0] mat_a;
+    always @(posedge AXIS_ACLK)begin
+        if(~AXIS_ARESETN|~matw)begin
+            mat_a <= 7'd0;
+        end
+        else begin
+            mat_a <= mat_a + 7'd1;
+        end
+    end;
+
+    reg [31:0]      rand_num;
+    xorshift rng (.clk(AXIS_ACLK), .rst(~AXIS_ARESETN), .matw(matw), .rand_num(rand_num));
+
     generate
         genvar         i;
         for (i = 0; i < 1; i = i + 1)begin
             core core
                  (
                      .clk(AXIS_ACLK),
+                     .rst(~AXIS_ARESETN),
+                     .matw(matw),
+                     .mat_a(mat_a),
+                     .rand_num(rand_num),
                      .init(k_init),
 
                      .mat_d(S_AXIS_TDATA),
@@ -406,6 +424,9 @@ module top
                 default:
                     ;
             endcase
+        end
+        else if (matw & mat_a == 99) begin // S_AXI_ACLKとAXIS_ACLKのクロック周波数は今は100MHzで一緒？だから大丈夫？
+            matw <= 1'b0;
         end
     end
 

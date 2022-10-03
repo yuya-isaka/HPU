@@ -1,10 +1,11 @@
 `default_nettype none
 
 // xorshift
-module sv_test
+module xorshift
     (
         input   wire            clk,
-        input   wire            rstn,
+        input   wire            rst,
+        input   wire            matw,
         output  logic [31:0]    rand_num
     );
 
@@ -18,7 +19,7 @@ module sv_test
     reg [31:0] w;
 
     always_ff @(posedge clk) begin
-                  if (!rstn | (x == 0 && y == 0 && z == 0 && w == 0))begin
+                  if (~matw | rst)begin
                       // パターン１
                       // x <= 2380889285;
                       // y <= 1631889387;

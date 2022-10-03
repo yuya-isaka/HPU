@@ -3,6 +3,10 @@
 module core
     (
         input wire              clk,
+        input wire              rst,
+        input wire              matw,
+        input wire [6:0]        mat_a,
+        input wire [31:0]       rand_num,
         input wire              init, // k_init
 
         input wire [64:0]       mat_d,
@@ -19,13 +23,25 @@ module core
     // 各コアにつき32bitのデータを128個集める
     reg [31:0]        item_memory [0:99];
 
+    always_ff @(posedge clk) begin
+                  if (matw) begin
+                      item_memory[mat_a] = rand_num;
+                  end
+              end;
+
+    // integer i;
+    // integer j;
+    // initial begin
+    //     j = 33215360;
+    //     for (i=0; i < 100; i++) begin
+    //         item_memory[i] = j;
+    //         j += 18360;
+    //     end
+    // end
     integer i;
-    integer j;
     initial begin
-        j = 33215360;
         for (i=0; i < 100; i++) begin
-            item_memory[i] = j;
-            j += 18360;
+            item_memory[i] = i;
         end
     end
 

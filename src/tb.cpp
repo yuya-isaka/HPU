@@ -116,6 +116,26 @@ int main(int argc, char **argv)
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  // matw <- 1;
+  verilator_top->S_AXI_AWADDR = 0;
+  verilator_top->S_AXI_WDATA = 1;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
+
+  verilator_top->S_AXI_ARVALID = 1;
+  eval();
+  eval();
+  while (0 != verilator_top->S_AXI_RDATA)
+  {
+    eval();
+  }
+  verilator_top->S_AXI_ARVALID = 0;
+  eval();
+
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // run <- 1;

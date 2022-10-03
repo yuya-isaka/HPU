@@ -85,49 +85,42 @@ int main(int argc, char **argv)
 	printf("\n ------------------------------- 開始 ------------------------------- \n\n");
 
 	// randomテスト
-	for (int i = 0; i < 10; i++)
-	{
-		printf("   %d:  %10u\n", i, xor128());
-	}
+	// for (int i = 0; i < 10; i++)
+	// {
+	// 	printf("   %d:  %10u\n", i, xor128());
+	// }
 
 	// hdcテスト
-	// unsigned int sample_array[24];
-	// unsigned int sample = 33215360;
-	// for (int i = 0; i < 24; i++)
-	// {
-	// 	sample_array[i] = sample;
-	// 	sample += 180038;
-	// }
 
-	// unsigned int item_memory_array[100];
-	// unsigned int item_memory_value = 33215360;
-	// for (unsigned int i = 0; i < 100; i++)
-	// {
-	// 	item_memory_array[i] = item_memory_value;
-	// 	item_memory_value += 18360;
-	// }
+	unsigned int item_memory_array[100];
+	item_memory_array[0] = 88675123;
+	for (unsigned int i = 1; i < 100; i++)
+	{
+		item_memory_array[i] = xor128();
+		// printf("   %d:  %10u\n", i, item_memory_array[i]);
+	}
 
-	// unsigned int result_array[8];
-	// unsigned int result = 0;
-	// int tmp = 0;
-	// int num = 0;
-	// for (unsigned int i = 0; i < 24; i++)
-	// {
-	// 	result ^= shifter(item_memory_array[i], tmp);
-	// 	tmp += 1;
-	// 	if (tmp == 3)
-	// 	{
-	// 		putb(result);
-	// 		result_array[num] = result;
-	// 		tmp = 0;
-	// 		result = 0;
-	// 		num += 1;
-	// 	}
-	// }
+	unsigned int result_array[8];
+	unsigned int result = 0;
+	int tmp = 0;
+	int num = 0;
+	for (unsigned int i = 0; i < 24; i++)
+	{
+		result ^= shifter(item_memory_array[i], tmp);
+		tmp += 1;
+		if (tmp == 3)
+		{
+			putb(result);
+			result_array[num] = result;
+			tmp = 0;
+			result = 0;
+			num += 1;
+		}
+	}
 
-	// unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
-	// printf("%d\n", result_real);
-	// putb(result_real);
+	unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
+	printf("%d\n", result_real);
+	putb(result_real);
 
 	printf("\n ------------------------------- 終了 ------------------------------- \n");
 
