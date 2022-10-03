@@ -282,7 +282,7 @@ module top
         end
     end;
 
-    reg [31:0]      rand_num;
+    wire [31:0]      rand_num;
     xorshift rng (.clk(AXIS_ACLK), .rst(~AXIS_ARESETN), .matw(matw), .rand_num(rand_num));
 
     generate
