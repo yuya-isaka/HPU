@@ -56,16 +56,16 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 uint32_t xor128(void)
 {
 	// 内部で値を保持（seed） パターン１
-	static uint32_t x = 2380889285;
-	static uint32_t y = 1631889387;
-	static uint32_t z = 1698655726;
-	static uint32_t w = 2336862850;
+	// static uint32_t x = 2380889285;
+	// static uint32_t y = 1631889387;
+	// static uint32_t z = 1698655726;
+	// static uint32_t w = 2336862850;
 
 	// 内部で値を保持（seed） パターン２
-	// static uint32_t x = 123456789;
-	// static uint32_t y = 362436069;
-	// static uint32_t z = 521288629;
-	// static uint32_t w = 88675123;
+	static uint32_t x = 123456789;
+	static uint32_t y = 362436069;
+	static uint32_t z = 521288629;
+	static uint32_t w = 88675123;
 
 	// 前回のxを使う
 	uint32_t t = x ^ (x << 11);
