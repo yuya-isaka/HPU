@@ -54,6 +54,30 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
   return result;
 }
 
+uint32_t xor128(void)
+{
+  // 内部で値を保持（seed） パターン１
+  // static uint32_t x = 2380889285;
+  // static uint32_t y = 1631889387;
+  // static uint32_t z = 1698655726;
+  // static uint32_t w = 2336862850;
+
+  // 内部で値を保持（seed） パターン２
+  static uint32_t x = 123456789;
+  static uint32_t y = 362436069;
+  static uint32_t z = 521288629;
+  static uint32_t w = 88675123;
+
+  // 前回のxを使う
+  uint32_t t = x ^ (x << 11);
+  // 更新
+  x = y;
+  y = z;
+  z = w;
+
+  return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+}
+
 // ====================================================================================================================================================================================
 
 volatile int *top;
@@ -185,6 +209,10 @@ void main()
   // mat <- 1;
   top[0x00 / 4] = 1;
 
+  // 乱数生成終わるのを待つ
+  while (top[0x00 / 4] & 0x1)
+    ;
+
   //////////////////////////////////////////////////////////////////////////////////////// run ///////////////////////////////////////////////////////////////////////////////////////////////
 
   // run <- 1;
@@ -254,11 +282,10 @@ void main()
   // 現状、乱数生成器がないので、33215360を起点に下ランダムな値をitem_memory_arrayに入力
   // これはテスト用
   unsigned int item_memory_array[100];
-  unsigned int item_memory_value = 33215360;
-  for (unsigned int i = 0; i < 100; i++)
+  item_memory_array[0] = 88675123;
+  for (unsigned int i = 1; i < 100; i++)
   {
-    item_memory_array[i] = item_memory_value;
-    item_memory_value += 18360;
+    item_memory_array[i] = xor128();
   }
 
   unsigned int result_array[8]; // 動的 今回24個のアドレスで3-gramなので、24/3=8
