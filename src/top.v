@@ -97,12 +97,53 @@ module top
 
     reg               run, matw, last;
 
+    // 24なら12
+    reg [18:0] addr_num;
+    always @(posedge AXIS_ACLK)begin
+        if(~AXIS_ARESETN)begin
+            addr_num <= 19'd0;
+        end
+        else begin
+            addr_num <= 19'd11;
+        end
+    end
+
+    reg [19:0] addr_j;
+    always @(posedge AXIS_ACLK)begin
+        if(~AXIS_ARESETN)begin
+            addr_j <= 19'd0;
+        end
+        else begin
+            addr_j <= 19'd2;
+        end
+    end
+
+    reg [19:0] addr_i;
+    always @(posedge AXIS_ACLK)begin
+        if(~AXIS_ARESETN)begin
+            addr_i <= 19'd0;
+        end
+        else begin
+            addr_i <= 19'd7;
+        end
+    end
+
+    reg [15:0] random_num;
+    always @(posedge AXIS_ACLK)begin
+        if(~AXIS_ARESETN)begin
+            random_num <= 15'd0;
+        end
+        else begin
+            // 65536 最大値
+            random_num <= 15'd99;
+        end
+    end
 
     /////////////////////////////////////////////////////////////////////////////////
 
 
     wire              src_v;   // アドレス生成をしているか否か
-    wire [8:0]        src_a;   // アドレス
+    wire [18:0]        src_a;   // アドレス
     wire              src_fin; // アドレスの生成が最後か否か (s_init駆動、p変更, src_enを埋める)
     src_ctrl src_ctrl
              (
@@ -111,10 +152,11 @@ module top
                  .run(run),
                  .src_valid(S_AXIS_TVALID),
                  .src_en(src_en),
+                 .addr_num(addr_num[18:0]),
 
                  .src_ready(S_AXIS_TREADY),
                  .src_v(src_v),
-                 .src_a(src_a[8:0]),
+                 .src_a(src_a[18:0]),
                  .src_fin(src_fin)
              );
 
@@ -171,7 +213,7 @@ module top
     wire              k_init;
     wire              k_fin;
     wire              exec;
-    wire [9:0]        exec_src_addr;
+    wire [19:0]        exec_src_addr;
     exe_ctrl exe_ctrl
              (
                  .clk(AXIS_ACLK),
@@ -179,12 +221,14 @@ module top
                  .s_init(s_init),
                  .out_busy(out_busy),
                  .out_fin(out_fin),
+                 .addr_i(addr_i[19:0]),
+                 .addr_j(addr_j[19:0]),
 
                  .s_fin(s_fin),
                  .k_init(k_init),
                  .k_fin(k_fin),
                  .exec(exec),
-                 .exec_src_addr(exec_src_addr[9:0])
+                 .exec_src_addr(exec_src_addr[19:0])
              );
 
 
@@ -214,10 +258,10 @@ module top
             (
                 .clk(AXIS_ACLK),
                 .src_v(src_v),
-                .src_a(src_a[8:0]),
+                .src_a(src_a[18:0]),
                 .src_d(S_AXIS_TDATA),
                 .exec(exec),
-                .exec_src_addr(exec_src_addr[9:0]),
+                .exec_src_addr(exec_src_addr[19:0]),
                 .p(p),
 
                 .exec_src_data(exec_src_data)
@@ -425,7 +469,7 @@ module top
                     ;
             endcase
         end
-        else if (matw & mat_a == 99) begin // S_AXI_ACLKとAXIS_ACLKのクロック周波数は今は100MHzで一緒？だから大丈夫？
+        else if (matw & mat_a == random_num) begin // S_AXI_ACLKとAXIS_ACLKのクロック周波数は今は100MHzで一緒？だから大丈夫？
             matw <= 1'b0;
         end
     end

@@ -4,10 +4,10 @@ module src_buf
     (
         input wire          clk,
         input wire          src_v,
-        input wire [8:0]    src_a,
+        input wire [18:0]    src_a,
         input wire [63:0]   src_d,
         input wire          exec,
-        input wire [9:0]    exec_src_addr,
+        input wire [19:0]    exec_src_addr,
         input wire          p,
 
         output reg [31:0]   exec_src_data
@@ -21,26 +21,28 @@ module src_buf
     always_ff @(posedge clk) begin
                   if(exec & ~p) begin
                       if (~exec_src_addr[0]) begin // 偶数
-                          exec_src_data <= buff0even[exec_src_addr[9:1]];
+                          exec_src_data <= buff0even[exec_src_addr[19:1]];
                       end
                       if (exec_src_addr[0]) begin // 奇数
-                          exec_src_data <= buff0odd[exec_src_addr[9:1]];
+                          exec_src_data <= buff0odd[exec_src_addr[19:1]];
                       end
                   end
                   if(exec & p) begin
                       if (~exec_src_addr[0]) begin // 偶数
-                          exec_src_data <= buff1even[exec_src_addr[9:1]];
+                          exec_src_data <= buff1even[exec_src_addr[19:1]];
                       end
                       if (exec_src_addr[0]) begin // 奇数
-                          exec_src_data <= buff1odd[exec_src_addr[9:1]];
+                          exec_src_data <= buff1odd[exec_src_addr[19:1]];
                       end
                   end
               end;
 
     // buff0----------------------------------------------------------
     // アドレスが入ってくる
-    reg [31:0]        buff0even [0:511];
-    reg [31:0]        buff0odd [0:511];
+    // 2^20 = 1048576
+    // １個当たり 524288
+    reg [31:0]        buff0even [0:524287];
+    reg [31:0]        buff0odd [0:524287];
 
     always_ff @(posedge clk) begin
                   if(src_v & p) begin
@@ -50,8 +52,8 @@ module src_buf
               end;
 
     // buff1----------------------------------------------------------
-    reg [31:0]        buff1even [0:511];
-    reg [31:0]        buff1odd [0:511];
+    reg [31:0]        buff1even [0:524287];
+    reg [31:0]        buff1odd [0:524287];
 
     always_ff @(posedge clk) begin
                   if(src_v & ~p) begin

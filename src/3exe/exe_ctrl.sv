@@ -8,18 +8,20 @@ module exe_ctrl
         input wire              s_init,       // srcの受信が終了した次(最初なら)　or 前の計算が終わった次（次のデータがあるなら）
         input wire              out_busy,
         input wire              out_fin,
+        input wire [19:0]       addr_i,
+        input wire [19:0]       addr_j,
 
         output reg              s_fin,        // outrfの次。dst_buffに演算結果が全て入った時
         output logic            k_init,       // jループの始まりの前 (s_initの次)
         output reg              k_fin,        // jループが終わった次に駆動
         output reg              exec,         // 演算の始まり(jループの始まり)
-        output logic [9:0]      exec_src_addr    // src_buffから読み出すアドレス
+        output logic [19:0]      exec_src_addr    // src_buffから読み出すアドレス
     );
 
     wire                        last_i, last_j;
     wire                        next_i, next_j;
-    wire [3:0]                  i;
-    wire [6:0]                  j;
+    wire [19:0]                  i;
+    wire [19:0]                  j;
     reg                         s_init_delay, k_init_next;
     reg                         start;
     reg                         s_fin_period;
@@ -71,14 +73,17 @@ module exe_ctrl
     // ってのを４回する
 
     // i loop
-    agu_next #(.W(4)) l_i (.ini(2'd0), .fin(7), .start(s_init), .last(last_i), .clk(clk),  .rst(rst),
+    // n-gramが何個？
+    agu_next #(.W(20)) l_i (.ini(2'd0), .fin(addr_i), .start(s_init), .last(last_i), .clk(clk),  .rst(rst),
                            .next(next_i), .data(i), .en(last_j));
 
     // j loop
-    agu_next #(.W(7)) l_j (.ini(3'd0), .fin(2),  .start(start), .last(last_j), .clk(clk),  .rst(rst),
+    // n-gram
+    agu_next #(.W(20)) l_j (.ini(3'd0), .fin(addr_j),  .start(start), .last(last_j), .clk(clk),  .rst(rst),
                            .next(next_j), .data(j), .en(1'b1));
 
     always_comb begin
+                    // 現状最大20bit
                     exec_src_addr = i*3 + j;
                 end;
 

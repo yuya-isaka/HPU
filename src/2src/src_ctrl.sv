@@ -7,10 +7,11 @@ module src_ctrl
         input wire              run,          // 開始
         input wire              src_valid,    // S_AXIS_TVALID
         input wire [1:0]        src_en,       // ソースバッファが空いているか否か
+        input wire [18:0]       addr_num,  // アドレスの数
 
         output logic            src_ready,    // S_AXIS_TREADY
         output logic            src_v,        // アドレスが生成されているか否か
-        output logic [8:0]      src_a,        // アドレス
+        output logic [18:0]      src_a,        // アドレス
         output logic		    src_fin       // アドレスの生成が最後か否か
     );
 
@@ -43,9 +44,13 @@ module src_ctrl
 
     // 今回は24個
     wire              last_i;
-    reg [8:0]         i;
-    agu #(.W(9)) l_i (.ini(4'd0), .fin(11), .start(start), .last(last_i), .clk(clk), .rst(~src_ready|~run),
-                      .data(i), .en(sen));
+
+    // 合計が何個かをfin内に指定
+    // 16bitの範囲だとする(アイテムメモリーの量)
+    // で今回は偶数と奇数で分けて保存するので、8bitでいい
+    reg [18:0]         i;
+    agu #(.W(19)) l_i (.ini(4'd0), .fin(addr_num), .start(start), .last(last_i), .clk(clk), .rst(~src_ready|~run),
+                       .data(i), .en(sen));
 
     always_comb begin
                     src_a = i;
