@@ -93,32 +93,46 @@ int main(int argc, char **argv)
 	// hdcテスト
 
 	unsigned int item_memory_array[100];
-	item_memory_array[0] = 88675123;
-	for (unsigned int i = 1; i < 100; i++)
+	// item_memory_array[0] = 88675123;
+	// for (unsigned int i = 1; i < 100; i++)
+	// {
+	// 	item_memory_array[i] = xor128();
+	// 	// printf("   %d:  %10u\n", i, item_memory_array[i]);
+	// }
+	for (unsigned int i = 0; i < 100; i++)
 	{
-		item_memory_array[i] = xor128();
-		// printf("   %d:  %10u\n", i, item_memory_array[i]);
+		item_memory_array[i] = i;
 	}
 
-	unsigned int result_array[8];
-	unsigned int result = 0;
-	int tmp = 0;
-	int num = 0;
-	for (unsigned int i = 0; i < 24; i++)
+	unsigned int result_array[8] = {0};
+	// unsigned int result = 0;
+	// int tmp = 0;
+	// int num = 0;
+	// for (unsigned int i = 0; i < 24; i++)
+	// {
+	// 	result ^= shifter(item_memory_array[i], tmp);
+	// 	tmp += 1;
+	// 	if (tmp == 3)
+	// 	{
+	// 		putb(result);
+	// 		result_array[num] = result;
+	// 		tmp = 0;
+	// 		result = 0;
+	// 		num += 1;
+	// 	}
+	// }
+
+	for (unsigned int i = 0; i < 8; i++)
 	{
-		result ^= shifter(item_memory_array[i], tmp);
-		tmp += 1;
-		if (tmp == 3)
+		for (int j = 0; j < 10; j++)
 		{
-			putb(result);
-			result_array[num] = result;
-			tmp = 0;
-			result = 0;
-			num += 1;
+			result_array[i] += item_memory_array[i * 3 + j];
 		}
+		putb(result_array[i]);
 	}
 
 	unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
+
 	printf("%d\n", result_real);
 	putb(result_real);
 
