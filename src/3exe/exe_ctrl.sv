@@ -52,7 +52,7 @@ module exe_ctrl
                       exec <= 1'b0;
                   end
                   else begin
-                      exec <= k_init | exec & !last_j;
+                      exec <= s_init | exec & !last_j;
                   end
               end;
 

@@ -288,10 +288,10 @@ module top
                      .matw(matw),
                      .mat_a(mat_a),
                      .rand_num(rand_num),
-                     .init(k_init),
 
                      .mat_d(S_AXIS_TDATA),
                      .src_v(src_v),
+                     .s_init(s_init),
 
                      .exec(exec),
                      .out_period(out_period),

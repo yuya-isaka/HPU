@@ -150,10 +150,10 @@ int main(int argc, char **argv)
 
   // 送信
   verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 0; i < 24; i += 2)
+  for (int i = 0; i < 11; i++)
   {
     conv.d0 = i;
-    conv.d1 = i + 1;
+    conv.d1 = i;
     verilator_top->S_AXIS_TDATA = conv.wd;
     eval();
   }
