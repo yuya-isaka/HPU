@@ -44,7 +44,7 @@ module dst_buf
     //　一旦この方法で書いて、その後試してみようか
 
     // いやそもそもdualportメモリやからそれはないか
-    (* ram_style = "block" *)                      reg [63:0]        buff0 [0:31]; // アドレス偶数
+    (* ram_style = "block" *)  reg [63:0]        buff0; // アドレス偶数
     // reg [31:0]        buff0 [0:31]; // アドレス偶数
     // reg [31:0]        buff1 [0:31]; // アドレス奇数
 
@@ -52,6 +52,7 @@ module dst_buf
 
     wire [63:0]      sign_bit_1;
 
+    // ここが次元数で可変になる
     generate
         genvar i;
         for (i = 0; i < 32; i = i + 1) begin
@@ -71,7 +72,13 @@ module dst_buf
 
     always_ff @(posedge clk) begin
                   if (s_fin) begin
-                      buff0[0] <= sign_bit_1;
+                      buff0 <= sign_bit_1;
+                  end
+                  // s_fin_inでpが変わってるからこれでいける
+                  else if (stream_v & p) begin
+                      //   stream_0[31:0] <= buff0[stream_a];
+                      //   stream_0[63:32] <= buff1[stream_a];
+                      stream_0 <= buff0;
                   end
               end;
 
@@ -87,20 +94,10 @@ module dst_buf
     //               end
     //           end;
 
-    // さっきまで計算してたやつを出力
-    // s_fin_inでpが変わってるからこれでいける
-    always_ff @(posedge clk) begin
-                  if (stream_v & p) begin
-                      //   stream_0[31:0] <= buff0[stream_a];
-                      //   stream_0[63:32] <= buff1[stream_a];
-                      stream_0 <= buff0[0];
-                  end
-              end;
-
     // out_addrの最上位ビットが1
     ////////////////////////////////////////////////////////////////////////////
 
-    (* ram_style = "block" *)                      reg [63:0]        buff2 [0:31]; // アドレス偶数
+    (* ram_style = "block" *) reg [63:0]  buff2; // アドレス偶数
     // reg [31:0]        buff2 [0:31]; // アドレス偶数
     // reg [31:0]        buff3 [0:31]; // アドレス奇数
 
@@ -127,7 +124,12 @@ module dst_buf
 
     always_ff @(posedge clk) begin
                   if (s_fin) begin
-                      buff2[0] <= sign_bit_2;
+                      buff2 <= sign_bit_2;
+                  end
+                  else if (stream_v & ~p) begin
+                      //   stream_1[31:0] <= buff2[stream_a];
+                      //   stream_1[63:32] <= buff3[stream_a];
+                      stream_1 <= buff2;
                   end
               end;
 
@@ -142,14 +144,6 @@ module dst_buf
     //                   buff3[out_addr[5:1]] <= result;
     //               end
     //           end;
-
-    always_ff @(posedge clk) begin
-                  if (stream_v & ~p) begin
-                      //   stream_1[31:0] <= buff2[stream_a];
-                      //   stream_1[63:32] <= buff3[stream_a];
-                      stream_1 <= buff2[0];
-                  end
-              end;
 
 endmodule
 

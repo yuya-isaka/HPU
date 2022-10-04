@@ -21,11 +21,14 @@ module core
     );
 
     // 各コアにつき32bitのデータを128個集める
-    reg [31:0]        item_memory [0:99];
+    (* ram_style = "block" *) reg [31:0]        item_memory [0:99];
 
     always_ff @(posedge clk) begin
                   if (matw) begin
                       item_memory[mat_a] = rand_num;
+                  end
+                  else if (exec_next) begin // 偶数
+                      exec_mat_data <= item_memory[exec_src_data[8:0]];
                   end
               end;
 
@@ -38,12 +41,12 @@ module core
     //         j += 18360;
     //     end
     // end
-    integer i;
-    initial begin
-        for (i=0; i < 100; i++) begin
-            item_memory[i] = i;
-        end
-    end
+    // integer i;
+    // initial begin
+    //     for (i=0; i < 100; i++) begin
+    //         item_memory[i] = i;
+    //     end
+    // end
 
     reg [31:0]        exec_mat_data;
 
@@ -59,12 +62,6 @@ module core
                         acc = acc_left;
                     end
                 end;
-
-    always_ff @(posedge clk)begin
-                  if (exec_next) begin // 偶数
-                      exec_mat_data <= item_memory[exec_src_data[8:0]];
-                  end
-              end;
 
     // initを適切なタイミングで１にする
     reg               init_next, init_next_next;
