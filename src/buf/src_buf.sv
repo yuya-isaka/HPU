@@ -8,7 +8,6 @@ module src_buf
         input wire [63:0]   src_d,
         input wire          exec,
         input wire [19:0]    exec_src_addr,
-        input wire          p,
 
         output reg [31:0]   exec_src_data
     );
@@ -31,39 +30,26 @@ module src_buf
 
 
     // buff1----------------------------------------------------------
-    (* ram_style = "block" *)     reg [31:0]        buff1even [0:1023];
-    (* ram_style = "block" *)     reg [31:0]        buff1odd [0:1023];
+    // (* ram_style = "block" *)     reg [31:0]        buff1even [0:1023];
+    // (* ram_style = "block" *)     reg [31:0]        buff1odd [0:1023];
 
     ////////////////////////////////////////////////////////////////////
 
     always_ff @(posedge clk) begin
-                  if(exec & ~p & ~exec_src_addr[0]) begin // 偶数
+                  if(exec & ~exec_src_addr[0]) begin // 偶数
                       exec_src_data <= buff0even[exec_src_addr[19:1]];
                   end
-                  else if(exec & ~p & exec_src_addr[0]) begin // 奇数
+                  else if(exec & exec_src_addr[0]) begin // 奇数
                       exec_src_data <= buff0odd[exec_src_addr[19:1]];
-                  end
-                  else if (exec & p & ~exec_src_addr[0]) begin // 偶数
-                      exec_src_data <= buff1even[exec_src_addr[19:1]];
-                  end
-                  else if (exec & p & exec_src_addr[0]) begin // 奇数
-                      exec_src_data <= buff1odd[exec_src_addr[19:1]];
                   end
               end;
 
     ////////////////////////////////////////////////////////////////////
 
     always_ff @(posedge clk) begin
-                  if(src_v & p) begin
+                  if(src_v) begin
                       buff0even[src_a] <= src_d[31:0];
                       buff0odd[src_a] <= src_d[63:32];
-                  end
-              end;
-
-    always_ff @(posedge clk) begin
-                  if(src_v & ~p) begin
-                      buff1even[src_a] <= src_d[31:0];
-                      buff1odd[src_a] <= src_d[63:32];
                   end
               end;
 

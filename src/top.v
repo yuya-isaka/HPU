@@ -156,7 +156,6 @@ module top
                  .matw(matw),
                  .run(run),
                  .src_valid(S_AXIS_TVALID),
-                 .src_en(src_en),
                  .addr_num(addr_num[18:0]),
 
                  .src_ready(S_AXIS_TREADY),
@@ -165,31 +164,6 @@ module top
                  .src_fin(src_fin)
              );
 
-
-    wire [1:0]     src_en;
-    src_en_ctrl src_en_ctrl
-                (
-                    .clk(AXIS_ACLK),
-                    .run(run),
-                    .src_fin(src_fin),
-                    .p(p),
-                    .s_fin_in(s_fin_in),
-
-                    .src_en(src_en)
-                );
-
-
-    wire              p;
-    p_ctrl p_ctrl
-           (
-               .clk(AXIS_ACLK),
-               .run(run),
-               .src_fin(src_fin),
-               .src_en(src_en),
-               .s_fin_in(s_fin_in),
-
-               .p(p)
-           );
 
 
     wire              s_fin_in; // 次の計算するものがある or 最後
@@ -202,8 +176,6 @@ module top
                .dst_ready(M_AXIS_TREADY),
                .s_fin(s_fin),
                .src_fin(src_fin),
-               .src_en(src_en),
-               .p(p),
 
                .s_fin_in(s_fin_in),
                .s_init(s_init)
@@ -267,7 +239,6 @@ module top
                 .src_d(S_AXIS_TDATA),
                 .exec(exec),
                 .exec_src_addr(exec_src_addr[19:0]),
-                .p(p),
 
                 .exec_src_data(exec_src_data)
             );
@@ -301,7 +272,6 @@ module top
                 .out_addr(out_addr[5:0]), // 計算している方なのでp
                 .out_fin(out_fin),
                 .result(result),
-                .p(p),
                 .s_fin(s_fin),
 
                 .stream_d(M_AXIS_TDATA)

@@ -8,8 +8,6 @@ module s_ctrl
         input wire          dst_ready,
         input wire          s_fin,    // outrfの次、dst_buffに演算結果がすべて入った時
         input wire          src_fin, // srcから送られてくるのが終了したよ
-        input wire [1:0]    src_en, // 2種類格納
-        input wire		    p,
 
         output logic	    s_fin_in, // wire
         output reg		    s_init
@@ -25,7 +23,7 @@ module s_ctrl
     always_comb begin
                     s_fin_in = 1'b0;
 
-                    if((s_fin | s_fin_dayo) & (src_en[~p] | last) & dst_ready)begin
+                    if((s_fin | s_fin_dayo) & (last) & dst_ready)begin
                         s_fin_in = 1'b1;
                     end
                 end;
@@ -35,7 +33,7 @@ module s_ctrl
                   if(~run)begin
                       s_init <= 1'b0;
                   end
-                  else if(src_fin & src_en[1:0]==2'b00)begin // 何もない時、始める
+                  else if(src_fin)begin // 何もない時、始める
                       s_init <= 1'b1;
                   end
                   else if(s_fin_in)begin // 計算が終わった時、次があるなら, もしくは最後なら

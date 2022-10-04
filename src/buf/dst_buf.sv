@@ -9,22 +9,16 @@ module dst_buf
         input wire [5:0]        out_addr,
         input wire              out_fin,
         input wire [31:0]       result,
-        input wire              p,
         input wire              s_fin,
 
         output logic [63:0]     stream_d // M_AXIS_TDATA
     );
 
     reg [63:0]        stream_0;
-    reg [63:0]        stream_1;
 
     // steram_aの最上位ビットで、今計算していない方（送り出す方）がどちらかを判断
     always_comb begin
-                    stream_d = stream_1;
-
-                    if (p) begin
-                        stream_d = stream_0;
-                    end
+                    stream_d = stream_0;
                 end;
 
     // out_addrの最上位ビットで、今計算している方がどちらかを判断
@@ -64,7 +58,6 @@ module dst_buf
                         .result_bit(result[i]),
                         .s_fin(s_fin),
                         .out_period(out_period),
-                        .p(p),
                         .out_fin(out_fin),
                         .sign_bit(sign_bit_1[i])
                     );
@@ -77,9 +70,7 @@ module dst_buf
                       buff0 <= sign_bit_1;
                   end
                   // s_fin_inでpが変わってるからこれでいける
-                  else if (stream_v & p) begin
-                      //   stream_0[31:0] <= buff0[stream_a];
-                      //   stream_0[63:32] <= buff1[stream_a];
+                  else if (stream_v) begin
                       stream_0 <= buff0;
                   end
               end;
@@ -100,41 +91,41 @@ module dst_buf
     ////////////////////////////////////////////////////////////////////////////
 
     // これもBRAMになっている
-    (* ram_style = "block" *)         reg [63:0]  buff2; // アドレス偶数
+    // (* ram_style = "block" *)         reg [63:0]  buff2; // アドレス偶数
     // reg [31:0]        buff2 [0:31]; // アドレス偶数
     // reg [31:0]        buff3 [0:31]; // アドレス奇数
 
-    wire [63:0]      sign_bit_2;
+    // wire [63:0]      sign_bit_2;
     // initial begin
     //     counter_2 = 0;
     // end
 
-    generate
-        genvar j;
-        for (j = 0; j < 32; j = j + 1) begin
-            counter counter
-                    (
-                        .clk(clk),
-                        .result_bit(result[j]),
-                        .s_fin(s_fin),
-                        .out_period(out_period),
-                        .p(~p),
-                        .out_fin(out_fin),
-                        .sign_bit(sign_bit_2[j])
-                    );
-        end
-    endgenerate
+    // generate
+    //     genvar j;
+    //     for (j = 0; j < 32; j = j + 1) begin
+    //         counter counter
+    //                 (
+    //                     .clk(clk),
+    //                     .result_bit(result[j]),
+    //                     .s_fin(s_fin),
+    //                     .out_period(out_period),
+    //                     .p(~p),
+    //                     .out_fin(out_fin),
+    //                     .sign_bit(sign_bit_2[j])
+    //                 );
+    //     end
+    // endgenerate
 
-    always_ff @(posedge clk) begin
-                  if (s_fin) begin
-                      buff2 <= sign_bit_2;
-                  end
-                  else if (stream_v & ~p) begin
-                      //   stream_1[31:0] <= buff2[stream_a];
-                      //   stream_1[63:32] <= buff3[stream_a];
-                      stream_1 <= buff2;
-                  end
-              end;
+    // always_ff @(posedge clk) begin
+    //               if (s_fin) begin
+    //                   buff2 <= sign_bit_2;
+    //               end
+    //               else if (stream_v & ~p) begin
+    //                   //   stream_1[31:0] <= buff2[stream_a];
+    //                   //   stream_1[63:32] <= buff3[stream_a];
+    //                   stream_1 <= buff2;
+    //               end
+    //           end;
 
     // always_ff @(posedge clk) begin // 偶数
     //               if(out_period & p & ~out_addr[0]) begin
