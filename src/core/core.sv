@@ -28,18 +28,18 @@ module core
 
     reg src_v_next;
     always_ff @(posedge clk) begin
-        src_v_next <= src_v;
-    end;
+                  src_v_next <= src_v;
+              end;
 
 
     // 各コアにつき32bitのデータを128個集める
     // BRAMになっているよし
-    (* ram_style = "block" *)         reg [31:0]        item_memory [0:99];
+    (* ram_style = "block" *)          reg [31:0]        item_memory [0:99];
 
     always_ff @(posedge clk) begin
-                //   if (matw) begin
-                //       item_memory[mat_a] = rand_num;
-                //   end
+                  //   if (matw) begin
+                  //       item_memory[mat_a] = rand_num;
+                  //   end
                   if (src_v_next) begin // 偶数
                       m2 <= item_memory[exec_src_data[8:0]];
                   end
@@ -77,7 +77,7 @@ module core
                       permutation <= 0;
                   end
                   else if(exec)begin
-                    //   acc_left <= acc_left ^ (m2 >> permutation | ( ( m2 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
+                      //   acc_left <= acc_left ^ (m2 >> permutation | ( ( m2 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
                       acc_left <= acc_left + m2;
                       permutation <= permutation + 1;
                   end

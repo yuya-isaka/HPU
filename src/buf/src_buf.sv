@@ -10,10 +10,10 @@ module src_buf
     );
 
     always @(posedge clk) begin
-                  if(src_v) begin // 偶数
-                      exec_src_data <= src_d[31:0];
-                  end
-              end;
+        if(src_v) begin // 偶数
+            exec_src_data <= src_d[31:0];
+        end
+    end;
 
 
 endmodule

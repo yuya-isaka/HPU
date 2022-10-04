@@ -2,22 +2,19 @@
 
 module top
     (
+        // AXI Lite Slave Interface
         input wire         S_AXI_ACLK,
         input wire         S_AXI_ARESETN,
-
-        ////////////////////////////////////////////////////////////////////////////
-        // AXI Lite Slave Interface
         input wire [31:0]  S_AXI_AWADDR,
         input wire         S_AXI_AWVALID,
         output wire        S_AXI_AWREADY,
         input wire [31:0]  S_AXI_WDATA,
-        input wire [3:0]   S_AXI_WSTRB, // ストローブ信号,wstrb は wdata のうち実際に書き込む部位をバイト単位で指定します
+        input wire [3:0]   S_AXI_WSTRB,
         input wire         S_AXI_WVALID,
         output wire        S_AXI_WREADY,
         output wire [1:0]  S_AXI_BRESP,
         output wire        S_AXI_BVALID,
         input wire         S_AXI_BREADY,
-
         input wire [31:0]  S_AXI_ARADDR,
         input wire         S_AXI_ARVALID,
         output wire        S_AXI_ARREADY,
@@ -27,32 +24,24 @@ module top
         input wire         S_AXI_RREADY,
 
 
+        // AXI Stream Master Interface
         input wire         AXIS_ACLK,
         input wire         AXIS_ARESETN,
-
-        ////////////////////////////////////////////////////////////////////////////
-        // AXI Stream Master Interface
         output wire        M_AXIS_TVALID,
         output wire [63:0] M_AXIS_TDATA,
         output wire [7:0]  M_AXIS_TSTRB,
-        output wire        M_AXIS_TLAST, // データの区切り、最後のデータの時に立たせる, // 必須らしい
-        // https://www.acri.c.titech.ac.jp/wordpress/archives/11585
-        // https://support.xilinx.com/s/article/60053?language=ja (Xilinxのアンサー)
+        output wire        M_AXIS_TLAST,
         input wire         M_AXIS_TREADY,
 
-        // tuserというデータの先頭を示す、オプショナルな信号もあるっぽい
-
-        ////////////////////////////////////////////////////////////////////////////
         // AXI Stream Slave Interface
         output wire        S_AXIS_TREADY,
         input wire [63:0]  S_AXIS_TDATA,
         input wire [7:0]   S_AXIS_TSTRB,
-        input wire         S_AXIS_TLAST, // データの区切り、最後のデータの時にたつ, 次のクロックにはデータがこない
+        input wire         S_AXIS_TLAST,
         input wire         S_AXIS_TVALID
     );
 
     ///////////////////////////////////////////////////////////////////////////////
-
 
     assign M_AXIS_TSTRB = 8'hff;
 
@@ -60,7 +49,7 @@ module top
 
     ///////////////////////////////////////////////////////////////////////////////
 
-    // n-gram
+    // 3
     reg [19:0] addr_j;
     always @(posedge AXIS_ACLK)begin
         if(~AXIS_ARESETN)begin
@@ -71,7 +60,7 @@ module top
         end
     end
 
-    // 24 / 3 - 1
+    // 8
     reg [19:0] addr_i;
     always @(posedge AXIS_ACLK)begin
         if(~AXIS_ARESETN)begin
@@ -82,7 +71,7 @@ module top
         end
     end
 
-    // item_memoryの数
+    // item_memory数
     reg [15:0] random_num;
     always @(posedge AXIS_ACLK)begin
         if(~AXIS_ARESETN)begin
@@ -97,14 +86,16 @@ module top
     /////////////////////////////////////////////////////////////////////////////////
 
 
-    wire              src_v;   // アドレス生成をしているか否か
+    wire src_v;
     src_ctrl src_ctrl
              (
+                 // input
                  .clk(AXIS_ACLK),
                  .matw(matw),
                  .run(run),
                  .src_valid(S_AXIS_TVALID),
 
+                 // output
                  .src_ready(S_AXIS_TREADY),
                  .src_v(src_v)
              );

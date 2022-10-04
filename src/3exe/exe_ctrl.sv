@@ -105,19 +105,19 @@ module exe_ctrl
 
     reg out_fin;
     always_ff @(posedge clk) begin
-        out_fin <= last_i;
-    end
+                  out_fin <= last_i;
+              end
 
-    // s_fin
-    // outrfの次に駆動
-    always_ff @(posedge clk)begin
-                  if(rst)begin
-                      s_fin <= 1'b0;
-                  end
-                  else begin
-                      s_fin <= s_fin_period & out_fin;
-                  end
-              end;
+              // s_fin
+              // outrfの次に駆動
+              always_ff @(posedge clk)begin
+                            if(rst)begin
+                                s_fin <= 1'b0;
+                            end
+                            else begin
+                                s_fin <= s_fin_period & out_fin;
+                            end
+                        end;
 
 endmodule
 
