@@ -218,12 +218,9 @@ module top
                 .clk(AXIS_ACLK),
                 .src_v(src_v),
                 .src_d(S_AXIS_TDATA),
-                .exec(exec),
-                .exec_src_addr(exec_src_addr[19:0]),
 
                 .exec_src_data(exec_src_data)
             );
-
 
     //////////////////////////////////////////////////////////////////////////////////
 
