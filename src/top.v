@@ -97,6 +97,8 @@ module top
 
     reg               run, matw, last;
 
+    ///////////////////////////////////////////////////////////////////////////////
+
     // 24なら12
     reg [18:0] addr_num;
     always @(posedge AXIS_ACLK)begin
