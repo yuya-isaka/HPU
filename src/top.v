@@ -99,17 +99,6 @@ module top
 
     ///////////////////////////////////////////////////////////////////////////////
 
-    // 24なら12
-    reg [18:0] addr_num;
-    always @(posedge AXIS_ACLK)begin
-        if(~AXIS_ARESETN)begin
-            addr_num <= 19'd0;
-        end
-        else begin
-            addr_num <= 19'd11;
-        end
-    end
-
     // n-gram
     reg [19:0] addr_j;
     always @(posedge AXIS_ACLK)begin
@@ -154,7 +143,6 @@ module top
                  .matw(matw),
                  .run(run),
                  .src_valid(S_AXIS_TVALID),
-                 .addr_num(addr_num[18:0]),
 
                  .src_ready(S_AXIS_TREADY),
                  .src_v(src_v)
