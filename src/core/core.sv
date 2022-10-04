@@ -11,6 +11,7 @@ module core
         input wire [64:0]       mat_d,
         input wire src_v,
         input wire s_init,
+        input wire last_j,
 
         input wire              exec,
         input wire              out_period,
@@ -101,7 +102,7 @@ module core
 
     reg [31:0]     permutation;
     always_ff @(posedge clk)begin
-                  if(src_v & ~s_init)begin
+                  if(src_v & ~s_init | last_j)begin
                       permutation <= 32'h0;
                       acc_left <= 32'h0;
                       permutation <= 0;

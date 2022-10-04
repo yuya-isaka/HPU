@@ -11,35 +11,26 @@ module exe_ctrl
         input wire [19:0]       addr_i,
         input wire [19:0]       addr_j,
 
+        output wire last_j,
         output reg              s_fin,        // outrfの次。dst_buffに演算結果が全て入った時
         output logic            k_init,       // jループの始まりの前 (s_initの次)
         output reg              k_fin,        // jループが終わった次に駆動
         output reg              exec         // 演算の始まり(jループの始まり)
     );
 
-    wire                        last_i, last_j;
+    wire                        last_i;
     wire                        next_i, next_j;
     wire [19:0]                  i;
     wire [19:0]                  j;
-    reg                         s_init_delay, k_init_next;
+    reg                         k_init_next;
     reg                         start;
     reg                         s_fin_period;
 
-    // s_initの次にスタート //////////////////////////////////////////////////
-    // s_init_delay
-    always_ff @(posedge clk)begin
-                  if(rst)begin
-                      s_init_delay <= 1'b0;
-                  end
-                  else begin
-                      s_init_delay <= s_init;
-                  end
-              end;
     // k_init (s_initの次に駆動, その後はk_init_nextが駆動)
     always_comb begin
                     k_init = 1'b0;
 
-                    if((s_init_delay | k_init_next) & !out_busy)begin
+                    if((s_init | k_init_next) & !out_busy)begin
                         k_init = 1'b1;
                     end
                 end;

@@ -168,6 +168,7 @@ module top
     ///////////////////////////////////////////////////////////////////////////////////
 
 
+    wire                last_j;
     wire              s_fin;
     wire              k_init;
     wire              k_fin;
@@ -182,6 +183,7 @@ module top
                  .addr_i(addr_i[19:0]),
                  .addr_j(addr_j[19:0]),
 
+                 .last_j(last_j),
                  .s_fin(s_fin),
                  .k_init(k_init),
                  .k_fin(k_fin),
@@ -292,6 +294,7 @@ module top
                      .mat_d(S_AXIS_TDATA),
                      .src_v(src_v),
                      .s_init(s_init),
+                     .last_j(last_j),
 
                      .exec(exec),
                      .out_period(out_period),
