@@ -25,15 +25,11 @@ module out_ctrl
 
     // outが先に終わってて、kが終わった次 or kが先に終わってて、outが終わった次
 
-    reg k_fin_fin;
-    always_ff @(posedge clk) begin
-                  k_fin_fin <= k_fin;
-              end;
 
     logic start;
     always_comb begin
                     start = 1'b0;
-                    if( (k_fin_fin&!j_period) | (last_j_next&k_fin_retention) )begin
+                    if( (k_fin&!j_period) | (last_j_next&k_fin_retention) )begin
                         start = 1'b1;
                     end
                 end;
@@ -61,7 +57,7 @@ module out_ctrl
                   if(rst)begin
                       k_fin_retention <= 1'b0;
                   end
-                  else if(k_fin_fin&out_busy)begin
+                  else if(k_fin&out_busy)begin
                       k_fin_retention <= 1'b1;
                   end
                   else if (last_j_next) begin
@@ -108,6 +104,7 @@ module out_ctrl
                   end
               end;
 
+    // k_finの何回後にupdateしたいか
     // 例外
     // 2段FF start → update
     reg               update_after_start;

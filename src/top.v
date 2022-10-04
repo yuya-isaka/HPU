@@ -200,11 +200,11 @@ module top
                  .clk(AXIS_ACLK),
                  .rst(~run),
                  .s_init(s_init),
-                 .out_busy(out_busy),
                  .k_init(k_init),
                  .k_fin(k_fin),
                  .addr_i(addr_i),
 
+                 .out_busy(out_busy),
                  .out_period(out_period),
                  .out_fin(out_fin),
                  .update(update)
