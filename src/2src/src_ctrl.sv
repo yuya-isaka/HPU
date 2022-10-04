@@ -11,7 +11,6 @@ module src_ctrl
         output logic            src_ready,    // S_AXIS_TREADY
         output logic            src_v,        // アドレスが生成されているか否か
         output logic [18:0]      src_a,        // アドレス
-        output logic		    src_fin       // アドレスの生成が最後か否か
     );
 
     // 送っておっけい
@@ -37,20 +36,9 @@ module src_ctrl
                     src_ready = 1'b1;
                 end;
 
-    // 今回は24個
-    wire              last_i;
-
-    // 合計が何個かをfin内に指定
-    // 16bitの範囲だとする(アイテムメモリーの量)
-    // で今回は偶数と奇数で分けて保存するので、8bitでいい
-    reg [18:0]         i;
-    agu #(.W(19)) l_i (.ini(4'd0), .fin(addr_num), .start(start), .last(last_i), .clk(clk), .rst(~src_ready|~run),
-                       .data(i), .en(sen));
 
     always_comb begin
-                    src_a = i;
                     src_v = start;
-                    src_fin = last_i;
                 end;
 
 endmodule

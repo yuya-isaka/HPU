@@ -4,7 +4,6 @@ module src_buf
     (
         input wire          clk,
         input wire          src_v,
-        input wire [18:0]    src_a,
         input wire [63:0]   src_d,
         input wire          exec,
         input wire [19:0]    exec_src_addr,
@@ -36,22 +35,12 @@ module src_buf
     ////////////////////////////////////////////////////////////////////
 
     always_ff @(posedge clk) begin
-                  if(exec & ~exec_src_addr[0]) begin // 偶数
-                      exec_src_data <= buff0even[exec_src_addr[19:1]];
-                  end
-                  else if(exec & exec_src_addr[0]) begin // 奇数
-                      exec_src_data <= buff0odd[exec_src_addr[19:1]];
+                  if(src_v) begin // 偶数
+                      exec_src_data <= src_d[31:0];
                   end
               end;
 
     ////////////////////////////////////////////////////////////////////
-
-    always_ff @(posedge clk) begin
-                  if(src_v) begin
-                      buff0even[src_a] <= src_d[31:0];
-                      buff0odd[src_a] <= src_d[63:32];
-                  end
-              end;
 
 
 endmodule

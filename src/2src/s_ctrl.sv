@@ -7,7 +7,7 @@ module s_ctrl
         input wire          last,
         input wire          dst_ready,
         input wire          s_fin,    // outrfの次、dst_buffに演算結果がすべて入った時
-        input wire          src_fin, // srcから送られてくるのが終了したよ
+        input wire          src_v, // srcから送られてくるのが終了したよ
 
         output logic	    s_fin_in, // wire
         output reg		    s_init
@@ -33,7 +33,7 @@ module s_ctrl
                   if(~run)begin
                       s_init <= 1'b0;
                   end
-                  else if(src_fin)begin // 何もない時、始める
+                  else if(src_v)begin // 何もない時、始める
                       s_init <= 1'b1;
                   end
                   else if(s_fin_in)begin // 計算が終わった時、次があるなら, もしくは最後なら

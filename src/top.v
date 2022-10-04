@@ -148,8 +148,6 @@ module top
 
 
     wire              src_v;   // アドレス生成をしているか否か
-    wire [18:0]        src_a;   // アドレス
-    wire              src_fin; // アドレスの生成が最後か否か (s_init駆動、p変更, src_enを埋める)
     src_ctrl src_ctrl
              (
                  .clk(AXIS_ACLK),
@@ -159,9 +157,7 @@ module top
                  .addr_num(addr_num[18:0]),
 
                  .src_ready(S_AXIS_TREADY),
-                 .src_v(src_v),
-                 .src_a(src_a[18:0]),
-                 .src_fin(src_fin)
+                 .src_v(src_v)
              );
 
 
@@ -175,12 +171,11 @@ module top
                .last(last),
                .dst_ready(M_AXIS_TREADY),
                .s_fin(s_fin),
-               .src_fin(src_fin),
+               .src_v(src_v),
 
                .s_fin_in(s_fin_in),
                .s_init(s_init)
            );
-
 
 
     ///////////////////////////////////////////////////////////////////////////////////
@@ -235,7 +230,6 @@ module top
             (
                 .clk(AXIS_ACLK),
                 .src_v(src_v),
-                .src_a(src_a[18:0]),
                 .src_d(S_AXIS_TDATA),
                 .exec(exec),
                 .exec_src_addr(exec_src_addr[19:0]),
