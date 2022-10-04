@@ -10,8 +10,8 @@ union
 {
   struct
   {
-    int32_t d0;
-    int32_t d1;
+    unsigned int d0;
+    unsigned int d1;
   };
   uint64_t wd;
 } conv;
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
 
   // 送信
   verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 0; i < 24; i += 2)
+  for (int i = 0; i < 90; i += 2)
   {
     conv.d0 = i;
     conv.d1 = i + 1;
@@ -161,7 +161,7 @@ int main(int argc, char **argv)
   eval();
 
   verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 0; i < 24; i += 2)
+  for (int i = 0; i < 90; i += 2)
   {
     conv.d0 = i;
     conv.d1 = i + 1;
@@ -182,7 +182,7 @@ int main(int argc, char **argv)
   for (int i = 0; i < 1; i++)
   {
     conv.wd = verilator_top->M_AXIS_TDATA;
-    printf("%d\n", conv.d0);
+    printf("%u\n", conv.d0);
     putb(conv.d0);
     putb(conv.d1);
     printf("\n");
@@ -210,7 +210,7 @@ int main(int argc, char **argv)
   for (int i = 0; i < 1; i++)
   {
     conv.wd = verilator_top->M_AXIS_TDATA;
-    printf("%d\n", conv.d0);
+    printf("%u\n", conv.d0);
     putb(conv.d0);
     putb(conv.d1);
     printf("\n");

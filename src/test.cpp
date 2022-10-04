@@ -100,11 +100,11 @@ int main(int argc, char **argv)
 		// printf("   %d:  %10u\n", i, item_memory_array[i]);
 	}
 
-	unsigned int result_array[8];
+	unsigned int result_array[30];
 	unsigned int result = 0;
 	int tmp = 0;
 	int num = 0;
-	for (unsigned int i = 0; i < 24; i++)
+	for (unsigned int i = 0; i < 90; i++)
 	{
 		result ^= shifter(item_memory_array[i], tmp);
 		tmp += 1;
@@ -119,7 +119,7 @@ int main(int argc, char **argv)
 	}
 
 	unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
-	printf("%d\n", result_real);
+	printf("%u\n", result_real);
 	putb(result_real);
 
 	printf("\n ------------------------------- 終了 ------------------------------- \n");

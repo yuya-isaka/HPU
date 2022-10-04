@@ -106,7 +106,7 @@ module top
             addr_num <= 19'd0;
         end
         else begin
-            addr_num <= 19'd11;
+            addr_num <= 19'd44;
         end
     end
 
@@ -126,7 +126,7 @@ module top
             addr_i <= 19'd0;
         end
         else begin
-            addr_i <= 19'd7;
+            addr_i <= 19'd29;
         end
     end
 
