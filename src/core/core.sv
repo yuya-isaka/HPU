@@ -46,15 +46,6 @@ module core
                   end
               end;
 
-    // integer i;
-    // integer j;
-    // initial begin
-    //     j = 33215360;
-    //     for (i=0; i < 100; i++) begin
-    //         item_memory[i] = j;
-    //         j += 18360;
-    //     end
-    // end
     integer i;
     initial begin
         for (i=0; i < 100; i++) begin
@@ -77,28 +68,7 @@ module core
                     end
                 end;
 
-    // // initを適切なタイミングで１にする
-    // reg               init_next, init_next_next;
-    // always_ff @(posedge clk)begin
-    //               init_next <= init;
-    //               init_next_next <= init_next;
-    //           end;
-
-    // reg               exec_next, exec_next_next, exec_next_next_next;
-    // always_ff @(posedge clk)begin
-    //               exec_next <= exec;
-    //               exec_next_next <= exec_next;
-    //               exec_next_next_next <= exec_next_next;
-    //           end;
-
-
-    // 周波数をあげるためにレジスタを間に挟む (ここがクリティカルパスになるっぽい)
     reg [31:0]        m2;
-    // always_ff @(posedge clk)begin
-    //               if(exec_next_next)begin
-    //                   m2 <= exec_mat_data;
-    //               end
-    //           end;
 
     reg [31:0]     permutation;
     always_ff @(posedge clk)begin
@@ -108,10 +78,6 @@ module core
                       permutation <= 0;
                   end
                   else if(exec)begin
-                      // クリティカルパスになりそう（なるなら分けてもいい）
-                      //   acc_left <= acc_left ^ (m2 >> m2 | ( ( m2 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
-                      //   acc_left <= acc_left ^ (32'd33215360 >> m2 | ( ( 32'd33215360 & ((1'b1 << m2) - 1'b1) ) << (32 - m2) ) );
-                      //   acc_left <= acc_left ^ (32'd33215360 >> permutation | ( ( 32'd33215360 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
                     //   acc_left <= acc_left ^ (m2 >> permutation | ( ( m2 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
                       acc_left <= acc_left + m2;
                       permutation <= permutation + 1;
@@ -120,7 +86,6 @@ module core
 
     always_ff @(posedge clk) begin
                   if(out_period)begin
-                      //   acc_right <= acc_next;
                       acc_right <= acc_left;
                   end
               end;

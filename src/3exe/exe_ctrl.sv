@@ -59,23 +59,11 @@ module exe_ctrl
     ////////////////////////////////////////////////////////////
 
 
-    // 32bitデータを64回出力
-    // ってのを４回する
-
-    // i loop
-    // n-gramが何個？
     agu_next #(.W(20)) l_i (.ini(2'd0), .fin(addr_i), .start(s_init), .last(last_i), .clk(clk),  .rst(rst),
                             .next(next_i), .data(i), .en(last_j));
 
-    // j loop
-    // n-gram
     agu_next #(.W(20)) l_j (.ini(3'd0), .fin(addr_j),  .start(start), .last(last_j), .clk(clk),  .rst(rst),
                             .next(next_j), .data(j), .en(1'b1));
-
-    // always_comb begin
-    //                 // 現状最大20bit
-    //                 exec_src_addr = i*3 + j;
-    //             end;
 
     // last_jの次にスタート /////////////////////////////////////////////////
     // last_j -> next_i と k_fin -> k_init_next　と k_init -> exec と start

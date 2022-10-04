@@ -6,10 +6,10 @@ module out_ctrl
         input wire       rst,
 
         // srcの受信が終了した次(最初なら)　or前の計算が終わった次（次のデータがあるなら）
-        input wire       s_init,
         input wire       k_init,   // exeの jループの始まりの前 (s_initの次)
         input wire       k_fin,    // exeの jループが終わった次に駆動
         input wire [19:0] addr_i,
+        input wire s_init,
 
         output reg       out_busy,
         output reg       out_period,

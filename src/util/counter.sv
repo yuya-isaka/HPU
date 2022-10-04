@@ -8,8 +8,7 @@ module counter
          input wire			clk,
          input wire 		result_bit,
          input wire   		s_fin,
-         input wire			out_period,
-         input wire			out_fin,
+         input wire         k_fin,
          output logic 		sign_bit
      );
 
@@ -25,7 +24,7 @@ module counter
                   if (s_fin) begin
                       box <= 0;
                   end
-                  else if(out_period & out_fin) begin
+                  else if(k_fin) begin
                       if (result_bit == 1'b0) begin
                           box <= box + $signed(1);
                       end

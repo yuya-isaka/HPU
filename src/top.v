@@ -199,10 +199,10 @@ module top
              (
                  .clk(AXIS_ACLK),
                  .rst(~run),
-                 .s_init(s_init),
                  .k_init(k_init),
                  .k_fin(k_fin),
                  .addr_i(addr_i),
+                 .s_init(s_init),
 
                  .out_busy(out_busy),
                  .out_period(out_period),
@@ -245,10 +245,9 @@ module top
                 .clk(AXIS_ACLK),
                 .stream_v(stream_v),
                 .stream_a(stream_a[4:0]), // 計算していない方なので~p
-                .out_period(out_period),
-                .out_fin(out_fin),
                 .result(result),
                 .s_fin(s_fin),
+                .k_fin(k_fin),
 
                 .stream_d(M_AXIS_TDATA)
             );

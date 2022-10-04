@@ -5,10 +5,9 @@ module dst_buf
         input wire              clk,
         input wire              stream_v,
         input wire [4:0]        stream_a,
-        input wire              out_period,
-        input wire              out_fin,
         input wire [31:0]       result,
         input wire              s_fin,
+        input wire k_fin,
 
         output logic [63:0]     stream_d // M_AXIS_TDATA
     );
@@ -40,8 +39,7 @@ module dst_buf
                         .clk(clk),
                         .result_bit(result[i]),
                         .s_fin(s_fin),
-                        .out_period(out_period),
-                        .out_fin(out_fin),
+                        .k_fin(k_fin),
                         .sign_bit(sign_bit_1[i])
                     );
         end
