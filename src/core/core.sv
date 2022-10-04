@@ -14,7 +14,6 @@ module core
         input wire last_j,
 
         input wire              exec,
-        input wire              out_period,
         input wire              update,
         input wire [31:0]       exec_src_data,
         // input wire [31:0]       acc_next,
@@ -61,7 +60,7 @@ module core
     // 次のサイクルから, 各コアのaccが次のコアのaccで更新されていく
 
     always_comb begin
-                    acc = acc_right;
+                    acc = 0;
 
                     if (update) begin
                         acc = acc_left;
@@ -84,11 +83,11 @@ module core
                   end
               end;
 
-    always_ff @(posedge clk) begin
-                  if(out_period)begin
-                      acc_right <= acc_left;
-                  end
-              end;
+    // always_ff @(posedge clk) begin
+    //               if(out_period)begin
+    //                   acc_right <= acc_left;
+    //               end
+    //           end;
 
 endmodule
 

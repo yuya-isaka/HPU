@@ -6,8 +6,6 @@ module exe_ctrl
         input wire              rst,
 
         input wire              s_init,       // srcの受信が終了した次(最初なら)　or 前の計算が終わった次（次のデータがあるなら）
-        input wire              out_busy,
-        input wire              out_fin,
         input wire [19:0]       addr_i,
         input wire [19:0]       addr_j,
 
@@ -30,7 +28,7 @@ module exe_ctrl
     always_comb begin
                     k_init = 1'b0;
 
-                    if((s_init | k_init_next) & !out_busy)begin
+                    if(s_init | k_init_next)begin
                         k_init = 1'b1;
                     end
                 end;
@@ -84,7 +82,7 @@ module exe_ctrl
                   if(rst)begin
                       k_init_next <= 1'b0;
                   end
-                  else if(~out_busy|next_j)begin
+                  else if(next_j)begin
                       k_init_next <= next_i & ~s_init;
                   end
               end;
@@ -104,6 +102,12 @@ module exe_ctrl
                       s_fin_period <= 1'b0;
                   end
               end;
+
+    reg out_fin;
+    always_ff @(posedge clk) begin
+        out_fin <= last_i;
+    end
+
     // s_fin
     // outrfの次に駆動
     always_ff @(posedge clk)begin

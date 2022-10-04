@@ -1,42 +1,3 @@
-/**********************************************************************\
-*      addrress range   access size   function                         *
-* reg  0x000            32bit         [0] matw matrix write            *
-*                                     [1] run  data input/ matrix mul/ *
-*                                              data output             *
-*                                     [2] last last cycle              *
-* reg  0x010            32bit         control dummy register           *
-\**********************************************************************/
-
-// dst_ctrl ... stream_a
-// out_ctrl ... out_addr
-// exe_ctrl ... exe_src_addr
-
-// register_write -> matw -> mat_v
-//                        -> mat_a
-
-// register_w -> run -> src_v
-//                   -> src_a
-//                           -> src_fin -> s_init
-//                                      -> p反転
-//                                      -> src_en
-
-// s_init -> k_init -> exec          -> k_fin -> k_init
-//                  -> exec_mat_addr
-//                  -> exec_src_addr
-//                  -> exec_src_data
-
-// k_fin -> out_period
-//       -> out_busy
-//       -> out_addr
-//                     -> out_fin -> s_fin
-// update -> result
-
-// 最後のout_fin -> s_fin
-//                 s_fin_in -> s_init
-//                          -> src_en
-//                          -> p反転（新しい計算）
-//                          -> stream_v
-//                          -> stream_a
 `default_nettype none
 
 module top
@@ -178,8 +139,6 @@ module top
                  .clk(AXIS_ACLK),
                  .rst(~run),
                  .s_init(s_init),
-                 .out_busy(out_busy),
-                 .out_fin(out_fin),
                  .addr_i(addr_i[19:0]),
                  .addr_j(addr_j[19:0]),
 
@@ -190,25 +149,10 @@ module top
                  .exec(exec)
              );
 
-
-    wire              out_busy;
-    wire              out_period;
-    wire              out_fin;
-    wire              update;
-    out_ctrl out_ctrl
-             (
-                 .clk(AXIS_ACLK),
-                 .rst(~run),
-                 .k_init(k_init),
-                 .k_fin(k_fin),
-                 .addr_i(addr_i),
-                 .s_init(s_init),
-
-                 .out_busy(out_busy),
-                 .out_period(out_period),
-                 .out_fin(out_fin),
-                 .update(update)
-             );
+    reg              update;
+    always @(posedge AXIS_ACLK) begin
+        update <= k_fin;
+    end
 
 
     wire [31:0]       exec_src_data;
@@ -296,7 +240,6 @@ module top
                      .last_j(last_j),
 
                      .exec(exec),
-                     .out_period(out_period),
                      .update(update),
                      .exec_src_data(exec_src_data),
                      //  .acc_next(acc[i+1]),

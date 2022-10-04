@@ -23,7 +23,6 @@ DESIGN_SRCS = \
 ./2src/src_ctrl.sv \
 ./2src/s_ctrl.sv \
 ./3exe/exe_ctrl.sv \
-./3exe/out_ctrl.sv \
 ./4dst/dst_ctrl.sv \
 ./buf/dst_buf.sv \
 ./core/core.sv \
@@ -32,6 +31,7 @@ DESIGN_SRCS = \
 ./util/counter.sv \
 ./util/xorshift.sv \
 ./buf/src_buf.sv \
+# ./3exe/out_ctrl.sv \
 # ./2src/p_ctrl.sv \
 # ./2src/src_en_ctrl.sv \
 # ./1mat/mat_ctrl.sv \
