@@ -30,8 +30,8 @@ module src_buf
 
 
     // buff1----------------------------------------------------------
-    (* ram_style = "block" *) reg [31:0]        buff1even [0:524287];
-    (* ram_style = "block" *) reg [31:0]        buff1odd [0:524287];
+    (* ram_style = "block" *) reg [31:0]        buff1even [0:1023];
+    (* ram_style = "block" *) reg [31:0]        buff1odd [0:1023];
 
     always_ff @(posedge clk) begin
                   if(src_v & ~p) begin
