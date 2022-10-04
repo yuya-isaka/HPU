@@ -26,44 +26,47 @@ module src_buf
     // １個当たり 524288
     // reg [31:0]        buff0even [0:524287];
     // reg [31:0]        buff0odd [0:524287];
-    (* ram_style = "block" *)  reg [31:0]        buff0even [0:1023];
-    (* ram_style = "block" *)  reg [31:0]        buff0odd [0:1023];
+    (* ram_style = "block" *)     reg [31:0]        buff0even [0:1023];
+    (* ram_style = "block" *)     reg [31:0]        buff0odd [0:1023];
 
 
     // buff1----------------------------------------------------------
-    (* ram_style = "block" *)  reg [31:0]        buff1even [0:1023];
-    (* ram_style = "block" *)  reg [31:0]        buff1odd [0:1023];
+    (* ram_style = "block" *)     reg [31:0]        buff1even [0:1023];
+    (* ram_style = "block" *)     reg [31:0]        buff1odd [0:1023];
+
+    ////////////////////////////////////////////////////////////////////
 
     always_ff @(posedge clk) begin
-                  if(src_v & ~p) begin
-                      buff1even[src_a] <= src_d[31:0];
-                  end
-                  else if (exec & p & ~exec_src_addr[0]) begin // 偶数
-                      exec_src_data <= buff1even[exec_src_addr[19:1]];
-                  end
-
-                  if(src_v & ~p) begin
-                      buff1odd[src_a] <= src_d[63:32];
-                  end
-                  else if (exec & p & exec_src_addr[0]) begin // 奇数
-                      exec_src_data <= buff1odd[exec_src_addr[19:1]];
-                  end
-
-                  if(src_v & p) begin
-                      buff0even[src_a] <= src_d[31:0];
-                  end
-                  else if(exec & ~p & ~exec_src_addr[0]) begin // 偶数
+                  if(exec & ~p & ~exec_src_addr[0]) begin // 偶数
                       exec_src_data <= buff0even[exec_src_addr[19:1]];
-                  end
-
-                  if(src_v & p) begin
-                      buff0odd[src_a] <= src_d[63:32];
                   end
                   else if(exec & ~p & exec_src_addr[0]) begin // 奇数
                       exec_src_data <= buff0odd[exec_src_addr[19:1]];
                   end
-
+                  else if (exec & p & ~exec_src_addr[0]) begin // 偶数
+                      exec_src_data <= buff1even[exec_src_addr[19:1]];
+                  end
+                  else if (exec & p & exec_src_addr[0]) begin // 奇数
+                      exec_src_data <= buff1odd[exec_src_addr[19:1]];
+                  end
               end;
+
+    ////////////////////////////////////////////////////////////////////
+
+    always_ff @(posedge clk) begin
+                  if(src_v & p) begin
+                      buff0even[src_a] <= src_d[31:0];
+                      buff0odd[src_a] <= src_d[63:32];
+                  end
+              end;
+
+    always_ff @(posedge clk) begin
+                  if(src_v & ~p) begin
+                      buff1even[src_a] <= src_d[31:0];
+                      buff1odd[src_a] <= src_d[63:32];
+                  end
+              end;
+
 
 endmodule
 
