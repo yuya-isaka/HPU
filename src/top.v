@@ -110,6 +110,7 @@ module top
         end
     end
 
+    // n-gram
     reg [19:0] addr_j;
     always @(posedge AXIS_ACLK)begin
         if(~AXIS_ARESETN)begin
@@ -120,6 +121,7 @@ module top
         end
     end
 
+    // 24 / 3 - 1
     reg [19:0] addr_i;
     always @(posedge AXIS_ACLK)begin
         if(~AXIS_ARESETN)begin
@@ -130,6 +132,7 @@ module top
         end
     end
 
+    // item_memoryの数
     reg [15:0] random_num;
     always @(posedge AXIS_ACLK)begin
         if(~AXIS_ARESETN)begin
