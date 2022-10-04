@@ -4,7 +4,6 @@ module s_ctrl
     (
         input wire          clk,
         input wire          run,
-        input wire          last,
         input wire          dst_ready,
         input wire          s_fin,    // outrfの次、dst_buffに演算結果がすべて入った時
         input wire          src_v, // srcから送られてくるのが終了したよ
@@ -15,15 +14,13 @@ module s_ctrl
 
     reg                s_fin_dayo;
 
-    // 計算が終わった & srcのもう一方がある　＆　いつでも送っていい
     // 計算が終わった　＆ 最後 & いつでも送っていい
-    // 計算終わって待っている状態（s_fin_dayo) & srcのもう一方がある & いつでも送っていい
     // 計算が終わって待っている状態(s_fin_dayo) & 最後 & いつでも送っていい
 
     always_comb begin
                     s_fin_in = 1'b0;
 
-                    if((s_fin | s_fin_dayo) & (last) & dst_ready)begin
+                    if((s_fin | s_fin_dayo) & dst_ready)begin
                         s_fin_in = 1'b1;
                     end
                 end;
@@ -36,9 +33,6 @@ module s_ctrl
                   else if(src_v)begin // 何もない時、始める
                       s_init <= 1'b1;
                   end
-                  else if(s_fin_in)begin // 計算が終わった時、次があるなら, もしくは最後なら
-                      s_init <= ~last;
-                  end
                   else begin
                       s_init <= 1'b0;
                   end
@@ -49,11 +43,11 @@ module s_ctrl
                   if(~run)begin
                       s_fin_dayo <= 1'b0;
                   end
-                  else if(s_fin_in)begin // 計算が終わった時、次があるなら, もしくは最後なら
+                  else if(s_fin_in)begin
                       s_fin_dayo <= 1'b0;
                   end
                   else if(s_fin)begin
-                      s_fin_dayo <= 1'b1; // 計算が終わってるよーってのを保持
+                      s_fin_dayo <= 1'b1;
                   end
               end;
 

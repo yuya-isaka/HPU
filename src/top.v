@@ -156,7 +156,6 @@ module top
            (
                .clk(AXIS_ACLK),
                .run(run),
-               .last(last),
                .dst_ready(M_AXIS_TREADY),
                .s_fin(s_fin),
                .src_v(src_v),

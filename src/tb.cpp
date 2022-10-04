@@ -160,16 +160,6 @@ int main(int argc, char **argv)
   verilator_top->S_AXIS_TVALID = 0;
   eval();
 
-  // last <- 1;
-  verilator_top->S_AXI_AWADDR = 0;
-  verilator_top->S_AXI_WDATA = 6;
-  verilator_top->S_AXI_AWVALID = 1;
-  verilator_top->S_AXI_WVALID = 1;
-  eval();
-  verilator_top->S_AXI_AWVALID = 0;
-  verilator_top->S_AXI_WVALID = 0;
-  eval();
-
   // 演算終わって送られてくるの待つ
   while (!verilator_top->M_AXIS_TVALID)
   {
