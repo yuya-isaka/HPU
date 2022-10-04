@@ -9,6 +9,7 @@ module out_ctrl
         input wire       s_init,
         input wire       k_init,   // exeの jループの始まりの前 (s_initの次)
         input wire       k_fin,    // exeの jループが終わった次に駆動
+        input wire [19:0] addr_i,
 
         output reg       out_busy,
         output reg       out_period,
@@ -18,7 +19,7 @@ module out_ctrl
 
 
     wire              last_i, last_j;
-    wire [2:0]        i, j;
+    wire [19:0]        i, j;
     reg               last_j_next;
     reg               out_period_pre;
 
@@ -85,7 +86,7 @@ module out_ctrl
 
 
     // jの終わりに更新される
-    agu #(.W(3)) l_i (.ini(0), .fin(7),  .start(s_init), .last(last_i), .clk(clk), .rst(rst),
+    agu #(.W(20)) l_i (.ini(0), .fin(addr_i),  .start(s_init), .last(last_i), .clk(clk), .rst(rst),
                       .data(i), .en(last_j));
 
     // kが終わるたびに新しいのが始まる

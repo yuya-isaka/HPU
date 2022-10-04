@@ -201,6 +201,7 @@ module top
                  .out_busy(out_busy),
                  .k_init(k_init),
                  .k_fin(k_fin),
+                 .addr_i(addr_i),
 
                  .out_period(out_period),
                  .out_fin(out_fin),
