@@ -13,7 +13,6 @@ module out_ctrl
         output reg       out_busy,
         output reg       out_period,
         output reg       out_fin,
-        output reg [5:0] out_addr,
         output reg       update
     );
 
@@ -93,21 +92,6 @@ module out_ctrl
     agu #(.W(3)) l_j (.ini(0), .fin(1),  .start(start), .last(last_j), .clk(clk), .rst(rst),
                       .data(j), .en(1'b1));
 
-    // なぜここを０にしたら止まるのか
-
-    reg [5:0]         out_addr_pre; // 最大64
-    always_ff @(posedge clk)begin
-                  if(rst)begin
-                      out_addr_pre <= 0;
-                      out_addr <= 0;
-                  end
-                  else begin
-                      //   out_addr_pre <= i*8 + j;
-                      out_addr_pre <= i;
-                      out_addr <= out_addr_pre;
-                  end
-              end;
-
     always_ff @(posedge clk)begin
                   if(rst)begin
                       out_period_pre <= 1'b0;
@@ -146,16 +130,6 @@ module out_ctrl
                   end
               end;
 
-
-    // k_fin -> k_init
-    // start -> j_period
-    //       -> out_period_pre     -> out_period
-    //                             -> out_busy
-    //       -> out_addr_pre       -> out_addr
-    //       -> update_after_start -> update (値をaccに移した、あとは順番にdst_bufに格納)
-
-    // last_j -> last_j_next
-    //        -> out_fin
 
 endmodule
 

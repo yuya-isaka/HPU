@@ -14,8 +14,7 @@ module exe_ctrl
         output reg              s_fin,        // outrfの次。dst_buffに演算結果が全て入った時
         output logic            k_init,       // jループの始まりの前 (s_initの次)
         output reg              k_fin,        // jループが終わった次に駆動
-        output reg              exec,         // 演算の始まり(jループの始まり)
-        output logic [19:0]      exec_src_addr    // src_buffから読み出すアドレス
+        output reg              exec         // 演算の始まり(jループの始まり)
     );
 
     wire                        last_i, last_j;
@@ -82,10 +81,10 @@ module exe_ctrl
     agu_next #(.W(20)) l_j (.ini(3'd0), .fin(addr_j),  .start(start), .last(last_j), .clk(clk),  .rst(rst),
                             .next(next_j), .data(j), .en(1'b1));
 
-    always_comb begin
-                    // 現状最大20bit
-                    exec_src_addr = i*3 + j;
-                end;
+    // always_comb begin
+    //                 // 現状最大20bit
+    //                 exec_src_addr = i*3 + j;
+    //             end;
 
     // last_jの次にスタート /////////////////////////////////////////////////
     // last_j -> next_i と k_fin -> k_init_next　と k_init -> exec と start

@@ -172,7 +172,6 @@ module top
     wire              k_init;
     wire              k_fin;
     wire              exec;
-    wire [19:0]        exec_src_addr;
     exe_ctrl exe_ctrl
              (
                  .clk(AXIS_ACLK),
@@ -186,15 +185,13 @@ module top
                  .s_fin(s_fin),
                  .k_init(k_init),
                  .k_fin(k_fin),
-                 .exec(exec),
-                 .exec_src_addr(exec_src_addr[19:0])
+                 .exec(exec)
              );
 
 
     wire              out_busy;
     wire              out_period;
     wire              out_fin;
-    wire [5:0]        out_addr;
     wire              update;
     out_ctrl out_ctrl
              (
@@ -207,7 +204,6 @@ module top
 
                  .out_period(out_period),
                  .out_fin(out_fin),
-                 .out_addr(out_addr[5:0]),
                  .update(update)
              );
 
@@ -247,7 +243,6 @@ module top
                 .stream_v(stream_v),
                 .stream_a(stream_a[4:0]), // 計算していない方なので~p
                 .out_period(out_period),
-                .out_addr(out_addr[5:0]), // 計算している方なのでp
                 .out_fin(out_fin),
                 .result(result),
                 .s_fin(s_fin),
