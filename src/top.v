@@ -291,6 +291,7 @@ module top
                      .init(k_init),
 
                      .mat_d(S_AXIS_TDATA),
+                     .src_v(src_v),
 
                      .exec(exec),
                      .out_period(out_period),

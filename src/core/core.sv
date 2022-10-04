@@ -10,6 +10,7 @@ module core
         input wire              init, // k_init
 
         input wire [64:0]       mat_d,
+        input wire src_v,
 
         input wire              exec,
         input wire              out_period,
@@ -20,15 +21,26 @@ module core
         output logic [31:0]     acc
     );
 
+    // reg [31:0] exec_src_data_next;
+    // always_ff @(posedge clk) begin
+    //     exec_src_data_next <= exec_src_data;
+    // end;
+
+    reg src_v_next;
+    always_ff @(posedge clk) begin
+        src_v_next <= src_v;
+    end;
+
+
     // 各コアにつき32bitのデータを128個集める
     // BRAMになっているよし
     (* ram_style = "block" *)         reg [31:0]        item_memory [0:99];
 
     always_ff @(posedge clk) begin
-                  if (matw) begin
-                      item_memory[mat_a] = rand_num;
-                  end
-                  else if (exec_next) begin // 偶数
+                //   if (matw) begin
+                //       item_memory[mat_a] = rand_num;
+                //   end
+                  if (src_v_next) begin // 偶数
                       exec_mat_data <= item_memory[exec_src_data[8:0]];
                   end
               end;
@@ -42,12 +54,12 @@ module core
     //         j += 18360;
     //     end
     // end
-    // integer i;
-    // initial begin
-    //     for (i=0; i < 100; i++) begin
-    //         item_memory[i] = i;
-    //     end
-    // end
+    integer i;
+    initial begin
+        for (i=0; i < 100; i++) begin
+            item_memory[i] = i;
+        end
+    end
 
     reg [31:0]        exec_mat_data;
 
