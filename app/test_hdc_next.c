@@ -312,7 +312,7 @@ void main()
 	}
 
 	unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
-	printf("%d\n", result_real);
+	printf("%u\n", result_real);
 	putb(result_real);
 	if (result_real != dst[0])
 	{
@@ -322,9 +322,9 @@ void main()
 	{
 		printf("Success\n");
 	}
-	printf("%d\n", dst[0]);
+	printf("%u\n", dst[0]);
 	putb(dst[0]);
-	printf("%d\n", dst[1]);
+	printf("%u\n", dst[1]);
 	putb(dst[1]);
 
 	// 受信設定
