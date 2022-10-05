@@ -85,34 +85,34 @@ module top
 
     /////////////////////////////////////////////////////////////////////////////////
 
-
     wire src_v;
     src_ctrl src_ctrl
              (
-                 // input
+                 // in
                  .clk(AXIS_ACLK),
                  .matw(matw),
                  .run(run),
                  .src_valid(S_AXIS_TVALID),
 
-                 // output
+                 // out
                  .src_ready(S_AXIS_TREADY),
                  .src_v(src_v)
              );
 
 
-
-    wire              s_fin_in; // 次の計算するものがある or 最後
-    wire              s_init; // srcの受信が終了した次(最初なら)　or 前の計算が終わった次（次のデータがあるなら）
+    wire stream_ok;
+    wire s_init;
     s_ctrl s_ctrl
            (
+               // in
                .clk(AXIS_ACLK),
                .run(run),
                .dst_ready(M_AXIS_TREADY),
                .s_fin(s_fin),
                .src_v(src_v),
 
-               .s_fin_in(s_fin_in),
+               // out
+               .stream_ok(stream_ok),
                .s_init(s_init)
            );
 
@@ -166,7 +166,7 @@ module top
                  .clk(AXIS_ACLK),
                  .run(run),
                  .dst_ready(M_AXIS_TREADY),
-                 .s_fin_in(s_fin_in),
+                 .stream_ok(stream_ok),
 
                  .dst_valid(M_AXIS_TVALID),
                  .dst_last(M_AXIS_TLAST),

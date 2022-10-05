@@ -5,7 +5,7 @@ module dst_ctrl
         input wire          clk,
         input wire          run,
         input wire          dst_ready,
-        input wire          s_fin_in, // 次のsrcがあるなら、もしくは最後なら送り返す (送る側を完全に信用、まあ今回のCGRAなら問題ないね)
+        input wire          stream_ok,
 
         output reg          dst_valid,
         output reg          dst_last,
@@ -20,7 +20,7 @@ module dst_ctrl
                   if(~run)begin
                       stream_active <= 1'b0;
                   end
-                  else if(dst_ready & s_fin_in & !last_i)begin // !last_iは正直いらんけど、念の為
+                  else if(dst_ready & stream_ok & !last_i)begin // !last_iは正直いらんけど、念の為
                       stream_active <= 1'b1;
                   end
                   else if(last_i) begin
@@ -36,7 +36,7 @@ module dst_ctrl
                       start_check <= 1'b0;
                   end
                   else if(dst_ready)begin
-                      start_check <= s_fin_in;
+                      start_check <= stream_ok;
                   end
               end;
 
