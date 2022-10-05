@@ -185,10 +185,10 @@ module top
     reg [15:0] mat_a;
     always @(posedge AXIS_ACLK)begin
         if(~AXIS_ARESETN|~matw)begin
-            mat_a <= 15'd0;
+            mat_a <= 16'd0;
         end
         else begin
-            mat_a <= mat_a + 15'd1;
+            mat_a <= mat_a + 16'd1;
         end
     end;
 
