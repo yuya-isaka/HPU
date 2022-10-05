@@ -221,27 +221,20 @@ void main()
 
   printf("\n ------------------------- Sample %d Input --------------------------- \n\n", 0);
 
-  int sample[24];              // 動的
-  for (int i = 0; i < 24; i++) // 動的
+  int sample[48]; // 動的
+  int tmp = 0;
+  for (int i = 0; i < 48; i += 2) // 動的
   {
     // ここにアドレスを指定
     // ここでは0-23のアドレスを入力
-    sample[i] = i;
+    sample[i] = tmp;
+    sample[i + 1] = tmp;
     printf("%3d ", sample[i]);
 
     src[i] = sample[i];
+    src[i + 1] = sample[i + 1];
+    tmp++;
   }
-
-  // AXI DMA 送信の設定（UIO経由）
-  // 8 * 128 * 32 = 32768bit
-  // 32768bit / 64bit = 512サイクル
-  dma[0x00 / 4] = 1;
-  dma[0x18 / 4] = src_phys;
-  dma[0x28 / 4] = 24 * 4; // 動的
-
-  // 送信終了をUIO経由のビジーループで監視
-  while ((dma[0x04 / 4] & 0x1000) != 0x1000)
-    ;
 
   // 受信設定
   // 受信チャネルの設定前に送信チャネルを設定すると変になるっぽい
@@ -249,17 +242,6 @@ void main()
   dma[0x48 / 4] = dst_phys;
   dma[0x58 / 4] = 2 * 4;
 
-  for (int i = 0; i < 24; i++) // 動的
-  {
-    // ここにアドレスを指定
-    // ここでは0-23のアドレスを入力
-    // 今回は２回ハイパーベクトルを求めている
-    sample[i] = i;
-    printf("%3d ", sample[i]);
-
-    src[i] = sample[i];
-  }
-
   // AXI DMA 送信の設定（UIO経由）
   // 8 * 128 * 32 = 32768bit
   // 32768bit / 64bit = 512サイクル
@@ -267,9 +249,31 @@ void main()
   dma[0x18 / 4] = src_phys;
   dma[0x28 / 4] = 24 * 4; // 動的
 
+  // // 送信終了をUIO経由のビジーループで監視
+  // while ((dma[0x04 / 4] & 0x1000) != 0x1000)
+  //   ;
+
+  // for (int i = 0; i < 24; i++) // 動的
+  // {
+  //   // ここにアドレスを指定
+  //   // ここでは0-23のアドレスを入力
+  //   // 今回は２回ハイパーベクトルを求めている
+  //   sample[i] = i;
+  //   printf("%3d ", sample[i]);
+
+  //   src[i] = sample[i];
+  // }
+
+  // AXI DMA 送信の設定（UIO経由）
+  // 8 * 128 * 32 = 32768bit
+  // 32768bit / 64bit = 512サイクル
+  // dma[0x00 / 4] = 1;
+  // dma[0x18 / 4] = src_phys;
+  // dma[0x28 / 4] = 24 * 4; // 動的
+
   // 送信終了をUIO経由のビジーループで監視
-  while ((dma[0x04 / 4] & 0x1000) != 0x1000)
-    ;
+  // while ((dma[0x04 / 4] & 0x1000) != 0x1000)
+  //   ;
 
   // 演算終わって送られてくるの待つ
   while ((dma[0x34 / 4] & 0x1000) != 0x1000)
@@ -323,52 +327,52 @@ void main()
 
   // 受信設定
   // 受信チャネルの設定前に送信チャネルを設定すると変になるっぽい
-  dma[0x30 / 4] = 1;
-  dma[0x48 / 4] = dst_phys;
-  dma[0x58 / 4] = 2 * 4;
+  // dma[0x30 / 4] = 1;
+  // dma[0x48 / 4] = dst_phys;
+  // dma[0x58 / 4] = 2 * 4;
 
   /////////////////////////////////////////////////////////////////////////////////////// 結果確認 //////////////////////////////////////////////////////////////////////////////////
 
   // last <- 1;
-  top[0x00 / 4] = 6;
+  // top[0x00 / 4] = 6;
 
   // 演算終わって送られてくるの待つ
-  while ((dma[0x34 / 4] & 0x1000) != 0x1000)
-    ;
+  // while ((dma[0x34 / 4] & 0x1000) != 0x1000)
+  //   ;
 
   printf("\n ------------------------- Sample %d Output -------------------------- \n\n", 1);
 
   // unsigned int result_array[8];
-  result = 0;
-  tmp = 0;
-  num = 0;
-  for (unsigned int i = 0; i < 24; i++) // 動的
-  {
-    result ^= shifter(item_memory_array[i], tmp);
-    tmp += 1;
-    if (tmp == 3) // 将来的には動的
-    {
-      putb(result);
-      result_array[num] = result;
-      tmp = 0;
-      result = 0;
-      num += 1;
-    }
-  }
+  // result = 0;
+  // tmp = 0;
+  // num = 0;
+  // for (unsigned int i = 0; i < 24; i++) // 動的
+  // {
+  //   result ^= shifter(item_memory_array[i], tmp);
+  //   tmp += 1;
+  //   if (tmp == 3) // 将来的には動的
+  //   {
+  //     putb(result);
+  //     result_array[num] = result;
+  //     tmp = 0;
+  //     result = 0;
+  //     num += 1;
+  //   }
+  // }
 
-  result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
-  printf("%d\n", result_real);
-  putb(result_real);
-  if (result_real != dst[0])
-  {
-    printf("Error\n");
-  }
-  else
-  {
-    printf("Success\n");
-  }
-  printf("%d\n", dst[0]);
-  putb(dst[0]);
+  // result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
+  // printf("%d\n", result_real);
+  // putb(result_real);
+  // if (result_real != dst[0])
+  // {
+  //   printf("Error\n");
+  // }
+  // else
+  // {
+  //   printf("Success\n");
+  // }
+  // printf("%d\n", dst[0]);
+  // putb(dst[0]);
 
   //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
 
