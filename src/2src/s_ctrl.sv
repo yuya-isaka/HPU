@@ -6,7 +6,6 @@ module s_ctrl
         input wire          run,
         input wire          dst_ready,
         input wire          s_fin,
-        input wire          src_v,
 
         output logic	    stream_ok
     );
