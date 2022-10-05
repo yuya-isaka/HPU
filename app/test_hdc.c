@@ -89,6 +89,15 @@ unsigned long dst_phys;
 
 // ====================================================================================================================================================================================
 
+// const int RANNUM = 100;
+// const int ARNUM = 30;
+// const int ADDRNUM = 90;
+// const int ADDRNUMNUM = 180;
+const int RANNUM = 1000;
+const int ARNUM = 300;
+const int ADDRNUM = 900;
+const int ADDRNUMNUM = 1800;
+
 void main()
 {
 
@@ -221,9 +230,9 @@ void main()
 
   printf("\n ------------------------- Sample %d Input --------------------------- \n\n", 0);
 
-  int sample[48]; // 動的
+  int sample[ADDRNUMNUM]; // 動的
   int tmp = 0;
-  for (int i = 0; i < 48; i += 2) // 動的
+  for (int i = 0; i < ADDRNUMNUM; i += 2) // 動的
   {
     // ここにアドレスを指定
     // ここでは0-23のアドレスを入力
@@ -241,7 +250,7 @@ void main()
   // 32768bit / 64bit = 512サイクル
   dma[0x00 / 4] = 1;
   dma[0x18 / 4] = src_phys;
-  dma[0x28 / 4] = 48 * 4; // 動的
+  dma[0x28 / 4] = ADDRNUMNUM * 4; // 動的
 
   // 受信設定
   // 送信チャネルの設定前に受信チャネルを設定すると変になるっぽい
@@ -285,19 +294,19 @@ void main()
 
   // 現状、乱数生成器がないので、33215360を起点に下ランダムな値をitem_memory_arrayに入力
   // これはテスト用
-  unsigned int item_memory_array[100];
+  unsigned int item_memory_array[RANNUM];
   item_memory_array[0] = 88675123;
-  for (unsigned int i = 1; i < 100; i++)
+  for (unsigned int i = 1; i < RANNUM; i++)
   {
     item_memory_array[i] = xor128();
   }
 
-  unsigned int result_array[8]; // 動的 今回24個のアドレスで3-gramなので、24/3=8
+  unsigned int result_array[ARNUM]; // 動的 今回24個のアドレスで3-gramなので、24/3=8
   unsigned int result = 0;
   // 理想の計算
   tmp = 0;
   int num = 0;
-  for (unsigned int i = 0; i < 24; i++) // 動的
+  for (unsigned int i = 0; i < ADDRNUM; i++) // 動的
   {
     result ^= shifter(item_memory_array[i], tmp);
     tmp += 1;
