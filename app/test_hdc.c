@@ -324,6 +324,8 @@ void main()
   }
   printf("%d\n", dst[0]);
   putb(dst[0]);
+  printf("%d\n", dst[1]);
+  putb(dst[1]);
 
   // 受信設定
   // 受信チャネルの設定前に送信チャネルを設定すると変になるっぽい
