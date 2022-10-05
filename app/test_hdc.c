@@ -295,7 +295,7 @@ void main()
   unsigned int result_array[8]; // 動的 今回24個のアドレスで3-gramなので、24/3=8
   unsigned int result = 0;
   // 理想の計算
-  int tmp = 0;
+  tmp = 0;
   int num = 0;
   for (unsigned int i = 0; i < 24; i++) // 動的
   {
