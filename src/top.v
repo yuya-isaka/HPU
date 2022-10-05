@@ -109,7 +109,6 @@ module top
                .run(run),
                .dst_ready(M_AXIS_TREADY),
                .s_fin(s_fin),
-               .src_v(src_v),
 
                // out
                .stream_ok(stream_ok)
