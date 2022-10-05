@@ -72,6 +72,9 @@ void putb(unsigned int v)
 
 // ====================================================================================================================================================================================
 
+// const int ADDRNUM = 90;
+const int ADDRNUM = 900;
+
 int main(int argc, char **argv)
 {
 
@@ -152,7 +155,7 @@ int main(int argc, char **argv)
 
   // 送信
   verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 0; i < 900; i++)
+  for (int i = 0; i < ADDRNUM; i++)
   {
     conv.d0 = i;
     conv.d1 = i;

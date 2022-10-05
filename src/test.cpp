@@ -79,6 +79,13 @@ unsigned int xor128(void)
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
+// const int RANNUM = 100;
+// const int ARNUM = 30;
+// const int ADDRNUM = 90;
+const int RANNUM = 1000;
+const int ARNUM = 300;
+const int ADDRNUM = 900;
+
 int main(int argc, char **argv)
 {
 
@@ -92,9 +99,9 @@ int main(int argc, char **argv)
 
 	// hdcテスト
 
-	unsigned int item_memory_array[1000];
+	unsigned int item_memory_array[RANNUM];
 	item_memory_array[0] = 88675123;
-	for (unsigned int i = 1; i < 1000; i++)
+	for (unsigned int i = 1; i < RANNUM; i++)
 	{
 		item_memory_array[i] = xor128();
 		// printf("   %d:  %10u\n", i, item_memory_array[i]);
@@ -104,11 +111,11 @@ int main(int argc, char **argv)
 	// 	item_memory_array[i] = i;
 	// }
 
-	unsigned int result_array[300] = {0};
+	unsigned int result_array[ARNUM] = {0};
 	unsigned int result = 0;
 	int tmp = 0;
 	int num = 0;
-	for (unsigned int i = 0; i < 900; i++)
+	for (unsigned int i = 0; i < ADDRNUM; i++)
 	{
 		result ^= shifter(item_memory_array[i], tmp);
 		tmp += 1;
