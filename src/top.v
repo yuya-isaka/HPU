@@ -55,7 +55,7 @@ module top
             addr_j <= 19'd0;
         end
         else begin
-            addr_j <= 19'd3;
+            addr_j <= 19'd9;
         end
     end
 
@@ -66,7 +66,7 @@ module top
             addr_i <= 19'd0;
         end
         else begin
-            addr_i <= 19'd5;
+            addr_i <= 19'd7;
         end
     end
 
@@ -118,7 +118,6 @@ module top
 
     wire last_j;
     wire s_fin;
-    wire k_fin;
     wire exec;
     exe_ctrl exe_ctrl
              (
@@ -132,7 +131,6 @@ module top
                  // out
                  .last_j(last_j),
                  .s_fin(s_fin),
-                 .k_fin(k_fin),
                  .exec(exec)
              );
 

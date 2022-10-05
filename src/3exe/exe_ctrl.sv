@@ -9,9 +9,8 @@ module exe_ctrl
         input wire [19:0]       addr_j,
 
         output wire last_j,
-        output reg              s_fin,        // outrfの次。dst_buffに演算結果が全て入った時
-        output reg              k_fin,        // jループが終わった次に駆動
-        output reg              exec         // 演算の始まり(jループの始まり)
+        output reg              s_fin,
+        output reg              exec
     );
 
     wire last_i;
@@ -19,6 +18,7 @@ module exe_ctrl
     wire [19:0] i;
     wire [19:0] j;
 
+    // 要改良
     always_ff @(posedge clk)begin
                   if(rst)begin
                       exec <= 1'b0;
@@ -34,30 +34,12 @@ module exe_ctrl
                   src_v_nn <= src_v_n;
               end;
 
-    ////////////////////////////////////////////////////////////
-
     agu_next #(.W(20)) l_i (.ini(2'd0), .fin(addr_i), .start(src_v), .last(last_i), .clk(clk),  .rst(rst),
                             .next(next_i), .data(i), .en(last_j));
 
     agu_next #(.W(20)) l_j (.ini(3'd0), .fin(addr_j),  .start(src_v_nn), .last(last_j), .clk(clk),  .rst(rst),
                             .next(next_j), .data(j), .en(1'b1));
 
-    // last_jの次にスタート /////////////////////////////////////////////////
-    // last_j -> next_i と k_fin -> k_init_next　と k_init -> exec と start
-    // k_fin
-    always_ff @(posedge clk)begin
-                  if(rst)begin
-                      k_fin <= 1'b0;
-                  end
-                  else begin
-                      k_fin <= last_j;
-                  end
-              end;
-
-    //////////////////////////////////////////////////////////////////////
-
-    // s_fin
-    // outrfの次に駆動
     always_ff @(posedge clk)begin
                   if(rst)begin
                       s_fin <= 1'b0;
