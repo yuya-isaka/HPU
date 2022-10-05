@@ -6,34 +6,30 @@ module out_ctrl
         input wire       rst,
 
         // srcの受信が終了した次(最初なら)　or前の計算が終わった次（次のデータがあるなら）
-        input wire       s_init,
         input wire       k_init,   // exeの jループの始まりの前 (s_initの次)
         input wire       k_fin,    // exeの jループが終わった次に駆動
+        input wire [19:0] addr_i,
+        input wire s_init,
 
         output reg       out_busy,
         output reg       out_period,
         output reg       out_fin,
-        output reg [5:0] out_addr,
         output reg       update
     );
 
 
     wire              last_i, last_j;
-    wire [2:0]        i, j;
+    wire [19:0]        i, j;
     reg               last_j_next;
     reg               out_period_pre;
 
     // outが先に終わってて、kが終わった次 or kが先に終わってて、outが終わった次
 
-    reg k_fin_fin;
-    always_ff @(posedge clk) begin
-                  k_fin_fin <= k_fin;
-              end;
 
     logic start;
     always_comb begin
                     start = 1'b0;
-                    if( (k_fin_fin&!j_period) | (last_j_next&k_fin_retention) )begin
+                    if( (k_fin&!j_period) | (last_j_next&k_fin_retention) )begin
                         start = 1'b1;
                     end
                 end;
@@ -61,7 +57,7 @@ module out_ctrl
                   if(rst)begin
                       k_fin_retention <= 1'b0;
                   end
-                  else if(k_fin_fin&out_busy)begin
+                  else if(k_fin&out_busy)begin
                       k_fin_retention <= 1'b1;
                   end
                   else if (last_j_next) begin
@@ -86,27 +82,12 @@ module out_ctrl
 
 
     // jの終わりに更新される
-    agu #(.W(3)) l_i (.ini(0), .fin(7),  .start(s_init), .last(last_i), .clk(clk), .rst(rst),
+    agu #(.W(20)) l_i (.ini(0), .fin(addr_i),  .start(s_init), .last(last_i), .clk(clk), .rst(rst),
                       .data(i), .en(last_j));
 
     // kが終わるたびに新しいのが始まる
     agu #(.W(3)) l_j (.ini(0), .fin(1),  .start(start), .last(last_j), .clk(clk), .rst(rst),
                       .data(j), .en(1'b1));
-
-    // なぜここを０にしたら止まるのか
-
-    reg [5:0]         out_addr_pre; // 最大64
-    always_ff @(posedge clk)begin
-                  if(rst)begin
-                      out_addr_pre <= 0;
-                      out_addr <= 0;
-                  end
-                  else begin
-                      //   out_addr_pre <= i*8 + j;
-                      out_addr_pre <= i;
-                      out_addr <= out_addr_pre;
-                  end
-              end;
 
     always_ff @(posedge clk)begin
                   if(rst)begin
@@ -123,6 +104,7 @@ module out_ctrl
                   end
               end;
 
+    // k_finの何回後にupdateしたいか
     // 例外
     // 2段FF start → update
     reg               update_after_start;
@@ -146,16 +128,6 @@ module out_ctrl
                   end
               end;
 
-
-    // k_fin -> k_init
-    // start -> j_period
-    //       -> out_period_pre     -> out_period
-    //                             -> out_busy
-    //       -> out_addr_pre       -> out_addr
-    //       -> update_after_start -> update (値をaccに移した、あとは順番にdst_bufに格納)
-
-    // last_j -> last_j_next
-    //        -> out_fin
 
 endmodule
 

@@ -1,62 +1,20 @@
-/**********************************************************************\
-*      addrress range   access size   function                         *
-* reg  0x000            32bit         [0] matw matrix write            *
-*                                     [1] run  data input/ matrix mul/ *
-*                                              data output             *
-*                                     [2] last last cycle              *
-* reg  0x010            32bit         control dummy register           *
-\**********************************************************************/
-
-// dst_ctrl ... stream_a
-// out_ctrl ... out_addr
-// exe_ctrl ... exe_src_addr
-
-// register_write -> matw -> mat_v
-//                        -> mat_a
-
-// register_w -> run -> src_v
-//                   -> src_a
-//                           -> src_fin -> s_init
-//                                      -> p反転
-//                                      -> src_en
-
-// s_init -> k_init -> exec          -> k_fin -> k_init
-//                  -> exec_mat_addr
-//                  -> exec_src_addr
-//                  -> exec_src_data
-
-// k_fin -> out_period
-//       -> out_busy
-//       -> out_addr
-//                     -> out_fin -> s_fin
-// update -> result
-
-// 最後のout_fin -> s_fin
-//                 s_fin_in -> s_init
-//                          -> src_en
-//                          -> p反転（新しい計算）
-//                          -> stream_v
-//                          -> stream_a
 `default_nettype none
 
 module top
     (
+        // AXI Lite Slave Interface
         input wire         S_AXI_ACLK,
         input wire         S_AXI_ARESETN,
-
-        ////////////////////////////////////////////////////////////////////////////
-        // AXI Lite Slave Interface
         input wire [31:0]  S_AXI_AWADDR,
         input wire         S_AXI_AWVALID,
         output wire        S_AXI_AWREADY,
         input wire [31:0]  S_AXI_WDATA,
-        input wire [3:0]   S_AXI_WSTRB, // ストローブ信号,wstrb は wdata のうち実際に書き込む部位をバイト単位で指定します
+        input wire [3:0]   S_AXI_WSTRB,
         input wire         S_AXI_WVALID,
         output wire        S_AXI_WREADY,
         output wire [1:0]  S_AXI_BRESP,
         output wire        S_AXI_BVALID,
         input wire         S_AXI_BREADY,
-
         input wire [31:0]  S_AXI_ARADDR,
         input wire         S_AXI_ARVALID,
         output wire        S_AXI_ARREADY,
@@ -65,51 +23,32 @@ module top
         output wire        S_AXI_RVALID,
         input wire         S_AXI_RREADY,
 
-
+        // AXI Stream Master Interface
         input wire         AXIS_ACLK,
         input wire         AXIS_ARESETN,
-
-        ////////////////////////////////////////////////////////////////////////////
-        // AXI Stream Master Interface
         output wire        M_AXIS_TVALID,
         output wire [63:0] M_AXIS_TDATA,
         output wire [7:0]  M_AXIS_TSTRB,
-        output wire        M_AXIS_TLAST, // データの区切り、最後のデータの時に立たせる, // 必須らしい
-        // https://www.acri.c.titech.ac.jp/wordpress/archives/11585
-        // https://support.xilinx.com/s/article/60053?language=ja (Xilinxのアンサー)
+        output wire        M_AXIS_TLAST,
         input wire         M_AXIS_TREADY,
 
-        // tuserというデータの先頭を示す、オプショナルな信号もあるっぽい
-
-        ////////////////////////////////////////////////////////////////////////////
         // AXI Stream Slave Interface
         output wire        S_AXIS_TREADY,
         input wire [63:0]  S_AXIS_TDATA,
         input wire [7:0]   S_AXIS_TSTRB,
-        input wire         S_AXIS_TLAST, // データの区切り、最後のデータの時にたつ, 次のクロックにはデータがこない
+        input wire         S_AXIS_TLAST,
         input wire         S_AXIS_TVALID
     );
 
     ///////////////////////////////////////////////////////////////////////////////
 
-
     assign M_AXIS_TSTRB = 8'hff;
 
-    reg               run, matw, last;
+    reg run, matw, last;
 
     ///////////////////////////////////////////////////////////////////////////////
 
-    // 24なら12
-    reg [18:0] addr_num;
-    always @(posedge AXIS_ACLK)begin
-        if(~AXIS_ARESETN)begin
-            addr_num <= 19'd0;
-        end
-        else begin
-            addr_num <= 19'd44;
-        end
-    end
-
+    // 3
     reg [19:0] addr_j;
     always @(posedge AXIS_ACLK)begin
         if(~AXIS_ARESETN)begin
@@ -120,6 +59,7 @@ module top
         end
     end
 
+    // 8
     reg [19:0] addr_i;
     always @(posedge AXIS_ACLK)begin
         if(~AXIS_ARESETN)begin
@@ -130,6 +70,7 @@ module top
         end
     end
 
+    // item_memory数
     reg [15:0] random_num;
     always @(posedge AXIS_ACLK)begin
         if(~AXIS_ARESETN)begin
@@ -143,132 +84,58 @@ module top
 
     /////////////////////////////////////////////////////////////////////////////////
 
-
-    wire              src_v;   // アドレス生成をしているか否か
-    wire [18:0]        src_a;   // アドレス
-    wire              src_fin; // アドレスの生成が最後か否か (s_init駆動、p変更, src_enを埋める)
+    wire src_v;
     src_ctrl src_ctrl
              (
+                 // in
                  .clk(AXIS_ACLK),
                  .matw(matw),
                  .run(run),
                  .src_valid(S_AXIS_TVALID),
-                 .src_en(src_en),
-                 .addr_num(addr_num[18:0]),
 
+                 // out
                  .src_ready(S_AXIS_TREADY),
-                 .src_v(src_v),
-                 .src_a(src_a[18:0]),
-                 .src_fin(src_fin)
+                 .src_v(src_v)
              );
 
 
-    wire [1:0]     src_en;
-    src_en_ctrl src_en_ctrl
-                (
-                    .clk(AXIS_ACLK),
-                    .run(run),
-                    .src_fin(src_fin),
-                    .p(p),
-                    .s_fin_in(s_fin_in),
-
-                    .src_en(src_en)
-                );
-
-
-    wire              p;
-    p_ctrl p_ctrl
-           (
-               .clk(AXIS_ACLK),
-               .run(run),
-               .src_fin(src_fin),
-               .src_en(src_en),
-               .s_fin_in(s_fin_in),
-
-               .p(p)
-           );
-
-
-    wire              s_fin_in; // 次の計算するものがある or 最後
-    wire              s_init; // srcの受信が終了した次(最初なら)　or 前の計算が終わった次（次のデータがあるなら）
+    wire stream_ok;
     s_ctrl s_ctrl
            (
+               // in
                .clk(AXIS_ACLK),
                .run(run),
-               .last(last),
                .dst_ready(M_AXIS_TREADY),
                .s_fin(s_fin),
-               .src_fin(src_fin),
-               .src_en(src_en),
-               .p(p),
+               .src_v(src_v),
 
-               .s_fin_in(s_fin_in),
-               .s_init(s_init)
+               // out
+               .stream_ok(stream_ok)
            );
-
 
 
     ///////////////////////////////////////////////////////////////////////////////////
 
-
-    wire              s_fin;
-    wire              k_init;
-    wire              k_fin;
-    wire              exec;
-    wire [19:0]        exec_src_addr;
+    wire last_j;
+    wire s_fin;
+    wire exec;
     exe_ctrl exe_ctrl
              (
+                 // in
                  .clk(AXIS_ACLK),
                  .rst(~run),
-                 .s_init(s_init),
-                 .out_busy(out_busy),
-                 .out_fin(out_fin),
+                 .src_v(src_v),
                  .addr_i(addr_i[19:0]),
                  .addr_j(addr_j[19:0]),
 
+                 // out
+                 .last_j(last_j),
                  .s_fin(s_fin),
-                 .k_init(k_init),
-                 .k_fin(k_fin),
-                 .exec(exec),
-                 .exec_src_addr(exec_src_addr[19:0])
+                 .exec(exec)
              );
 
-
-    wire              out_busy;
-    wire              out_period;
-    wire              out_fin;
-    wire [5:0]        out_addr;
-    wire              update;
-    out_ctrl out_ctrl
-             (
-                 .clk(AXIS_ACLK),
-                 .rst(~run),
-                 .s_init(s_init),
-                 .out_busy(out_busy),
-                 .k_init(k_init),
-                 .k_fin(k_fin),
-
-                 .out_period(out_period),
-                 .out_fin(out_fin),
-                 .out_addr(out_addr[5:0]),
-                 .update(update)
-             );
-
-
-    wire [31:0]       exec_src_data;
-    src_buf src_buf
-            (
-                .clk(AXIS_ACLK),
-                .src_v(src_v),
-                .src_a(src_a[18:0]),
-                .src_d(S_AXIS_TDATA),
-                .exec(exec),
-                .exec_src_addr(exec_src_addr[19:0]),
-                .p(p),
-
-                .exec_src_data(exec_src_data)
-            );
-
+    wire update;
+    assign update = last_j;
 
     //////////////////////////////////////////////////////////////////////////////////
 
@@ -280,7 +147,7 @@ module top
                  .clk(AXIS_ACLK),
                  .run(run),
                  .dst_ready(M_AXIS_TREADY),
-                 .s_fin_in(s_fin_in),
+                 .stream_ok(stream_ok),
 
                  .dst_valid(M_AXIS_TVALID),
                  .dst_last(M_AXIS_TLAST),
@@ -294,12 +161,9 @@ module top
                 .clk(AXIS_ACLK),
                 .stream_v(stream_v),
                 .stream_a(stream_a[4:0]), // 計算していない方なので~p
-                .out_period(out_period),
-                .out_addr(out_addr[5:0]), // 計算している方なのでp
-                .out_fin(out_fin),
                 .result(result),
-                .p(p),
                 .s_fin(s_fin),
+                .last_j(last_j),
 
                 .stream_d(M_AXIS_TDATA)
             );
@@ -341,17 +205,15 @@ module top
                      .matw(matw),
                      .mat_a(mat_a),
                      .rand_num(rand_num),
-                     .init(k_init),
 
-                     .mat_d(S_AXIS_TDATA),
+                     .src_v(src_v),
+                     .last_j(last_j),
+                     .src_d(S_AXIS_TDATA),
+                     .addr_j(addr_j),
 
                      .exec(exec),
-                     .out_period(out_period),
                      .update(update),
-                     .exec_src_data(exec_src_data),
-                     //  .acc_next(acc[i+1]),
 
-                     //  .acc(acc[i])
                      .acc(acc)
                  );
         end

@@ -150,53 +150,14 @@ int main(int argc, char **argv)
 
   // 送信
   verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 0; i < 90; i += 2)
+  for (int i = 0; i < 24; i++)
   {
     conv.d0 = i;
-    conv.d1 = i + 1;
+    conv.d1 = i;
     verilator_top->S_AXIS_TDATA = conv.wd;
     eval();
   }
   verilator_top->S_AXIS_TVALID = 0;
-  eval();
-
-  verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 0; i < 90; i += 2)
-  {
-    conv.d0 = i;
-    conv.d1 = i + 1;
-    verilator_top->S_AXIS_TDATA = conv.wd;
-    eval();
-  }
-  verilator_top->S_AXIS_TVALID = 0;
-  eval();
-
-  // 演算終わって送られてくるの待つ
-  while (!verilator_top->M_AXIS_TVALID)
-  {
-    eval();
-  }
-
-  printf("\n ------------------------- Output -------------------------- \n\n");
-
-  for (int i = 0; i < 1; i++)
-  {
-    conv.wd = verilator_top->M_AXIS_TDATA;
-    printf("%u\n", conv.d0);
-    putb(conv.d0);
-    putb(conv.d1);
-    printf("\n");
-    eval();
-  }
-
-  // last <- 1;
-  verilator_top->S_AXI_AWADDR = 0;
-  verilator_top->S_AXI_WDATA = 6;
-  verilator_top->S_AXI_AWVALID = 1;
-  verilator_top->S_AXI_WVALID = 1;
-  eval();
-  verilator_top->S_AXI_AWVALID = 0;
-  verilator_top->S_AXI_WVALID = 0;
   eval();
 
   // 演算終わって送られてくるの待つ

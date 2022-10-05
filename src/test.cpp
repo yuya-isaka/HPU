@@ -99,8 +99,12 @@ int main(int argc, char **argv)
 		item_memory_array[i] = xor128();
 		// printf("   %d:  %10u\n", i, item_memory_array[i]);
 	}
+	// for (unsigned int i = 0; i < 100; i++)
+	// {
+	// 	item_memory_array[i] = i;
+	// }
 
-	unsigned int result_array[30];
+	unsigned int result_array[8] = {0};
 	unsigned int result = 0;
 	int tmp = 0;
 	int num = 0;
@@ -110,7 +114,8 @@ int main(int argc, char **argv)
 		tmp += 1;
 		if (tmp == 3)
 		{
-			putb(result);
+			// putb(result);
+			printf("%u\n", result);
 			result_array[num] = result;
 			tmp = 0;
 			result = 0;
@@ -118,8 +123,19 @@ int main(int argc, char **argv)
 		}
 	}
 
+	// for (unsigned int i = 0; i < 8; i++)
+	// {
+	// 	for (int j = 0; j < 10; j++)
+	// 	{
+	// 		result_array[i] += item_memory_array[i * 10 + j];
+	// 	}
+	// 	printf("%d\n", result_array[i]);
+	// 	// putb(result_array[i]);
+	// }
+
 	unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
-	printf("%u\n", result_real);
+
+	printf("\n%d\n", result_real);
 	putb(result_real);
 
 	printf("\n ------------------------------- 終了 ------------------------------- \n");

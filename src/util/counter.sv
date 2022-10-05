@@ -8,16 +8,14 @@ module counter
          input wire			clk,
          input wire 		result_bit,
          input wire   		s_fin,
-         input wire			out_period,
-         input wire			p,
-         input wire			out_fin,
+         input wire         last_j,
          output logic 		sign_bit
      );
 
     // これは分散RAM
     // これがあかんと言われるのはわかる
     // 32bitあれば足りるでしょうと、20億くらい
-    (* ram_style = "block" *)           reg signed [W-1:0] box;
+    (* ram_style = "block" *)                            reg signed [W-1:0] box;
     initial begin
         box = 0;
     end
@@ -26,7 +24,7 @@ module counter
                   if (s_fin) begin
                       box <= 0;
                   end
-                  else if(out_period & ~p & out_fin) begin
+                  else if(last_j) begin
                       if (result_bit == 1'b0) begin
                           box <= box + $signed(1);
                       end
