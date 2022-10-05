@@ -89,14 +89,14 @@ unsigned long dst_phys;
 
 // ====================================================================================================================================================================================
 
-// const int RANNUM = 100;
-// const int ARNUM = 30;
-// const int ADDRNUM = 90;
-// const int ADDRNUMNUM = 180;
-const int RANNUM = 1000;
-const int ARNUM = 300;
-const int ADDRNUM = 900;
-const int ADDRNUMNUM = 1800;
+const int RANNUM = 100;
+const int ARNUM = 30;
+const int ADDRNUM = 90;
+const int ADDRNUMNUM = 180;
+// const int RANNUM = 1000;
+// const int ARNUM = 300;
+// const int ADDRNUM = 900;
+// const int ADDRNUMNUM = 1800;
 
 void main()
 {

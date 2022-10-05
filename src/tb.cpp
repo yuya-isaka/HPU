@@ -72,8 +72,8 @@ void putb(unsigned int v)
 
 // ====================================================================================================================================================================================
 
-// const int ADDRNUM = 90;
-const int ADDRNUM = 900;
+const int ADDRNUM = 90;
+// const int ADDRNUM = 900;
 
 int main(int argc, char **argv)
 {

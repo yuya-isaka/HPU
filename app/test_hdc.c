@@ -89,14 +89,14 @@ unsigned long dst_phys;
 
 // ====================================================================================================================================================================================
 
-// const int RANNUM = 100;
-// const int ARNUM = 30;
-// const int ADDRNUM = 90;
-// const int ADDRNUMNUM = 180;
-const int RANNUM = 1000;
-const int ARNUM = 300;
-const int ADDRNUM = 900;
-const int ADDRNUMNUM = 1800;
+const int RANNUM = 100;
+const int ARNUM = 30;
+const int ADDRNUM = 90;
+const int ADDRNUMNUM = 180;
+// const int RANNUM = 1000;
+// const int ARNUM = 300;
+// const int ADDRNUM = 900;
+// const int ADDRNUMNUM = 1800;
 
 void main()
 {
@@ -245,18 +245,18 @@ void main()
     tmp++;
   }
 
-  // 受信設定
-  // 送信チャネルの設定前に受信チャネルを設定すると変になるっぽい
-  dma[0x30 / 4] = 1;
-  dma[0x48 / 4] = dst_phys;
-  dma[0x58 / 4] = 2 * 4;
-
   // AXI DMA 送信の設定（UIO経由）
   // 8 * 128 * 32 = 32768bit
   // 32768bit / 64bit = 512サイクル
   dma[0x00 / 4] = 1;
   dma[0x18 / 4] = src_phys;
   dma[0x28 / 4] = ADDRNUMNUM * 4; // 動的
+
+  // 受信設定
+  // 送信チャネルの設定前に受信チャネルを設定すると変になるっぽい
+  dma[0x30 / 4] = 1;
+  dma[0x48 / 4] = dst_phys;
+  dma[0x58 / 4] = 2 * 4;
 
   // // 送信終了をUIO経由のビジーループで監視
   // while ((dma[0x04 / 4] & 0x1000) != 0x1000)

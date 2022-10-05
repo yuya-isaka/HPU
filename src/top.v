@@ -66,8 +66,8 @@ module top
             addr_i <= 19'd0;
         end
         else begin
-            addr_i <= 19'd299;
-            // addr_i <= 19'd29;
+            // addr_i <= 19'd299;
+            addr_i <= 19'd29;
         end
     end
 
@@ -79,8 +79,8 @@ module top
         end
         else begin
             // 65536 最大値
-            random_num <= 15'd1000;
-            // random_num <= 15'd100;
+            // random_num <= 15'd1000;
+            random_num <= 15'd100;
         end
     end
 
