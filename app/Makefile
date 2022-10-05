@@ -3,8 +3,8 @@ test_hdc: test_hdc.c
 
 # sudo ./test_hdc
 
-# %: %.c
-# 	arm-linux-gnueabihf-gcc $@.c -o $@
+%: %.c
+	arm-liNux-gnueabihf-gcc $@.c -o $@
 
 clean:
 	rm test_hdc
