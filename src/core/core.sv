@@ -11,6 +11,7 @@ module core
         input wire [64:0]       mat_d,
         input wire src_v,
         input wire last_j,
+        input wire [63:0] src_d,
 
         input wire              exec,
         input wire              update,
@@ -33,14 +34,14 @@ module core
 
     // 各コアにつき32bitのデータを128個集める
     // BRAMになっているよし
-    (* ram_style = "block" *)                   reg [31:0]        item_memory [0:99];
+    (* ram_style = "block" *)                     reg [31:0]        item_memory [0:99];
 
     always_ff @(posedge clk) begin
                   //   if (matw) begin
                   //       item_memory[mat_a] = rand_num;
                   //   end
-                  if (src_v_next) begin // 偶数
-                      m2 <= item_memory[exec_src_data[8:0]];
+                  if (src_v) begin // 偶数
+                      m2 <= item_memory[src_d[8:0]];
                   end
               end;
 
@@ -70,15 +71,20 @@ module core
 
     reg [31:0]     permutation;
     always_ff @(posedge clk)begin
-                  if(rst | last_j)begin
+                  if(rst)begin
                       permutation <= 32'h0;
                       acc_left <= 32'h0;
-                      permutation <= 0;
                   end
                   else if(exec)begin
-                      //   acc_left <= acc_left ^ (m2 >> permutation | ( ( m2 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
-                      acc_left <= acc_left + m2;
-                      permutation <= permutation + 1;
+                      if (last_j) begin
+                          acc_left <= m2;
+                          permutation <= 32'h0;
+                      end
+                      else begin
+                          //   acc_left <= acc_left ^ (m2 >> permutation | ( ( m2 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
+                          acc_left <= acc_left + m2;
+                          permutation <= permutation + 1;
+                      end
                   end
               end;
 

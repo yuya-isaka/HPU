@@ -136,21 +136,15 @@ module top
                  .exec(exec)
              );
 
-    reg              update;
+    wire update;
+    assign update = last_j;
+
+    reg [31:0] exec_src_data;
     always @(posedge AXIS_ACLK) begin
-        update <= k_fin;
-    end
-
-
-    wire [31:0]       exec_src_data;
-    src_buf src_buf
-            (
-                .clk(AXIS_ACLK),
-                .src_v(src_v),
-                .src_d(S_AXIS_TDATA),
-
-                .exec_src_data(exec_src_data)
-            );
+        if(src_v) begin
+            exec_src_data <= S_AXIS_TDATA[31:0];
+        end
+    end;
 
     //////////////////////////////////////////////////////////////////////////////////
 
@@ -224,6 +218,7 @@ module top
                      .mat_d(S_AXIS_TDATA),
                      .src_v(src_v),
                      .last_j(last_j),
+                     .src_d(S_AXIS_TDATA),
 
                      .exec(exec),
                      .update(update),

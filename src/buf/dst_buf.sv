@@ -22,7 +22,7 @@ module dst_buf
     // いやそもそもdualportメモリやからそれはないか
     // これは分散RAM
     // そもそもあれかな、フリップフロップでええやんってなってる？
-    (* ram_style = "block" *)                    reg [63:0]        buff0; // アドレス偶数
+    (* ram_style = "block" *)                      reg [63:0]        buff0; // アドレス偶数
     // reg [31:0]        buff0 [0:31]; // アドレス偶数
     // reg [31:0]        buff1 [0:31]; // アドレス奇数
 

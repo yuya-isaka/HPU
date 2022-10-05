@@ -29,12 +29,18 @@ module exe_ctrl
                   end
               end;
 
+    reg src_v_n, src_v_nn;
+    always_ff @(posedge clk) begin
+                  src_v_n <= src_v;
+                  src_v_nn <= src_v_n;
+              end;
+
     ////////////////////////////////////////////////////////////
 
     agu_next #(.W(20)) l_i (.ini(2'd0), .fin(addr_i), .start(src_v), .last(last_i), .clk(clk),  .rst(rst),
                             .next(next_i), .data(i), .en(last_j));
 
-    agu_next #(.W(20)) l_j (.ini(3'd0), .fin(addr_j),  .start(src_v), .last(last_j), .clk(clk),  .rst(rst),
+    agu_next #(.W(20)) l_j (.ini(3'd0), .fin(addr_j),  .start(src_v_nn), .last(last_j), .clk(clk),  .rst(rst),
                             .next(next_j), .data(j), .en(1'b1));
 
     // last_jの次にスタート /////////////////////////////////////////////////

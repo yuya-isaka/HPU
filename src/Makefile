@@ -30,7 +30,7 @@ DESIGN_SRCS = \
 ./util/agu_next.sv \
 ./util/counter.sv \
 ./util/xorshift.sv \
-./buf/src_buf.sv \
+# ./buf/src_buf.sv \
 # ./3exe/out_ctrl.sv \
 # ./2src/p_ctrl.sv \
 # ./2src/src_en_ctrl.sv \
