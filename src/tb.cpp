@@ -150,7 +150,7 @@ int main(int argc, char **argv)
 
   // 送信
   verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 0; i < 24; i++)
+  for (int i = 1; i < 25; i++)
   {
     conv.d0 = i;
     conv.d1 = i;

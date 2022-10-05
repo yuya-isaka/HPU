@@ -10,7 +10,6 @@ module core
 
         input wire [64:0]       mat_d,
         input wire src_v,
-        input wire s_init,
         input wire last_j,
 
         input wire              exec,
@@ -34,7 +33,7 @@ module core
 
     // 各コアにつき32bitのデータを128個集める
     // BRAMになっているよし
-    (* ram_style = "block" *)              reg [31:0]        item_memory [0:99];
+    (* ram_style = "block" *)                   reg [31:0]        item_memory [0:99];
 
     always_ff @(posedge clk) begin
                   //   if (matw) begin
@@ -71,7 +70,7 @@ module core
 
     reg [31:0]     permutation;
     always_ff @(posedge clk)begin
-                  if(src_v & ~s_init | last_j)begin
+                  if(rst | last_j)begin
                       permutation <= 32'h0;
                       acc_left <= 32'h0;
                       permutation <= 0;

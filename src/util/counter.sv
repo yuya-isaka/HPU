@@ -15,7 +15,7 @@ module counter
     // これは分散RAM
     // これがあかんと言われるのはわかる
     // 32bitあれば足りるでしょうと、20億くらい
-    (* ram_style = "block" *)                reg signed [W-1:0] box;
+    (* ram_style = "block" *)                     reg signed [W-1:0] box;
     initial begin
         box = 0;
     end

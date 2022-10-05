@@ -36,14 +36,10 @@ module s_ctrl
                   if(~run)begin
                       s_init <= 1'b0;
                   end
-                  else if(src_v)begin
-                      s_init <= 1'b1;
-                  end
                   else begin
-                      s_init <= 1'b0;
+                      s_init <= src_v;
                   end
               end;
-
 
 endmodule
 

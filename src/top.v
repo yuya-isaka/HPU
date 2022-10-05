@@ -23,7 +23,6 @@ module top
         output wire        S_AXI_RVALID,
         input wire         S_AXI_RREADY,
 
-
         // AXI Stream Master Interface
         input wire         AXIS_ACLK,
         input wire         AXIS_ARESETN,
@@ -45,7 +44,7 @@ module top
 
     assign M_AXIS_TSTRB = 8'hff;
 
-    reg               run, matw, last;
+    reg run, matw, last;
 
     ///////////////////////////////////////////////////////////////////////////////
 
@@ -101,7 +100,6 @@ module top
 
 
     wire stream_ok;
-    wire s_init;
     s_ctrl s_ctrl
            (
                // in
@@ -113,29 +111,27 @@ module top
 
                // out
                .stream_ok(stream_ok),
-               .s_init(s_init)
            );
 
 
     ///////////////////////////////////////////////////////////////////////////////////
 
-
-    wire                last_j;
-    wire              s_fin;
-    wire              k_init;
-    wire              k_fin;
-    wire              exec;
+    wire last_j;
+    wire s_fin;
+    wire k_fin;
+    wire exec;
     exe_ctrl exe_ctrl
              (
+                 // in
                  .clk(AXIS_ACLK),
                  .rst(~run),
-                 .s_init(s_init),
+                 .src_v(src_v),
                  .addr_i(addr_i[19:0]),
                  .addr_j(addr_j[19:0]),
 
+                 // out
                  .last_j(last_j),
                  .s_fin(s_fin),
-                 .k_init(k_init),
                  .k_fin(k_fin),
                  .exec(exec)
              );
@@ -227,7 +223,6 @@ module top
 
                      .mat_d(S_AXIS_TDATA),
                      .src_v(src_v),
-                     .s_init(s_init),
                      .last_j(last_j),
 
                      .exec(exec),
