@@ -5,7 +5,7 @@ module core
         input wire              clk,
         input wire              rst,
         input wire              matw,
-        input wire [6:0]        mat_a,
+        input wire [15:0]        mat_a,
         input wire [31:0]       rand_num,
 
         input wire src_v,
@@ -27,7 +27,7 @@ module core
 
     // 各コアにつき32bitのデータを128個集める
     // BRAMになっているよし
-    (* ram_style = "block" *)                          reg [31:0]        item_memory [0:99];
+    (* ram_style = "block" *)                          reg [31:0]        item_memory [0:1023];
 
     always_ff @(posedge clk) begin
                   if (matw) begin

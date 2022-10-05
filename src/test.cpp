@@ -92,9 +92,9 @@ int main(int argc, char **argv)
 
 	// hdcテスト
 
-	unsigned int item_memory_array[100];
+	unsigned int item_memory_array[1000];
 	item_memory_array[0] = 88675123;
-	for (unsigned int i = 1; i < 100; i++)
+	for (unsigned int i = 1; i < 1000; i++)
 	{
 		item_memory_array[i] = xor128();
 		// printf("   %d:  %10u\n", i, item_memory_array[i]);
@@ -104,11 +104,11 @@ int main(int argc, char **argv)
 	// 	item_memory_array[i] = i;
 	// }
 
-	unsigned int result_array[8] = {0};
+	unsigned int result_array[300] = {0};
 	unsigned int result = 0;
 	int tmp = 0;
 	int num = 0;
-	for (unsigned int i = 0; i < 90; i++)
+	for (unsigned int i = 0; i < 900; i++)
 	{
 		result ^= shifter(item_memory_array[i], tmp);
 		tmp += 1;
@@ -135,7 +135,7 @@ int main(int argc, char **argv)
 
 	unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
 
-	printf("\n%d\n", result_real);
+	printf("\n%u\n", result_real);
 	putb(result_real);
 
 	printf("\n ------------------------------- 終了 ------------------------------- \n");

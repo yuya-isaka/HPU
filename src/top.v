@@ -66,7 +66,7 @@ module top
             addr_i <= 19'd0;
         end
         else begin
-            addr_i <= 19'd7;
+            addr_i <= 19'd299;
         end
     end
 
@@ -78,7 +78,7 @@ module top
         end
         else begin
             // 65536 最大値
-            random_num <= 15'd99;
+            random_num <= 15'd1000;
         end
     end
 
@@ -182,13 +182,13 @@ module top
     // wire [31:0] result = acc[0];
     wire [31:0] result = acc;
 
-    reg [6:0] mat_a;
+    reg [15:0] mat_a;
     always @(posedge AXIS_ACLK)begin
         if(~AXIS_ARESETN|~matw)begin
-            mat_a <= 7'd0;
+            mat_a <= 15'd0;
         end
         else begin
-            mat_a <= mat_a + 7'd1;
+            mat_a <= mat_a + 15'd1;
         end
     end;
 
