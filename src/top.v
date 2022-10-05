@@ -67,7 +67,7 @@ module top
         end
         else begin
             // addr_i <= 19'd299;
-            addr_i <= 19'd29;
+            addr_i <= 19'd7;
         end
     end
 
@@ -203,6 +203,7 @@ module top
                  (
                      .clk(AXIS_ACLK),
                      .rst(~AXIS_ARESETN),
+                     .run(run),
                      .matw(matw),
                      .mat_a(mat_a),
                      .rand_num(rand_num),

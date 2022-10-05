@@ -4,6 +4,7 @@ module core
     (
         input wire              clk,
         input wire              rst,
+        input wire              run,
         input wire              matw,
         input wire [15:0]        mat_a,
         input wire [31:0]       rand_num,
@@ -18,12 +19,6 @@ module core
 
         output logic [31:0]     acc
     );
-
-    reg src_v_next;
-    always_ff @(posedge clk) begin
-                  src_v_next <= src_v;
-              end;
-
 
     // 各コアにつき32bitのデータを128個集める
     // BRAMになっているよし
@@ -65,7 +60,7 @@ module core
 
     reg [31:0]     permutation;
     always_ff @(posedge clk) begin
-                  if (rst | ~exec) begin
+                  if (rst | ~run) begin
                       permutation <= 32'h0;
                   end
                   else if (exec) begin
@@ -79,7 +74,7 @@ module core
               end;
 
     always_ff @(posedge clk)begin
-                  if(rst | ~exec)begin
+                  if(rst | ~run)begin
                       acc_left <= 32'h0;
                   end
                   else if(exec)begin

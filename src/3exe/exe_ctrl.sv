@@ -38,7 +38,7 @@ module exe_ctrl
                             .next(next_i), .data(i), .en(last_j));
 
     agu_next #(.W(20)) l_j (.ini(3'd0), .fin(addr_j),  .start(src_v_nn), .last(last_j), .clk(clk),  .rst(rst),
-                            .next(next_j), .data(j), .en(1'b1));
+                            .next(next_j), .data(j), .en(exec | (i == addr_i & j == addr_j)));
 
     always_ff @(posedge clk)begin
                   if(rst)begin

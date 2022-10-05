@@ -80,8 +80,8 @@ unsigned int xor128(void)
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 const int RANNUM = 100;
-const int ARNUM = 30;
-const int ADDRNUM = 90;
+const int ARNUM = 8;
+const int ADDRNUM = 24;
 // const int RANNUM = 1000;
 // const int ARNUM = 300;
 // const int ADDRNUM = 900;
