@@ -24,7 +24,7 @@ module exe_ctrl
                       exec <= 1'b0;
                   end
                   else begin
-                      exec <= src_v | (exec & !last_i);
+                      exec <= src_v;
                   end
               end;
 

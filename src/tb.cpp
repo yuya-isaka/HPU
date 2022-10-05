@@ -155,7 +155,18 @@ int main(int argc, char **argv)
 
   // 送信
   verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 0; i < ADDRNUM; i++)
+  for (int i = 0; i < 45; i++)
+  {
+    conv.d0 = i;
+    conv.d1 = i;
+    verilator_top->S_AXIS_TDATA = conv.wd;
+    eval();
+  }
+  verilator_top->S_AXIS_TVALID = 0;
+  eval();
+
+  verilator_top->S_AXIS_TVALID = 1;
+  for (int i = 45; i < 90; i++)
   {
     conv.d0 = i;
     conv.d1 = i;
