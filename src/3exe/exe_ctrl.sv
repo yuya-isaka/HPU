@@ -18,7 +18,6 @@ module exe_ctrl
     wire next_i, next_j;
     wire [19:0] i;
     wire [19:0] j;
-    reg s_fin_period;
 
     always_ff @(posedge clk)begin
                   if(rst)begin
@@ -57,36 +56,16 @@ module exe_ctrl
 
     //////////////////////////////////////////////////////////////////////
 
-    // last_iの次にスタート /////////////////////////////////////////////////
-    // last_i -> s_fin_period ... -> s_fin
-    // s_fin_period // last_iの次に始まり、out_finまでで終わる
+    // s_fin
+    // outrfの次に駆動
     always_ff @(posedge clk)begin
                   if(rst)begin
-                      s_fin_period <= 1'b0;
+                      s_fin <= 1'b0;
                   end
-                  else if(last_i)begin
-                      s_fin_period <= 1'b1;
-                  end
-                  else if(out_fin) begin
-                      s_fin_period <= 1'b0;
+                  else begin
+                      s_fin <= last_i;
                   end
               end;
-
-    reg out_fin;
-    always_ff @(posedge clk) begin
-                  out_fin <= last_i;
-              end
-
-              // s_fin
-              // outrfの次に駆動
-              always_ff @(posedge clk)begin
-                            if(rst)begin
-                                s_fin <= 1'b0;
-                            end
-                            else begin
-                                s_fin <= s_fin_period & out_fin;
-                            end
-                        end;
 
 endmodule
 

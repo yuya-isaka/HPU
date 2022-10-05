@@ -7,7 +7,7 @@ module dst_buf
         input wire [4:0]        stream_a,
         input wire [31:0]       result,
         input wire              s_fin,
-        input wire k_fin,
+        input wire last_j,
 
         output logic [63:0]     stream_d // M_AXIS_TDATA
     );
@@ -22,7 +22,7 @@ module dst_buf
     // いやそもそもdualportメモリやからそれはないか
     // これは分散RAM
     // そもそもあれかな、フリップフロップでええやんってなってる？
-    (* ram_style = "block" *)                      reg [63:0]        buff0; // アドレス偶数
+    (* ram_style = "block" *)                       reg [63:0]        buff0; // アドレス偶数
     // reg [31:0]        buff0 [0:31]; // アドレス偶数
     // reg [31:0]        buff1 [0:31]; // アドレス奇数
 
@@ -39,7 +39,7 @@ module dst_buf
                         .clk(clk),
                         .result_bit(result[i]),
                         .s_fin(s_fin),
-                        .k_fin(k_fin),
+                        .last_j(last_j),
                         .sign_bit(sign_bit_1[i])
                     );
         end

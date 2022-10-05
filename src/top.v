@@ -55,7 +55,7 @@ module top
             addr_j <= 19'd0;
         end
         else begin
-            addr_j <= 19'd2;
+            addr_j <= 19'd3;
         end
     end
 
@@ -66,7 +66,7 @@ module top
             addr_i <= 19'd0;
         end
         else begin
-            addr_i <= 19'd7;
+            addr_i <= 19'd5;
         end
     end
 
@@ -172,7 +172,7 @@ module top
                 .stream_a(stream_a[4:0]), // 計算していない方なので~p
                 .result(result),
                 .s_fin(s_fin),
-                .k_fin(k_fin),
+                .last_j(last_j),
 
                 .stream_d(M_AXIS_TDATA)
             );
