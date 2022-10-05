@@ -110,7 +110,7 @@ module top
                .src_v(src_v),
 
                // out
-               .stream_ok(stream_ok),
+               .stream_ok(stream_ok)
            );
 
 

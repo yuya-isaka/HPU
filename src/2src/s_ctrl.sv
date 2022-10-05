@@ -8,8 +8,7 @@ module s_ctrl
         input wire          s_fin,
         input wire          src_v,
 
-        output logic	    stream_ok,
-        output reg		    s_init
+        output logic	    stream_ok
     );
 
     reg s_fin_keep;
@@ -31,15 +30,6 @@ module s_ctrl
                         stream_ok = 1'b1;
                     end
                 end;
-
-    always_ff @(posedge clk)begin
-                  if(~run)begin
-                      s_init <= 1'b0;
-                  end
-                  else begin
-                      s_init <= src_v;
-                  end
-              end;
 
 endmodule
 
