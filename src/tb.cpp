@@ -116,25 +116,25 @@ int main(int argc, char **argv)
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  // // matw <- 1;
-  // verilator_top->S_AXI_AWADDR = 0;
-  // verilator_top->S_AXI_WDATA = 1;
-  // verilator_top->S_AXI_AWVALID = 1;
-  // verilator_top->S_AXI_WVALID = 1;
-  // eval();
-  // verilator_top->S_AXI_AWVALID = 0;
-  // verilator_top->S_AXI_WVALID = 0;
-  // eval();
+  // matw <- 1;
+  verilator_top->S_AXI_AWADDR = 0;
+  verilator_top->S_AXI_WDATA = 1;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
 
-  // verilator_top->S_AXI_ARVALID = 1;
-  // eval();
-  // eval();
-  // while (0 != verilator_top->S_AXI_RDATA)
-  // {
-  //   eval();
-  // }
-  // verilator_top->S_AXI_ARVALID = 0;
-  // eval();
+  verilator_top->S_AXI_ARVALID = 1;
+  eval();
+  eval();
+  while (0 != verilator_top->S_AXI_RDATA)
+  {
+    eval();
+  }
+  verilator_top->S_AXI_ARVALID = 0;
+  eval();
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
 
   // 送信
   verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 0; i < 80; i++)
+  for (int i = 0; i < 24; i++)
   {
     conv.d0 = i;
     conv.d1 = i;

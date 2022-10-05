@@ -55,7 +55,7 @@ module top
             addr_j <= 19'd0;
         end
         else begin
-            addr_j <= 19'd9;
+            addr_j <= 19'd2;
         end
     end
 
@@ -213,10 +213,10 @@ module top
                      .mat_a(mat_a),
                      .rand_num(rand_num),
 
-                     .mat_d(S_AXIS_TDATA),
                      .src_v(src_v),
                      .last_j(last_j),
                      .src_d(S_AXIS_TDATA),
+                     .addr_j(addr_j),
 
                      .exec(exec),
                      .update(update),
