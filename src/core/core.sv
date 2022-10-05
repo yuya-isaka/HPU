@@ -15,16 +15,9 @@ module core
 
         input wire              exec,
         input wire              update,
-        input wire [31:0]       exec_src_data,
-        // input wire [31:0]       acc_next,
 
         output logic [31:0]     acc
     );
-
-    // reg [31:0] exec_src_data_next;
-    // always_ff @(posedge clk) begin
-    //     exec_src_data_next <= exec_src_data;
-    // end;
 
     reg src_v_next;
     always_ff @(posedge clk) begin
@@ -38,7 +31,8 @@ module core
 
     always_ff @(posedge clk) begin
                   if (matw) begin
-                      item_memory[mat_a] = rand_num;
+                      item_memory[mat_a] <= rand_num;
+                      m2 <= 0;
                   end
                   else if (src_v) begin // 偶数
                       m2 <= item_memory[src_d[31:0]];
@@ -71,7 +65,7 @@ module core
 
     reg [31:0]     permutation;
     always_ff @(posedge clk) begin
-                  if (rst) begin
+                  if (rst | ~exec) begin
                       permutation <= 32'h0;
                   end
                   else if (exec) begin
@@ -85,7 +79,7 @@ module core
               end;
 
     always_ff @(posedge clk)begin
-                  if(rst)begin
+                  if(rst | ~exec)begin
                       acc_left <= 32'h0;
                   end
                   else if(exec)begin

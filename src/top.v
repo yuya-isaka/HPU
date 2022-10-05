@@ -137,13 +137,6 @@ module top
     wire update;
     assign update = last_j;
 
-    reg [31:0] exec_src_data;
-    always @(posedge AXIS_ACLK) begin
-        if(src_v) begin
-            exec_src_data <= S_AXIS_TDATA[31:0];
-        end
-    end;
-
     //////////////////////////////////////////////////////////////////////////////////
 
 
@@ -220,10 +213,7 @@ module top
 
                      .exec(exec),
                      .update(update),
-                     .exec_src_data(exec_src_data),
-                     //  .acc_next(acc[i+1]),
 
-                     //  .acc(acc[i])
                      .acc(acc)
                  );
         end

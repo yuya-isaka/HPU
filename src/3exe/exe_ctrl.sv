@@ -8,7 +8,7 @@ module exe_ctrl
         input wire [19:0]       addr_i,
         input wire [19:0]       addr_j,
 
-        output wire last_j,
+        output wire             last_j,
         output reg              s_fin,
         output reg              exec
     );
@@ -24,7 +24,7 @@ module exe_ctrl
                       exec <= 1'b0;
                   end
                   else begin
-                      exec <= src_v | exec & !last_j;
+                      exec <= src_v | (exec & !last_i);
                   end
               end;
 
