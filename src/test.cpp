@@ -126,9 +126,10 @@ int main(int argc, char **argv)
 	{
 		for (int j = 0; j < 10; j++)
 		{
-			result_array[i] += item_memory_array[i * 3 + j];
+			result_array[i] += item_memory_array[i * 10 + j];
 		}
-		putb(result_array[i]);
+		printf("%d\n", result_array[i]);
+		// putb(result_array[i]);
 	}
 
 	unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
