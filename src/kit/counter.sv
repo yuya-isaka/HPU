@@ -38,9 +38,7 @@ module counter
     //==============================================================
 
     // 符号ビット
-    always_comb begin
-                    sign_bit = box[W-1];
-                end;
+    assign sign_bit = box[W-1];
 
 
 endmodule

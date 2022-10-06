@@ -22,17 +22,6 @@ module agu
          output logic           last
      );
 
-    // データが最後　&&
-    // startもしくは既にアドレス生成が始まっている　&&
-    // enable
-    always_comb begin
-                    last = 1'b0;
-
-                    if ((data==fin) & (run|start) & en) begin
-                        last = 1'b1;
-                    end
-                end;
-
     // start もしくは既にアドレス生成が始まっている場合
     //      最後に０にする
     //      それまでは１
@@ -67,6 +56,19 @@ module agu
                       end
                   end
               end;
+
+    //==============================================================
+
+    // データが最後　&&
+    // startもしくは既にアドレス生成が始まっている　&&
+    // enable
+    always_comb begin
+                    last = 1'b0;
+
+                    if ((data==fin) & (run|start) & en) begin
+                        last = 1'b1;
+                    end
+                end;
 
 endmodule
 

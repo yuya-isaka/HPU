@@ -19,14 +19,14 @@ module core
     (* ram_style = "block" *)
     reg [31:0]      item_memory [0:1023];
 
-    reg [31:0]      hv;
+    reg [31:0]      hypervector;
     always_ff @(posedge clk) begin
                   if (gen) begin
                       item_memory[item_a] <= rand_num;
-                      hv <= 0;
+                      hypervector <= 0;
                   end
                   else if (get_v) begin
-                      hv <= item_memory[get_d[31:0]];
+                      hypervector <= item_memory[get_d[31:0]];
                   end
               end;
 
@@ -53,17 +53,17 @@ module core
                   end
               end;
 
-    reg [31:0]      encoding_hv;
-    always_ff @(posedge clk)begin
-                  if(~run)begin
-                      encoding_hv <= 32'h0;
+    reg [31:0]      encoding;
+    always_ff @(posedge clk) begin
+                  if (~run) begin
+                      encoding <= 32'h0;
                   end
-                  else if(exec)begin
+                  else if (exec) begin
                       if (update) begin
-                          encoding_hv <= hv;
+                          encoding <= hypervector;
                       end
                       else begin
-                          encoding_hv <= encoding_hv ^ (hv >> permutation | ( ( hv & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
+                          encoding <= encoding ^ (hypervector >> permutation | ( ( hypervector & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
                       end
                   end
               end;
@@ -74,7 +74,7 @@ module core
                     result = 0;
 
                     if (update) begin
-                        result = encoding_hv;
+                        result = encoding;
                     end
                 end;
 

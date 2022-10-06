@@ -3,41 +3,41 @@
 module top
     (
         // AXI Lite Slave Interface
-        input wire         S_AXI_ACLK,
-        input wire         S_AXI_ARESETN,
-        input wire [31:0]  S_AXI_AWADDR,
-        input wire         S_AXI_AWVALID,
-        output wire        S_AXI_AWREADY,
-        input wire [31:0]  S_AXI_WDATA,
-        input wire [3:0]   S_AXI_WSTRB,
-        input wire         S_AXI_WVALID,
-        output wire        S_AXI_WREADY,
-        output wire [1:0]  S_AXI_BRESP,
-        output wire        S_AXI_BVALID,
-        input wire         S_AXI_BREADY,
-        input wire [31:0]  S_AXI_ARADDR,
-        input wire         S_AXI_ARVALID,
-        output wire        S_AXI_ARREADY,
-        output reg [31:0]  S_AXI_RDATA,
-        output wire [1:0]  S_AXI_RRESP,
-        output wire        S_AXI_RVALID,
-        input wire         S_AXI_RREADY,
+        input wire              S_AXI_ACLK,
+        input wire              S_AXI_ARESETN,
+        input wire [31:0]       S_AXI_AWADDR,
+        input wire              S_AXI_AWVALID,
+        output wire             S_AXI_AWREADY,
+        input wire [31:0]       S_AXI_WDATA,
+        input wire [3:0]        S_AXI_WSTRB,
+        input wire              S_AXI_WVALID,
+        output wire             S_AXI_WREADY,
+        output wire [1:0]       S_AXI_BRESP,
+        output wire             S_AXI_BVALID,
+        input wire              S_AXI_BREADY,
+        input wire [31:0]       S_AXI_ARADDR,
+        input wire              S_AXI_ARVALID,
+        output wire             S_AXI_ARREADY,
+        output reg [31:0]       S_AXI_RDATA,
+        output wire [1:0]       S_AXI_RRESP,
+        output wire             S_AXI_RVALID,
+        input wire              S_AXI_RREADY,
 
         // AXI Stream Master Interface
-        input wire         AXIS_ACLK,
-        input wire         AXIS_ARESETN,
-        output wire        M_AXIS_TVALID,
-        output wire [63:0] M_AXIS_TDATA,
-        output wire [7:0]  M_AXIS_TSTRB,
-        output wire        M_AXIS_TLAST,
-        input wire         M_AXIS_TREADY,
+        input wire              AXIS_ACLK,
+        input wire              AXIS_ARESETN,
+        output wire             M_AXIS_TVALID,
+        output wire [63:0]      M_AXIS_TDATA,
+        output wire [7:0]       M_AXIS_TSTRB,
+        output wire             M_AXIS_TLAST,
+        input wire              M_AXIS_TREADY,
 
         // AXI Stream Slave Interface
-        output wire        S_AXIS_TREADY,
-        input wire [63:0]  S_AXIS_TDATA,
-        input wire [7:0]   S_AXIS_TSTRB,
-        input wire         S_AXIS_TLAST,
-        input wire         S_AXIS_TVALID
+        output wire             S_AXIS_TREADY,
+        input wire [63:0]       S_AXIS_TDATA,
+        input wire [7:0]        S_AXIS_TSTRB,
+        input wire              S_AXIS_TLAST,
+        input wire              S_AXIS_TVALID
     );
 
     //==============================================================
@@ -86,6 +86,7 @@ module top
 
     //==============================================================
 
+    // S_AXIS_TREADY
     wire        get_v;
     get_enable get_enable
                (
@@ -118,6 +119,8 @@ module top
                  .get_fin(get_fin)
              );
 
+    // M_AXIS_TVALID
+    // M_AXIS_TLAST
     wire              stream_v;
     wire [7:0]        stream_a;
     stream_ctrl stream_ctrl
@@ -136,6 +139,7 @@ module top
                 );
 
 
+    // M_AXIS_TDATA
     buffer_ctrl buffer_ctrl
                 (
                     // in
@@ -144,14 +148,12 @@ module top
                     .stream_v(stream_v),
                     .stream_a(stream_a[7:0]),
                     .result(result[31:0]),
-                    .get_fin(get_fin),
                     .update(update),
+                    .get_fin(get_fin),
 
                     // out
                     .stream_d(M_AXIS_TDATA[63:0])
                 );
-
-    //==============================================================
 
     reg [15:0]      item_a;
     always @(posedge AXIS_ACLK) begin
@@ -193,7 +195,7 @@ module top
                      .update(update),
 
                      // out
-                     .result(result)
+                     .result(result[31:0])
                  );
         end
     endgenerate
@@ -206,15 +208,15 @@ module top
     reg [11:2]      read_addr;
     reg [31:0]      write_data;
 
-    wire INI =  (state == 4'b0000);
-    wire AW  =  (state == 4'b0001);
-    wire W   =  (state == 4'b0010);
-    wire AWW =  (state == 4'b0011);
-    wire AR1 =  (state == 4'b0100);
-    wire AR2 =  (state == 4'b1000);
+    wire INI = (state == 4'b0000);
+    wire AW  = (state == 4'b0001);
+    wire W   = (state == 4'b0010);
+    wire AWW = (state == 4'b0011);
+    wire AR1 = (state == 4'b0100);
+    wire AR2 = (state == 4'b1000);
 
-    assign S_AXI_BRESP = 2'b00;
-    assign S_AXI_RRESP = 2'b00;
+    assign S_AXI_BRESP   = 2'b00;
+    assign S_AXI_RRESP   = 2'b00;
     assign S_AXI_AWREADY = INI | W;
     assign S_AXI_WREADY  = INI | AW;
     assign S_AXI_ARREADY = INI;
@@ -279,8 +281,8 @@ module top
         end
     end
 
-    wire register_w = AWW & (write_addr[11:10]==2'b00);
-    wire register_r = AR1 & (read_addr[11:10]==2'b00);
+    wire register_w = AWW & (write_addr[11:10] == 2'b00);
+    wire register_r = AR1 & (read_addr[11:10] == 2'b00);
 
     //==============================================================
 
@@ -291,7 +293,7 @@ module top
             control <= 32'h0;
         end
         else if (register_w) begin
-            case({write_addr[9:2],2'b00})
+            case ({write_addr[9:2],2'b00})
                 10'h00:
                     {run, gen} <= write_data[1:0];
                 10'h10:
@@ -300,7 +302,7 @@ module top
                     ;
             endcase
         end
-        else if (gen & item_a == random_num) begin // S_AXI_ACLKとAXIS_ACLKのクロック周波数は今は100MHzで一緒？だから大丈夫？
+        else if (gen & item_a == random_num) begin
             gen <= 1'b0;
         end
     end
@@ -311,7 +313,7 @@ module top
     always @(posedge S_AXI_ACLK) begin
         if (register_r) begin
             S_AXI_RDATA <= 0;
-            case({read_addr[9:2],2'b00})
+            case ({read_addr[9:2],2'b00})
                 10'h00:
                     S_AXI_RDATA[1:0] <= {run, gen};
                 10'h10:

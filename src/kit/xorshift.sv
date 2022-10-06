@@ -1,20 +1,22 @@
 `default_nettype none
 
-// xorshift
 module xorshift
     (
-        input   wire            clk,
-        input   wire            gen,
-        output  logic [31:0]    rand_num
+        // in
+        input wire              clk,
+        input wire              gen,
+
+        // out
+        output logic [31:0]     rand_num
     );
 
-    reg [31:0] x;
-    reg [31:0] y;
-    reg [31:0] z;
-    reg [31:0] w;
+    reg [31:0]      x;
+    reg [31:0]      y;
+    reg [31:0]      z;
+    reg [31:0]      w;
 
     always_ff @(posedge clk) begin
-                  if (~gen)begin
+                  if (~gen) begin
                       // パターン１
                       // x <= 2380889285;
                       // y <= 1631889387;
@@ -37,9 +39,7 @@ module xorshift
 
     //==============================================================
 
-    always_comb begin
-                    rand_num = w;
-                end;
+    assign rand_num = w;
 
 endmodule
 
