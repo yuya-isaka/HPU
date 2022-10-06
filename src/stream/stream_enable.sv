@@ -1,6 +1,6 @@
 `default_nettype none
 
-module s_ctrl
+module stream_enable
     (
         // in
         input wire          clk,
@@ -27,6 +27,7 @@ module s_ctrl
 
     always_comb begin
                     stream_ok = 1'b0;
+
                     if ((get_fin | get_fin_keep) & dst_ready) begin
                         stream_ok = 1'b1;
                     end

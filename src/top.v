@@ -86,37 +86,23 @@ module top
     /////////////////////////////////////////////////////////////////////////////////
 
     wire get_v;
-    get_ctrl get_ctrl
-             (
-                 // in
-                 .clk(AXIS_ACLK),
-                 .matw(matw),
-                 .run(run),
-                 .get_valid(S_AXIS_TVALID),
+    get_enable get_enable
+               (
+                   // in
+                   .clk(AXIS_ACLK),
+                   .matw(matw),
+                   .run(run),
+                   .get_valid(S_AXIS_TVALID),
 
-                 // out
-                 .get_ready(S_AXIS_TREADY),
-                 .get_v(get_v)
-             );
-
-
-    wire stream_ok;
-    s_ctrl s_ctrl
-           (
-               // in
-               .clk(AXIS_ACLK),
-               .rst(~run),
-               .dst_ready(M_AXIS_TREADY),
-               .get_fin(get_fin),
-
-               // out
-               .stream_ok(stream_ok)
-           );
+                   // out
+                   .get_ready(S_AXIS_TREADY),
+                   .get_v(get_v)
+               );
 
     wire last_j;
     wire get_fin;
     wire exec;
-    exe_ctrl exe_ctrl
+    get_ctrl get_ctrl
              (
                  // in
                  .clk(AXIS_ACLK),
@@ -127,9 +113,23 @@ module top
 
                  // out
                  .last_j(last_j),
-                 .get_fin(get_fin),
-                 .exec(exec)
+                 .exec(exec),
+                 .get_fin(get_fin)
              );
+
+    wire stream_ok;
+    stream_enable stream_enable
+                  (
+                      // in
+                      .clk(AXIS_ACLK),
+                      .rst(~run),
+                      .dst_ready(M_AXIS_TREADY),
+                      .get_fin(get_fin),
+
+                      // out
+                      .stream_ok(stream_ok)
+                  );
+
 
     wire update;
     assign update = last_j;

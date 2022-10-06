@@ -1,6 +1,6 @@
 `default_nettype none
 
-module get_ctrl
+module get_enable
     (
         // in
         input wire          clk,
@@ -15,6 +15,7 @@ module get_ctrl
 
     always_comb begin
                     get_v = 1'b0;
+
                     if (get_valid & get_ready & run & ~matw) begin
                         get_v = 1'b1;
                     end
