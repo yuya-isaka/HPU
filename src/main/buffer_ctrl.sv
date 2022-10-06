@@ -1,6 +1,6 @@
 `default_nettype none
 
-module buffer
+module buffer_ctrl
     (
         // in
         input wire              clk,

@@ -20,15 +20,14 @@ VERILATOR_MAKE_OPTS = OPT="-O3 -I ../../../"
 
 DESIGN_SRCS = \
 ./top.v \
-./get/get_enable.sv \
-./get/get_ctrl.sv \
-./stream/stream_enable.sv \
-./stream/stream_ctrl.sv \
-./buffer/buffer.sv \
-./core/core.sv \
-./util/agu.sv \
-./util/counter.sv \
-./util/xorshift.sv \
+./main/get_enable.sv \
+./main/get_ctrl.sv \
+./main/stream_ctrl.sv \
+./main/buffer_ctrl.sv \
+./main/core.sv \
+./kit/agu.sv \
+./kit/counter.sv \
+./kit/xorshift.sv \
 
 VERILATOR_CPP_TB = tb.cpp
 

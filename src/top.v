@@ -117,19 +117,6 @@ module top
                  .get_fin(get_fin)
              );
 
-    wire stream_ok;
-    stream_enable stream_enable
-                  (
-                      // in
-                      .clk(AXIS_ACLK),
-                      .rst(~run),
-                      .dst_ready(M_AXIS_TREADY),
-                      .get_fin(get_fin),
-
-                      // out
-                      .stream_ok(stream_ok)
-                  );
-
     wire              stream_v;
     wire [7:0]        stream_a;
     stream_ctrl stream_ctrl
@@ -137,8 +124,8 @@ module top
                     // in
                     .clk(AXIS_ACLK),
                     .rst(~run),
+                    .get_fin(get_fin),
                     .dst_ready(M_AXIS_TREADY),
-                    .stream_ok(stream_ok),
 
                     // out
                     .dst_valid(M_AXIS_TVALID),
@@ -148,7 +135,7 @@ module top
                 );
 
 
-    buffer buffer
+    buffer_ctrl buffer_ctrl
             (
                 // in
                 .clk(AXIS_ACLK),
