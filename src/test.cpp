@@ -79,12 +79,12 @@ unsigned int xor128(void)
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-const int RANNUM = 100;
-const int ARNUM = 8;
-const int ADDRNUM = 24;
-// const int RANNUM = 1000;
-// const int ARNUM = 300;
-// const int ADDRNUM = 900;
+// const int RANNUM = 100;
+// const int ARNUM = 8;
+// const int ADDRNUM = 24;
+const int RANNUM = 1000;
+const int ARNUM = 300;
+const int ADDRNUM = 900;
 
 int main(int argc, char **argv)
 {

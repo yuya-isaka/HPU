@@ -72,8 +72,8 @@ void putb(unsigned int v)
 
 // ====================================================================================================================================================================================
 
-const int ADDRNUM = 24;
-// const int ADDRNUM = 900;
+// const int ADDRNUM = 24;
+const int ADDRNUM = 900;
 
 int main(int argc, char **argv)
 {
@@ -155,7 +155,7 @@ int main(int argc, char **argv)
 
   // 送信
   verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 0; i < 13; i++)
+  for (int i = 0; i < 399; i++)
   {
     conv.d0 = i;
     conv.d1 = i;
@@ -171,7 +171,7 @@ int main(int argc, char **argv)
   eval();
 
   verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 13; i < 20; i++)
+  for (int i = 399; i < 520; i++)
   {
     conv.d0 = i;
     conv.d1 = i;
@@ -186,7 +186,7 @@ int main(int argc, char **argv)
   eval();
 
   verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 20; i < 23; i++)
+  for (int i = 520; i < 899; i++)
   {
     conv.d0 = i;
     conv.d1 = i;
@@ -199,7 +199,7 @@ int main(int argc, char **argv)
   eval();
 
   verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 23; i < 24; i++)
+  for (int i = 899; i < 900; i++)
   {
     conv.d0 = i;
     conv.d1 = i;
@@ -208,17 +208,6 @@ int main(int argc, char **argv)
   }
   verilator_top->S_AXIS_TVALID = 0;
   eval();
-
-  // verilator_top->S_AXIS_TVALID = 1;
-  // for (int i = 20; i < 24; i++)
-  // {
-  //   conv.d0 = i;
-  //   conv.d1 = i;
-  //   verilator_top->S_AXIS_TDATA = conv.wd;
-  //   eval();
-  // }
-  // verilator_top->S_AXIS_TVALID = 0;
-  // eval();
 
   // 演算終わって送られてくるの待つ
   while (!verilator_top->M_AXIS_TVALID)
