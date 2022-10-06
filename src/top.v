@@ -71,14 +71,13 @@ module top
         end
     end
 
-    // item_memory数
+    // item_memory数 (65536を最大値にしようかなと)
     reg [15:0] random_num;
     always @(posedge AXIS_ACLK)begin
         if(~AXIS_ARESETN)begin
             random_num <= 15'd0;
         end
         else begin
-            // 65536 最大値
             random_num <= 15'd1000;
             // random_num <= 15'd100;
         end
@@ -86,18 +85,18 @@ module top
 
     /////////////////////////////////////////////////////////////////////////////////
 
-    wire src_v;
-    src_ctrl src_ctrl
+    wire get_v;
+    get_ctrl get_ctrl
              (
                  // in
                  .clk(AXIS_ACLK),
                  .matw(matw),
                  .run(run),
-                 .src_valid(S_AXIS_TVALID),
+                 .get_valid(S_AXIS_TVALID),
 
                  // out
-                 .src_ready(S_AXIS_TREADY),
-                 .src_v(src_v)
+                 .get_ready(S_AXIS_TREADY),
+                 .get_v(get_v)
              );
 
 
@@ -114,9 +113,6 @@ module top
                .stream_ok(stream_ok)
            );
 
-
-    ///////////////////////////////////////////////////////////////////////////////////
-
     wire last_j;
     wire s_fin;
     wire exec;
@@ -125,7 +121,7 @@ module top
                  // in
                  .clk(AXIS_ACLK),
                  .rst(~run),
-                 .src_v(src_v),
+                 .get_v(get_v),
                  .addr_i(addr_i[19:0]),
                  .addr_j(addr_j[19:0]),
 
@@ -138,18 +134,17 @@ module top
     wire update;
     assign update = last_j;
 
-    //////////////////////////////////////////////////////////////////////////////////
-
-
     wire              stream_v;
     wire [4:0]        stream_a;
     dst_ctrl dst_ctrl
              (
+                 // in
                  .clk(AXIS_ACLK),
                  .run(run),
                  .dst_ready(M_AXIS_TREADY),
                  .stream_ok(stream_ok),
 
+                 // out
                  .dst_valid(M_AXIS_TVALID),
                  .dst_last(M_AXIS_TLAST),
                  .stream_v(stream_v),
@@ -159,13 +154,15 @@ module top
 
     dst_buf dst_buf
             (
+                // in
                 .clk(AXIS_ACLK),
                 .stream_v(stream_v),
-                .stream_a(stream_a[4:0]), // 計算していない方なので~p
+                .stream_a(stream_a[4:0]),
                 .result(result),
                 .s_fin(s_fin),
                 .last_j(last_j),
 
+                // out
                 .stream_d(M_AXIS_TDATA)
             );
 
@@ -173,14 +170,8 @@ module top
     //////////////////////////////////////////////////////////////////////////////////
 
 
-    // wire [31:0] acc [0:1];
     wire [31:0] acc;
-    // assign acc[1] = 0;
 
-    // updateで一気に8個のコアのaccが更新される
-    // 次のサイクルから, 各コアのaccが次のコアのaccで更新されていく
-    // だから先頭のaccを見ていれば、８個のコアの結果が順にわかって、それをdst_bufに入れられる
-    // wire [31:0] result = acc[0];
     wire [31:0] result = acc;
 
     reg [15:0] mat_a;
@@ -201,21 +192,21 @@ module top
         for (i = 0; i < 1; i = i + 1)begin
             core core
                  (
+                     // in
                      .clk(AXIS_ACLK),
                      .rst(~AXIS_ARESETN),
                      .run(run),
                      .matw(matw),
                      .mat_a(mat_a),
                      .rand_num(rand_num),
-
-                     .src_v(src_v),
+                     .get_v(get_v),
                      .last_j(last_j),
                      .src_d(S_AXIS_TDATA),
                      .addr_j(addr_j),
-
                      .exec(exec),
                      .update(update),
 
+                     // out
                      .acc(acc)
                  );
         end

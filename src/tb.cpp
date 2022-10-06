@@ -93,10 +93,10 @@ int main(int argc, char **argv)
   printf("\n ---------------------------- 開始 ----------------------------- \n");
 
   verilator_top->S_AXI_BREADY = 1;
-  verilator_top->S_AXI_WSTRB = 15; // ストローブ信号,wstrb は wdata のうち実際に書き込む部位をバイト単位で指定します
+  verilator_top->S_AXI_WSTRB = 15;
   verilator_top->S_AXI_RREADY = 1;
-  verilator_top->S_AXIS_TSTRB = 255; // ストリーム用のストローブ信号
-  verilator_top->S_AXIS_TLAST = 0;   // データ区切り信号
+  verilator_top->S_AXIS_TSTRB = 255;
+  verilator_top->S_AXIS_TLAST = 0;
   verilator_top->M_AXIS_TREADY = 1;
 
   verilator_top->S_AXI_ARESETN = 0;

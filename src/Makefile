@@ -20,7 +20,7 @@ VERILATOR_MAKE_OPTS = OPT="-O3 -I ../../../"
 
 DESIGN_SRCS = \
 ./top.v \
-./2src/src_ctrl.sv \
+./2src/get_ctrl.sv \
 ./2src/s_ctrl.sv \
 ./3exe/exe_ctrl.sv \
 ./4dst/dst_ctrl.sv \

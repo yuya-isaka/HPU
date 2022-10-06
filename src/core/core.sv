@@ -9,7 +9,7 @@ module core
         input wire [15:0]        mat_a,
         input wire [31:0]       rand_num,
 
-        input wire src_v,
+        input wire get_v,
         input wire last_j,
         input wire [63:0] src_d,
         input wire [19:0] addr_j,
@@ -30,7 +30,7 @@ module core
                       item_memory[mat_a] <= rand_num;
                       m2 <= 0;
                   end
-                  else if (src_v) begin // 偶数
+                  else if (get_v) begin // 偶数
                       m2 <= item_memory[src_d[31:0]];
                   end
               end;
