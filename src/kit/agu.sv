@@ -22,7 +22,6 @@ module agu
          output logic           last
      );
 
-
     // データが最後　&&
     // startもしくは既にアドレス生成が始まっている　&&
     // enable

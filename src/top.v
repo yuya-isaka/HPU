@@ -51,8 +51,8 @@ module top
 
     // 3
     reg [19:0]      addr_j;
-    always @(posedge AXIS_ACLK)begin
-        if(~AXIS_ARESETN)begin
+    always @(posedge AXIS_ACLK) begin
+        if (~AXIS_ARESETN) begin
             addr_j <= 19'd0;
         end
         else begin
@@ -62,8 +62,8 @@ module top
 
     // 8
     reg [19:0]      addr_i;
-    always @(posedge AXIS_ACLK)begin
-        if(~AXIS_ARESETN)begin
+    always @(posedge AXIS_ACLK) begin
+        if (~AXIS_ARESETN) begin
             addr_i <= 19'd0;
         end
         else begin
@@ -74,8 +74,8 @@ module top
 
     // item_memory数 (65536最大値)
     reg [15:0]      random_num;
-    always @(posedge AXIS_ACLK)begin
-        if(~AXIS_ARESETN)begin
+    always @(posedge AXIS_ACLK) begin
+        if (~AXIS_ARESETN) begin
             random_num <= 15'd0;
         end
         else begin
@@ -86,7 +86,7 @@ module top
 
     //==============================================================
 
-    wire get_v;
+    wire        get_v;
     get_enable get_enable
                (
                    // in
@@ -154,7 +154,7 @@ module top
     //==============================================================
 
     reg [15:0]      item_a;
-    always @(posedge AXIS_ACLK)begin
+    always @(posedge AXIS_ACLK) begin
         if (~gen) begin
             item_a <= 16'd0;
         end
@@ -166,15 +166,18 @@ module top
     wire [31:0]      rand_num;
     xorshift prng
              (
+                 // in
                  .clk(AXIS_ACLK),
                  .gen(gen),
+
+                 // out
                  .rand_num(rand_num[31:0])
              );
 
     wire [31:0]         result;
     generate
         genvar         i;
-        for (i = 0; i < 1; i = i + 1)begin
+        for (i = 0; i < 1; i = i + 1) begin
             core core
                  (
                      // in
@@ -198,98 +201,88 @@ module top
     //==============================================================
 
     // AXI Lite Slave State
-    reg [3:0]         state;
-    reg [11:2]        write_addr;
-    reg [11:2]        read_addr;
-    reg [31:0]        write_data;
+    reg [3:0]       state;
+    reg [11:2]      write_addr;
+    reg [11:2]      read_addr;
+    reg [31:0]      write_data;
 
     wire INI =  (state == 4'b0000);
-    wire AW =   (state == 4'b0001);
-    wire W =    (state == 4'b0010);
+    wire AW  =  (state == 4'b0001);
+    wire W   =  (state == 4'b0010);
     wire AWW =  (state == 4'b0011);
     wire AR1 =  (state == 4'b0100);
     wire AR2 =  (state == 4'b1000);
 
-    assign S_AXI_BRESP = 2'b00; // スレーブからの結果の成否
-    // bresp[1:0] は上位１ビットがゼロなら成功、１なら失敗になります
-    //         00 : OKAY
-    //         01 : Exclusive Access OK
-    //         10 : Slave Error
-    //         11 : Decode Error
-    assign S_AXI_RRESP = 2'b00; // スレーブからの結果の成否
-    // rresp[1:0] は上位１ビットがゼロなら成功、１なら失敗になります
-    //          00 : OKAY
-    //          01 : Exclusive Access OK
-    //          10 : Slave Error
-    //          11 : Decode Error
+    assign S_AXI_BRESP = 2'b00;
+    assign S_AXI_RRESP = 2'b00;
     assign S_AXI_AWREADY = INI | W;
     assign S_AXI_WREADY  = INI | AW;
     assign S_AXI_ARREADY = INI;
     assign S_AXI_BVALID  = AWW;
     assign S_AXI_RVALID  = AR2;
 
-    always @(posedge S_AXI_ACLK)begin
-        if(~S_AXI_ARESETN)begin
-            state<=4'b0000;
-            write_addr<=0;
-            write_data<=0;
+    always @(posedge S_AXI_ACLK) begin
+        if (~S_AXI_ARESETN) begin
+            state <= 4'b0000;
+            write_addr <= 0;
+            write_data <= 0;
         end
         // INI
-        else if(INI)begin
-            if(S_AXI_AWVALID & S_AXI_WVALID)begin
-                state<=4'b0011; // go AWW
-                write_addr[11:2]<=S_AXI_AWADDR[11:2];
-                write_data<=S_AXI_WDATA;
+        else if (INI) begin
+            if (S_AXI_AWVALID & S_AXI_WVALID) begin // go AWW
+                state <= 4'b0011;
+                write_addr[11:2] <= S_AXI_AWADDR[11:2];
+                write_data <= S_AXI_WDATA;
             end
-            else if(S_AXI_AWVALID)begin
-                state<=4'b0001; // go AW
-                write_addr[11:2]<=S_AXI_AWADDR[11:2];
+            else if (S_AXI_AWVALID) begin // go AW
+                state <= 4'b0001;
+                write_addr[11:2] <= S_AXI_AWADDR[11:2];
             end
-            else if(S_AXI_WVALID)begin
-                state<=4'b0010; // go W
-                write_data<=S_AXI_WDATA;
+            else if (S_AXI_WVALID) begin // go W
+                state <= 4'b0010;
+                write_data <= S_AXI_WDATA;
             end
-            else if(S_AXI_ARVALID)begin
-                state<=4'b0100; // go AR1
-                read_addr[11:2]<=S_AXI_ARADDR[11:2];
+            else if (S_AXI_ARVALID) begin // go AR1
+                state <= 4'b0100;
+                read_addr[11:2] <= S_AXI_ARADDR[11:2];
             end
         end
         // AW
-        else if(AW)begin
-            if(S_AXI_WVALID)begin
-                state<=4'b0011; // go AWW
-                write_data<=S_AXI_WDATA;
+        else if (AW) begin
+            if (S_AXI_WVALID) begin // go AWW
+                state <= 4'b0011;
+                write_data <= S_AXI_WDATA;
             end
         end
         // W
-        else if(W)begin
-            if(S_AXI_AWVALID)begin
-                state<=4'b0011; // go AWW
-                write_addr[11:2]<=S_AXI_AWADDR[11:2];
+        else if (W) begin
+            if (S_AXI_AWVALID) begin // go AWW
+                state <= 4'b0011;
+                write_addr[11:2] <= S_AXI_AWADDR[11:2];
             end
         end
         // AWW
-        else if(AWW)begin
-            if(S_AXI_BREADY)
-                state<=4'b0000; // go INI
+        else if (AWW) begin
+            if (S_AXI_BREADY) begin // go INI
+                state <= 4'b0000;
+            end
         end
         // AR1
-        else if(AR1)begin
-            state<=4'b1000;
+        else if (AR1) begin
+            state <= 4'b1000;
         end
         // AR2
-        else if(AR2)begin
-            if(S_AXI_RREADY)
-                state<=4'b0000; // go INI
+        else if (AR2) begin
+            if (S_AXI_RREADY) begin // go INI
+                state <= 4'b0000;
+            end
         end
     end
 
+    wire register_w = AWW & (write_addr[11:10]==2'b00);
+    wire register_r = AR1 & (read_addr[11:10]==2'b00);
 
-    wire        register_w = AWW & (write_addr[11:10]==2'b00);
-    wire        register_r = AR1 & (read_addr[11:10]==2'b00);
-
-    ////////////////////////////////////////////////////////////////////////////
-
+    //==============================================================
 
     // Register Write
     always @(posedge S_AXI_ACLK) begin
@@ -312,7 +305,7 @@ module top
         end
     end
 
-    ////////////////////////////////////////////////////////////////////////////
+    //==============================================================
 
     // Register Read
     always @(posedge S_AXI_ACLK) begin

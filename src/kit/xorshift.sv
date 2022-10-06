@@ -8,10 +8,6 @@ module xorshift
         output  logic [31:0]    rand_num
     );
 
-    always_comb begin
-                    rand_num = w;
-                end;
-
     reg [31:0] x;
     reg [31:0] y;
     reg [31:0] z;
@@ -38,6 +34,12 @@ module xorshift
                       w <= (w ^ (w >> 19)) ^ ((x ^ (x << 11)) ^ ((x ^ (x << 11)) >> 8));
                   end
               end;
+
+    //==============================================================
+
+    always_comb begin
+                    rand_num = w;
+                end;
 
 endmodule
 
