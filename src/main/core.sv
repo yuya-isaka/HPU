@@ -4,8 +4,8 @@ module core
     (
         input wire              clk,
         input wire              run,
-        input wire              matw,
-        input wire [15:0]       mat_a,
+        input wire              gen,
+        input wire [15:0]       item_a,
         input wire [31:0]       rand_num,
         input wire              get_v,
         input wire [63:0]       get_d,
@@ -21,8 +21,8 @@ module core
 
     reg [31:0]      hv;
     always_ff @(posedge clk) begin
-                  if (matw) begin
-                      item_memory[mat_a] <= rand_num;
+                  if (gen) begin
+                      item_memory[item_a] <= rand_num;
                       hv <= 0;
                   end
                   else if (get_v) begin

@@ -4,7 +4,7 @@ module get_enable
     (
         // in
         input wire          clk,
-        input wire          matw,
+        input wire          gen,
         input wire          run,
         input wire          get_valid,
 
@@ -16,7 +16,7 @@ module get_enable
     always_comb begin
                     get_v = 1'b0;
 
-                    if (get_valid & get_ready & run & ~matw) begin
+                    if (get_valid & get_ready & run & ~gen) begin
                         get_v = 1'b1;
                     end
                 end;

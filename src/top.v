@@ -44,7 +44,8 @@ module top
 
     assign M_AXIS_TSTRB = 8'hff;
 
-    reg         run, matw, last;
+    reg [31:0]      control;
+    reg             run, gen;
 
     //==============================================================
 
@@ -90,7 +91,7 @@ module top
                (
                    // in
                    .clk(AXIS_ACLK),
-                   .matw(matw),
+                   .gen(gen),
                    .run(run),
                    .get_valid(S_AXIS_TVALID),
 
@@ -136,34 +137,39 @@ module top
 
 
     buffer_ctrl buffer_ctrl
-            (
-                // in
-                .clk(AXIS_ACLK),
-                .rst(~run),
-                .stream_v(stream_v),
-                .stream_a(stream_a[7:0]),
-                .result(result[31:0]),
-                .get_fin(get_fin),
-                .update(update),
+                (
+                    // in
+                    .clk(AXIS_ACLK),
+                    .rst(~run),
+                    .stream_v(stream_v),
+                    .stream_a(stream_a[7:0]),
+                    .result(result[31:0]),
+                    .get_fin(get_fin),
+                    .update(update),
 
-                // out
-                .stream_d(M_AXIS_TDATA[63:0])
-            );
+                    // out
+                    .stream_d(M_AXIS_TDATA[63:0])
+                );
 
     //==============================================================
 
-    reg [15:0] mat_a;
+    reg [15:0]      item_a;
     always @(posedge AXIS_ACLK)begin
-        if(~AXIS_ARESETN|~matw)begin
-            mat_a <= 16'd0;
+        if (~gen) begin
+            item_a <= 16'd0;
         end
         else begin
-            mat_a <= mat_a + 16'd1;
+            item_a <= item_a + 16'd1;
         end
     end;
 
     wire [31:0]      rand_num;
-    xorshift rng (.clk(AXIS_ACLK), .rst(~AXIS_ARESETN), .matw(matw), .rand_num(rand_num));
+    xorshift prng
+             (
+                 .clk(AXIS_ACLK),
+                 .gen(gen),
+                 .rand_num(rand_num[31:0])
+             );
 
     wire [31:0]         result;
     generate
@@ -174,8 +180,8 @@ module top
                      // in
                      .clk(AXIS_ACLK),
                      .run(run),
-                     .matw(matw),
-                     .mat_a(mat_a[15:0]),
+                     .gen(gen),
+                     .item_a(item_a[15:0]),
                      .rand_num(rand_num[31:0]),
                      .get_v(get_v),
                      .get_d(S_AXIS_TDATA[63:0]),
@@ -279,43 +285,42 @@ module top
     end
 
 
-    reg [31:0] control;
-
-    wire       register_w = AWW & (write_addr[11:10]==2'b00);
-    wire       register_r  = AR1 & (read_addr[11:10]==2'b00);
+    wire        register_w = AWW & (write_addr[11:10]==2'b00);
+    wire        register_r = AR1 & (read_addr[11:10]==2'b00);
 
     ////////////////////////////////////////////////////////////////////////////
 
+
     // Register Write
-    always @(posedge S_AXI_ACLK)begin
-        if(~S_AXI_ARESETN)begin
-            {last, run, matw} <= 3'b000;
+    always @(posedge S_AXI_ACLK) begin
+        if (~S_AXI_ARESETN) begin
+            {run, gen} <= 2'b00;
             control <= 32'h0;
         end
-        else if(register_w)begin
+        else if (register_w) begin
             case({write_addr[9:2],2'b00})
                 10'h00:
-                    {last, run, matw} <= write_data[2:0];
+                    {run, gen} <= write_data[1:0];
                 10'h10:
                     control <= write_data;
                 default:
                     ;
             endcase
         end
-        else if (matw & mat_a == random_num) begin // S_AXI_ACLKとAXIS_ACLKのクロック周波数は今は100MHzで一緒？だから大丈夫？
-            matw <= 1'b0;
+        else if (gen & item_a == random_num) begin // S_AXI_ACLKとAXIS_ACLKのクロック周波数は今は100MHzで一緒？だから大丈夫？
+            gen <= 1'b0;
         end
     end
 
     ////////////////////////////////////////////////////////////////////////////
 
     // Register Read
-    always @(posedge S_AXI_ACLK)begin
-        if(register_r)begin
+    always @(posedge S_AXI_ACLK) begin
+        if (register_r) begin
             S_AXI_RDATA <= 0;
             case({read_addr[9:2],2'b00})
                 10'h00:
-                    S_AXI_RDATA[2:0] <= {last, run, matw};
+                    S_AXI_RDATA[1:0] <= {run, gen};
                 10'h10:
                     S_AXI_RDATA <= control;
                 default:

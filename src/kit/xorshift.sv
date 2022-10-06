@@ -4,8 +4,7 @@
 module xorshift
     (
         input   wire            clk,
-        input   wire            rst,
-        input   wire            matw,
+        input   wire            gen,
         output  logic [31:0]    rand_num
     );
 
@@ -19,7 +18,7 @@ module xorshift
     reg [31:0] w;
 
     always_ff @(posedge clk) begin
-                  if (~matw | rst)begin
+                  if (~gen)begin
                       // パターン１
                       // x <= 2380889285;
                       // y <= 1631889387;
