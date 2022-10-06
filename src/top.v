@@ -40,16 +40,16 @@ module top
         input wire         S_AXIS_TVALID
     );
 
-    ///////////////////////////////////////////////////////////////////////////////
+    //==============================================================
 
     assign M_AXIS_TSTRB = 8'hff;
 
-    reg run, matw, last;
+    reg         run, matw, last;
 
-    ///////////////////////////////////////////////////////////////////////////////
+    //==============================================================
 
     // 3
-    reg [19:0] addr_j;
+    reg [19:0]      addr_j;
     always @(posedge AXIS_ACLK)begin
         if(~AXIS_ARESETN)begin
             addr_j <= 19'd0;
@@ -60,7 +60,7 @@ module top
     end
 
     // 8
-    reg [19:0] addr_i;
+    reg [19:0]      addr_i;
     always @(posedge AXIS_ACLK)begin
         if(~AXIS_ARESETN)begin
             addr_i <= 19'd0;
@@ -71,8 +71,8 @@ module top
         end
     end
 
-    // item_memory数 (65536を最大値にしようかなと)
-    reg [15:0] random_num;
+    // item_memory数 (65536最大値)
+    reg [15:0]      random_num;
     always @(posedge AXIS_ACLK)begin
         if(~AXIS_ARESETN)begin
             random_num <= 15'd0;
@@ -83,7 +83,7 @@ module top
         end
     end
 
-    /////////////////////////////////////////////////////////////////////////////////
+    //==============================================================
 
     wire get_v;
     get_enable get_enable
@@ -131,44 +131,39 @@ module top
                   );
 
     wire              stream_v;
-    wire [4:0]        stream_a;
-    dst_ctrl dst_ctrl
-             (
-                 // in
-                 .clk(AXIS_ACLK),
-                 .run(run),
-                 .dst_ready(M_AXIS_TREADY),
-                 .stream_ok(stream_ok),
+    wire [7:0]        stream_a;
+    stream_ctrl stream_ctrl
+                (
+                    // in
+                    .clk(AXIS_ACLK),
+                    .rst(~run),
+                    .dst_ready(M_AXIS_TREADY),
+                    .stream_ok(stream_ok),
 
-                 // out
-                 .dst_valid(M_AXIS_TVALID),
-                 .dst_last(M_AXIS_TLAST),
-                 .stream_v(stream_v),
-                 .stream_a(stream_a[4:0])
-             );
+                    // out
+                    .dst_valid(M_AXIS_TVALID),
+                    .dst_last(M_AXIS_TLAST),
+                    .stream_v(stream_v),
+                    .stream_a(stream_a[7:0])
+                );
 
 
-    dst_buf dst_buf
+    buffer buffer
             (
                 // in
                 .clk(AXIS_ACLK),
+                .rst(~run),
                 .stream_v(stream_v),
-                .stream_a(stream_a[4:0]),
-                .result(result),
+                .stream_a(stream_a[7:0]),
+                .result(result[31:0]),
                 .get_fin(get_fin),
                 .update(update),
 
                 // out
-                .stream_d(M_AXIS_TDATA)
+                .stream_d(M_AXIS_TDATA[63:0])
             );
 
-
-    //////////////////////////////////////////////////////////////////////////////////
-
-
-    wire [31:0] acc;
-
-    wire [31:0] result = acc;
+    //==============================================================
 
     reg [15:0] mat_a;
     always @(posedge AXIS_ACLK)begin
@@ -183,6 +178,7 @@ module top
     wire [31:0]      rand_num;
     xorshift rng (.clk(AXIS_ACLK), .rst(~AXIS_ARESETN), .matw(matw), .rand_num(rand_num));
 
+    wire [31:0]         result;
     generate
         genvar         i;
         for (i = 0; i < 1; i = i + 1)begin
@@ -190,25 +186,23 @@ module top
                  (
                      // in
                      .clk(AXIS_ACLK),
-                     .rst(~AXIS_ARESETN),
                      .run(run),
                      .matw(matw),
-                     .mat_a(mat_a),
-                     .rand_num(rand_num),
+                     .mat_a(mat_a[15:0]),
+                     .rand_num(rand_num[31:0]),
                      .get_v(get_v),
-                     .src_d(S_AXIS_TDATA),
-                     .addr_j(addr_j),
+                     .get_d(S_AXIS_TDATA[63:0]),
+                     .addr_j(addr_j[19:0]),
                      .exec(exec),
                      .update(update),
 
                      // out
-                     .acc(acc)
+                     .result(result)
                  );
         end
     endgenerate
 
-
-    ////////////////////////////////////////////////////////////////////////////
+    //==============================================================
 
     // AXI Lite Slave State
     reg [3:0]         state;

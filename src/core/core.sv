@@ -3,32 +3,30 @@
 module core
     (
         input wire              clk,
-        input wire              rst,
         input wire              run,
         input wire              matw,
         input wire [15:0]       mat_a,
         input wire [31:0]       rand_num,
         input wire              get_v,
-        input wire [63:0]       src_d,
+        input wire [63:0]       get_d,
         input wire [19:0]       addr_j,
         input wire              exec,
         input wire              update,
 
-        output logic [31:0]     acc
+        output logic [31:0]     result
     );
 
-    // 各コアにつき32bitのデータを128個集める
-    // BRAMになっているよし
     (* ram_style = "block" *)
     reg [31:0]      item_memory [0:1023];
 
+    reg [31:0]      hv;
     always_ff @(posedge clk) begin
                   if (matw) begin
                       item_memory[mat_a] <= rand_num;
-                      m2 <= 0;
+                      hv <= 0;
                   end
-                  else if (get_v) begin // 偶数
-                      m2 <= item_memory[src_d[31:0]];
+                  else if (get_v) begin
+                      hv <= item_memory[get_d[31:0]];
                   end
               end;
 
@@ -39,15 +37,10 @@ module core
     //     end
     // end
 
-    // reg [31:0]        exec_mat_data;
-
-    reg [31:0]        acc_right, acc_left;
-
-    reg [31:0]        m2;
-
-    reg [31:0]     permutation;
+    // 後々要改造（permutation == addr_j)
+    reg [31:0]      permutation;
     always_ff @(posedge clk) begin
-                  if (rst | ~run) begin
+                  if (~run) begin
                       permutation <= 32'h0;
                   end
                   else if (exec) begin
@@ -60,16 +53,17 @@ module core
                   end
               end;
 
+    reg [31:0]      encoding_hv;
     always_ff @(posedge clk)begin
-                  if(rst | ~run)begin
-                      acc_left <= 32'h0;
+                  if(~run)begin
+                      encoding_hv <= 32'h0;
                   end
                   else if(exec)begin
                       if (update) begin
-                          acc_left <= m2;
+                          encoding_hv <= hv;
                       end
                       else begin
-                          acc_left <= acc_left ^ (m2 >> permutation | ( ( m2 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
+                          encoding_hv <= encoding_hv ^ (hv >> permutation | ( ( hv & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
                       end
                   end
               end;
@@ -77,10 +71,10 @@ module core
     //==============================================================
 
     always_comb begin
-                    acc = 0;
+                    result = 0;
 
                     if (update) begin
-                        acc = acc_left;
+                        result = encoding_hv;
                     end
                 end;
 

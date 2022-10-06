@@ -5,25 +5,24 @@ module counter
          parameter W = 32
      )
      (
+         // in
          input wire			clk,
+         input wire         rst,
          input wire 		result_bit,
-         input wire   		get_fin,
          input wire         update,
+
+         // out
          output logic 		sign_bit
      );
 
-    // これは分散RAM
-    // これがあかんと言われるのはわかる
-    // 32bitあれば足りるでしょうと、20億くらい
+    // 分散RAM (符号付き)
+    // warning出る
     (* ram_style = "block" *)
     reg signed [W-1:0]      box;
 
-    initial begin
-        box = 0;
-    end
-
+    // $signed(1'b1)にするとバグる
     always_ff @(posedge clk) begin
-                  if (get_fin) begin
+                  if (rst) begin
                       box <= 0;
                   end
                   else if(update) begin
@@ -38,6 +37,7 @@ module counter
 
     //==============================================================
 
+    // 符号ビット
     always_comb begin
                     sign_bit = box[W-1];
                 end;

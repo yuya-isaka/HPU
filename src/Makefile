@@ -23,21 +23,17 @@ DESIGN_SRCS = \
 ./get/get_enable.sv \
 ./get/get_ctrl.sv \
 ./stream/stream_enable.sv \
-./stream/dst_ctrl.sv \
-./buf/dst_buf.sv \
+./stream/stream_ctrl.sv \
+./buffer/buffer.sv \
 ./core/core.sv \
 ./util/agu.sv \
 ./util/counter.sv \
 ./util/xorshift.sv \
-# ./util/agu_next.sv \
-# ./param/agu_param.sv \
 
 VERILATOR_CPP_TB = tb.cpp
 
 default: $(SIM_DIR)/Vtop
 	./sim/Vtop
-
-sim: $(SIM_DIR)/Vtop
 
 $(SIM_DIR)/Vtop: $(DESIGN_SRCS) $(VERILATOR_CPP_TB)
 	$(VERILATOR) $(VERILATOR_OPTS) $(DESIGN_SRCS) --exe ../$(VERILATOR_CPP_TB)
@@ -46,9 +42,6 @@ $(SIM_DIR)/Vtop: $(DESIGN_SRCS) $(VERILATOR_CPP_TB)
 
 clean:
 	rm -rf sim/ tmp.vcd
-
-run :
-	./sim/Vtop
 
 format :
 	iStyle --style=kr -n $(DESIGN_SRCS)
