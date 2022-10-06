@@ -22,7 +22,8 @@ module core
 
     // 各コアにつき32bitのデータを128個集める
     // BRAMになっているよし
-    (* ram_style = "block" *)                           reg [31:0]        item_memory [0:1023];
+    (* ram_style = "block" *)
+    reg [31:0]      item_memory [0:1023];
 
     always_ff @(posedge clk) begin
                   if (matw) begin
