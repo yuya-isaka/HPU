@@ -101,8 +101,8 @@ module top
                );
 
     wire        update;
-    wire        get_fin;
     wire        exec;
+    wire        get_fin;
     get_ctrl get_ctrl
              (
                  // in

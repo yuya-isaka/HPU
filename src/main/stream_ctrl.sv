@@ -3,19 +3,19 @@
 module stream_ctrl
     (
         // in
-        input wire          clk,
-        input wire          rst,
-        input wire          get_fin,
-        input wire          dst_ready,
+        input wire              clk,
+        input wire              rst,
+        input wire              get_fin,
+        input wire              dst_ready,
 
         // out
-        output reg          dst_valid,
-        output reg          dst_last,
-        output logic        stream_v,
-        output logic [7:0]  stream_a
+        output reg              dst_valid,
+        output reg              dst_last,
+        output logic            stream_v,
+        output logic [7:0]      stream_a
     );
 
-    reg get_fin_keep;
+    reg         get_fin_keep;
     always_ff @(posedge clk) begin
                   if (rst) begin
                       get_fin_keep <= 1'b0;
@@ -55,6 +55,7 @@ module stream_ctrl
     wire            last_stream;
     agu #(.W(8)) agu_stream_i
         (
+            // in
             .ini(8'd0),
             .fin(8'd0),
             .start(start),
@@ -62,11 +63,13 @@ module stream_ctrl
             .rst(rst),
             .en(dst_ready),
 
+            // out
             .data(i),
             .last(last_stream)
         );
 
 
+    // dst_valid
     always_ff @(posedge clk)begin
                   if (rst) begin
                       dst_valid <= 1'b0;
@@ -76,6 +79,7 @@ module stream_ctrl
                   end
               end;
 
+    // dst_last
     always_ff @(posedge clk)begin
                   if (rst) begin
                       dst_last <= 1'b0;
@@ -105,10 +109,8 @@ module stream_ctrl
                     end
                 end;
 
-    always_comb begin
-                    stream_a = i;
-                    stream_v = stream_active & dst_ready;
-                end;
+    assign stream_v = stream_active & dst_ready;
+    assign stream_a = i;
 
 endmodule
 

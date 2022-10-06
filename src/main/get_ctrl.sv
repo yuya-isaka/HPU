@@ -21,7 +21,8 @@ module get_ctrl
                   get_v_nn <= get_v_n;
               end;
 
-    always_ff @(posedge clk)begin
+    // exec
+    always_ff @(posedge clk) begin
                   if (rst) begin
                       exec <= 1'b0;
                   end
@@ -30,40 +31,41 @@ module get_ctrl
                   end
               end;
 
-    always_ff @(posedge clk)begin
+    // get_fin
+    always_ff @(posedge clk) begin
                   if (rst) begin
                       get_fin <= 1'b0;
                   end
                   else begin
-                      get_fin <= last_i;
+                      get_fin <= last_update;
                   end
               end;
 
     wire [19:0]         i;
-    wire [19:0]         j;
-    wire                last_i;
-
+    wire                last_update;
     agu #(.W(20)) agu_get_i
         (
             // in
             .clk(clk),
             .rst(rst),
-            .ini(0),
+            .ini(20'd0),
             .fin(addr_i),
             .start(get_v),
             .en(update),
 
             // out
             .data(i),
-            .last(last_i)
+            .last(last_update)
         );
 
+    // update
+    wire [19:0]         j;
     agu #(.W(20)) agu_get_j
         (
             // in
             .clk(clk),
             .rst(rst),
-            .ini(0),
+            .ini(20'd0),
             .fin(addr_j),
             .start(get_v_nn),
             .en(exec | (i == addr_i & j == addr_j)),
