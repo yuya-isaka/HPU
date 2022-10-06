@@ -99,9 +99,9 @@ module top
                    .get_v(get_v)
                );
 
-    wire last_j;
-    wire get_fin;
-    wire exec;
+    wire        update;
+    wire        get_fin;
+    wire        exec;
     get_ctrl get_ctrl
              (
                  // in
@@ -112,7 +112,7 @@ module top
                  .addr_j(addr_j[19:0]),
 
                  // out
-                 .last_j(last_j),
+                 .update(update),
                  .exec(exec),
                  .get_fin(get_fin)
              );
@@ -129,10 +129,6 @@ module top
                       // out
                       .stream_ok(stream_ok)
                   );
-
-
-    wire update;
-    assign update = last_j;
 
     wire              stream_v;
     wire [4:0]        stream_a;
@@ -160,7 +156,7 @@ module top
                 .stream_a(stream_a[4:0]),
                 .result(result),
                 .get_fin(get_fin),
-                .last_j(last_j),
+                .update(update),
 
                 // out
                 .stream_d(M_AXIS_TDATA)
@@ -200,7 +196,6 @@ module top
                      .mat_a(mat_a),
                      .rand_num(rand_num),
                      .get_v(get_v),
-                     .last_j(last_j),
                      .src_d(S_AXIS_TDATA),
                      .addr_j(addr_j),
                      .exec(exec),

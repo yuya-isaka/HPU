@@ -6,14 +6,11 @@ module core
         input wire              rst,
         input wire              run,
         input wire              matw,
-        input wire [15:0]        mat_a,
+        input wire [15:0]       mat_a,
         input wire [31:0]       rand_num,
-
-        input wire get_v,
-        input wire last_j,
-        input wire [63:0] src_d,
-        input wire [19:0] addr_j,
-
+        input wire              get_v,
+        input wire [63:0]       src_d,
+        input wire [19:0]       addr_j,
         input wire              exec,
         input wire              update,
 
@@ -46,17 +43,6 @@ module core
 
     reg [31:0]        acc_right, acc_left;
 
-    // updateで一気に8個のコアのaccが更新される
-    // 次のサイクルから, 各コアのaccが次のコアのaccで更新されていく
-
-    always_comb begin
-                    acc = 0;
-
-                    if (update) begin
-                        acc = acc_left;
-                    end
-                end;
-
     reg [31:0]        m2;
 
     reg [31:0]     permutation;
@@ -79,7 +65,7 @@ module core
                       acc_left <= 32'h0;
                   end
                   else if(exec)begin
-                      if (last_j) begin
+                      if (update) begin
                           acc_left <= m2;
                       end
                       else begin
@@ -88,11 +74,15 @@ module core
                   end
               end;
 
-    // always_ff @(posedge clk) begin
-    //               if(out_period)begin
-    //                   acc_right <= acc_left;
-    //               end
-    //           end;
+    //==============================================================
+
+    always_comb begin
+                    acc = 0;
+
+                    if (update) begin
+                        acc = acc_left;
+                    end
+                end;
 
 endmodule
 

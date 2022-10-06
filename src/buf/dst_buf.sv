@@ -7,7 +7,7 @@ module dst_buf
         input wire [4:0]        stream_a,
         input wire [31:0]       result,
         input wire              get_fin,
-        input wire              last_j,
+        input wire              update,
 
         output logic [63:0]     stream_d // M_AXIS_TDATA
     );
@@ -40,7 +40,7 @@ module dst_buf
                         .clk(clk),
                         .result_bit(result[i]),
                         .get_fin(get_fin),
-                        .last_j(last_j),
+                        .update(update),
                         .sign_bit(sign_bit_1[i])
                     );
         end

@@ -10,7 +10,7 @@ module get_ctrl
         input wire [19:0]       addr_j,
 
         // out
-        output wire             last_j,
+        output wire             update,
         output reg              exec,
         output reg              get_fin
     );
@@ -51,7 +51,7 @@ module get_ctrl
             .ini(0),
             .fin(addr_i),
             .start(get_v),
-            .en(last_j),
+            .en(update),
 
             // out
             .data(i),
@@ -70,7 +70,7 @@ module get_ctrl
 
             // out
             .data(j),
-            .last(last_j)
+            .last(update)
         );
 
 endmodule

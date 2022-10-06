@@ -8,7 +8,7 @@ module counter
          input wire			clk,
          input wire 		result_bit,
          input wire   		get_fin,
-         input wire         last_j,
+         input wire         update,
          output logic 		sign_bit
      );
 
@@ -26,7 +26,7 @@ module counter
                   if (get_fin) begin
                       box <= 0;
                   end
-                  else if(last_j) begin
+                  else if(update) begin
                       if (result_bit == 1'b0) begin
                           box <= box + $signed(1);
                       end
@@ -36,8 +36,8 @@ module counter
                   end
               end;
 
-    // 出力
-    // 分散RAM
+    //==============================================================
+
     always_comb begin
                     sign_bit = box[W-1];
                 end;

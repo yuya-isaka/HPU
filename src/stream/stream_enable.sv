@@ -25,6 +25,8 @@ module stream_enable
                   end
               end;
 
+    //==============================================================
+
     always_comb begin
                     stream_ok = 1'b0;
 
