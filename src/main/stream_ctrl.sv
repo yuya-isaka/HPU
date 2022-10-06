@@ -17,6 +17,7 @@ module stream_ctrl
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
     reg         get_fin_keep;
     always_ff @(posedge clk) begin
                   if (rst) begin
@@ -37,6 +38,31 @@ module stream_ctrl
                   end
                   else if (dst_ready) begin
                       stream_ok_keep <= stream_ok;
+                  end
+              end;
+
+    //================================================================
+
+    logic       stream_ok;
+    always_comb begin
+                    stream_ok = 1'b0;
+
+                    if ((get_fin | get_fin_keep) & dst_ready) begin
+                        stream_ok = 1'b1;
+                    end
+                end;
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    // dst_valid
+    always_ff @(posedge clk)begin
+                  if (rst) begin
+                      dst_valid <= 1'b0;
+                  end
+                  else if (dst_ready) begin
+                      dst_valid <= stream_active;
                   end
               end;
 
@@ -70,37 +96,7 @@ module stream_ctrl
             .last(last_stream)
         );
 
-
-    // dst_valid
-    always_ff @(posedge clk)begin
-                  if (rst) begin
-                      dst_valid <= 1'b0;
-                  end
-                  else if (dst_ready) begin
-                      dst_valid <= stream_active;
-                  end
-              end;
-
-    // dst_last
-    always_ff @(posedge clk)begin
-                  if (rst) begin
-                      dst_last <= 1'b0;
-                  end
-                  else if (dst_ready) begin
-                      dst_last <= stream_active & last_stream;
-                  end
-              end;
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    logic       stream_ok;
-    always_comb begin
-                    stream_ok = 1'b0;
-
-                    if ((get_fin | get_fin_keep) & dst_ready) begin
-                        stream_ok = 1'b1;
-                    end
-                end;
+    //================================================================
 
     logic       start;
     always_comb begin
@@ -113,6 +109,23 @@ module stream_ctrl
 
     assign stream_v = stream_active & dst_ready;
     assign stream_a = i;
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    // dst_last
+    always_ff @(posedge clk)begin
+                  if (rst) begin
+                      dst_last <= 1'b0;
+                  end
+                  else if (dst_ready) begin
+                      dst_last <= stream_active & last_stream;
+                  end
+              end;
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 endmodule
 

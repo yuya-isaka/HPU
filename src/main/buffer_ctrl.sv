@@ -5,17 +5,18 @@ module buffer_ctrl
         // in
         input wire              clk,
         input wire              rst,
-        input wire              stream_v,
-        input wire [7:0]        stream_a,
         input wire [31:0]       result,
         input wire              update,
         input wire              get_fin,
+        input wire              stream_v,
+        input wire [7:0]        stream_a,
 
         // out
         output logic [63:0]     stream_d
     );
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     // 次元数で可変になる、要改良
     wire [63:0]      sign_bit;
@@ -36,6 +37,10 @@ module buffer_ctrl
         end
     endgenerate
 
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     reg [63:0]      encoded_hv;
     always_ff @(posedge clk) begin
                   if (get_fin) begin
@@ -43,14 +48,15 @@ module buffer_ctrl
                   end
               end;
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     // stream_d
     always_ff @(posedge clk) begin
                   if (stream_v) begin
                       stream_d <= encoded_hv;
                   end
               end;
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 endmodule
 

@@ -42,6 +42,7 @@ module top
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
     // Parameter
 
     // 3
@@ -79,9 +80,10 @@ module top
         end
     end
 
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // S_AXIS_TREADY
+
     wire        get_v;
     get_enable get_enable
                (
@@ -114,6 +116,22 @@ module top
                  .get_fin(get_fin)
              );
 
+    // M_AXIS_TDATA
+    buffer_ctrl buffer_ctrl
+                (
+                    // in
+                    .clk(AXIS_ACLK),
+                    .rst(~run),
+                    .result(result[31:0]),
+                    .update(update),
+                    .get_fin(get_fin),
+                    .stream_v(stream_v),
+                    .stream_a(stream_a[7:0]),
+
+                    // out
+                    .stream_d(M_AXIS_TDATA[63:0])
+                );
+
     // M_AXIS_TVALID
     // M_AXIS_TLAST
     wire              stream_v;
@@ -133,22 +151,7 @@ module top
                     .stream_a(stream_a[7:0])
                 );
 
-
-    // M_AXIS_TDATA
-    buffer_ctrl buffer_ctrl
-                (
-                    // in
-                    .clk(AXIS_ACLK),
-                    .rst(~run),
-                    .stream_v(stream_v),
-                    .stream_a(stream_a[7:0]),
-                    .result(result[31:0]),
-                    .update(update),
-                    .get_fin(get_fin),
-
-                    // out
-                    .stream_d(M_AXIS_TDATA[63:0])
-                );
+    //================================================================
 
     reg [15:0]      item_a;
     always @(posedge AXIS_ACLK) begin
@@ -170,6 +173,8 @@ module top
                  // out
                  .rand_num(rand_num[31:0])
              );
+
+    //================================================================
 
     wire [31:0]         result;
     generate
@@ -195,11 +200,14 @@ module top
         end
     endgenerate
 
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     assign M_AXIS_TSTRB = 8'hff;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     // AXI Lite Slave State
     reg [3:0]       state;
@@ -213,6 +221,8 @@ module top
     wire AWW = (state == 4'b0011);
     wire AR1 = (state == 4'b0100);
     wire AR2 = (state == 4'b1000);
+
+    //================================================================
 
     assign S_AXI_BRESP   = 2'b00;
     assign S_AXI_RRESP   = 2'b00;
@@ -280,13 +290,19 @@ module top
         end
     end
 
+    //================================================================
+
     wire register_w = AWW & (write_addr[11:10] == 2'b00);
     wire register_r = AR1 & (read_addr[11:10] == 2'b00);
 
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     reg [31:0]      control;
     reg             run, gen;
+
+    //================================================================
 
     // Register Write
     always @(posedge S_AXI_ACLK) begin
@@ -309,6 +325,8 @@ module top
         end
     end
 
+    //================================================================
+
     // Register Read
     always @(posedge S_AXI_ACLK) begin
         if (register_r) begin
@@ -323,6 +341,10 @@ module top
             endcase
         end
     end
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 endmodule
 
 `default_nettype wire
