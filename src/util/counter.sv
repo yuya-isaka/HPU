@@ -7,7 +7,7 @@ module counter
      (
          input wire			clk,
          input wire 		result_bit,
-         input wire   		s_fin,
+         input wire   		get_fin,
          input wire         last_j,
          output logic 		sign_bit
      );
@@ -23,7 +23,7 @@ module counter
     end
 
     always_ff @(posedge clk) begin
-                  if (s_fin) begin
+                  if (get_fin) begin
                       box <= 0;
                   end
                   else if(last_j) begin

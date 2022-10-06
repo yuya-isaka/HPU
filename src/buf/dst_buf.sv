@@ -6,8 +6,8 @@ module dst_buf
         input wire              stream_v,
         input wire [4:0]        stream_a,
         input wire [31:0]       result,
-        input wire              s_fin,
-        input wire last_j,
+        input wire              get_fin,
+        input wire              last_j,
 
         output logic [63:0]     stream_d // M_AXIS_TDATA
     );
@@ -39,7 +39,7 @@ module dst_buf
                     (
                         .clk(clk),
                         .result_bit(result[i]),
-                        .s_fin(s_fin),
+                        .get_fin(get_fin),
                         .last_j(last_j),
                         .sign_bit(sign_bit_1[i])
                     );
@@ -48,7 +48,7 @@ module dst_buf
 
 
     always_ff @(posedge clk) begin
-                  if (s_fin) begin
+                  if (get_fin) begin
                       buff0 <= sign_bit_1;
                   end
                   // s_fin_inでpが変わってるからこれでいける

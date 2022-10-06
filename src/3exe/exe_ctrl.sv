@@ -9,12 +9,11 @@ module exe_ctrl
         input wire [19:0]       addr_j,
 
         output wire             last_j,
-        output reg              s_fin,
+        output reg              get_fin,
         output reg              exec
     );
 
     wire last_i;
-    wire next_i, next_j;
     wire [19:0] i;
     wire [19:0] j;
 
@@ -34,7 +33,7 @@ module exe_ctrl
                   get_v_nn <= get_v_n;
               end;
 
-    agu_next #(.W(20)) l_i
+    agu #(.W(20)) l_i
              (
                  .ini(2'd0),
                  .fin(addr_i),
@@ -42,12 +41,11 @@ module exe_ctrl
                  .last(last_i),
                  .clk(clk),
                  .rst(rst),
-                 .next(next_i),
                  .data(i),
                  .en(last_j)
              );
 
-    agu_next #(.W(20)) l_j
+    agu #(.W(20)) l_j
              (
                  .ini(3'd0),
                  .fin(addr_j),
@@ -55,17 +53,16 @@ module exe_ctrl
                  .last(last_j),
                  .clk(clk),
                  .rst(rst),
-                 .next(next_j),
                  .data(j),
                  .en(exec | (i == addr_i & j == addr_j))
              );
 
     always_ff @(posedge clk)begin
                   if(rst)begin
-                      s_fin <= 1'b0;
+                      get_fin <= 1'b0;
                   end
                   else begin
-                      s_fin <= last_i;
+                      get_fin <= last_i;
                   end
               end;
 

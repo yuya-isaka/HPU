@@ -105,16 +105,16 @@ module top
            (
                // in
                .clk(AXIS_ACLK),
-               .run(run),
+               .rst(~run),
                .dst_ready(M_AXIS_TREADY),
-               .s_fin(s_fin),
+               .get_fin(get_fin),
 
                // out
                .stream_ok(stream_ok)
            );
 
     wire last_j;
-    wire s_fin;
+    wire get_fin;
     wire exec;
     exe_ctrl exe_ctrl
              (
@@ -127,7 +127,7 @@ module top
 
                  // out
                  .last_j(last_j),
-                 .s_fin(s_fin),
+                 .get_fin(get_fin),
                  .exec(exec)
              );
 
@@ -159,7 +159,7 @@ module top
                 .stream_v(stream_v),
                 .stream_a(stream_a[4:0]),
                 .result(result),
-                .s_fin(s_fin),
+                .get_fin(get_fin),
                 .last_j(last_j),
 
                 // out

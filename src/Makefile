@@ -27,9 +27,9 @@ DESIGN_SRCS = \
 ./buf/dst_buf.sv \
 ./core/core.sv \
 ./util/agu.sv \
-./util/agu_next.sv \
 ./util/counter.sv \
 ./util/xorshift.sv \
+# ./util/agu_next.sv \
 # ./param/agu_param.sv \
 
 VERILATOR_CPP_TB = tb.cpp
