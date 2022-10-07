@@ -63,7 +63,7 @@ module top
             addr_i <= 19'd0;
         end
         else begin
-            addr_i <= 19'd299;
+            addr_i <= 19'd149;
             // addr_i <= 19'd7;
         end
     end
@@ -122,7 +122,8 @@ module top
                     // in
                     .clk(AXIS_ACLK),
                     .rst(~run),
-                    .result(result[31:0]),
+                    .result_1(result_1[31:0]),
+                    .result_2(result_2[31:0]),
                     .update(update),
                     .get_fin(get_fin),
                     .stream_v(stream_v),
@@ -174,9 +175,13 @@ module top
                  .rand_num(rand_num[31:0])
              );
 
+
     //================================================================
 
-    wire [31:0]         result;
+
+    wire [31:0]         result_1;
+    wire [31:0]         result_2;
+
     generate
         genvar         i;
         for (i = 0; i < 1; i = i + 1) begin
@@ -195,7 +200,8 @@ module top
                      .update(update),
 
                      // out
-                     .result(result[31:0])
+                     .result_1(result_1[31:0]),
+                     .result_2(result_2[31:0])
                  );
         end
     endgenerate

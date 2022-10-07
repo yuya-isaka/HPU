@@ -5,7 +5,8 @@ module buffer_ctrl
         // in
         input wire              clk,
         input wire              rst,
-        input wire [31:0]       result,
+        input wire [31:0]       result_1,
+        input wire [31:0]       result_2,
         input wire              update,
         input wire              get_fin,
         input wire              stream_v,
@@ -29,7 +30,8 @@ module buffer_ctrl
                         // in
                         .clk(clk),
                         .rst(rst),
-                        .result_bit(result[i]),
+                        .result_bit_1(result_1[i]),
+                        .result_bit_2(result_2[i]),
                         .update(update),
 
                         // out

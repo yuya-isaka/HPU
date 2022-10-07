@@ -13,7 +13,8 @@ module core
         input wire              exec,
         input wire              update,
 
-        output logic [31:0]     result
+        output logic [31:0]     result_1,
+        output logic [31:0]     result_2
     );
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +41,7 @@ module core
                       hv_2 <= 0;
                   end
                   else if (get_v) begin
-                      hv_2 <= item_memory[get_d[63:0]];
+                      hv_2 <= item_memory[get_d[63:32]];
                   end
               end;
 
@@ -58,6 +59,7 @@ module core
 
     // 後々要改造（permutation == addr_j)
     reg [31:0]      permutation;
+
     always_ff @(posedge clk) begin
                   if (~run) begin
                       permutation <= 32'h0;
@@ -72,28 +74,38 @@ module core
                   end
               end;
 
-    reg [31:0]      encoding;
+
+    reg [31:0]      enc_1;
+    reg [31:0]      enc_2;
+
     always_ff @(posedge clk) begin
                   if (~run) begin
-                      encoding <= 32'h0;
+                      enc_1 <= 32'h0;
+                      enc_2 <= 32'h0;
                   end
                   else if (exec) begin
                       if (update) begin
-                          encoding <= hv_1;
+                          enc_1 <= hv_1;
+                          enc_2 <= hv_2;
                       end
                       else begin
-                          encoding <= encoding ^ (hv_1 >> permutation | ( ( hv_1 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
+                          enc_1 <= enc_1 ^ (hv_1 >> permutation | ( ( hv_1 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
+                          enc_2 <= enc_2 ^ (hv_2 >> permutation | ( ( hv_2 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
                       end
                   end
               end;
 
+
     //================================================================
 
+
     always_comb begin
-                    result = 0;
+                    result_1 = 0;
+                    result_2 = 0;
 
                     if (update) begin
-                        result = encoding;
+                        result_1 = enc_1;
+                        result_2 = enc_2;
                     end
                 end;
 

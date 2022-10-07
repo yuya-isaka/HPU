@@ -156,54 +156,16 @@ int main(int argc, char **argv)
 
   // 送信
   verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 0; i < 399; i++)
+  int tmp = 2;
+  for (int i = 0; i < ADDRNUM; i++)
   {
     conv.d0 = i;
-    conv.d1 = i;
-    verilator_top->S_AXIS_TDATA = conv.wd;
-    eval();
-  }
-  verilator_top->S_AXIS_TVALID = 0;
-  eval();
-  eval();
-  eval();
-  eval();
-  eval();
-  eval();
-
-  verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 399; i < 520; i++)
-  {
-    conv.d0 = i;
-    conv.d1 = i;
-    verilator_top->S_AXIS_TDATA = conv.wd;
-    eval();
-  }
-  verilator_top->S_AXIS_TVALID = 0;
-  eval();
-  eval();
-  eval();
-  eval();
-  eval();
-
-  verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 520; i < 899; i++)
-  {
-    conv.d0 = i;
-    conv.d1 = i;
-    verilator_top->S_AXIS_TDATA = conv.wd;
-    eval();
-  }
-  verilator_top->S_AXIS_TVALID = 0;
-  eval();
-  eval();
-  eval();
-
-  verilator_top->S_AXIS_TVALID = 1;
-  for (int i = 899; i < 900; i++)
-  {
-    conv.d0 = i;
-    conv.d1 = i;
+    conv.d1 = i + 3;
+    if (i == tmp)
+    {
+      i += 3;
+      tmp += 6; // 6個ずつ送るから
+    }
     verilator_top->S_AXIS_TDATA = conv.wd;
     eval();
   }

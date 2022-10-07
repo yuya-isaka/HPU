@@ -8,7 +8,8 @@ module counter
          // in
          input wire			clk,
          input wire         rst,
-         input wire 		result_bit,
+         input wire 		result_bit_1,
+         input wire 		result_bit_2,
          input wire         update,
 
          // out
@@ -29,18 +30,33 @@ module counter
                   if (rst) begin
                       box <= 0;
                   end
-                  else if(update) begin
-                      if (result_bit == 1'b0) begin
-                          box <= box + $signed(1);
-                      end
-                      else begin
-                          box <= box - $signed(1);
-                      end
+                  else if (update) begin
+                      box <= box + bit_1 + bit_2;
                   end
               end;
 
 
     //================================================================
+
+
+    // 1bitにするとbox+bit_1+bit_2で勝手に1bitとして符号拡張されて必ず-1される (教訓も込めて2bitで実装、暗黙の符号拡張に任せる)
+    logic signed [1:0]        bit_1;
+    always_comb begin
+                    bit_1 = $signed(1'b1); // -1
+
+                    if (result_bit_1 == 1'b0) begin
+                        bit_1 = $signed(1); // 1
+                    end
+                end;
+
+    logic signed [1:0]        bit_2;
+    always_comb begin
+                    bit_2 = $signed(1'b1); // -1
+
+                    if (result_bit_2 == 1'b0) begin
+                        bit_2 = $signed(1); // 1
+                    end
+                end;
 
 
     // 符号ビット
