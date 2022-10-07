@@ -20,6 +20,7 @@ module buffer_ctrl
 
     // 次元数で可変になる、要改良
     wire [63:0]      sign_bit;
+
     generate
         genvar i;
         for (i = 0; i < 32; i = i + 1) begin
@@ -47,6 +48,7 @@ module buffer_ctrl
                       encoded_hv <= sign_bit;
                   end
               end;
+
 
     // stream_d
     always_ff @(posedge clk) begin

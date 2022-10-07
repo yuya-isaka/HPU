@@ -31,6 +31,7 @@ module stream_ctrl
                   end
               end;
 
+
     reg         stream_ok_keep;
     always_ff @(posedge clk)begin
                   if (rst) begin
@@ -41,7 +42,9 @@ module stream_ctrl
                   end
               end;
 
+
     //================================================================
+
 
     logic       stream_ok;
     always_comb begin
@@ -66,6 +69,7 @@ module stream_ctrl
                   end
               end;
 
+
     reg         stream_active;
     always_ff @(posedge clk)begin
                   if (rst) begin
@@ -79,8 +83,10 @@ module stream_ctrl
                   end
               end;
 
+
     wire [7:0]      i;
     wire            last_stream;
+
     agu #(.W(8)) agu_stream_i
         (
             // in
@@ -96,9 +102,12 @@ module stream_ctrl
             .last(last_stream)
         );
 
+
     //================================================================
 
+
     logic       start;
+
     always_comb begin
                     start = 1'b0;
 
@@ -106,6 +115,7 @@ module stream_ctrl
                         start = 1'b1;
                     end
                 end;
+
 
     assign stream_v = stream_active & dst_ready;
     assign stream_a = i;

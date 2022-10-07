@@ -19,10 +19,12 @@ module get_ctrl
 
 
     reg         get_v_n, get_v_nn;
+
     always_ff @(posedge clk) begin
                   get_v_n <= get_v;
                   get_v_nn <= get_v_n;
               end;
+
 
     // exec
     always_ff @(posedge clk) begin
@@ -34,6 +36,7 @@ module get_ctrl
                   end
               end;
 
+
     // get_fin
     always_ff @(posedge clk) begin
                   if (rst) begin
@@ -44,8 +47,10 @@ module get_ctrl
                   end
               end;
 
+
     wire [19:0]         i;
     wire                last_update;
+
     agu #(.W(20)) agu_get_i
         (
             // in
@@ -61,8 +66,10 @@ module get_ctrl
             .last(last_update)
         );
 
+
     // update
     wire [19:0]         j;
+
     agu #(.W(20)) agu_get_j
         (
             // in
