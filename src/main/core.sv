@@ -23,14 +23,24 @@ module core
     reg [31:0]      item_memory [0:1023];
 
 
-    reg [31:0]      hypervector;
+    reg [31:0]      hv_1;
     always_ff @(posedge clk) begin
                   if (gen) begin
                       item_memory[item_a] <= rand_num;
-                      hypervector <= 0;
+                      hv_1 <= 0;
                   end
                   else if (get_v) begin
-                      hypervector <= item_memory[get_d[31:0]];
+                      hv_1 <= item_memory[get_d[31:0]];
+                  end
+              end;
+
+    reg [31:0]      hv_2;
+    always_ff @(posedge clk) begin
+                  if (gen) begin
+                      hv_2 <= 0;
+                  end
+                  else if (get_v) begin
+                      hv_2 <= item_memory[get_d[63:0]];
                   end
               end;
 
@@ -68,10 +78,10 @@ module core
                   end
                   else if (exec) begin
                       if (update) begin
-                          encoding <= hypervector;
+                          encoding <= hv_1;
                       end
                       else begin
-                          encoding <= encoding ^ (hypervector >> permutation | ( ( hypervector & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
+                          encoding <= encoding ^ (hv_1 >> permutation | ( ( hv_1 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
                       end
                   end
               end;
