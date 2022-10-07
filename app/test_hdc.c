@@ -229,6 +229,7 @@ void main()
     {
       i += 3;
       tmp += 6;
+      printf("\n");
     }
   }
 
