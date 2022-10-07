@@ -216,15 +216,14 @@ void main()
 
   printf("\n ------------------------- Sample %d Input --------------------------- \n\n", 0);
 
-  int sample[ADDRNUM];
   int tmp = 2;
+  int tmp_2 = 0;
   for (int i = 0; i < ADDRNUM; i++)
   {
-    sample[i] = i;
-    sample[i + 1] = i + 3;
-    printf("%3d ", sample[i]);
-    src[i] = sample[i];
-    src[i + 1] = sample[i + 1];
+    src[tmp_2] = i;
+    src[tmp_2 + 1] = i + 3;
+    printf("%3d ", src[i]);
+    tmp_2 += 2;
 
     if (i == tmp)
     {
