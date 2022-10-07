@@ -47,6 +47,7 @@ module top
 
     // 3
     reg [19:0]      addr_j;
+
     always @(posedge AXIS_ACLK) begin
         if (~AXIS_ARESETN) begin
             addr_j <= 19'd0;
@@ -56,8 +57,10 @@ module top
         end
     end
 
+
     // 8
     reg [19:0]      addr_i;
+
     always @(posedge AXIS_ACLK) begin
         if (~AXIS_ARESETN) begin
             addr_i <= 19'd0;
@@ -68,8 +71,10 @@ module top
         end
     end
 
+
     // item_memory数 (65536最大値)
     reg [15:0]      random_num;
+
     always @(posedge AXIS_ACLK) begin
         if (~AXIS_ARESETN) begin
             random_num <= 15'd0;
@@ -85,6 +90,7 @@ module top
 
 
     wire        get_v;
+
     get_enable get_enable
                (
                    // in
@@ -98,9 +104,11 @@ module top
                    .get_v(get_v)
                );
 
+
     wire        update;
     wire        exec;
     wire        get_fin;
+
     get_ctrl get_ctrl
              (
                  // in
@@ -115,6 +123,7 @@ module top
                  .exec(exec),
                  .get_fin(get_fin)
              );
+
 
     // M_AXIS_TDATA
     buffer_ctrl buffer_ctrl
@@ -133,10 +142,12 @@ module top
                     .stream_d(M_AXIS_TDATA[127:0])
                 );
 
+
     // M_AXIS_TVALID
     // M_AXIS_TLAST
     wire              stream_v;
     wire [7:0]        stream_a;
+
     stream_ctrl stream_ctrl
                 (
                     // in
@@ -152,9 +163,12 @@ module top
                     .stream_a(stream_a[7:0])
                 );
 
+
     //================================================================
 
+
     reg [15:0]      item_a;
+
     always @(posedge AXIS_ACLK) begin
         if (~gen) begin
             item_a <= 16'd0;
@@ -164,7 +178,9 @@ module top
         end
     end;
 
+
     wire [31:0]      rand_num;
+
     xorshift prng
              (
                  // in
@@ -223,6 +239,7 @@ module top
     reg [11:2]      read_addr;
     reg [31:0]      write_data;
 
+
     wire INI = (state == 4'b0000);
     wire AW  = (state == 4'b0001);
     wire W   = (state == 4'b0010);
@@ -230,7 +247,9 @@ module top
     wire AR1 = (state == 4'b0100);
     wire AR2 = (state == 4'b1000);
 
+
     //================================================================
+
 
     assign S_AXI_BRESP   = 2'b00;
     assign S_AXI_RRESP   = 2'b00;
@@ -298,7 +317,9 @@ module top
         end
     end
 
+
     //================================================================
+
 
     wire register_w = AWW & (write_addr[11:10] == 2'b00);
     wire register_r = AR1 & (read_addr[11:10] == 2'b00);
@@ -310,7 +331,9 @@ module top
     reg [31:0]      control;
     reg             run, gen;
 
+
     //================================================================
+
 
     // Register Write
     always @(posedge S_AXI_ACLK) begin
@@ -333,7 +356,9 @@ module top
         end
     end
 
+
     //================================================================
+
 
     // Register Read
     always @(posedge S_AXI_ACLK) begin
