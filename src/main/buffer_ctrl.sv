@@ -13,14 +13,14 @@ module buffer_ctrl
         input wire [7:0]        stream_a,
 
         // out
-        output logic [63:0]     stream_d
+        output logic [127:0]     stream_d
     );
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     // 次元数で可変になる、要改良
-    wire [63:0]      sign_bit;
+    wire [127:0]      sign_bit;
 
     generate
         genvar i;
@@ -44,7 +44,7 @@ module buffer_ctrl
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    reg [63:0]      encoded_hv;
+    reg [127:0]      encoded_hv;
     always_ff @(posedge clk) begin
                   if (get_fin) begin
                       encoded_hv <= sign_bit;

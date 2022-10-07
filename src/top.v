@@ -27,14 +27,14 @@ module top
         input wire              AXIS_ACLK,
         input wire              AXIS_ARESETN,
         output wire             M_AXIS_TVALID,
-        output wire [63:0]      M_AXIS_TDATA,
+        output wire [127:0]     M_AXIS_TDATA,
         output wire [7:0]       M_AXIS_TSTRB,
         output wire             M_AXIS_TLAST,
         input wire              M_AXIS_TREADY,
 
         // AXI Stream Slave Interface
         output wire             S_AXIS_TREADY,
-        input wire [63:0]       S_AXIS_TDATA,
+        input wire [127:0]      S_AXIS_TDATA,
         input wire [7:0]        S_AXIS_TSTRB,
         input wire              S_AXIS_TLAST,
         input wire              S_AXIS_TVALID
@@ -130,7 +130,7 @@ module top
                     .stream_a(stream_a[7:0]),
 
                     // out
-                    .stream_d(M_AXIS_TDATA[63:0])
+                    .stream_d(M_AXIS_TDATA[127:0])
                 );
 
     // M_AXIS_TVALID

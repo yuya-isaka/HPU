@@ -17,6 +17,16 @@ union
   uint64_t wd;
 } conv;
 
+union
+{
+  struct
+  {
+    unsigned int d0;
+    unsigned int d1;
+  };
+  uint64_t wd;
+} conv2;
+
 vluint64_t main_time = 0;
 vluint64_t sim_start = 0;
 vluint64_t sim_end = sim_start + 300000;
@@ -161,12 +171,17 @@ int main(int argc, char **argv)
   {
     conv.d0 = i;
     conv.d1 = i + 3;
+    conv2.d0 = i;
+    conv2.d1 = i + 3;
     if (i == tmp)
     {
       i += 3;
       tmp += 6; // 6個ずつ送るから
     }
-    verilator_top->S_AXIS_TDATA = conv.wd;
+    verilator_top->S_AXIS_TDATA[0] = conv.d0;
+    verilator_top->S_AXIS_TDATA[1] = conv.d1;
+    verilator_top->S_AXIS_TDATA[2] = conv2.d0;
+    verilator_top->S_AXIS_TDATA[3] = conv2.d1;
     eval();
   }
   verilator_top->S_AXIS_TVALID = 0;
@@ -182,9 +197,15 @@ int main(int argc, char **argv)
 
   for (int i = 0; i < 1; i++)
   {
-    conv.wd = verilator_top->M_AXIS_TDATA;
+    conv.d0 = verilator_top->M_AXIS_TDATA[0];
+    conv.d1 = verilator_top->M_AXIS_TDATA[1];
+    conv2.d0 = verilator_top->M_AXIS_TDATA[2];
+    conv2.d1 = verilator_top->M_AXIS_TDATA[3];
     printf("  %u\n\n", conv.d0);
     putb(conv.d0);
+    printf("  %u\n\n", conv.d1);
+    printf("  %u\n\n", conv2.d0);
+    printf("  %u\n\n", conv2.d0);
     eval();
   }
 
