@@ -8,7 +8,8 @@ module core
         input wire [15:0]       item_a,
         input wire [31:0]       rand_num,
         input wire              get_v,
-        input wire [63:0]       get_d,
+        input wire [31:0]       get_d_1,
+        input wire [31:0]       get_d_2,
         input wire [19:0]       addr_j,
         input wire              exec,
         input wire              update,
@@ -31,7 +32,7 @@ module core
                       hv_1 <= 0;
                   end
                   else if (get_v) begin
-                      hv_1 <= item_memory[get_d[31:0]];
+                      hv_1 <= item_memory[get_d_1];
                   end
               end;
 
@@ -41,7 +42,7 @@ module core
                       hv_2 <= 0;
                   end
                   else if (get_v) begin
-                      hv_2 <= item_memory[get_d[63:32]];
+                      hv_2 <= item_memory[get_d_2];
                   end
               end;
 
