@@ -66,22 +66,21 @@ module top
             addr_i <= 19'd0;
         end
         else begin
-            addr_i <= 19'd149;
+            addr_i <= 19'd109;
             // addr_i <= 19'd7;
         end
     end
 
 
     // item_memory数 (65536最大値)
-    reg [15:0]      random_num;
+    reg [15:0]      item_memory_num;
 
     always @(posedge AXIS_ACLK) begin
         if (~AXIS_ARESETN) begin
-            random_num <= 15'd0;
+            item_memory_num <= 15'd0;
         end
         else begin
-            random_num <= 15'd1000;
-            // random_num <= 15'd100;
+            item_memory_num <= 15'd1000;
         end
     end
 
@@ -107,6 +106,7 @@ module top
 
     wire        update;
     wire        exec;
+    wire        last_update;
     wire        get_fin;
 
     get_ctrl get_ctrl
@@ -121,6 +121,7 @@ module top
                  // out
                  .update(update),
                  .exec(exec),
+                 .last_update(last_update),
                  .get_fin(get_fin)
              );
 
@@ -131,9 +132,12 @@ module top
                     // in
                     .clk(AXIS_ACLK),
                     .rst(~run),
+                    .tmp_addr_i(addr_i[0]),
+                    .tmp_rand(tmp_rand[31:0]),
                     .result_1(result_1[31:0]),
                     .result_2(result_2[31:0]),
                     .update(update),
+                    .last_update(last_update),
                     .get_fin(get_fin),
                     .stream_v(stream_v),
                     .stream_a(stream_a[7:0]),
@@ -192,6 +196,18 @@ module top
              );
 
 
+    reg [31:0]      tmp_rand;
+
+    always @(posedge AXIS_ACLK) begin
+        if (~AXIS_ARESETN) begin
+            tmp_rand <= 32'd0;
+        end
+        else if (gen & addr_i[0] & (item_a == item_memory_num)) begin
+            tmp_rand <= rand_num;
+        end
+    end
+
+
     //================================================================
 
 
@@ -208,6 +224,7 @@ module top
                      .run(run),
                      .gen(gen),
                      .item_a(item_a[15:0]),
+                     .item_memory_num(item_memory_num[15:0]),
                      .rand_num(rand_num[31:0]),
                      .get_v(get_v),
                      .get_d_1(S_AXIS_TDATA[31:0]),
@@ -351,7 +368,7 @@ module top
                     ;
             endcase
         end
-        else if (gen & item_a == random_num) begin
+        else if (gen & item_a == item_memory_num) begin
             gen <= 1'b0;
         end
     end

@@ -6,6 +6,7 @@ module core
         input wire              run,
         input wire              gen,
         input wire [15:0]       item_a,
+        input wire [15:0]       item_memory_num,
         input wire [31:0]       rand_num,
         input wire              get_v,
         input wire [31:0]       get_d_1,
@@ -27,7 +28,7 @@ module core
 
     reg [31:0]      hv_1;
     always_ff @(posedge clk) begin
-                  if (gen) begin
+                  if (gen & (item_a != item_memory_num)) begin
                       item_memory[item_a] <= rand_num;
                       hv_1 <= 0;
                   end

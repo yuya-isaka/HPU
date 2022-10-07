@@ -12,6 +12,7 @@ module get_ctrl
         // out
         output wire             update,
         output reg              exec,
+        output wire             last_update,
         output reg              get_fin
     );
 
@@ -49,7 +50,6 @@ module get_ctrl
 
 
     wire [19:0]         i;
-    wire                last_update;
 
     agu #(.W(20)) agu_get_i
         (

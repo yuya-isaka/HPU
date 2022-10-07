@@ -78,13 +78,17 @@ unsigned int xor128(void)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// const int RANNUM = 100;
-// const int ARNUM = 8;
-// const int ADDRNUM = 24;
-const int RANNUM = 1000;
-const int ARNUM = 300;
-const int ADDRNUM = 900;
+// item_memoryの数（top.vの設定値より１つ大きくする）
+const int RANNUM = 1001;
 
+// ADDRNUM / NGRAM + 1を設定
+const int ARNUM = 221;
+
+// 今回のアドレス合計数　（top.vの方では、2つまとめて送ってるので(ADDRNUM/2/NGRAM)-1=149を設定中）
+// tb.cppのADDRNUMとは一緒
+const int ADDRNUM = 660;
+
+// N-gram
 const int NGRAM = 3;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,6 +124,13 @@ int main(int argc, char **argv)
 			result = 0;
 			num += 1;
 		}
+	}
+
+	// 多数決関数用
+	if ((ADDRNUM / NGRAM) < ARNUM)
+	{
+		result_array[num] = item_memory_array[RANNUM - 1];
+		// printf("%u", item_memory_array[RANNUM - 1]);
 	}
 
 	unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));

@@ -5,9 +5,12 @@ module buffer_ctrl
         // in
         input wire              clk,
         input wire              rst,
+        input wire              tmp_addr_i,
+        input wire [31:0]       tmp_rand,
         input wire [31:0]       result_1,
         input wire [31:0]       result_2,
         input wire              update,
+        input wire              last_update,
         input wire              get_fin,
         input wire              stream_v,
         input wire [7:0]        stream_a,
@@ -30,9 +33,12 @@ module buffer_ctrl
                         // in
                         .clk(clk),
                         .rst(rst),
+                        .tmp_addr_i(tmp_addr_i),
+                        .tmp_rand_bit(tmp_rand[i]),
                         .result_bit_1(result_1[i]),
                         .result_bit_2(result_2[i]),
                         .update(update),
+                        .last_update(last_update),
 
                         // out
                         .sign_bit(sign_bit[i])
