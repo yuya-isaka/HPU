@@ -97,7 +97,6 @@ const int RANNUM = 1000;
 const int ARNUM = 300;
 const int ADDRNUM = 900;
 
-const int ADDRNUM_2 = 450;
 const int NGRAM = 3;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,7 +218,7 @@ void main()
 
   int sample[ADDRNUM];
   int tmp = 2;
-  for (int i = 0; i < ADDRNUM_2; i++)
+  for (int i = 0; i < ADDRNUM; i++)
   {
     sample[i] = i;
     sample[i + 1] = i + 3;
