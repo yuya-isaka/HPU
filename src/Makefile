@@ -24,7 +24,7 @@ DESIGN_SRCS = \
 ./main/get_ctrl.sv \
 ./main/stream_ctrl.sv \
 ./main/buffer_ctrl.sv \
-./main/core.sv \
+./main/core.v \
 ./kit/agu.sv \
 ./kit/counter.sv \
 ./kit/xorshift.sv \
