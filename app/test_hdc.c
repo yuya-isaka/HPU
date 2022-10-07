@@ -96,8 +96,8 @@ unsigned long dst_phys;
 const int RANNUM = 1000;
 const int ARNUM = 300;
 const int ADDRNUM = 900;
-const int ADDRNUMNUM = 1800;
 
+const int ADDRNUM_2 = 450;
 const int NGRAM = 3;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -217,23 +217,27 @@ void main()
 
   printf("\n ------------------------- Sample %d Input --------------------------- \n\n", 0);
 
-  int sample[ADDRNUMNUM];
-  int tmp = 0;
-  for (int i = 0; i < ADDRNUMNUM; i += 2)
+  int sample[ADDRNUM];
+  int tmp = 2;
+  for (int i = 0; i < ADDRNUM_2; i++)
   {
-    sample[i] = tmp;
-    sample[i + 1] = tmp;
+    sample[i] = i;
+    sample[i + 1] = i + 3;
     printf("%3d ", sample[i]);
-
     src[i] = sample[i];
     src[i + 1] = sample[i + 1];
-    tmp++;
+
+    if (i == tmp)
+    {
+      i += 3;
+      tmp += 6;
+    }
   }
 
   // AXI DMA 送信の設定（UIO経由）
   dma[0x00 / 4] = 1;
   dma[0x18 / 4] = src_phys;
-  dma[0x28 / 4] = ADDRNUMNUM * 4; // 動的
+  dma[0x28 / 4] = ADDRNUM * 4; // 動的
 
   // 受信設定
   // 送信チャネルの設定前に受信チャネルを設定すると変になるっぽい
