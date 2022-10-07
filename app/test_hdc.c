@@ -223,7 +223,7 @@ void main()
     src[tmp_2] = i;
     src[tmp_2 + 1] = i + 3;
     printf("%4d %4d", src[tmp_2], src[tmp_2 + 1]);
-    tmp_2 += 2;
+    tmp_2 += 4;
 
     if (i == tmp)
     {
