@@ -81,7 +81,14 @@ void putb(unsigned int v)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const int ADDRNUM = 660;
+// N-gram
+const int NGRAM = 3;
+
+// test.cppのADDRNUMと同じ
+const int ADDRNUM = 663;
+
+// ADDRNUMが奇数かどうか
+const int ODD = 1;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -165,17 +172,31 @@ int main(int argc, char **argv)
 
   // 送信
   verilator_top->S_AXIS_TVALID = 1;
-  int tmp = 2;
+  int tmp = NGRAM - 1;
   for (int i = 0; i < ADDRNUM; i++)
   {
     conv.d0 = i;
-    conv.d1 = i + 3;
+    if (ODD && i >= (ADDRNUM - NGRAM))
+    {
+      conv.d1 = 0;
+    }
+    else
+    {
+      conv.d1 = i + NGRAM;
+    }
     conv2.d0 = i;
-    conv2.d1 = i + 3;
+    if (ODD && i >= (ADDRNUM - NGRAM))
+    {
+      conv2.d1 = 0;
+    }
+    else
+    {
+      conv2.d1 = i + NGRAM;
+    }
     if (i == tmp)
     {
-      i += 3;
-      tmp += 6; // 6個ずつ送るから
+      i += NGRAM;
+      tmp += (2 * NGRAM); // ２個分を同時に送っているから2 * NGRAM
     }
     verilator_top->S_AXIS_TDATA[0] = conv.d0;
     verilator_top->S_AXIS_TDATA[1] = conv.d1;

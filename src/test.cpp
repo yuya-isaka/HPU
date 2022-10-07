@@ -84,9 +84,10 @@ const int RANNUM = 1001;
 // ADDRNUM / NGRAM + 1を設定
 const int ARNUM = 221;
 
-// 今回のアドレス合計数　（top.vの方では、2つまとめて送ってるので(ADDRNUM/2/NGRAM)-1=149を設定中）
+// 偶数 ... ADDRNUM/NGRAM/2-1をtop.vに設定  (例：900 ... 900/NGRAM/2-1=149)
+// 奇数 ... ADDRNUM/NGRAM/2をtop.vに設定	(例:903 ... 903/NGRAM/2=150）
 // tb.cppのADDRNUMとは一緒
-const int ADDRNUM = 660;
+const int ADDRNUM = 663;
 
 // N-gram
 const int NGRAM = 3;
