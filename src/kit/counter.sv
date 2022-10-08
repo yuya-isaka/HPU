@@ -131,6 +131,7 @@ module counter
 
     wire signed [1:0]      select [0:31];
 
+    // 32コア
     generate
         genvar      k;
         for (k = 0; k < 32; k = k + 1) begin
