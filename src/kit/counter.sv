@@ -2,7 +2,8 @@
 
 module counter
     #(
-         parameter W = 32
+        // addr_iが100万以上になったら増やす必要あり
+         parameter W = 20
      )
      (
          // in
