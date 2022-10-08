@@ -89,15 +89,25 @@ unsigned long dst_phys;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// const int RANNUM = 100;
-// const int ARNUM = 30;
-// const int ADDRNUM = 90;
-// const int ADDRNUMNUM = 180;
-const int RANNUM = 1000;
-const int ARNUM = 300;
-const int ADDRNUM = 900;
+// item_memoryの数（top.vの設定値より１つ大きくする）
+const int RANNUM = 1001;
 
+// ADDRNUM / NGRAM + 1を設定
+const int ARNUM = 221;
+
+// 偶数 ... ADDRNUM/NGRAM/2-1をtop.vに設定  (例：900 ... 900/NGRAM/2-1=149)
+// 奇数 ... ADDRNUM/NGRAM/2をtop.vに設定	(例:903 ... 903/NGRAM/2=150）
+// tb.cppのADDRNUMとは一緒
+const int ADDRNUM = 663;
+
+// N-gram
 const int NGRAM = 3;
+
+// ADDRNUMが奇数か
+const int ODD = 1;
+
+// 送信ビット
+const int BUSWIDTH = 128;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -216,19 +226,28 @@ void main()
 
   printf("\n ------------------------- Sample %d Input --------------------------- \n\n", 0);
 
-  int tmp = 2;
+  int tmp = NGRAM - 1;
   int tmp_2 = 0;
   for (int i = 0; i < ADDRNUM; i++)
   {
     src[tmp_2] = i;
-    src[tmp_2 + 1] = i + 3;
+    if (ODD && i >= (ADDRNUM - NGRAM))
+    {
+
+      src[tmp_2 + 1] = 0;
+    }
+    else
+    {
+
+      src[tmp_2 + 1] = i + NGRAM;
+    }
     printf("%4d %4d", src[tmp_2], src[tmp_2 + 1]);
-    tmp_2 += 4;
+    tmp_2 += (BUSWIDTH / 32); // 128bitずつ送っているから（128/32=4)
 
     if (i == tmp)
     {
-      i += 3;
-      tmp += 6;
+      i += NGRAM;
+      tmp += (2 * NGRAM); // ２個分を同時に送っているから2 * NGRAM
       printf("\n");
     }
   }
@@ -236,13 +255,15 @@ void main()
   // AXI DMA 送信の設定（UIO経由）
   dma[0x00 / 4] = 1;
   dma[0x18 / 4] = src_phys;
-  dma[0x28 / 4] = ADDRNUM * 8; // 450 * 2 * 2 * 4
+  // 偶数 ... ADDRNUM / 並列数 * BUSWIDTH (900 / 2) * (128 / 8)
+  // 奇数 ... ADDRNUM / 並列数 * BUSWIDTH ((903 / 2) + 1) * (128 / 8)
+  dma[0x28 / 4] = (ADDRNUM / 2 + 1) * (BUSWIDTH / 8);
 
   // 受信設定
   // 送信チャネルの設定前に受信チャネルを設定すると変になるっぽい
   dma[0x30 / 4] = 1;
   dma[0x48 / 4] = dst_phys;
-  dma[0x58 / 4] = 4 * 4;
+  dma[0x58 / 4] = 4 * 4; // 4つ * 4バイト = 16バイト = 128ビット
 
   // 演算終了を待つ
   while ((dma[0x34 / 4] & 0x1000) != 0x1000)
@@ -260,7 +281,7 @@ void main()
     item_memory_array[i] = xor128();
   }
 
-  unsigned int result_array[ARNUM];
+  unsigned int result_array[ARNUM] = {0};
   unsigned int result = 0;
   tmp = 0;
   int num = 0;
@@ -276,6 +297,13 @@ void main()
       result = 0;
       num += 1;
     }
+  }
+
+  // 多数決関数用
+  if ((ADDRNUM / NGRAM) < ARNUM)
+  {
+    result_array[num] = item_memory_array[RANNUM - 1];
+    // printf("%u", item_memory_array[RANNUM - 1]);
   }
 
   unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));

@@ -196,7 +196,7 @@ int main(int argc, char **argv)
     if (i == tmp)
     {
       i += NGRAM;
-      tmp += (2 * NGRAM); // ２個分を同時に送っているから2 * NGRAM
+      tmp += (2 * NGRAM);
     }
     verilator_top->S_AXIS_TDATA[0] = conv.d0;
     verilator_top->S_AXIS_TDATA[1] = conv.d1;
