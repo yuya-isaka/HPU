@@ -98,6 +98,7 @@ const int ARNUM = 221;
 // 偶数 ... ADDRNUM/NGRAM/2-1をtop.vに設定  (例：900 ... 900/NGRAM/2-1=149)
 // 奇数 ... ADDRNUM/NGRAM/2をtop.vに設定	(例:903 ... 903/NGRAM/2=150）
 // tb.cppのADDRNUMとは一緒
+// ADDRNUM + NGRAM を処理する設計にする（ADDRNUMは663で、今回なNGRAMで２個を連続で処理するから2の倍数の666で処理する）
 const int ADDRNUM = 663;
 
 // N-gram
@@ -257,7 +258,7 @@ void main()
   dma[0x18 / 4] = src_phys;
   // 偶数 ... ADDRNUM / 並列数 * BUSWIDTH (900 / 2) * (128 / 8)
   // 奇数 ... ADDRNUM / 並列数 * BUSWIDTH ((903 / 2) + 1) * (128 / 8)
-  dma[0x28 / 4] = (ADDRNUM / 2 + 2) * (BUSWIDTH / 8);
+  dma[0x28 / 4] = ((ADDRNUM + 3) / 2) * (BUSWIDTH / 8);
 
   // 受信設定
   // 送信チャネルの設定前に受信チャネルを設定すると変になるっぽい
