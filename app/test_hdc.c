@@ -257,7 +257,7 @@ void main()
   dma[0x18 / 4] = src_phys;
   // 偶数 ... ADDRNUM / 並列数 * BUSWIDTH (900 / 2) * (128 / 8)
   // 奇数 ... ADDRNUM / 並列数 * BUSWIDTH ((903 / 2) + 1) * (128 / 8)
-  dma[0x28 / 4] = (ADDRNUM / 2 + 1) * (BUSWIDTH / 8);
+  dma[0x28 / 4] = (ADDRNUM / 2 + 2) * (BUSWIDTH / 8);
 
   // 受信設定
   // 送信チャネルの設定前に受信チャネルを設定すると変になるっぽい
