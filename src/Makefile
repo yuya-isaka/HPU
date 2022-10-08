@@ -18,12 +18,6 @@ VERILATOR_OPTS = \
 	-MAKEFLAGS "OBJCACHE=ccache CXX=clang++ LINK=clang++" \
 	--compiler clang \
 
-# VERILATOR_OPTS = \
-# 	--cc \
-# 	-Wno-lint \
-# 	--Mdir sim \
-# 	--trace \
-
 VERILATOR_MAKE_OPTS = OPT="-O3 -I ../../../"
 
 DESIGN_SRCS = \
