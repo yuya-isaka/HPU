@@ -18,9 +18,10 @@ module stream_ctrl
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    reg         get_fin_n;
+    reg         get_fin_n, get_fin_nn;
     always_ff @(posedge clk) begin
                   get_fin_n <= get_fin;
+                  get_fin_nn <= get_fin_n;
               end;
 
 
@@ -32,7 +33,7 @@ module stream_ctrl
                   else if (stream_ok) begin
                       get_fin_keep <= 1'b0;
                   end
-                  else if (get_fin_n) begin
+                  else if (get_fin_nn) begin
                       get_fin_keep <= 1'b1;
                   end
               end;
@@ -56,7 +57,7 @@ module stream_ctrl
     always_comb begin
                     stream_ok = 1'b0;
 
-                    if ((get_fin_n | get_fin_keep) & dst_ready) begin
+                    if ((get_fin_nn | get_fin_keep) & dst_ready) begin
                         stream_ok = 1'b1;
                     end
                 end;
