@@ -92,23 +92,23 @@ unsigned long dst_phys;
 // item_memoryの数（top.vの設定値より１つ大きくする）
 const int RANNUM = 1001;
 
-// ADDRNUM / NGRAM + 1を設定
-const int ARNUM = 221;
+// ADDRNUM / NGRAM + 1を設定 (必ず奇数になるようにする)
+const int ARNUM = 321;
 
 // 偶数 ... ADDRNUM/NGRAM/2-1をtop.vに設定  (例：900 ... 900/NGRAM/2-1=149)
 // 奇数 ... ADDRNUM/NGRAM/2をtop.vに設定	(例:903 ... 903/NGRAM/2=150）
 // tb.cppのADDRNUMとは一緒
 // ADDRNUM + NGRAM を処理する設計にする（ADDRNUMは663で、今回なNGRAMで２個を連続で処理するから2の倍数の666で処理する）
-const int ADDRNUM = 663;
+const int ADDRNUM = 960;
 
 // N-gram
 const int NGRAM = 3;
 
 // ADDRNUMが奇数か
-const int ODD = 1;
+const int ODD = 0;
 
 // 送信ビット
-const int BUSWIDTH = 128;
+const int BUSWIDTH = 1024;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -227,44 +227,36 @@ void main()
 
   printf("\n ------------------------- Sample %d Input --------------------------- \n\n", 0);
 
+  int send_num = 0;
   int tmp = NGRAM - 1;
   int tmp_2 = 0;
   for (int i = 0; i < ADDRNUM; i++)
   {
-    src[tmp_2] = i;
-    if (ODD && i >= (ADDRNUM - NGRAM))
+    // 32コア
+    for (int j = 0; j < 32; j++)
     {
-
-      src[tmp_2 + 1] = 0;
+      src[tmp_2] = i + (NGRAM * j);
+      tmp_2++;
+      send_num++;
     }
-    else
-    {
-
-      src[tmp_2 + 1] = i + NGRAM;
-    }
-    printf("%4d %4d", src[tmp_2], src[tmp_2 + 1]);
-    tmp_2 += (BUSWIDTH / 32); // 128bitずつ送っているから（128/32=4)
 
     if (i == tmp)
     {
-      i += NGRAM;
-      tmp += (2 * NGRAM); // ２個分を同時に送っているから2 * NGRAM
-      printf("\n");
+      i += NGRAM * 31;
+      tmp += (32 * NGRAM); // 32個分を同時に送っているから32 * NGRAM
     }
   }
 
   // AXI DMA 送信の設定（UIO経由）
   dma[0x00 / 4] = 1;
   dma[0x18 / 4] = src_phys;
-  // 偶数 ... ADDRNUM / 並列数 * BUSWIDTH (900 / 2) * (128 / 8)
-  // 奇数 ... ADDRNUM / 並列数 * BUSWIDTH ((903 / 2) + 1) * (128 / 8)
-  dma[0x28 / 4] = ((ADDRNUM + 3) / 2) * (BUSWIDTH / 8);
+  dma[0x28 / 4] = send_num * 4;
 
   // 受信設定
   // 送信チャネルの設定前に受信チャネルを設定すると変になるっぽい
   dma[0x30 / 4] = 1;
   dma[0x48 / 4] = dst_phys;
-  dma[0x58 / 4] = 4 * 4; // 4つ * 4バイト = 16バイト = 128ビット
+  dma[0x58 / 4] = 32 * 4; // 32個 * 4バイト = 128バイト = 1024ビット
 
   // 演算終了を待つ
   while ((dma[0x34 / 4] & 0x1000) != 0x1000)
