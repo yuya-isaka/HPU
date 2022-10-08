@@ -281,7 +281,7 @@ void main()
     item_memory_array[i] = xor128();
   }
 
-  unsigned int result_array[ARNUM] = {0};
+  unsigned int result_array[ARNUM];
   unsigned int result = 0;
   tmp = 0;
   int num = 0;
