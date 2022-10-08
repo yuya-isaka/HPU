@@ -22,17 +22,22 @@ module counter
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    reg         update_next;
+    reg         update_n, update_nn;
     always_ff @(posedge clk) begin
-                  update_next <= update;
-              end
+                  update_n <= update;
+                  update_nn <= update_n;
+              end;
 
 
-              // 分散RAM (符号付き)
-              // warning出る
-              (* ram_style = "block" *)
-              reg signed [W-1:0]      box;
+    // 分散RAM (符号付き)
+    // warning出る
+    (* ram_style = "block" *)
+    reg signed [W-1:0]      box;
 
+    reg signed [W-1:0]      box_1;
+    reg signed [W-1:0]      box_2;
+    reg signed [W-1:0]      box_3;
+    reg signed [W-1:0]      box_4;
 
     // run == 1 にする前に設定する必要性あり
     // $signed(1'b1)にするとバグる
@@ -53,41 +58,49 @@ module counter
                       else begin
                           box <= 0;
                       end
+                      box_1 <= 0;
+                      box_2 <= 0;
+                      box_3 <= 0;
+                      box_4 <= 0;
                   end
-                  else if (update_next) begin
-                      box <= box
-                          + select[0]
-                          + select[1]
-                          + select[2]
-                          + select[3]
-                          + select[4]
-                          + select[5]
-                          + select[6]
-                          + select[7]
-                          + select[8]
-                          + select[9]
-                          + select[10]
-                          + select[11]
-                          + select[12]
-                          + select[13]
-                          + select[14]
-                          + select[15]
-                          + select[16]
-                          + select[17]
-                          + select[18]
-                          + select[19]
-                          + select[20]
-                          + select[21]
-                          + select[22]
-                          + select[23]
-                          + select[24]
-                          + select[25]
-                          + select[26]
-                          + select[27]
-                          + select[28]
-                          + select[29]
-                          + select[30]
-                          + select[31];
+                  else if (update_n) begin
+                      box_1 <= select[0]
+                            + select[1]
+                            + select[2]
+                            + select[3]
+                            + select[4]
+                            + select[5]
+                            + select[6]
+                            + select[7];
+                      box_2 <= select[8]
+                            + select[9]
+                            + select[10]
+                            + select[11]
+                            + select[12]
+                            + select[13]
+                            + select[14]
+                            + select[15];
+                      box_3 <=
+                            select[16]
+                            + select[17]
+                            + select[18]
+                            + select[19]
+                            + select[20]
+                            + select[21]
+                            + select[22]
+                            + select[23];
+                      box_4 <=
+                            select[24]
+                            + select[25]
+                            + select[26]
+                            + select[27]
+                            + select[28]
+                            + select[29]
+                            + select[30]
+                            + select[31];
+                  end
+                  else if (update_nn) begin
+                      box <= box + box_1 + box_2 + box_3 + box_4;
                   end
               end;
 
