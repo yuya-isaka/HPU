@@ -15,6 +15,14 @@ VERILATOR_OPTS = \
 	-Wno-fatal \
 	--Mdir sim \
 	--trace \
+	-MAKEFLAGS "OBJCACHE=ccache CXX=clang++ LINK=clang++" \
+	--compiler clang \
+
+# VERILATOR_OPTS = \
+# 	--cc \
+# 	-Wno-lint \
+# 	--Mdir sim \
+# 	--trace \
 
 VERILATOR_MAKE_OPTS = OPT="-O3 -I ../../../"
 
@@ -28,6 +36,7 @@ DESIGN_SRCS = \
 ./kit/agu.sv \
 ./kit/counter.sv \
 ./kit/xorshift.sv \
+./kit/selector.sv \
 
 VERILATOR_CPP_TB = tb.cpp
 

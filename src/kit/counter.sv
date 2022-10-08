@@ -6,17 +6,17 @@ module counter
      )
      (
          // in
-         input wire			    clk,
-         input wire             rst,
-         input wire             tmp_addr_i,
-         input wire             tmp_rand_bit,
-         input wire 		    result_bit_1,
-         input wire 		    result_bit_2,
-         input wire             update,
-         input wire             last_update,
+         input wire			        clk,
+         input wire                 rst,
+         input wire                 tmp_addr_i,
+         input wire                 tmp_rand_bit,
+         input wire [4:0]           remainder,
+         input wire [31:0]          result,
+         input wire                 update,
+         input wire                 last_update,
 
          // out
-         output logic 		    sign_bit
+         output logic 		        sign_bit
      );
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,13 +49,39 @@ module counter
                       end
                   end
                   else if (update) begin
-                      // 多数決対象が奇数の時（addr_iは偶数）　&& 最後の更新
-                      if (~tmp_addr_i & last_update) begin
-                          box <= box + bit_1;
-                      end
-                      else begin
-                          box <= box + bit_1 + bit_2;
-                      end
+                      box <= box
+                          + select[0]
+                          + select[1]
+                          + select[2]
+                          + select[3]
+                          + select[4]
+                          + select[5]
+                          + select[6]
+                          + select[7]
+                          + select[8]
+                          + select[9]
+                          + select[10]
+                          + select[11]
+                          + select[12]
+                          + select[13]
+                          + select[14]
+                          + select[15]
+                          + select[16]
+                          + select[17]
+                          + select[18]
+                          + select[19]
+                          + select[20]
+                          + select[21]
+                          + select[22]
+                          + select[23]
+                          + select[24]
+                          + select[25]
+                          + select[26]
+                          + select[27]
+                          + select[28]
+                          + select[29]
+                          + select[30]
+                          + select[31];
                   end
               end;
 
@@ -63,32 +89,68 @@ module counter
     //================================================================
 
 
-    // 1bitにするとbox+bit_1+bit_2で勝手に1bitとして符号拡張されて必ず-1される (教訓も込めて2bitで実装、暗黙の符号拡張に任せる)
-    logic signed [1:0]        bit_1;
-    always_comb begin
-                    // -1
-                    bit_1 = $signed(1'b1);
+    logic signed [1:0]      select [0:31];
 
-                    if (result_bit_1 == 1'b0) begin
-                        // 1
-                        bit_1 = $signed(1);
-                    end
-                end;
+    generate
+        genvar      k;
+        for (k = 0; k < 32; k = k + 1) begin
+            selector selector
+                     (
+                         // in
+                         .last_update(last_update),
+                         .remainder(remainder),
+                         .result_bit(result[k]),
+                         .constant(constant[k]),
 
-    logic signed [1:0]        bit_2;
-    always_comb begin
-                    // -1
-                    bit_2 = $signed(1'b1);
+                         // out
+                         .sel_bit(select[k])
+                     );
+        end
+    endgenerate
 
-                    if (result_bit_2 == 1'b0) begin
-                        // 1
-                        bit_2 = $signed(1);
-                    end
-                end;
 
 
     // 符号ビット
     assign sign_bit = box[W-1];
+
+
+
+    logic [4:0]         constant[0:31];
+
+    always_comb begin
+                    constant[0] = 0;
+                    constant[1] = 1;
+                    constant[2] = 2;
+                    constant[3] = 3;
+                    constant[4] = 4;
+                    constant[5] = 5;
+                    constant[6] = 6;
+                    constant[7] = 7;
+                    constant[8] = 8;
+                    constant[9] = 9;
+                    constant[10] = 10;
+                    constant[11] = 11;
+                    constant[12] = 12;
+                    constant[13] = 13;
+                    constant[14] = 14;
+                    constant[15] = 15;
+                    constant[16] = 16;
+                    constant[17] = 17;
+                    constant[18] = 18;
+                    constant[19] = 19;
+                    constant[20] = 20;
+                    constant[21] = 21;
+                    constant[22] = 22;
+                    constant[23] = 23;
+                    constant[24] = 24;
+                    constant[25] = 25;
+                    constant[26] = 26;
+                    constant[27] = 27;
+                    constant[28] = 28;
+                    constant[29] = 29;
+                    constant[30] = 30;
+                    constant[31] = 31;
+                end;
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

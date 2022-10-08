@@ -27,14 +27,14 @@ module top
         input wire              AXIS_ACLK,
         input wire              AXIS_ARESETN,
         output wire             M_AXIS_TVALID,
-        output wire [127:0]     M_AXIS_TDATA,
+        output wire [1023:0]    M_AXIS_TDATA,
         output wire [7:0]       M_AXIS_TSTRB,
         output wire             M_AXIS_TLAST,
         input wire              M_AXIS_TREADY,
 
         // AXI Stream Slave Interface
         output wire             S_AXIS_TREADY,
-        input wire [127:0]      S_AXIS_TDATA,
+        input wire [1023:0]     S_AXIS_TDATA,
         input wire [7:0]        S_AXIS_TSTRB,
         input wire              S_AXIS_TLAST,
         input wire              S_AXIS_TVALID
@@ -66,8 +66,20 @@ module top
             addr_i <= 19'd0;
         end
         else begin
-            addr_i <= 19'd110;
+            addr_i <= 19'd9; // 今回は900 / 3gram / 32コア = 9  あまりを入れて 9 + 1 = 10
             // addr_i <= 19'd7;
+        end
+    end
+
+
+    reg [4:0]       remainder;
+
+    always @(posedge AXIS_ACLK) begin
+        if (~AXIS_ARESETN) begin
+            remainder <= 5'd0;
+        end
+        else begin
+            remainder <= 5'd0; // 今回の余りは20
         end
     end
 
@@ -104,6 +116,7 @@ module top
                );
 
 
+
     wire        update;
     wire        exec;
     wire        last_update;
@@ -134,8 +147,39 @@ module top
                     .rst(~run),
                     .tmp_addr_i(addr_i[0]),
                     .tmp_rand(tmp_rand[31:0]),
-                    .result_1(result_1[31:0]),
-                    .result_2(result_2[31:0]),
+                    .remainder(remainder),
+                    .result_1(result[0]),
+                    .result_2(result[1]),
+                    .result_3(result[2]),
+                    .result_4(result[3]),
+                    .result_5(result[4]),
+                    .result_6(result[5]),
+                    .result_7(result[6]),
+                    .result_8(result[7]),
+                    .result_9(result[8]),
+                    .result_10(result[9]),
+                    .result_11(result[10]),
+                    .result_12(result[11]),
+                    .result_13(result[12]),
+                    .result_14(result[13]),
+                    .result_15(result[14]),
+                    .result_16(result[15]),
+                    .result_17(result[16]),
+                    .result_18(result[17]),
+                    .result_19(result[18]),
+                    .result_20(result[19]),
+                    .result_21(result[20]),
+                    .result_22(result[21]),
+                    .result_23(result[22]),
+                    .result_24(result[23]),
+                    .result_25(result[24]),
+                    .result_26(result[25]),
+                    .result_27(result[26]),
+                    .result_28(result[27]),
+                    .result_29(result[28]),
+                    .result_30(result[29]),
+                    .result_31(result[30]),
+                    .result_32(result[31]),
                     .update(update),
                     .last_update(last_update),
                     .get_fin(get_fin),
@@ -143,7 +187,7 @@ module top
                     .stream_a(stream_a[7:0]),
 
                     // out
-                    .stream_d(M_AXIS_TDATA[127:0])
+                    .stream_d(M_AXIS_TDATA[1023:0])
                 );
 
 
@@ -183,6 +227,7 @@ module top
     end;
 
 
+
     wire [31:0]      rand_num;
 
     xorshift prng
@@ -194,6 +239,7 @@ module top
                  // out
                  .rand_num(rand_num[31:0])
              );
+
 
 
     reg [31:0]      tmp_rand;
@@ -211,12 +257,30 @@ module top
     //================================================================
 
 
-    wire [31:0]         result_1;
-    wire [31:0]         result_2;
+    // 後々要改造（permutation == addr_j)
+    reg [31:0]      permutation;
+
+    always @(posedge AXIS_ACLK) begin
+        if (~run) begin
+            permutation <= 32'h0;
+        end
+        else if (exec) begin
+            if (permutation == addr_j) begin
+                permutation <= 32'h0;
+            end
+            else begin
+                permutation <= permutation + 1;
+            end
+        end
+    end;
+
+
+
+    wire [31:0]         result [0:31];
 
     generate
-        genvar         i;
-        for (i = 0; i < 1; i = i + 1) begin
+        genvar      i;
+        for (i = 0; i < 32; i = i + 1) begin
             core core
                  (
                      // in
@@ -227,15 +291,13 @@ module top
                      .item_memory_num(item_memory_num[15:0]),
                      .rand_num(rand_num[31:0]),
                      .get_v(get_v),
-                     .get_d_1(S_AXIS_TDATA[31:0]),
-                     .get_d_2(S_AXIS_TDATA[63:32]),
-                     .addr_j(addr_j[19:0]),
+                     .get_d(S_AXIS_TDATA[31+32*i:32*i]),
+                     .permutation(permutation),
                      .exec(exec),
                      .update(update),
 
                      // out
-                     .result_1(result_1[31:0]),
-                     .result_2(result_2[31:0])
+                     .result(result[i])
                  );
         end
     endgenerate

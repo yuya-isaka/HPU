@@ -85,10 +85,10 @@ void putb(unsigned int v)
 const int NGRAM = 3;
 
 // test.cppのADDRNUMと同じ
-const int ADDRNUM = 663;
+const int ADDRNUM = 960;
 
 // ADDRNUMが奇数かどうか
-const int ODD = 1;
+// const int ODD = 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -175,33 +175,15 @@ int main(int argc, char **argv)
   int tmp = NGRAM - 1;
   for (int i = 0; i < ADDRNUM; i++)
   {
-    conv.d0 = i;
-    if (ODD && i >= (ADDRNUM - NGRAM))
+    for (int j = 0; j < 32; j++)
     {
-      conv.d1 = 0;
-    }
-    else
-    {
-      conv.d1 = i + NGRAM;
-    }
-    conv2.d0 = i;
-    if (ODD && i >= (ADDRNUM - NGRAM))
-    {
-      conv2.d1 = 0;
-    }
-    else
-    {
-      conv2.d1 = i + NGRAM;
+      verilator_top->S_AXIS_TDATA[j] = i + (NGRAM * j);
     }
     if (i == tmp)
     {
-      i += NGRAM;
-      tmp += (2 * NGRAM);
+      i += NGRAM * 31; // 後でi++であげてくれる。 // 0, 96, 192, 288, 384, 480, 576, 672, 768, 864, 960
+      tmp += (32 * NGRAM);
     }
-    verilator_top->S_AXIS_TDATA[0] = conv.d0;
-    verilator_top->S_AXIS_TDATA[1] = conv.d1;
-    verilator_top->S_AXIS_TDATA[2] = conv2.d0;
-    verilator_top->S_AXIS_TDATA[3] = conv2.d1;
     eval();
   }
   verilator_top->S_AXIS_TVALID = 0;
@@ -217,15 +199,11 @@ int main(int argc, char **argv)
 
   for (int i = 0; i < 1; i++)
   {
-    conv.d0 = verilator_top->M_AXIS_TDATA[0];
-    conv.d1 = verilator_top->M_AXIS_TDATA[1];
-    conv2.d0 = verilator_top->M_AXIS_TDATA[2];
-    conv2.d1 = verilator_top->M_AXIS_TDATA[3];
-    printf("  %u\n\n", conv.d0);
-    putb(conv.d0);
-    printf("  %u\n\n", conv.d1);
-    printf("  %u\n\n", conv2.d0);
-    printf("  %u\n\n", conv2.d0);
+    for (int j = 0; j < 32; j++)
+    {
+      printf("  %u\n\n", verilator_top->M_AXIS_TDATA[j]);
+      putb(verilator_top->M_AXIS_TDATA[j]);
+    }
     eval();
   }
 

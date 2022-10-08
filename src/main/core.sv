@@ -9,44 +9,32 @@ module core
         input wire [15:0]       item_memory_num,
         input wire [31:0]       rand_num,
         input wire              get_v,
-        input wire [31:0]       get_d_1,
-        input wire [31:0]       get_d_2,
-        input wire [19:0]       addr_j,
+        input wire [31:0]       get_d,
+        input wire [31:0]       permutation,
         input wire              exec,
         input wire              update,
 
-        output logic [31:0]     result_1,
-        output logic [31:0]     result_2
+        output logic [31:0]     result
     );
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+    // BRAMになるはず
     (* ram_style = "block" *)
     reg [31:0]      item_memory [0:1023];
 
 
-    reg [31:0]      hv_1;
+    reg [31:0]      hv;
     always_ff @(posedge clk) begin
                   if (gen & (item_a != item_memory_num)) begin
                       item_memory[item_a] <= rand_num;
-                      hv_1 <= 0;
+                      hv <= 0;
                   end
                   else if (get_v) begin
-                      hv_1 <= item_memory[get_d_1];
+                      hv <= item_memory[get_d];
                   end
               end;
-
-    reg [31:0]      hv_2;
-    always_ff @(posedge clk) begin
-                  if (gen) begin
-                      hv_2 <= 0;
-                  end
-                  else if (get_v) begin
-                      hv_2 <= item_memory[get_d_2];
-                  end
-              end;
-
 
     // integer i;
     // initial begin
@@ -59,40 +47,18 @@ module core
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // 後々要改造（permutation == addr_j)
-    reg [31:0]      permutation;
+    reg [31:0]      enc;
 
     always_ff @(posedge clk) begin
                   if (~run) begin
-                      permutation <= 32'h0;
-                  end
-                  else if (exec) begin
-                      if (permutation == addr_j) begin
-                          permutation <= 32'h0;
-                      end
-                      else begin
-                          permutation <= permutation + 1;
-                      end
-                  end
-              end;
-
-
-    reg [31:0]      enc_1;
-    reg [31:0]      enc_2;
-
-    always_ff @(posedge clk) begin
-                  if (~run) begin
-                      enc_1 <= 32'h0;
-                      enc_2 <= 32'h0;
+                      enc <= 32'h0;
                   end
                   else if (exec) begin
                       if (update) begin
-                          enc_1 <= hv_1;
-                          enc_2 <= hv_2;
+                          enc <= hv;
                       end
                       else begin
-                          enc_1 <= enc_1 ^ (hv_1 >> permutation | ( ( hv_1 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
-                          enc_2 <= enc_2 ^ (hv_2 >> permutation | ( ( hv_2 & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
+                          enc <= enc ^ (hv >> permutation | ( ( hv & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
                       end
                   end
               end;
@@ -102,12 +68,10 @@ module core
 
 
     always_comb begin
-                    result_1 = 0;
-                    result_2 = 0;
+                    result = 0;
 
                     if (update) begin
-                        result_1 = enc_1;
-                        result_2 = enc_2;
+                        result = enc;
                     end
                 end;
 
