@@ -116,18 +116,23 @@ module buffer_ctrl
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    reg [31:0]      encoded_hv;
-    always_ff @(posedge clk) begin
-                  if (get_fin) begin
-                      encoded_hv <= sign_bit;
-                  end
-              end;
+    // 1個ずらした影響でこれがいらない
+    // reg [31:0]      encoded_hv;
+    // always_ff @(posedge clk) begin
+    //               if (get_fin) begin
+    //                   encoded_hv <= sign_bit;
+    //               end
+    //           end;
 
 
+    // stream_vが立つタイミングのsign_bitが求めてた値
+    // update -> get_fin      -> stream_v
+    //        -> update_next  -> sign_bitが最新値
     // stream_d
     always_ff @(posedge clk) begin
                   if (stream_v) begin
-                      stream_d <= encoded_hv;
+                      stream_d <= sign_bit;
+                      //   stream_d <= encoded_hv;
                   end
               end;
 

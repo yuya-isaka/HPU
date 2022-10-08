@@ -22,10 +22,16 @@ module counter
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // 分散RAM (符号付き)
-    // warning出る
-    (* ram_style = "block" *)
-    reg signed [W-1:0]      box;
+    reg         update_next;
+    always_ff @(posedge clk) begin
+                  update_next <= update;
+              end
+
+
+              // 分散RAM (符号付き)
+              // warning出る
+              (* ram_style = "block" *)
+              reg signed [W-1:0]      box;
 
 
     // run == 1 にする前に設定する必要性あり
@@ -48,7 +54,7 @@ module counter
                           box <= 0;
                       end
                   end
-                  else if (update) begin
+                  else if (update_next) begin
                       box <= box
                           + select[0]
                           + select[1]
@@ -89,7 +95,7 @@ module counter
     //================================================================
 
 
-    logic signed [1:0]      select [0:31];
+    wire signed [1:0]      select [0:31];
 
     generate
         genvar      k;
@@ -97,6 +103,8 @@ module counter
             selector selector
                      (
                          // in
+                         .clk(clk),
+                         .update(update),
                          .last_update(last_update),
                          .remainder(remainder),
                          .result_bit(result[k]),
