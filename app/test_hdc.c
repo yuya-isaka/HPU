@@ -92,17 +92,18 @@ unsigned long dst_phys;
 // item_memoryの数（top.vの設定値より１つ大きくする）
 const int RANNUM = 1001;
 
-// ADDRNUM / NGRAM + 1を設定 (必ず奇数になるようにする)
-const int ARNUM = 321;
-
 // 偶数 ... ADDRNUM/NGRAM/2-1をtop.vに設定  (例：900 ... 900/NGRAM/2-1=149)
 // 奇数 ... ADDRNUM/NGRAM/2をtop.vに設定	(例:903 ... 903/NGRAM/2=150）
 // tb.cppのADDRNUMとは一緒
 // ADDRNUM + NGRAM を処理する設計にする（ADDRNUMは663で、今回なNGRAMで２個を連続で処理するから2の倍数の666で処理する）
-const int ADDRNUM = 960;
+// const int ADDRNUM = 960;
+const int ADDRNUM = 900;
 
 // N-gram
 const int NGRAM = 3;
+
+// ADDRNUM / NGRAM + 1を設定 (必ず奇数になるようにする)
+const int ARNUM = ADDRNUM / NGRAM + 1;
 
 // ADDRNUMが奇数か
 const int ODD = 0;
