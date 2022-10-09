@@ -257,25 +257,6 @@ module top
     //================================================================
 
 
-    // 後々要改造（permutation == addr_j)
-    reg [31:0]      permutation;
-
-    always @(posedge AXIS_ACLK) begin
-        if (~run) begin
-            permutation <= 32'h0;
-        end
-        else if (exec) begin
-            if (permutation == addr_j) begin
-                permutation <= 32'h0;
-            end
-            else begin
-                permutation <= permutation + 1;
-            end
-        end
-    end;
-
-
-
     wire [31:0]         core_result [0:31];
 
     generate
@@ -292,7 +273,7 @@ module top
                      .rand_num(rand_num[31:0]),
                      .get_v(get_v),
                      .get_d(S_AXIS_TDATA[31+32*i:32*i]),
-                     .permutation(permutation),
+                     .addr_j(addr_j[19:0]),
                      .exec(exec),
                      .update(update),
 

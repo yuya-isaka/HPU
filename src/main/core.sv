@@ -10,7 +10,7 @@ module core
         input wire [31:0]       rand_num,
         input wire              get_v,
         input wire [31:0]       get_d,
-        input wire [31:0]       permutation,
+        input wire [19:0]       addr_j,
         input wire              exec,
         input wire              update,
 
@@ -45,6 +45,25 @@ module core
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    // 後々要改造（permutation == addr_j)
+    reg [31:0]      permutation;
+
+    always @(posedge clk) begin
+        if (~run) begin
+            permutation <= 32'h0;
+        end
+        else if (exec) begin
+            if (permutation == addr_j) begin
+                permutation <= 32'h0;
+            end
+            else begin
+                permutation <= permutation + 1;
+            end
+        end
+    end;
+
 
 
     reg [31:0]      enc;
