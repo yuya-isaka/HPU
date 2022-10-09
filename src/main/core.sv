@@ -14,7 +14,7 @@ module core
         input wire              exec,
         input wire              update,
 
-        output logic [31:0]     result
+        output logic [31:0]     core_result
     );
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -68,10 +68,10 @@ module core
 
 
     always_comb begin
-                    result = 0;
+                    core_result = 0;
 
                     if (update) begin
-                        result = enc;
+                        core_result = enc;
                     end
                 end;
 

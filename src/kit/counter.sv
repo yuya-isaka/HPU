@@ -12,10 +12,9 @@ module counter
          input wire                 rst,
          input wire                 tmp_addr_i,
          input wire                 tmp_rand_bit,
-         input wire [4:0]           remainder,
-         input wire [31:0]          result,
+         input wire [31:0]          core_enable,
+         input wire [31:0]          core_result,
          input wire                 update,
-         input wire                 last_update,
 
          // out
          output logic 		        sign_bit
@@ -140,10 +139,8 @@ module counter
                          // in
                          .clk(clk),
                          .update(update),
-                         .last_update(last_update),
-                         .remainder(remainder[4:0]),
-                         .result_bit(result[k]),
-                         .constant(constant[k]),
+                         .core_result_bit(core_result[k]),
+                         .core_enable_bit(core_enable[k]),
 
                          // out
                          .sel_bit(select[k])
@@ -155,45 +152,6 @@ module counter
 
     // 符号ビット
     assign sign_bit = box[W-1];
-
-
-
-    logic [4:0]         constant[0:31];
-
-    always_comb begin
-                    constant[0] = 1;
-                    constant[1] = 2;
-                    constant[2] = 3;
-                    constant[3] = 4;
-                    constant[4] = 5;
-                    constant[5] = 6;
-                    constant[6] = 7;
-                    constant[7] = 8;
-                    constant[8] = 9;
-                    constant[9] = 10;
-                    constant[10] = 11;
-                    constant[11] = 12;
-                    constant[12] = 13;
-                    constant[13] = 14;
-                    constant[14] = 15;
-                    constant[15] = 16;
-                    constant[16] = 17;
-                    constant[17] = 18;
-                    constant[18] = 19;
-                    constant[19] = 20;
-                    constant[20] = 21;
-                    constant[21] = 22;
-                    constant[22] = 23;
-                    constant[23] = 24;
-                    constant[24] = 25;
-                    constant[25] = 26;
-                    constant[26] = 27;
-                    constant[27] = 28;
-                    constant[28] = 29;
-                    constant[29] = 30;
-                    constant[30] = 31;
-                    constant[31] = 32;
-                end;
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

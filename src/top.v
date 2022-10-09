@@ -148,38 +148,38 @@ module top
                     .tmp_addr_i(addr_i[0]),
                     .tmp_rand(tmp_rand[31:0]),
                     .remainder(remainder),
-                    .result_1(result[0]),
-                    .result_2(result[1]),
-                    .result_3(result[2]),
-                    .result_4(result[3]),
-                    .result_5(result[4]),
-                    .result_6(result[5]),
-                    .result_7(result[6]),
-                    .result_8(result[7]),
-                    .result_9(result[8]),
-                    .result_10(result[9]),
-                    .result_11(result[10]),
-                    .result_12(result[11]),
-                    .result_13(result[12]),
-                    .result_14(result[13]),
-                    .result_15(result[14]),
-                    .result_16(result[15]),
-                    .result_17(result[16]),
-                    .result_18(result[17]),
-                    .result_19(result[18]),
-                    .result_20(result[19]),
-                    .result_21(result[20]),
-                    .result_22(result[21]),
-                    .result_23(result[22]),
-                    .result_24(result[23]),
-                    .result_25(result[24]),
-                    .result_26(result[25]),
-                    .result_27(result[26]),
-                    .result_28(result[27]),
-                    .result_29(result[28]),
-                    .result_30(result[29]),
-                    .result_31(result[30]),
-                    .result_32(result[31]),
+                    .core_result_1(core_result[0]),
+                    .core_result_2(core_result[1]),
+                    .core_result_3(core_result[2]),
+                    .core_result_4(core_result[3]),
+                    .core_result_5(core_result[4]),
+                    .core_result_6(core_result[5]),
+                    .core_result_7(core_result[6]),
+                    .core_result_8(core_result[7]),
+                    .core_result_9(core_result[8]),
+                    .core_result_10(core_result[9]),
+                    .core_result_11(core_result[10]),
+                    .core_result_12(core_result[11]),
+                    .core_result_13(core_result[12]),
+                    .core_result_14(core_result[13]),
+                    .core_result_15(core_result[14]),
+                    .core_result_16(core_result[15]),
+                    .core_result_17(core_result[16]),
+                    .core_result_18(core_result[17]),
+                    .core_result_19(core_result[18]),
+                    .core_result_20(core_result[19]),
+                    .core_result_21(core_result[20]),
+                    .core_result_22(core_result[21]),
+                    .core_result_23(core_result[22]),
+                    .core_result_24(core_result[23]),
+                    .core_result_25(core_result[24]),
+                    .core_result_26(core_result[25]),
+                    .core_result_27(core_result[26]),
+                    .core_result_28(core_result[27]),
+                    .core_result_29(core_result[28]),
+                    .core_result_30(core_result[29]),
+                    .core_result_31(core_result[30]),
+                    .core_result_32(core_result[31]),
                     .update(update),
                     .last_update(last_update),
                     .get_fin(get_fin),
@@ -276,7 +276,7 @@ module top
 
 
 
-    wire [31:0]         result [0:31];
+    wire [31:0]         core_result [0:31];
 
     generate
         genvar      i;
@@ -297,7 +297,7 @@ module top
                      .update(update),
 
                      // out
-                     .result(result[i])
+                     .core_result(core_result[i])
                  );
         end
     endgenerate
