@@ -36,9 +36,11 @@ module counter
     (* ram_style = "block" *)
     reg signed [W-1:0]      box;
 
+    // コア数可変
     reg signed [W-1:0]      box_11;
     reg signed [W-1:0]      box_22;
 
+    // コア数可変
     reg signed [W-1:0]      box_1;
     reg signed [W-1:0]      box_2;
     reg signed [W-1:0]      box_3;
@@ -67,6 +69,7 @@ module counter
                       else begin
                           box <= 0;
                       end
+                      // コア数可変
                       box_1 <= 0;
                       box_2 <= 0;
                       box_3 <= 0;
@@ -77,6 +80,7 @@ module counter
                       box_8 <= 0;
                   end
                   else if (update_n) begin
+                      // コア数可変
                       box_1 <= select[0]
                             + select[1]
                             + select[2]
@@ -116,10 +120,12 @@ module counter
                             + select[31];
                   end
                   else if (update_nn) begin
+                      // コア数可変
                       box_11 <= box_1 + box_2 + box_3 + box_4;
                       box_22 <= box_5 + box_6 + box_7 + box_8;
                   end
                   else if (update_nnn) begin
+                      // コア数可変
                       box <= box + box_11 + box_22;
                   end
               end;
@@ -128,11 +134,13 @@ module counter
     //================================================================
 
 
+    // コア数可変
     wire signed [1:0]      select [0:31];
 
-    // 32コア
+    // コア数可変
     generate
         genvar      k;
+        // コア数可変
         for (k = 0; k < 32; k = k + 1) begin
             selector selector
                      (

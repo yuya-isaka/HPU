@@ -27,6 +27,7 @@ module top
         input wire              AXIS_ACLK,
         input wire              AXIS_ARESETN,
         output wire             M_AXIS_TVALID,
+        //　バス幅可変
         output wire [1023:0]    M_AXIS_TDATA,
         output wire [7:0]       M_AXIS_TSTRB,
         output wire             M_AXIS_TLAST,
@@ -34,6 +35,7 @@ module top
 
         // AXI Stream Slave Interface
         output wire             S_AXIS_TREADY,
+        // バス幅可変
         input wire [1023:0]     S_AXIS_TDATA,
         input wire [7:0]        S_AXIS_TSTRB,
         input wire              S_AXIS_TLAST,
@@ -45,7 +47,7 @@ module top
 
     // Parameter
 
-    // 3
+    // N-gram
     reg [19:0]      addr_j;
 
     always @(posedge AXIS_ACLK) begin
@@ -58,7 +60,8 @@ module top
     end
 
 
-    // 8
+    // アドレス数 / N-gram / コア数　(余る場合は+1)
+    // 900 / 3gram / 32コア = 9  あまりを入れて 9 + 1 = 10
     reg [19:0]      addr_i;
 
     always @(posedge AXIS_ACLK) begin
@@ -66,12 +69,12 @@ module top
             addr_i <= 19'd0;
         end
         else begin
-            addr_i <= 19'd9; // 今回は900 / 3gram / 32コア = 9  あまりを入れて 9 + 1 = 10
-            // addr_i <= 19'd7;
+            addr_i <= 19'd9;
         end
     end
 
 
+    // 余りの数
     reg [4:0]       remainder;
 
     always @(posedge AXIS_ACLK) begin
@@ -79,12 +82,12 @@ module top
             remainder <= 5'd0;
         end
         else begin
-            remainder <= 5'd20; // 今回の余りは20
+            remainder <= 5'd20;
         end
     end
 
 
-    // item_memory数 (65536最大値)
+    // item_memory数 (現状65536最大値, 16bitアドレスで指定)
     reg [15:0]      item_memory_num;
 
     always @(posedge AXIS_ACLK) begin
@@ -146,8 +149,10 @@ module top
                     .clk(AXIS_ACLK),
                     .rst(~run),
                     .tmp_addr_i(addr_i[0]),
+                    // 次元数可変
                     .tmp_rand(tmp_rand[31:0]),
                     .remainder(remainder),
+                    // コア数可変
                     .core_result_1(core_result[0]),
                     .core_result_2(core_result[1]),
                     .core_result_3(core_result[2]),
@@ -184,9 +189,9 @@ module top
                     .last_update(last_update),
                     .get_fin(get_fin),
                     .stream_v(stream_v),
-                    .stream_a(stream_a[7:0]),
 
                     // out
+                    // バス幅可変
                     .stream_d(M_AXIS_TDATA[1023:0])
                 );
 
@@ -194,7 +199,6 @@ module top
     // M_AXIS_TVALID
     // M_AXIS_TLAST
     wire              stream_v;
-    wire [7:0]        stream_a;
 
     stream_ctrl stream_ctrl
                 (
@@ -207,8 +211,7 @@ module top
                     // out
                     .dst_valid(M_AXIS_TVALID),
                     .dst_last(M_AXIS_TLAST),
-                    .stream_v(stream_v),
-                    .stream_a(stream_a[7:0])
+                    .stream_v(stream_v)
                 );
 
 
@@ -228,6 +231,7 @@ module top
 
 
 
+    // 次元数可変
     wire [31:0]      rand_num;
 
     xorshift prng
@@ -242,6 +246,7 @@ module top
 
 
 
+    // 次元数可変
     reg [31:0]      tmp_rand;
 
     always @(posedge AXIS_ACLK) begin
@@ -257,10 +262,12 @@ module top
     //================================================================
 
 
+    // コア数可変
     wire [31:0]         core_result [0:31];
 
     generate
         genvar      i;
+        // コア数可変
         for (i = 0; i < 32; i = i + 1) begin
             core core
                  (
@@ -270,8 +277,10 @@ module top
                      .gen(gen),
                      .item_a(item_a[15:0]),
                      .item_memory_num(item_memory_num[15:0]),
+                     // 次元数可変
                      .rand_num(rand_num[31:0]),
                      .get_v(get_v),
+                     // アドレス数可変
                      .get_d(S_AXIS_TDATA[31+32*i:32*i]),
                      .addr_j(addr_j[19:0]),
                      .exec(exec),

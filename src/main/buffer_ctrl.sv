@@ -8,6 +8,7 @@ module buffer_ctrl
         input wire              tmp_addr_i,
         input wire [31:0]       tmp_rand,
         input wire [4:0]        remainder,
+        // コア数可変
         input wire [31:0]       core_result_1,
         input wire [31:0]       core_result_2,
         input wire [31:0]       core_result_3,
@@ -44,7 +45,6 @@ module buffer_ctrl
         input wire              last_update,
         input wire              get_fin,
         input wire              stream_v,
-        input wire [7:0]        stream_a,
 
         // out
         output logic [1023:0]     stream_d
@@ -53,11 +53,12 @@ module buffer_ctrl
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // 次元数で可変になる、要改良
+    // 次元数可変
     wire [31:0]      sign_bit;
 
     generate
         genvar i;
+        // 次元数可変
         for (i = 0; i < 32; i = i + 1) begin
             counter counter
                     (
@@ -66,7 +67,9 @@ module buffer_ctrl
                         .rst(rst),
                         .tmp_addr_i(tmp_addr_i),
                         .tmp_rand_bit(tmp_rand[i]),
+                        // コア数可変
                         .core_enable(core_enable[31:0]),
+                        // コア数可変
                         .core_result(
                             {
                                 core_result_32[i],
@@ -115,10 +118,11 @@ module buffer_ctrl
     //================================================================
 
 
-    // コア数準備
+    // コア数可変
     // 立っていたら無視
     logic [31:0]        core_enable;
 
+    // コア数可変
     always_comb begin
                     core_enable = 32'd0;
                     if (last_update) begin
