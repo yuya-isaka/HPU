@@ -79,7 +79,7 @@ module top
             remainder <= 5'd0;
         end
         else begin
-            remainder <= 5'd0; // 今回の余りは20
+            remainder <= 5'd20; // 今回の余りは20
         end
     end
 

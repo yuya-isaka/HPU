@@ -85,7 +85,8 @@ void putb(unsigned int v)
 const int NGRAM = 3;
 
 // test.cppのADDRNUMと同じ
-const int ADDRNUM = 960;
+// const int ADDRNUM = 960;
+const int ADDRNUM = 900;
 
 // ADDRNUMが奇数かどうか
 // const int ODD = 0;
@@ -199,11 +200,13 @@ int main(int argc, char **argv)
 
   for (int i = 0; i < 1; i++)
   {
-    for (int j = 0; j < 32; j++)
-    {
-      printf("  %u\n\n", verilator_top->M_AXIS_TDATA[j]);
-      putb(verilator_top->M_AXIS_TDATA[j]);
-    }
+    // for (int j = 0; j < 32; j++)
+    // {
+    //   printf("  %u\n\n", verilator_top->M_AXIS_TDATA[j]);
+    //   putb(verilator_top->M_AXIS_TDATA[j]);
+    // }
+    printf("  %u\n\n", verilator_top->M_AXIS_TDATA[0]);
+    putb(verilator_top->M_AXIS_TDATA[0]);
     eval();
   }
 

@@ -141,7 +141,7 @@ module counter
                          .clk(clk),
                          .update(update),
                          .last_update(last_update),
-                         .remainder(remainder),
+                         .remainder(remainder[4:0]),
                          .result_bit(result[k]),
                          .constant(constant[k]),
 
@@ -161,38 +161,38 @@ module counter
     logic [4:0]         constant[0:31];
 
     always_comb begin
-                    constant[0] = 0;
-                    constant[1] = 1;
-                    constant[2] = 2;
-                    constant[3] = 3;
-                    constant[4] = 4;
-                    constant[5] = 5;
-                    constant[6] = 6;
-                    constant[7] = 7;
-                    constant[8] = 8;
-                    constant[9] = 9;
-                    constant[10] = 10;
-                    constant[11] = 11;
-                    constant[12] = 12;
-                    constant[13] = 13;
-                    constant[14] = 14;
-                    constant[15] = 15;
-                    constant[16] = 16;
-                    constant[17] = 17;
-                    constant[18] = 18;
-                    constant[19] = 19;
-                    constant[20] = 20;
-                    constant[21] = 21;
-                    constant[22] = 22;
-                    constant[23] = 23;
-                    constant[24] = 24;
-                    constant[25] = 25;
-                    constant[26] = 26;
-                    constant[27] = 27;
-                    constant[28] = 28;
-                    constant[29] = 29;
-                    constant[30] = 30;
-                    constant[31] = 31;
+                    constant[0] = 1;
+                    constant[1] = 2;
+                    constant[2] = 3;
+                    constant[3] = 4;
+                    constant[4] = 5;
+                    constant[5] = 6;
+                    constant[6] = 7;
+                    constant[7] = 8;
+                    constant[8] = 9;
+                    constant[9] = 10;
+                    constant[10] = 11;
+                    constant[11] = 12;
+                    constant[12] = 13;
+                    constant[13] = 14;
+                    constant[14] = 15;
+                    constant[15] = 16;
+                    constant[16] = 17;
+                    constant[17] = 18;
+                    constant[18] = 19;
+                    constant[19] = 20;
+                    constant[20] = 21;
+                    constant[21] = 22;
+                    constant[22] = 23;
+                    constant[23] = 24;
+                    constant[24] = 25;
+                    constant[25] = 26;
+                    constant[26] = 27;
+                    constant[27] = 28;
+                    constant[28] = 29;
+                    constant[29] = 30;
+                    constant[30] = 31;
+                    constant[31] = 32;
                 end;
 
 

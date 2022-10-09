@@ -6,7 +6,7 @@ module selector
         input wire                      clk,
         input wire                      update,
         input wire 						last_update,
-        input wire 						remainder,
+        input wire [4:0]				remainder,
         input wire 						result_bit,
         input wire [4:0]				constant,
 
