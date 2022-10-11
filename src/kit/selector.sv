@@ -4,9 +4,9 @@ module selector
     (
         // in
         // コア数可変
-        // input wire                      clk,
+        input wire                      clk,
         // コア数可変
-        // input wire                      update,
+        input wire                      update,
         input wire 						core_result_bit,
         input wire 				        core_enable_bit,
 
@@ -21,35 +21,35 @@ module selector
 
 
     // コア数可変（32コア）
-    // always_ff @(posedge clk) begin
-    //               if (update) begin
-    //                   // -1
-    //                   sel_bit <= $signed(1'b1);
+    always_ff @(posedge clk) begin
+                  if (update) begin
+                      // -1
+                      sel_bit <= $signed(1'b1);
 
-    //                   if (core_enable_bit) begin
-    //                       sel_bit <= 0;
-    //                   end
-    //                   else if (core_result_bit == 1'b0) begin
-    //                       // 1
-    //                       sel_bit <= $signed(1);
-    //                   end
-    //               end
-    //           end;
+                      if (core_enable_bit) begin
+                          sel_bit <= 0;
+                      end
+                      else if (core_result_bit == 1'b0) begin
+                          // 1
+                          sel_bit <= $signed(1);
+                      end
+                  end
+              end;
 
 
     // コア数可変（4コア）
-    always_comb begin
-                    // -1
-                    sel_bit = $signed(1'b1);
+    // always_comb begin
+    //                 // -1
+    //                 sel_bit = $signed(1'b1);
 
-                    if (core_enable_bit) begin
-                        sel_bit = 0;
-                    end
-                    else if (core_result_bit == 1'b0) begin
-                        // 1
-                        sel_bit = $signed(1);
-                    end
-                end;
+    //                 if (core_enable_bit) begin
+    //                     sel_bit = 0;
+    //                 end
+    //                 else if (core_result_bit == 1'b0) begin
+    //                     // 1
+    //                     sel_bit = $signed(1);
+    //                 end
+    //             end;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

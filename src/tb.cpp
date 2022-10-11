@@ -84,7 +84,7 @@ void putb(unsigned int v)
 // 可変のパラメータ
 
 const int NGRAM = 3;
-const int ADDRNUM = 630;
+const int ADDRNUM = 990;
 const int CORENUM = 4;
 const int RANNUM = 1000;
 

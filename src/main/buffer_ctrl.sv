@@ -175,12 +175,12 @@ module buffer_ctrl
     //         ->   box ↑(sign_bit), update前にselectが組み合わせ回路で求まっている前提
 
     // コア数可変（32ならいらない）
-    reg [31:0]      encoded_hv;
-    always_ff @(posedge clk) begin
-                  if (get_fin) begin
-                      encoded_hv <= sign_bit;
-                  end
-              end;
+    // reg [31:0]      encoded_hv;
+    // always_ff @(posedge clk) begin
+    //               if (get_fin) begin
+    //                   encoded_hv <= sign_bit;
+    //               end
+    //           end;
 
 
     // 32コア
@@ -196,10 +196,10 @@ module buffer_ctrl
                       // コア数可変
 
                       // 32コア
-                      //   stream_d <= sign_bit;
+                        stream_d <= sign_bit;
 
                       // 4コア
-                      stream_d <= encoded_hv;
+                    //   stream_d <= encoded_hv;
                   end
               end;
 

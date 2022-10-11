@@ -14,10 +14,10 @@ module counter
          input wire                 tmp_rand_bit,
          // コア数可変
          //  input wire [31:0]          core_enable,
-         input wire [3:0]          core_enable,
+         input wire [3:0]           core_enable,
          // コア数可変
          //  input wire [31:0]          core_result,
-         input wire [3:0]          core_result,
+         input wire [3:0]           core_result,
          input wire                 update,
 
          // out
@@ -33,6 +33,11 @@ module counter
     //               update_nn <= update_n;
     //               update_nnn <= update_nn;
     //           end;
+
+    reg         update_n;
+    always_ff @(posedge clk) begin
+                  update_n <= update;
+              end;
 
 
     // 分散RAM (符号付き)
@@ -129,7 +134,7 @@ module counter
                   //       box_22 <= box_5 + box_6 + box_7 + box_8;
                   //   end
                   //   else if (update_nnn) begin
-                  else if (update) begin
+                  else if (update_n) begin
                       // コア数可変
                       //   box <= box + box_11 + box_22;
                       box <= box + select[0] + select[1] + select[2] + select[3];
@@ -153,9 +158,9 @@ module counter
                      (
                          // in
                          // コア数可変
-                         //  .clk(clk),
+                         .clk(clk),
                          // コア数可変
-                         //  .update(update),
+                         .update(update),
                          .core_result_bit(core_result[k]),
                          .core_enable_bit(core_enable[k]),
 
