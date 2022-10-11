@@ -7,26 +7,6 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-union
-{
-  struct
-  {
-    unsigned int d0;
-    unsigned int d1;
-  };
-  uint64_t wd;
-} conv;
-
-union
-{
-  struct
-  {
-    unsigned int d0;
-    unsigned int d1;
-  };
-  uint64_t wd;
-} conv2;
-
 vluint64_t main_time = 0;
 vluint64_t sim_start = 0;
 vluint64_t sim_end = sim_start + 300000;
@@ -93,7 +73,7 @@ const int RANNUM = 1000;
 // 自動で決まるパラメータ
 
 const int ADDRJ = NGRAM - 1;
-int ADDRI = ((ADDRNUM / NGRAM) - 1) / CORENUM;
+const int ADDRI = ((ADDRNUM / NGRAM) - 1) / CORENUM;
 const int REMAINDER = (ADDRNUM / NGRAM) % CORENUM;
 const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 

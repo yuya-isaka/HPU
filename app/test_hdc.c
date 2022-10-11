@@ -37,7 +37,8 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 {
   unsigned int result = 0;
 
-  unsigned int mask = (int)1 << (sizeof(result_array[0]) * 8 - 1);
+  // 次元数かへn
+  unsigned int mask = (int)1 << (32 - 1);
   while (mask)
   {
     int tmp = 0;
@@ -89,39 +90,32 @@ unsigned long dst_phys;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// item_memoryの数（top.vの設定値より１つ大きくする）
-const int RANNUM = 1001;
+// 可変のパラメータ
 
-// 偶数 ... ADDRNUM/NGRAM/2-1をtop.vに設定  (例：900 ... 900/NGRAM/2-1=149)
-// 奇数 ... ADDRNUM/NGRAM/2をtop.vに設定	(例:903 ... 903/NGRAM/2=150）
-// tb.cppのADDRNUMとは一緒
-// ADDRNUM + NGRAM を処理する設計にする（ADDRNUMは663で、今回なNGRAMで２個を連続で処理するから2の倍数の666で処理する）
-// const int ADDRNUM = 960;
-const int ADDRNUM = 900;
-
-const int CORENUM = 4;
-
-// N-gram
 const int NGRAM = 3;
-
-// ADDRNUM / NGRAM + 1を設定 (必ず奇数になるようにする)
-const int ARNUM = ADDRNUM / NGRAM + 1;
-
-// 送信ビット
+const int ADDRNUM = 900;
+const int CORENUM = 4;
+const int RANNUM = 1001;
 const int BUSWIDTH = 1024;
-
-const int ADDRJ = NGRAM - 1;
-int ADDRI = (ADDRNUM / NGRAM / CORENUM) - 1;
-const int REMAINDER = (ADDRNUM / NGRAM) % CORENUM;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void main()
+// 自動で決まるパラメータ
+
+const int ADDRJ = NGRAM - 1;
+const int ADDRI = ((ADDRNUM / NGRAM) - 1) / CORENUM;
+const int REMAINDER = (ADDRNUM / NGRAM) % CORENUM;
+const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int main()
 {
 
-  if (REMAINDER != 0)
+  int ARNUM = ADDRNUM / NGRAM;
+  if (EVEN)
   {
-    ADDRI++;
+    ARNUM++;
   }
 
   ///////////////////////////////////////////////////////////////////////////////// initial, udmabuf, uio 設定 ///////////////////////////////////////////////////////////////////////////////////
@@ -223,7 +217,7 @@ void main()
   //////////////////////////////////////////////////////////////////////////////////////// gen ///////////////////////////////////////////////////////////////////////////////////////////////
 
   // item_memory_num (乱数の数)
-  top[0x10 / 4] = RANNUM - 1;
+  top[0x04 / 4] = RANNUM - 1;
 
   // gen <- 1;
   top[0x00 / 4] = 1;
@@ -235,13 +229,16 @@ void main()
   //////////////////////////////////////////////////////////////////////////////////////// run ///////////////////////////////////////////////////////////////////////////////////////////////
 
   // addr_j
-  top[0x04 / 4] = ADDRJ;
+  top[0x08 / 4] = ADDRJ;
 
   // addr_i
-  top[0x08 / 4] = ADDRI;
+  top[0x0c / 4] = ADDRI;
 
   // remainder
-  top[0x0c / 4] = REMAINDER;
+  top[0x10 / 4] = REMAINDER;
+
+  // even
+  top[0x14 / 4] = EVEN;
 
   //////////////////////////////////////////////////////////////////////////////////////// run ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -297,7 +294,11 @@ void main()
     item_memory_array[i] = xor128();
   }
 
-  unsigned int result_array[ARNUM];
+  unsigned int *result_array = (unsigned int *)malloc(sizeof(unsigned int) * ARNUM);
+  if (result_array == NULL)
+  {
+    exit(0);
+  }
   unsigned int result = 0;
   tmp = 0;
   int num = 0;
@@ -316,13 +317,14 @@ void main()
   }
 
   // 多数決関数用
-  if ((ADDRNUM / NGRAM) < ARNUM)
+  if (EVEN)
   {
     result_array[num] = item_memory_array[RANNUM - 1];
+    putb(result_array[num]);
     // printf("%u", item_memory_array[RANNUM - 1]);
   }
 
-  unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
+  unsigned int result_real = grab_bit(result_array, ARNUM);
   printf("%u\n", result_real);
   putb(result_real);
 
@@ -347,5 +349,5 @@ void main()
 
   printf("\n ------------------------------ 終了 -------------------------------- \n\n");
 
-  return;
+  return 0;
 }
