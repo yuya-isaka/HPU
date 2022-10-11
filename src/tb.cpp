@@ -137,6 +137,16 @@ int main(int argc, char **argv)
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+  // item_memory_num <- 1000;
+  verilator_top->S_AXI_AWADDR = 16;
+  verilator_top->S_AXI_WDATA = 1000;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
+
   // matw <- 1;
   verilator_top->S_AXI_AWADDR = 0;
   verilator_top->S_AXI_WDATA = 1;
@@ -158,6 +168,41 @@ int main(int argc, char **argv)
   eval();
 
   printf("\n  生成！\n");
+  // matwはここで０になっている
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // Parameter セットアップ
+
+  // addr_j <- 2;
+  verilator_top->S_AXI_AWADDR = 4;
+  verilator_top->S_AXI_WDATA = 2;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
+
+  // addr_i <- 9;
+  verilator_top->S_AXI_AWADDR = 8;
+  verilator_top->S_AXI_WDATA = 9;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
+
+  // remainder <- 20;
+  verilator_top->S_AXI_AWADDR = 12;
+  verilator_top->S_AXI_WDATA = 20;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

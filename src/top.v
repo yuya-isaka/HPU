@@ -1,5 +1,6 @@
 `default_nettype none
 
+
 module top
     (
         // AXI Lite Slave Interface
@@ -42,65 +43,9 @@ module top
         input wire              S_AXIS_TVALID
     );
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    // Parameter
-
-    // N-gram
-    reg [19:0]      addr_j;
-
-    always @(posedge AXIS_ACLK) begin
-        if (~AXIS_ARESETN) begin
-            addr_j <= 19'd0;
-        end
-        else begin
-            addr_j <= 19'd2;
-        end
-    end
-
-
-    // アドレス数 / N-gram / コア数　(余る場合は+1)
-    // 900 / 3gram / 32コア = 9  あまりを入れて 9 + 1 = 10
-    reg [19:0]      addr_i;
-
-    always @(posedge AXIS_ACLK) begin
-        if (~AXIS_ARESETN) begin
-            addr_i <= 19'd0;
-        end
-        else begin
-            addr_i <= 19'd9;
-        end
-    end
-
-
-    // 余りの数
-    reg [4:0]       remainder;
-
-    always @(posedge AXIS_ACLK) begin
-        if (~AXIS_ARESETN) begin
-            remainder <= 5'd0;
-        end
-        else begin
-            remainder <= 5'd20;
-        end
-    end
-
-
-    // item_memory数 (現状65536最大値, 16bitアドレスで指定)
-    reg [15:0]      item_memory_num;
-
-    always @(posedge AXIS_ACLK) begin
-        if (~AXIS_ARESETN) begin
-            item_memory_num <= 15'd0;
-        end
-        else begin
-            item_memory_num <= 15'd1000;
-        end
-    end
-
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
     wire        get_v;
@@ -397,8 +342,21 @@ module top
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    reg [31:0]      control;
+    // 状態
     reg             run, gen;
+
+    // N-gram
+    reg [19:0]      addr_j;
+
+    // アドレス数 / N-gram / コア数　(余る場合は+1)
+    // 900 / 3gram / 32コア = 9  あまりを入れて 9 + 1 = 10
+    reg [19:0]      addr_i;
+
+    // 余りの数
+    reg [4:0]       remainder;
+
+    // item_memory数 (現状65536最大値, 16bitアドレスで指定)
+    reg [15:0]      item_memory_num;
 
 
     //================================================================
@@ -408,14 +366,23 @@ module top
     always @(posedge S_AXI_ACLK) begin
         if (~S_AXI_ARESETN) begin
             {run, gen} <= 2'b00;
-            control <= 32'h0;
+            addr_j <= 20'd0;
+            addr_i <= 20'd0;
+            remainder <= 5'd0;
+            item_memory_num <= 16'd0;
         end
         else if (register_w) begin
             case ({write_addr[9:2],2'b00})
-                10'h00:
+                10'd00:
                     {run, gen} <= write_data[1:0];
-                10'h10:
-                    control <= write_data;
+                10'd04:
+                    addr_j[19:0] <= write_data[19:0]; // 2
+                10'd08:
+                    addr_i[19:0] <= write_data[19:0]; // 9
+                10'd12:
+                    remainder[4:0] <= write_data[4:0]; // 20
+                10'd16:
+                    item_memory_num[15:0] <= write_data[15:0]; // 1000
                 default:
                     ;
             endcase
@@ -436,8 +403,14 @@ module top
             case ({read_addr[9:2],2'b00})
                 10'h00:
                     S_AXI_RDATA[1:0] <= {run, gen};
-                10'h10:
-                    S_AXI_RDATA <= control;
+                10'd04:
+                    S_AXI_RDATA[19:0] <= addr_j[19:0];
+                10'd08:
+                    S_AXI_RDATA[19:0] <= addr_i[19:0];
+                10'd12:
+                    S_AXI_RDATA[4:0] <= remainder[4:0];
+                10'd16:
+                    S_AXI_RDATA[15:0] <= item_memory_num[15:0];
                 default:
                     ;
             endcase
@@ -445,8 +418,11 @@ module top
     end
 
 
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 endmodule
+
 
 `default_nettype wire

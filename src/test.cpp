@@ -52,6 +52,8 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 	return result;
 }
 
+// 周期が2^128
+// 32bitごとに結果（LFSRは１bitごと）
 unsigned int xor128(void)
 {
 	// 内部で値を保持（seed） パターン１
