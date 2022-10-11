@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 		tmp += 1;
 		if (tmp == NGRAM)
 		{
-			putb(result);
+			// putb(result);
 			// printf("%u\n", result);
 			result_array[num] = result;
 			tmp = 0;
@@ -141,7 +141,7 @@ int main(int argc, char **argv)
 	if (EVEN)
 	{
 		result_array[num] = item_memory_array[RANNUM - 1];
-		putb(result_array[num]);
+		// putb(result_array[num]);
 		// printf("%u", item_memory_array[RANNUM - 1]);
 	}
 
