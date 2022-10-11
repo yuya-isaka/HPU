@@ -219,7 +219,7 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int RANN
     tmp += 1;
     if (tmp == NGRAM)
     {
-      putb(result);
+      // putb(result);
       result_array[num] = result;
       tmp = 0;
       result = 0;
@@ -231,13 +231,13 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int RANN
   if (EVEN)
   {
     result_array[num] = item_memory_array[RANNUM - 1];
-    putb(result_array[num]);
+    // putb(result_array[num]);
     // printf("%u", item_memory_array[RANNUM - 1]);
   }
 
   unsigned int result_real = grab_bit(result_array, ARNUM);
-  printf("%u\n", result_real);
-  putb(result_real);
+  // printf("%u\n", result_real);
+  // putb(result_real);
 
   if (result_real != dst[0])
   {
@@ -358,7 +358,10 @@ int main()
 
   // NGRAM, ADDRNUM, CORENUM, RANNUM, BUSWIDTH
 
-  check(3, 900, 4, 1001, 1024);
+  for (int i = 3; i <= 999; i += 3)
+  {
+    check(3, i, 4, 1001, 1024);
+  }
 
   printf("\n ------------------------------ 終了 -------------------------------- \n\n");
 
