@@ -63,7 +63,7 @@ module counter
     // $signed(1'b1)にするとバグる
     always_ff @(posedge clk) begin
                   if (rst) begin
-                      // 多数決対象が偶数の時（addr_iは奇数）
+                      // 偶数なら一個たす
                       if (tmp_even) begin
                           if (tmp_rand_bit == 1'b0) begin
                               // 1
@@ -74,7 +74,6 @@ module counter
                               box <= $signed(1'b1);
                           end
                       end
-                      // 多数決対象が奇数の時（addr_iは偶数）
                       else begin
                           box <= 0;
                       end
@@ -157,9 +156,7 @@ module counter
             selector selector
                      (
                          // in
-                         // コア数可変
                          .clk(clk),
-                         // コア数可変
                          .update(update),
                          .core_result_bit(core_result[k]),
                          .core_enable_bit(core_enable[k]),

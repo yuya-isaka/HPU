@@ -1,5 +1,6 @@
 `default_nettype none
 
+
 module buffer_ctrl
     (
         // in
@@ -196,10 +197,10 @@ module buffer_ctrl
                       // コア数可変
 
                       // 32コア
-                        stream_d <= sign_bit;
+                      stream_d <= sign_bit;
 
                       // 4コア
-                    //   stream_d <= encoded_hv;
+                      //   stream_d <= encoded_hv;
                   end
               end;
 
@@ -207,5 +208,6 @@ module buffer_ctrl
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 endmodule
+
 
 `default_nettype wire

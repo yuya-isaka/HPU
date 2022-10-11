@@ -55,7 +55,7 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
   return result;
 }
 
-unsigned int xor128(void)
+unsigned int xor128(int reset)
 {
   // 内部で値を保持（seed） パターン１
   // static unsigned int x = 2380889285;
@@ -69,14 +69,26 @@ unsigned int xor128(void)
   static unsigned int z = 521288629;
   static unsigned int w = 88675123;
 
-  // 前回のxを使う
-  unsigned int t = x ^ (x << 11);
-  // 更新
-  x = y;
-  y = z;
-  z = w;
+  if (reset)
+  {
+    x = 123456789;
+    y = 362436069;
+    z = 521288629;
+    w = 88675123;
+    return 0;
+  }
+  else
+  {
 
-  return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+    // 前回のxを使う
+    unsigned int t = x ^ (x << 11);
+    // 更新
+    x = y;
+    y = z;
+    z = w;
+
+    return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -202,7 +214,7 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int RANN
   item_memory_array[0] = 88675123;
   for (unsigned int i = 1; i < RANNUM; i++)
   {
-    item_memory_array[i] = xor128();
+    item_memory_array[i] = xor128(0);
   }
 
   unsigned int *result_array = (unsigned int *)malloc(sizeof(unsigned int) * ARNUM);
@@ -363,6 +375,7 @@ int main()
   for (int i = 3; i <= 999; i += 3)
   {
     check(3, i, 4, 1001, 1024);
+    xor128(1);
   }
 
   printf("\n ------------------------------ 終了 -------------------------------- \n\n");

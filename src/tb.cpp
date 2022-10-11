@@ -64,7 +64,7 @@ void putb(unsigned int v)
 // 可変のパラメータ
 
 const int NGRAM = 3;
-const int ADDRNUM = 990;
+const int ADDRNUM = 813;
 const int CORENUM = 4;
 const int RANNUM = 1000;
 
@@ -251,6 +251,142 @@ int main(int argc, char **argv)
     eval();
   }
 
+  //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
+
+  // ２回目
+
+  // item_memory_num <- 1000;
+  verilator_top->S_AXI_AWADDR = 4;
+  verilator_top->S_AXI_WDATA = RANNUM;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
+
+  // matw <- 1;
+  verilator_top->S_AXI_AWADDR = 0;
+  verilator_top->S_AXI_WDATA = 1;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
+
+  verilator_top->S_AXI_ARVALID = 1;
+  eval();
+  eval();
+  while (0 != verilator_top->S_AXI_RDATA)
+  {
+    eval();
+  }
+  verilator_top->S_AXI_ARVALID = 0;
+  eval();
+
+  printf("\n  生成！\n");
+  // matwはここで０になっている
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // Parameter セットアップ
+
+  // addr_j
+  verilator_top->S_AXI_AWADDR = 8;
+  verilator_top->S_AXI_WDATA = ADDRJ;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
+
+  // addr_i
+  verilator_top->S_AXI_AWADDR = 12;
+  verilator_top->S_AXI_WDATA = ADDRI;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
+
+  // remainder
+  verilator_top->S_AXI_AWADDR = 16;
+  verilator_top->S_AXI_WDATA = REMAINDER;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
+
+  // even
+  verilator_top->S_AXI_AWADDR = 20;
+  verilator_top->S_AXI_WDATA = EVEN;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // run <- 1;
+  verilator_top->S_AXI_AWADDR = 0;
+  verilator_top->S_AXI_WDATA = 2;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
+
+  // 送信
+  verilator_top->S_AXIS_TVALID = 1;
+  tmp = NGRAM - 1;
+  for (int i = 0; i < ADDRNUM; i++)
+  {
+    for (int j = 0; j < CORENUM; j++)
+    {
+      verilator_top->S_AXIS_TDATA[j] = i + (NGRAM * j);
+    }
+    if (i == tmp)
+    {
+      i += NGRAM * (CORENUM - 1); // 後でi++であげてくれる。 // 0, 96, 192, 288, 384, 480, 576, 672, 768, 864, 960
+      tmp += (CORENUM * NGRAM);
+    }
+    eval();
+  }
+  verilator_top->S_AXIS_TVALID = 0;
+  eval();
+
+  // 演算結果を待つ
+  while (!verilator_top->M_AXIS_TVALID)
+  {
+    eval();
+  }
+
+  printf("\n --------------------------- Output ---------------------------- \n\n");
+
+  for (int i = 0; i < 1; i++)
+  {
+    // for (int j = 0; j < 32; j++)
+    // {
+    //   printf("  %u\n\n", verilator_top->M_AXIS_TDATA[j]);
+    //   putb(verilator_top->M_AXIS_TDATA[j]);
+    // }
+    printf("  %u\n\n", verilator_top->M_AXIS_TDATA[0]);
+    putb(verilator_top->M_AXIS_TDATA[0]);
+    eval();
+  }
+
+  //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
 
   verilator_top->S_AXI_AWADDR = 0;
