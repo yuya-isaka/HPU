@@ -35,7 +35,8 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 {
 	unsigned int result = 0;
 
-	unsigned int mask = (int)1 << (sizeof(result_array[0]) * 8 - 1);
+	// 次元数可変
+	unsigned int mask = (int)1 << (32 - 1);
 	while (mask)
 	{
 		int tmp = 0;
@@ -80,24 +81,27 @@ unsigned int xor128(void)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// item_memoryの数（top.vの設定値より１つ大きくする）
+// 可変のパラメータ
+
+const int NGRAM = 3;
+const int ADDRNUM = 630;
 const int RANNUM = 1001;
 
-// 偶数 ... ADDRNUM/NGRAM/2-1をtop.vに設定  (例：900 ... 900/NGRAM/2-1=149)
-// 奇数 ... ADDRNUM/NGRAM/2をtop.vに設定	(例:903 ... 903/NGRAM/2=150）
-// tb.cppのADDRNUMとは一緒
-const int ADDRNUM = 900;
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// N-gram
-const int NGRAM = 3;
+// 自動で決まるパラメータ
 
-// ADDRNUM / NGRAM + 1を設定
-const int ARNUM = ADDRNUM / NGRAM + 1;
+const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char **argv)
 {
+	int ARNUM = ADDRNUM / NGRAM;
+	if (EVEN)
+	{
+		ARNUM++;
+	}
 
 	printf("\n ------------------------------- 開始 ------------------------------- \n\n");
 
@@ -110,7 +114,11 @@ int main(int argc, char **argv)
 		// printf("   %d:  %10u\n", i, item_memory_array[i]);
 	}
 
-	unsigned int result_array[ARNUM] = {0};
+	unsigned int *result_array = (unsigned int *)malloc(sizeof(unsigned int) * ARNUM);
+	if (result_array == NULL)
+	{
+		exit(0);
+	}
 	unsigned int result = 0;
 	int tmp = 0;
 	int num = 0;
@@ -120,7 +128,7 @@ int main(int argc, char **argv)
 		tmp += 1;
 		if (tmp == NGRAM)
 		{
-			// putb(result);
+			putb(result);
 			// printf("%u\n", result);
 			result_array[num] = result;
 			tmp = 0;
@@ -130,16 +138,19 @@ int main(int argc, char **argv)
 	}
 
 	// 多数決関数用
-	if ((ADDRNUM / NGRAM) < ARNUM)
+	if (EVEN)
 	{
 		result_array[num] = item_memory_array[RANNUM - 1];
+		putb(result_array[num]);
 		// printf("%u", item_memory_array[RANNUM - 1]);
 	}
 
-	unsigned int result_real = grab_bit(result_array, sizeof(result_array) / sizeof(result_array[0]));
+	unsigned int result_real = grab_bit(result_array, ARNUM);
 
 	printf("  %u\n\n", result_real);
 	putb(result_real);
+
+	free(result_array);
 
 	printf("\n ------------------------------- 終了 ------------------------------- \n");
 }

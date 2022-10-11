@@ -10,7 +10,7 @@ module counter
          // in
          input wire			        clk,
          input wire                 rst,
-         input wire                 tmp_addr_i,
+         input wire                 tmp_even,
          input wire                 tmp_rand_bit,
          // コア数可変
          //  input wire [31:0]          core_enable,
@@ -59,7 +59,7 @@ module counter
     always_ff @(posedge clk) begin
                   if (rst) begin
                       // 多数決対象が偶数の時（addr_iは奇数）
-                      if (tmp_addr_i) begin
+                      if (tmp_even) begin
                           if (tmp_rand_bit == 1'b0) begin
                               // 1
                               box <= $signed(1);
@@ -152,8 +152,10 @@ module counter
             selector selector
                      (
                          // in
-                         .clk(clk),
-                         .update(update),
+                         // コア数可変
+                         //  .clk(clk),
+                         // コア数可変
+                         //  .update(update),
                          .core_result_bit(core_result[k]),
                          .core_enable_bit(core_enable[k]),
 

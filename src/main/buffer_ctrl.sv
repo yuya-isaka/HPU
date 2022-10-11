@@ -5,7 +5,7 @@ module buffer_ctrl
         // in
         input wire              clk,
         input wire              rst,
-        input wire              tmp_addr_i,
+        input wire              tmp_even,
         input wire [31:0]       tmp_rand,
         input wire [4:0]        remainder,
         // コア数可変
@@ -65,7 +65,7 @@ module buffer_ctrl
                         // in
                         .clk(clk),
                         .rst(rst),
-                        .tmp_addr_i(tmp_addr_i),
+                        .tmp_even(tmp_even),
                         .tmp_rand_bit(tmp_rand[i]),
                         // コア数可変
                         // .core_enable(core_enable[31:0]),
@@ -129,7 +129,7 @@ module buffer_ctrl
                     // core_enable = 32'd0;
                     core_enable = 4'd0;
                     // コア数可変
-                    if (last_update) begin
+                    if (last_update & (remainder != 0)) begin
                         core_enable[0] = remainder < 1;
                         core_enable[1] = remainder < 2;
                         core_enable[2] = remainder < 3;
@@ -172,6 +172,7 @@ module buffer_ctrl
     // 『stream_vが立つタイミングのencoded_hvが求めてた値』
     // update  ->   get_fin         ->   stream_v
     //         ->   sign_bit(最新値) ->   encoded_hv
+    //         ->   box ↑(sign_bit), update前にselectが組み合わせ回路で求まっている前提
 
     // コア数可変（32ならいらない）
     reg [31:0]      encoded_hv;
@@ -186,6 +187,7 @@ module buffer_ctrl
     // 『stream_vが立つタイミングのsign_bitが求めてた値』
     // update  ->   get_fin      ->  get_fin_n  ->  get_fin_nn   ->  stream_v
     //         ->   update_n     ->  update_nn  ->  update_nnn   ->  sign_bit(最新値)
+    //         ->   select       ->  box_1 ...  ->  box_11       ->  box ↑ sign_bitも最新値
 
 
     // stream_d

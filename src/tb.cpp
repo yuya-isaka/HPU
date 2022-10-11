@@ -81,20 +81,21 @@ void putb(unsigned int v)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// N-gram
+// 可変のパラメータ
+
 const int NGRAM = 3;
-
-// test.cppのADDRNUMと同じ
-// const int ADDRNUM = 960;
-const int ADDRNUM = 900;
-
+const int ADDRNUM = 630;
 const int CORENUM = 4;
 const int RANNUM = 1000;
 
-const int ADDRJ = NGRAM - 1;
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int ADDRI = (ADDRNUM / NGRAM / CORENUM) - 1;
+// 自動で決まるパラメータ
+
+const int ADDRJ = NGRAM - 1;
+int ADDRI = ((ADDRNUM / NGRAM) - 1) / CORENUM;
 const int REMAINDER = (ADDRNUM / NGRAM) % CORENUM;
+const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -112,11 +113,6 @@ int main(int argc, char **argv)
   main_time = 0;
 
   //////////////////////////////////////////////////////////////////////////////// initial begin ///////////////////////////////////////////////////////////////////////////////////////////
-
-  if (REMAINDER != 0)
-  {
-    ADDRI++;
-  }
 
   printf("\n ---------------------------- 開始 ----------------------------- \n");
 
@@ -148,7 +144,7 @@ int main(int argc, char **argv)
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // item_memory_num <- 1000;
-  verilator_top->S_AXI_AWADDR = 16;
+  verilator_top->S_AXI_AWADDR = 4;
   verilator_top->S_AXI_WDATA = RANNUM;
   verilator_top->S_AXI_AWVALID = 1;
   verilator_top->S_AXI_WVALID = 1;
@@ -184,8 +180,8 @@ int main(int argc, char **argv)
 
   // Parameter セットアップ
 
-  // addr_j <- 2;
-  verilator_top->S_AXI_AWADDR = 4;
+  // addr_j
+  verilator_top->S_AXI_AWADDR = 8;
   verilator_top->S_AXI_WDATA = ADDRJ;
   verilator_top->S_AXI_AWVALID = 1;
   verilator_top->S_AXI_WVALID = 1;
@@ -194,8 +190,8 @@ int main(int argc, char **argv)
   verilator_top->S_AXI_WVALID = 0;
   eval();
 
-  // addr_i <- 9;
-  verilator_top->S_AXI_AWADDR = 8;
+  // addr_i
+  verilator_top->S_AXI_AWADDR = 12;
   verilator_top->S_AXI_WDATA = ADDRI;
   verilator_top->S_AXI_AWVALID = 1;
   verilator_top->S_AXI_WVALID = 1;
@@ -204,9 +200,19 @@ int main(int argc, char **argv)
   verilator_top->S_AXI_WVALID = 0;
   eval();
 
-  // remainder <- 20;
-  verilator_top->S_AXI_AWADDR = 12;
+  // remainder
+  verilator_top->S_AXI_AWADDR = 16;
   verilator_top->S_AXI_WDATA = REMAINDER;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
+
+  // even
+  verilator_top->S_AXI_AWADDR = 20;
+  verilator_top->S_AXI_WDATA = EVEN;
   verilator_top->S_AXI_AWVALID = 1;
   verilator_top->S_AXI_WVALID = 1;
   eval();

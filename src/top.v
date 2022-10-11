@@ -93,7 +93,7 @@ module top
                     // in
                     .clk(AXIS_ACLK),
                     .rst(~run),
-                    .tmp_addr_i(addr_i[0]),
+                    .tmp_even(even),
                     // 次元数可変
                     .tmp_rand(tmp_rand[31:0]),
                     .remainder(remainder),
@@ -198,7 +198,7 @@ module top
         if (~AXIS_ARESETN) begin
             tmp_rand <= 32'd0;
         end
-        else if (gen & addr_i[0] & (item_a == item_memory_num)) begin
+        else if (gen & (item_a == item_memory_num)) begin
             tmp_rand <= rand_num;
         end
     end
@@ -360,6 +360,8 @@ module top
     // item_memory数 (現状65536最大値, 16bitアドレスで指定)
     reg [15:0]      item_memory_num;
 
+    // アドレス / N-gramが偶数か
+    reg             even;
 
     //================================================================
 
@@ -368,23 +370,26 @@ module top
     always @(posedge S_AXI_ACLK) begin
         if (~S_AXI_ARESETN) begin
             {run, gen} <= 2'b00;
+            item_memory_num <= 16'd0;
             addr_j <= 20'd0;
             addr_i <= 20'd0;
             remainder <= 5'd0;
-            item_memory_num <= 16'd0;
+            even <= 1'd0;
         end
         else if (register_w) begin
             case ({write_addr[9:2],2'b00})
                 10'd00:
                     {run, gen} <= write_data[1:0];
                 10'd04:
-                    addr_j[19:0] <= write_data[19:0]; // 2
-                10'd08:
-                    addr_i[19:0] <= write_data[19:0]; // 9
-                10'd12:
-                    remainder[4:0] <= write_data[4:0]; // 20
-                10'd16:
                     item_memory_num[15:0] <= write_data[15:0]; // 1000
+                10'd08:
+                    addr_j[19:0] <= write_data[19:0]; // 2
+                10'd12:
+                    addr_i[19:0] <= write_data[19:0]; // 9
+                10'd16:
+                    remainder[4:0] <= write_data[4:0]; // 20
+                10'd20:
+                    even <= write_data[0];
                 default:
                     ;
             endcase
@@ -406,13 +411,15 @@ module top
                 10'h00:
                     S_AXI_RDATA[1:0] <= {run, gen};
                 10'd04:
-                    S_AXI_RDATA[19:0] <= addr_j[19:0];
-                10'd08:
-                    S_AXI_RDATA[19:0] <= addr_i[19:0];
-                10'd12:
-                    S_AXI_RDATA[4:0] <= remainder[4:0];
-                10'd16:
                     S_AXI_RDATA[15:0] <= item_memory_num[15:0];
+                10'd08:
+                    S_AXI_RDATA[19:0] <= addr_j[19:0];
+                10'd12:
+                    S_AXI_RDATA[19:0] <= addr_i[19:0];
+                10'd16:
+                    S_AXI_RDATA[4:0] <= remainder[4:0];
+                10'd20:
+                    S_AXI_RDATA <= even;
                 default:
                     ;
             endcase
