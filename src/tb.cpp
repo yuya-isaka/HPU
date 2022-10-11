@@ -88,8 +88,13 @@ const int NGRAM = 3;
 // const int ADDRNUM = 960;
 const int ADDRNUM = 900;
 
-// ADDRNUMが奇数かどうか
-// const int ODD = 0;
+const int CORENUM = 4;
+const int RANNUM = 1000;
+
+const int ADDRJ = NGRAM - 1;
+
+int ADDRI = (ADDRNUM / NGRAM / CORENUM) - 1;
+const int REMAINDER = (ADDRNUM / NGRAM) % CORENUM;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -107,6 +112,11 @@ int main(int argc, char **argv)
   main_time = 0;
 
   //////////////////////////////////////////////////////////////////////////////// initial begin ///////////////////////////////////////////////////////////////////////////////////////////
+
+  if (REMAINDER != 0)
+  {
+    ADDRI++;
+  }
 
   printf("\n ---------------------------- 開始 ----------------------------- \n");
 
@@ -139,7 +149,7 @@ int main(int argc, char **argv)
 
   // item_memory_num <- 1000;
   verilator_top->S_AXI_AWADDR = 16;
-  verilator_top->S_AXI_WDATA = 1000;
+  verilator_top->S_AXI_WDATA = RANNUM;
   verilator_top->S_AXI_AWVALID = 1;
   verilator_top->S_AXI_WVALID = 1;
   eval();
@@ -176,7 +186,7 @@ int main(int argc, char **argv)
 
   // addr_j <- 2;
   verilator_top->S_AXI_AWADDR = 4;
-  verilator_top->S_AXI_WDATA = 2;
+  verilator_top->S_AXI_WDATA = ADDRJ;
   verilator_top->S_AXI_AWVALID = 1;
   verilator_top->S_AXI_WVALID = 1;
   eval();
@@ -186,7 +196,7 @@ int main(int argc, char **argv)
 
   // addr_i <- 9;
   verilator_top->S_AXI_AWADDR = 8;
-  verilator_top->S_AXI_WDATA = 9;
+  verilator_top->S_AXI_WDATA = ADDRI;
   verilator_top->S_AXI_AWVALID = 1;
   verilator_top->S_AXI_WVALID = 1;
   eval();
@@ -196,7 +206,7 @@ int main(int argc, char **argv)
 
   // remainder <- 20;
   verilator_top->S_AXI_AWADDR = 12;
-  verilator_top->S_AXI_WDATA = 20;
+  verilator_top->S_AXI_WDATA = REMAINDER;
   verilator_top->S_AXI_AWVALID = 1;
   verilator_top->S_AXI_WVALID = 1;
   eval();
@@ -221,14 +231,14 @@ int main(int argc, char **argv)
   int tmp = NGRAM - 1;
   for (int i = 0; i < ADDRNUM; i++)
   {
-    for (int j = 0; j < 32; j++)
+    for (int j = 0; j < CORENUM; j++)
     {
       verilator_top->S_AXIS_TDATA[j] = i + (NGRAM * j);
     }
     if (i == tmp)
     {
-      i += NGRAM * 31; // 後でi++であげてくれる。 // 0, 96, 192, 288, 384, 480, 576, 672, 768, 864, 960
-      tmp += (32 * NGRAM);
+      i += NGRAM * (CORENUM - 1); // 後でi++であげてくれる。 // 0, 96, 192, 288, 384, 480, 576, 672, 768, 864, 960
+      tmp += (CORENUM * NGRAM);
     }
     eval();
   }
