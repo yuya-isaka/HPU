@@ -5,6 +5,23 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// 可変のパラメータ
+
+const int NGRAM = 3;
+const int ADDRNUM = 12;
+const int RANNUM = 1001;
+const int DIM = 64 / 32;
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// 自動で決まるパラメータ
+
+const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
+unsigned int item_memory_array[DIM][RANNUM];
+unsigned int item_memory_array_new[DIM][RANNUM];
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void printb(unsigned int v)
 {
 	unsigned int mask = (int)1 << (sizeof(v) * 8 - 1);
@@ -29,6 +46,52 @@ unsigned int shifter(unsigned int v, unsigned int num)
 
 	tmp_v = tmp_v | tmp;
 	return tmp_v;
+}
+
+unsigned int shifter_2(unsigned int *v, unsigned int num)
+{
+	// num回 論理右シフト
+	unsigned int tmp_v = *v >> num;
+
+	// 右にシフトしたやつを取り出して、左に(32-num)回 論理左シフト
+	unsigned int tmp_num = (1 << num) - 1;
+	*v = (*v & tmp_num) << (32 - num);
+
+	return tmp_v;
+}
+
+void shifter_new()
+{
+	int num = 0;
+	for (int i = 0; i < RANNUM; i++)
+	{
+		unsigned int result_tmp[DIM] = {0};
+		for (int j = 0; j < DIM; j++)
+		{
+			unsigned int tmp = item_memory_array[j][i];
+			unsigned int tmp_v = shifter_2(&tmp, num);
+			result_tmp[j] |= tmp_v;
+			if (j == 0)
+			{
+				result_tmp[DIM - 1] |= tmp;
+			}
+			else
+			{
+				result_tmp[j - 1] |= tmp;
+			}
+		}
+
+		for (int j = 0; j < DIM; j++)
+		{
+			item_memory_array_new[j][i] = result_tmp[j];
+		}
+
+		num++;
+		if (num == NGRAM)
+		{
+			num = 0;
+		}
+	}
 }
 
 unsigned int grab_bit(unsigned int result_array[], size_t size)
@@ -81,21 +144,6 @@ unsigned int xor128(void)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// 可変のパラメータ
-
-const int NGRAM = 3;
-const int ADDRNUM = 12;
-const int RANNUM = 1001;
-const int DIM = 64 / 32;
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 自動で決まるパラメータ
-
-const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 int main(int argc, char **argv)
 {
 	int ARNUM = ADDRNUM / NGRAM;
@@ -107,7 +155,6 @@ int main(int argc, char **argv)
 	printf("\n ------------------------------- 開始 ------------------------------- \n\n\n");
 
 	// hdcテスト
-	unsigned int item_memory_array[DIM][RANNUM];
 	item_memory_array[0][0] = 88675123;
 	for (int j = 0; j < RANNUM; j++)
 	{
@@ -118,6 +165,8 @@ int main(int argc, char **argv)
 			item_memory_array[i][j] = xor128();
 		}
 	}
+
+	shifter_new();
 
 	for (int j = 0; j < DIM; j++)
 	{
@@ -131,12 +180,13 @@ int main(int argc, char **argv)
 		int num = 0;
 		for (int i = 0; i < ADDRNUM; i++)
 		{
-			result ^= shifter(item_memory_array[j][i], tmp);
+			result ^= item_memory_array_new[j][i];
+			// printf("%d:%x\n", i, item_memory_array_new[j][i]);
 			tmp += 1;
 			if (tmp == NGRAM)
 			{
 				// putb(result);
-				// printf("%u\n", result);
+				printf("%x\n", result);
 				result_array[num] = result;
 				tmp = 0;
 				result = 0;
@@ -148,9 +198,10 @@ int main(int argc, char **argv)
 		{
 			result_array[num] = item_memory_array[j][RANNUM - 1];
 			// putb(result_array[num]);
-			// printf("%u", result_array[num]);
+			// printf("ランダム：%x\n", result_array[num]);
 		}
 		unsigned int result_real = grab_bit(result_array, ARNUM);
+		printf("  %x\n", result_real);
 		printf("  %u\n", result_real);
 		putb(result_real);
 		printf("\n");
