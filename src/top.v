@@ -43,8 +43,8 @@ module top
         input wire              S_AXIS_TVALID
     );
 
-    parameter DIM = 63;    // DIM-1
-    parameter WI = 1;      // 32が何個か-1
+    parameter DIM = 95;    // DIM-1
+    parameter WI = 2;      // 32が何個か-1
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -90,7 +90,7 @@ module top
 
 
     // M_AXIS_TDATA
-    buffer_ctrl #(.DIM(63)) buffer_ctrl
+    buffer_ctrl #(.DIM(95)) buffer_ctrl
                 (
                     // in
                     .clk(AXIS_ACLK),
@@ -235,9 +235,9 @@ module top
         else if (item_a_tmp == 1) begin
             rand_num[63:32] <= rand_num_tmp;
         end
-        // else if (item_a_tmp == 2) begin
-        //     rand_num[95:64] <= rand_num_tmp;
-        // end
+        else if (item_a_tmp == 2) begin
+            rand_num[95:64] <= rand_num_tmp;
+        end
         // else if (item_a_tmp == 3) begin
         //     rand_num[127:96] <= rand_num_tmp;
         // end
@@ -354,7 +354,7 @@ module top
         // コア数可変
         // for (i = 0; i < 32; i = i + 1) begin
         for (i = 0; i < 4; i = i + 1) begin
-            core #(.DIM(63)) core
+            core #(.DIM(95)) core
                  (
                      // in
                      .clk(AXIS_ACLK),

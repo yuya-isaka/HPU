@@ -10,7 +10,7 @@
 const int NGRAM = 3;
 const int ADDRNUM = 12;
 const int RANNUM = 1001;
-const int DIM = 64 / 32;
+const int DIM = 96 / 32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -186,7 +186,7 @@ int main(int argc, char **argv)
 			if (tmp == NGRAM)
 			{
 				// putb(result);
-				printf("%x\n", result);
+				// printf("%x\n", result);
 				result_array[num] = result;
 				tmp = 0;
 				result = 0;
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
 			// printf("ランダム：%x\n", result_array[num]);
 		}
 		unsigned int result_real = grab_bit(result_array, ARNUM);
-		printf("  %x\n", result_real);
+		// printf("  %x\n", result_real);
 		printf("  %u\n", result_real);
 		putb(result_real);
 		printf("\n");

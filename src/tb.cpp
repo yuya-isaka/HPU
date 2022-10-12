@@ -67,7 +67,7 @@ const int NGRAM = 3;
 const int ADDRNUM = 12;
 const int CORENUM = 4;
 const int RANNUM = 1000;
-const int DIM = 64 / 32;
+const int DIM = 96 / 32;
 // top.v DIM
 // top.v WI
 // top.v buffer_ctrl DIM
