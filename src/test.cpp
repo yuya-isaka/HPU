@@ -135,8 +135,8 @@ int main(int argc, char **argv)
 			tmp += 1;
 			if (tmp == NGRAM)
 			{
-				putb(result);
-				// printf("%u\n", result);
+				// putb(result);
+				printf("%u\n", result);
 				result_array[num] = result;
 				tmp = 0;
 				result = 0;
@@ -147,11 +147,11 @@ int main(int argc, char **argv)
 		if (EVEN)
 		{
 			result_array[num] = item_memory_array[j][RANNUM - 1];
-			putb(result_array[num]);
-			// printf("%u", item_memory_array[RANNUM - 1]);
+			// putb(result_array[num]);
+			printf("%u", result_array[num]);
 		}
 		unsigned int result_real = grab_bit(result_array, ARNUM);
-		printf("  %u\n", result_real);
+		printf("\n\n  %u\n", result_real);
 		putb(result_real);
 		printf("\n");
 
