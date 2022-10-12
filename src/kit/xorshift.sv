@@ -5,6 +5,7 @@ module xorshift
         // in
         input wire              clk,
         input wire              gen,
+        input wire              update_item,
 
         // out
         output logic [31:0]     rand_num
@@ -32,7 +33,7 @@ module xorshift
                       z <= 521288629;
                       w <= 88675123;
                   end
-                  else begin
+                  else if (~update_item) begin
                       x <= y;
                       y <= z;
                       z <= w;

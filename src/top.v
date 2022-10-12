@@ -43,8 +43,8 @@ module top
         input wire              S_AXIS_TVALID
     );
 
-    parameter DIM = 31;
-    parameter WI = 0;
+    parameter DIM = 63;
+    parameter WI = 2;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -90,7 +90,7 @@ module top
 
 
     // M_AXIS_TDATA
-    buffer_ctrl #(.DIM(31)) buffer_ctrl
+    buffer_ctrl #(.DIM(63)) buffer_ctrl
                 (
                     // in
                     .clk(AXIS_ACLK),
@@ -170,8 +170,8 @@ module top
 
     always @(posedge AXIS_ACLK) begin
         if (~gen) begin
-            item_a <= 16'd0;
-            item_a_tmp <= 5'd0;
+            item_a <= 0;
+            item_a_tmp <= 0;
         end
         else begin
             if (item_a_tmp == WI) begin
@@ -201,6 +201,7 @@ module top
                  // in
                  .clk(AXIS_ACLK),
                  .gen(gen),
+                 .update_item(update_item),
 
                  // out
                  .rand_num(rand_num_tmp[31:0])
@@ -210,14 +211,16 @@ module top
     // 次元数可変
     reg [DIM:0]       rand_num;
 
-    always @* begin
-        rand_num = 0;
-        if (gen & item_a_tmp == 0) begin
-            rand_num[31:0] = rand_num_tmp;
+    always @(posedge AXIS_ACLK) begin
+        if (~gen) begin
+            rand_num <= 0;
         end
-        // else if (item_a_tmp == 1) begin
-        //     rand_num[63:32] <= rand_num_tmp;
-        // end
+        else if (item_a_tmp == 0) begin
+            rand_num[31:0] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 1) begin
+            rand_num[63:32] <= rand_num_tmp;
+        end
         // else if (item_a_tmp == 2) begin
         //     rand_num[95:64] <= rand_num_tmp;
         // end
@@ -337,7 +340,7 @@ module top
         // コア数可変
         // for (i = 0; i < 32; i = i + 1) begin
         for (i = 0; i < 4; i = i + 1) begin
-            core #(.DIM(31)) core
+            core #(.DIM(63)) core
                  (
                      // in
                      .clk(AXIS_ACLK),
