@@ -63,7 +63,7 @@ module buffer_ctrl
     generate
         genvar i;
         // 次元数可変
-        for (i = 0; i < DIM; i = i + 1) begin
+        for (i = 0; i < DIM+1; i = i + 1) begin
 
             counter #(.W(30)) counter
                     (
