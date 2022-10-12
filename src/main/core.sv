@@ -4,22 +4,22 @@ module core
     #(
          parameter DIM = 1023
      )
-    (
-        input wire              clk,
-        input wire              run,
-        input wire              gen,
-        input wire              update_item,
-        input wire [15:0]       item_a,
-        input wire [15:0]       item_memory_num,
-        input wire [DIM:0]     rand_num,
-        input wire              get_v,
-        input wire [31:0]       get_d,
-        input wire [19:0]       addr_j,
-        input wire              exec,
-        input wire              update,
+     (
+         input wire              clk,
+         input wire              run,
+         input wire              gen,
+         input wire              update_item,
+         input wire [15:0]       item_a,
+         input wire [15:0]       item_memory_num,
+         input wire [DIM:0]     rand_num,
+         input wire              get_v,
+         input wire [31:0]       get_d,
+         input wire [19:0]       addr_j,
+         input wire              exec,
+         input wire              update,
 
-        output logic [DIM:0]   core_result
-    );
+         output logic [DIM:0]   core_result
+     );
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

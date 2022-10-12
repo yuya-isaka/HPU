@@ -167,24 +167,31 @@ module top
 
     reg [15:0]      item_a;
     reg [4:0]       item_a_tmp;
-    reg             update_item;
 
     always @(posedge AXIS_ACLK) begin
         if (~gen) begin
             item_a <= 16'd0;
             item_a_tmp <= 5'd0;
-            update_item <= 1'd0;
         end
         else begin
-            item_a_tmp <= item_a_tmp + 5'd1;
-            update_item <= 1'd0;
             if (item_a_tmp == WI) begin
-                update_item <= 1'd1;
                 item_a <= item_a + 16'd1;
                 item_a_tmp <= 5'd0;
             end
+            else begin
+                item_a_tmp <= item_a_tmp + 5'd1;
+            end
         end
     end;
+
+    reg             update_item;
+
+    always @* begin
+        update_item = 0;
+        if (item_a_tmp == WI) begin
+            update_item = 1'd1;
+        end
+    end
 
 
     wire [31:0]         rand_num_tmp;
@@ -203,108 +210,104 @@ module top
     // 次元数可変
     reg [DIM:0]       rand_num;
 
-    always @(posedge AXIS_ACLK) begin
-        if (~gen) begin
-            rand_num <= 0;
+    always @* begin
+        rand_num = 0;
+        if (gen & item_a_tmp == 0) begin
+            rand_num[31:0] = rand_num_tmp;
         end
-        else begin
-            if (item_a_tmp == 0) begin
-                rand_num[31:0] <= rand_num_tmp;
-            end
-            // else if (item_a_tmp == 1) begin
-            //     rand_num[63:32] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 2) begin
-            //     rand_num[95:64] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 3) begin
-            //     rand_num[127:96] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 4) begin
-            //     rand_num[159:128] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 5) begin
-            //     rand_num[191:160] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 6) begin
-            //     rand_num[223:192] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 7) begin
-            //     rand_num[255:224] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 8) begin
-            //     rand_num[287:256] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 9) begin
-            //     rand_num[319:288] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 10) begin
-            //     rand_num[351:320] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 11) begin
-            //     rand_num[383:352] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 12) begin
-            //     rand_num[415:384] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 13) begin
-            //     rand_num[447:416] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 14) begin
-            //     rand_num[479:448] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 15) begin
-            //     rand_num[511:480] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 16) begin
-            //     rand_num[543:512] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 17) begin
-            //     rand_num[575:544] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 18) begin
-            //     rand_num[607:576] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 19) begin
-            //     rand_num[639:608] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 20) begin
-            //     rand_num[671:640] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 21) begin
-            //     rand_num[703:672] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 22) begin
-            //     rand_num[735:704] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 23) begin
-            //     rand_num[767:736] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 24) begin
-            //     rand_num[799:768] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 25) begin
-            //     rand_num[831:800] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 26) begin
-            //     rand_num[863:832] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 27) begin
-            //     rand_num[895:864] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 28) begin
-            //     rand_num[927:896] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 29) begin
-            //     rand_num[959:928] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 30) begin
-            //     rand_num[991:960] <= rand_num_tmp;
-            // end
-            // else if (item_a_tmp == 31) begin
-            //     rand_num[1023:992] <= rand_num_tmp;
-            // end
-        end
+        // else if (item_a_tmp == 1) begin
+        //     rand_num[63:32] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 2) begin
+        //     rand_num[95:64] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 3) begin
+        //     rand_num[127:96] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 4) begin
+        //     rand_num[159:128] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 5) begin
+        //     rand_num[191:160] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 6) begin
+        //     rand_num[223:192] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 7) begin
+        //     rand_num[255:224] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 8) begin
+        //     rand_num[287:256] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 9) begin
+        //     rand_num[319:288] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 10) begin
+        //     rand_num[351:320] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 11) begin
+        //     rand_num[383:352] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 12) begin
+        //     rand_num[415:384] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 13) begin
+        //     rand_num[447:416] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 14) begin
+        //     rand_num[479:448] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 15) begin
+        //     rand_num[511:480] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 16) begin
+        //     rand_num[543:512] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 17) begin
+        //     rand_num[575:544] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 18) begin
+        //     rand_num[607:576] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 19) begin
+        //     rand_num[639:608] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 20) begin
+        //     rand_num[671:640] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 21) begin
+        //     rand_num[703:672] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 22) begin
+        //     rand_num[735:704] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 23) begin
+        //     rand_num[767:736] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 24) begin
+        //     rand_num[799:768] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 25) begin
+        //     rand_num[831:800] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 26) begin
+        //     rand_num[863:832] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 27) begin
+        //     rand_num[895:864] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 28) begin
+        //     rand_num[927:896] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 29) begin
+        //     rand_num[959:928] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 30) begin
+        //     rand_num[991:960] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 31) begin
+        //     rand_num[1023:992] <= rand_num_tmp;
+        // end
     end
 
 
