@@ -2,66 +2,70 @@
 
 
 module buffer_ctrl
-    (
-        // in
-        input wire              clk,
-        input wire              rst,
-        input wire              tmp_even,
-        input wire [31:0]       tmp_rand,
-        input wire [4:0]        remainder,
-        // コア数可変
-        input wire [31:0]       core_result_1,
-        input wire [31:0]       core_result_2,
-        input wire [31:0]       core_result_3,
-        input wire [31:0]       core_result_4,
-        // input wire [31:0]       core_result_5,
-        // input wire [31:0]       core_result_6,
-        // input wire [31:0]       core_result_7,
-        // input wire [31:0]       core_result_8,
-        // input wire [31:0]       core_result_9,
-        // input wire [31:0]       core_result_10,
-        // input wire [31:0]       core_result_11,
-        // input wire [31:0]       core_result_12,
-        // input wire [31:0]       core_result_13,
-        // input wire [31:0]       core_result_14,
-        // input wire [31:0]       core_result_15,
-        // input wire [31:0]       core_result_16,
-        // input wire [31:0]       core_result_17,
-        // input wire [31:0]       core_result_18,
-        // input wire [31:0]       core_result_19,
-        // input wire [31:0]       core_result_20,
-        // input wire [31:0]       core_result_21,
-        // input wire [31:0]       core_result_22,
-        // input wire [31:0]       core_result_23,
-        // input wire [31:0]       core_result_24,
-        // input wire [31:0]       core_result_25,
-        // input wire [31:0]       core_result_26,
-        // input wire [31:0]       core_result_27,
-        // input wire [31:0]       core_result_28,
-        // input wire [31:0]       core_result_29,
-        // input wire [31:0]       core_result_30,
-        // input wire [31:0]       core_result_31,
-        // input wire [31:0]       core_result_32,
-        input wire              update,
-        input wire              last_update,
-        input wire              get_fin,
-        input wire              stream_v,
+    #(
+         parameter DIM = 1023
+     )
+     (
+         // in
+         input wire              clk,
+         input wire              rst,
+         input wire              tmp_even,
+         input wire [DIM:0]       tmp_rand,
+         input wire [4:0]        remainder,
+         // コア数可変
+         input wire [DIM:0]       core_result_1,
+         input wire [DIM:0]       core_result_2,
+         input wire [DIM:0]       core_result_3,
+         input wire [DIM:0]       core_result_4,
+         // input wire [31:0]       core_result_5,
+         // input wire [31:0]       core_result_6,
+         // input wire [31:0]       core_result_7,
+         // input wire [31:0]       core_result_8,
+         // input wire [31:0]       core_result_9,
+         // input wire [31:0]       core_result_10,
+         // input wire [31:0]       core_result_11,
+         // input wire [31:0]       core_result_12,
+         // input wire [31:0]       core_result_13,
+         // input wire [31:0]       core_result_14,
+         // input wire [31:0]       core_result_15,
+         // input wire [31:0]       core_result_16,
+         // input wire [31:0]       core_result_17,
+         // input wire [31:0]       core_result_18,
+         // input wire [31:0]       core_result_19,
+         // input wire [31:0]       core_result_20,
+         // input wire [31:0]       core_result_21,
+         // input wire [31:0]       core_result_22,
+         // input wire [31:0]       core_result_23,
+         // input wire [31:0]       core_result_24,
+         // input wire [31:0]       core_result_25,
+         // input wire [31:0]       core_result_26,
+         // input wire [31:0]       core_result_27,
+         // input wire [31:0]       core_result_28,
+         // input wire [31:0]       core_result_29,
+         // input wire [31:0]       core_result_30,
+         // input wire [31:0]       core_result_31,
+         // input wire [31:0]       core_result_32,
+         input wire              update,
+         input wire              last_update,
+         input wire              get_fin,
+         input wire              stream_v,
 
-        // out
-        output logic [1023:0]     stream_d
-    );
+         // out
+         output logic [1023:0]     stream_d
+     );
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     // 次元数可変
-    wire [31:0]      sign_bit;
+    wire [DIM:0]      sign_bit;
 
     generate
         genvar i;
         // 次元数可変
-        for (i = 0; i < 32; i = i + 1) begin
-            counter counter
+        for (i = 0; i < DIM; i = i + 1) begin
+
+            counter #(.W(30)) counter
                     (
                         // in
                         .clk(clk),
@@ -113,6 +117,7 @@ module buffer_ctrl
                         // out
                         .sign_bit(sign_bit[i])
                     );
+
         end
     endgenerate
 

@@ -1,20 +1,24 @@
 `default_nettype none
 
 module core
+    #(
+         parameter DIM = 1023
+     )
     (
         input wire              clk,
         input wire              run,
         input wire              gen,
+        input wire              update_item,
         input wire [15:0]       item_a,
         input wire [15:0]       item_memory_num,
-        input wire [31:0]       rand_num,
+        input wire [DIM:0]     rand_num,
         input wire              get_v,
         input wire [31:0]       get_d,
         input wire [19:0]       addr_j,
         input wire              exec,
         input wire              update,
 
-        output logic [31:0]     core_result
+        output logic [DIM:0]   core_result
     );
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,12 +26,12 @@ module core
 
     // BRAMになるはず
     (* ram_style = "block" *)
-    reg [31:0]      item_memory [0:1023];
+    reg [DIM:0]      item_memory [0:1023];
 
 
-    reg [31:0]      hv;
+    reg [DIM:0]      hv;
     always_ff @(posedge clk) begin
-                  if (gen & (item_a != item_memory_num)) begin
+                  if (gen & (item_a != item_memory_num) & update_item) begin
                       item_memory[item_a] <= rand_num;
                       hv <= 0;
                   end
@@ -66,18 +70,18 @@ module core
 
 
 
-    reg [31:0]      enc;
+    reg [DIM:0]      enc;
 
     always_ff @(posedge clk) begin
                   if (~run) begin
-                      enc <= 32'h0;
+                      enc <= 0;
                   end
                   else if (exec) begin
                       if (update) begin
                           enc <= hv;
                       end
                       else begin
-                          enc <= enc ^ (hv >> permutation | ( ( hv & ((1'b1 << permutation) - 1'b1) ) << (32 - permutation) ) );
+                          enc <= enc ^ (hv >> permutation | ( ( hv & ((1'b1 << permutation) - 1'b1) ) << (DIM+1 - permutation) ) );
                       end
                   end
               end;

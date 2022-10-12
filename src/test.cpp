@@ -84,8 +84,9 @@ unsigned int xor128(void)
 // 可変のパラメータ
 
 const int NGRAM = 3;
-const int ADDRNUM = 813;
+const int ADDRNUM = 12;
 const int RANNUM = 1001;
+const int DIM = 32 / 32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -103,54 +104,59 @@ int main(int argc, char **argv)
 		ARNUM++;
 	}
 
-	printf("\n ------------------------------- 開始 ------------------------------- \n\n");
+	printf("\n ------------------------------- 開始 ------------------------------- \n\n\n");
 
 	// hdcテスト
-	unsigned int item_memory_array[RANNUM];
-	item_memory_array[0] = 88675123;
-	for (unsigned int i = 1; i < RANNUM; i++)
+	unsigned int item_memory_array[DIM][RANNUM];
+	item_memory_array[0][0] = 88675123;
+	for (int j = 0; j < RANNUM; j++)
 	{
-		item_memory_array[i] = xor128();
-		// printf("   %d:  %10u\n", i, item_memory_array[i]);
-	}
-
-	unsigned int *result_array = (unsigned int *)malloc(sizeof(unsigned int) * ARNUM);
-	if (result_array == NULL)
-	{
-		exit(0);
-	}
-	unsigned int result = 0;
-	int tmp = 0;
-	int num = 0;
-	for (unsigned int i = 0; i < ADDRNUM; i++)
-	{
-		result ^= shifter(item_memory_array[i], tmp);
-		tmp += 1;
-		if (tmp == NGRAM)
+		for (int i = 0; i < DIM; i++)
 		{
-			// putb(result);
-			// printf("%u\n", result);
-			result_array[num] = result;
-			tmp = 0;
-			result = 0;
-			num += 1;
+			if (i == 0 && j == 0)
+				continue;
+			item_memory_array[i][j] = xor128();
 		}
 	}
 
-	// 多数決関数用
-	if (EVEN)
+	for (int j = 0; j < DIM; j++)
 	{
-		result_array[num] = item_memory_array[RANNUM - 1];
-		// putb(result_array[num]);
-		// printf("%u", item_memory_array[RANNUM - 1]);
+		unsigned int *result_array = (unsigned int *)malloc(sizeof(unsigned int) * ARNUM);
+		if (result_array == NULL)
+		{
+			exit(0);
+		}
+		unsigned int result = 0;
+		int tmp = 0;
+		int num = 0;
+		for (int i = 0; i < ADDRNUM; i++)
+		{
+			result ^= shifter(item_memory_array[j][i], tmp);
+			tmp += 1;
+			if (tmp == NGRAM)
+			{
+				putb(result);
+				// printf("%u\n", result);
+				result_array[num] = result;
+				tmp = 0;
+				result = 0;
+				num += 1;
+			}
+		}
+		// 多数決関数用
+		if (EVEN)
+		{
+			result_array[num] = item_memory_array[j][RANNUM - 1];
+			putb(result_array[num]);
+			// printf("%u", item_memory_array[RANNUM - 1]);
+		}
+		unsigned int result_real = grab_bit(result_array, ARNUM);
+		printf("  %u\n", result_real);
+		putb(result_real);
+		printf("\n");
+
+		free(result_array);
 	}
-
-	unsigned int result_real = grab_bit(result_array, ARNUM);
-
-	printf("  %u\n\n", result_real);
-	putb(result_real);
-
-	free(result_array);
 
 	printf("\n ------------------------------- 終了 ------------------------------- \n");
 }

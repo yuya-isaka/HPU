@@ -9,7 +9,7 @@
 
 vluint64_t main_time = 0;
 vluint64_t sim_start = 0;
-vluint64_t sim_end = sim_start + 300000;
+vluint64_t sim_end = sim_start + 3000000;
 
 VerilatedVcdC *tfp;
 Vtop *verilator_top;
@@ -56,7 +56,7 @@ void printb(unsigned int v)
 
 void putb(unsigned int v)
 {
-  printf("  0"), putchar('b'), printb(v), printf("\n\n");
+  printf("  0"), putchar('b'), printb(v), printf("\n");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,9 +64,10 @@ void putb(unsigned int v)
 // 可変のパラメータ
 
 const int NGRAM = 3;
-const int ADDRNUM = 813;
+const int ADDRNUM = 12;
 const int CORENUM = 4;
 const int RANNUM = 1000;
+const int DIM = 64 / 32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -241,13 +242,14 @@ int main(int argc, char **argv)
 
   for (int i = 0; i < 1; i++)
   {
-    // for (int j = 0; j < 32; j++)
-    // {
-    //   printf("  %u\n\n", verilator_top->M_AXIS_TDATA[j]);
-    //   putb(verilator_top->M_AXIS_TDATA[j]);
-    // }
-    printf("  %u\n\n", verilator_top->M_AXIS_TDATA[0]);
-    putb(verilator_top->M_AXIS_TDATA[0]);
+    for (int j = 0; j < DIM; j++)
+    {
+      printf("  %u\n", verilator_top->M_AXIS_TDATA[j]);
+      putb(verilator_top->M_AXIS_TDATA[j]);
+      printf("\n");
+    }
+    // printf("  %u\n\n", verilator_top->M_AXIS_TDATA[0]);
+    // putb(verilator_top->M_AXIS_TDATA[0]);
     eval();
   }
 
