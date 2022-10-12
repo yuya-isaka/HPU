@@ -43,8 +43,8 @@ module top
         input wire              S_AXIS_TVALID
     );
 
-    parameter DIM = 63;
-    parameter WI = 2;
+    parameter DIM = 63;    // DIM-1
+    parameter WI = 1;      // 32が何個か-1
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -165,17 +165,14 @@ module top
     //================================================================
 
 
-    reg [15:0]      item_a;
     reg [4:0]       item_a_tmp;
 
     always @(posedge AXIS_ACLK) begin
         if (~gen) begin
-            item_a <= 0;
             item_a_tmp <= 0;
         end
         else begin
             if (item_a_tmp == WI) begin
-                item_a <= item_a + 16'd1;
                 item_a_tmp <= 5'd0;
             end
             else begin
@@ -184,12 +181,30 @@ module top
         end
     end;
 
+
     reg             update_item;
 
-    always @* begin
-        update_item = 0;
-        if (item_a_tmp == WI) begin
-            update_item = 1'd1;
+    always @(posedge AXIS_ACLK) begin
+        if (~gen) begin
+            update_item <= 0;
+        end
+        else if (item_a_tmp == WI) begin
+            update_item <= 1'd1;
+        end
+        else begin
+            update_item <= 0;
+        end
+    end
+
+
+    reg [15:0]      item_a;
+
+    always @(posedge AXIS_ACLK) begin
+        if (~gen) begin
+            item_a <= 0;
+        end
+        else if (update_item) begin
+            item_a <= item_a + 16'd1;
         end
     end
 
@@ -201,7 +216,6 @@ module top
                  // in
                  .clk(AXIS_ACLK),
                  .gen(gen),
-                 .update_item(update_item),
 
                  // out
                  .rand_num(rand_num_tmp[31:0])
