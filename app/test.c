@@ -11,6 +11,268 @@ volatile int *dst;
 unsigned long src_phys;
 unsigned long dst_phys;
 
+void printb(unsigned int v)
+{
+	unsigned int mask = (int)1 << (sizeof(v) * 8 - 1);
+	do
+		putchar(mask & v ? '1' : '0');
+	while (mask >>= 1);
+}
+
+void putb(unsigned int v)
+{
+	putchar('0'), putchar('b'), printb(v), putchar('\n');
+}
+
+unsigned int shifter(unsigned int v, unsigned int num)
+{
+	// num回 論理右シフト
+	unsigned int tmp = v >> num;
+
+	// 右にシフトしたやつを取り出して、左に(32-num)回 論理左シフト
+	unsigned int tmp_num = (1 << num) - 1;
+	unsigned int tmp_v = (v & tmp_num) << ((sizeof(v) * 8) - num);
+
+	tmp_v = tmp_v | tmp;
+	return tmp_v;
+}
+
+unsigned int grab_bit(unsigned int result_array[], size_t size)
+{
+	unsigned int result = 0;
+
+	// 次元数かへn
+	unsigned int mask = (int)1 << (32 - 1);
+	while (mask)
+	{
+		int tmp = 0;
+		for (int i = 0; i < size; i++)
+		{
+			tmp += (mask & result_array[i] ? 1 : 0);
+		}
+		if (tmp > (size / 2))
+		{
+			result += mask;
+		}
+		mask >>= 1;
+	}
+	return result;
+}
+
+unsigned int xor128(int reset)
+{
+	// 内部で値を保持（seed） パターン１
+	// static unsigned int x = 2380889285;
+	// static unsigned int y = 1631889387;
+	// static unsigned int z = 1698655726;
+	// static unsigned int w = 2336862850;
+
+	// 内部で値を保持（seed） パターン２
+	static unsigned int x = 123456789;
+	static unsigned int y = 362436069;
+	static unsigned int z = 521288629;
+	static unsigned int w = 88675123;
+
+	if (reset)
+	{
+		x = 123456789;
+		y = 362436069;
+		z = 521288629;
+		w = 88675123;
+		return 0;
+	}
+	else
+	{
+
+		// 前回のxを使う
+		unsigned int t = x ^ (x << 11);
+		// 更新
+		x = y;
+		y = z;
+		z = w;
+
+		return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+	}
+}
+
+void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int RANNUM, const int BUSWIDTH)
+{
+
+	printf("0");
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// 自動で決まるパラメータ
+
+	const int ADDRJ = NGRAM - 1;
+	const int ADDRI = ((ADDRNUM / NGRAM) - 1) / CORENUM;
+	const int REMAINDER = (ADDRNUM / NGRAM) % CORENUM;
+	const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
+	int ARNUM = ADDRNUM / NGRAM;
+	if (EVEN)
+	{
+		ARNUM++;
+	}
+
+	printf("0");
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// dma reset
+	dma[0x30 / 4] = 4;
+	dma[0x00 / 4] = 4;
+	while (dma[0x00 / 4] & 0x4)
+		;
+
+	//////////////////////////////////////////////////////////////////////////////////////// gen ///////////////////////////////////////////////////////////////////////////////////////////////
+
+	printf("0");
+
+	// item_memory_num (乱数の数)
+	top[0x04 / 4] = RANNUM - 1;
+
+	// gen <- 1;
+	top[0x00 / 4] = 1;
+
+	// 乱数生成終了を待つ
+	while (top[0x00 / 4] & 0x1)
+		;
+
+	//////////////////////////////////////////////////////////////////////////////////////// run ///////////////////////////////////////////////////////////////////////////////////////////////
+
+	// addr_j
+	top[0x08 / 4] = ADDRJ;
+
+	// addr_i
+	top[0x0c / 4] = ADDRI;
+
+	// remainder
+	top[0x10 / 4] = REMAINDER;
+
+	// even
+	top[0x14 / 4] = EVEN;
+
+	//////////////////////////////////////////////////////////////////////////////////////// run ///////////////////////////////////////////////////////////////////////////////////////////////
+
+	printf("1");
+
+	// run <- 1;
+	top[0x00 / 4] = 2;
+
+	// printf("\n ------------------------- Sample Input --------------------------- \n\n");
+
+	int send_num = 0;
+	int tmp = NGRAM - 1;
+	int tmp_2 = 0;
+	for (int i = 0; i < ADDRNUM; i++)
+	{
+		// 1024bit
+		for (int j = 0; j < (BUSWIDTH / 32); j++)
+		{
+			src[tmp_2] = i + (NGRAM * j);
+			tmp_2++;
+			send_num++;
+		}
+
+		if (i == tmp)
+		{
+			i += NGRAM * (CORENUM - 1);
+			tmp += (CORENUM * NGRAM); // 32個分を同時に送っているから32 * NGRAM
+		}
+	}
+
+	printf("2");
+
+	// AXI DMA 送信の設定（UIO経由）
+	dma[0x00 / 4] = 1;
+	dma[0x18 / 4] = src_phys;
+	dma[0x28 / 4] = send_num * 4;
+
+	printf("3");
+
+	// 受信設定
+	// 送信チャネルの設定前に受信チャネルを設定すると変になるっぽい
+	dma[0x30 / 4] = 1;
+	dma[0x48 / 4] = dst_phys;
+	dma[0x58 / 4] = (BUSWIDTH / 32) * 4; // 32個 * 4バイト = 128バイト = 1024ビット
+
+	printf("4");
+
+	// 演算終了を待つ
+	while ((dma[0x34 / 4] & 0x1000) != 0x1000)
+		;
+
+	printf("5");
+
+	/////////////////////////////////////////////////////////////////////////////////////// 結果確認 //////////////////////////////////////////////////////////////////////////////////
+
+	// printf("\n ------------------------- Sample Output -------------------------- \n\n");
+
+	// 理想の計算
+	unsigned int item_memory_array[RANNUM];
+	item_memory_array[0] = 88675123;
+	for (unsigned int i = 1; i < RANNUM; i++)
+	{
+		item_memory_array[i] = xor128(0);
+	}
+
+	unsigned int *result_array = (unsigned int *)malloc(sizeof(unsigned int) * ARNUM);
+	if (result_array == NULL)
+	{
+		exit(0);
+	}
+	unsigned int result = 0;
+	tmp = 0;
+	int num = 0;
+	for (unsigned int i = 0; i < ADDRNUM; i++)
+	{
+		result ^= shifter(item_memory_array[i], tmp);
+		tmp += 1;
+		if (tmp == NGRAM)
+		{
+			// putb(result);
+			result_array[num] = result;
+			tmp = 0;
+			result = 0;
+			num += 1;
+		}
+	}
+
+	// 多数決関数用
+	if (EVEN)
+	{
+		result_array[num] = item_memory_array[RANNUM - 1];
+		// putb(result_array[num]);
+		// printf("%u", item_memory_array[RANNUM - 1]);
+	}
+
+	unsigned int result_real = grab_bit(result_array, ARNUM);
+	// printf("%u\n", result_real);
+	// putb(result_real);
+
+	if (result_real != dst[0])
+	{
+		printf("Error %u %u\n", result_real, dst[0]);
+	}
+	else
+	{
+		printf("Success\n");
+	}
+
+	// printf("%u\n", dst[0]);
+	// putb(dst[0]);
+	// printf("%u\n", dst[1]);
+	// putb(dst[1]);
+
+	free(result_array);
+
+	/////////////////////////////////////////////////////////////////////////////////////////  終了 ////////////////////////////////////////////////////////////////////////////////////
+
+	// run <- 0;
+	top[0x00 / 4] = 0;
+
+	return;
+}
+
 int main()
 {
 	printf("\n ------------------------------ 開始 -------------------------------- \n");
@@ -92,7 +354,9 @@ int main()
 		return 0;
 	}
 
-	printf("0k3");
+	check(3, 819, 4, 1001, 1024);
+
+	printf("\n ------------------------------ 終了 -------------------------------- \n\n");
 
 	return 0;
 }
