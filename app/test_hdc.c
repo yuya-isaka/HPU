@@ -139,6 +139,8 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int RANN
 
   //////////////////////////////////////////////////////////////////////////////////////// gen ///////////////////////////////////////////////////////////////////////////////////////////////
 
+  printf("0");
+
   // item_memory_num (乱数の数)
   top[0x04 / 4] = RANNUM - 1;
 
@@ -165,6 +167,8 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int RANN
 
   //////////////////////////////////////////////////////////////////////////////////////// run ///////////////////////////////////////////////////////////////////////////////////////////////
 
+  printf("1");
+
   // run <- 1;
   top[0x00 / 4] = 2;
 
@@ -190,10 +194,14 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int RANN
     }
   }
 
+  printf("2");
+
   // AXI DMA 送信の設定（UIO経由）
   dma[0x00 / 4] = 1;
   dma[0x18 / 4] = src_phys;
   dma[0x28 / 4] = send_num * 4;
+
+  printf("3");
 
   // 受信設定
   // 送信チャネルの設定前に受信チャネルを設定すると変になるっぽい
@@ -201,9 +209,13 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int RANN
   dma[0x48 / 4] = dst_phys;
   dma[0x58 / 4] = (BUSWIDTH / 32) * 4; // 32個 * 4バイト = 128バイト = 1024ビット
 
+  printf("4");
+
   // 演算終了を待つ
   while ((dma[0x34 / 4] & 0x1000) != 0x1000)
     ;
+
+  printf("5");
 
   /////////////////////////////////////////////////////////////////////////////////////// 結果確認 //////////////////////////////////////////////////////////////////////////////////
 
