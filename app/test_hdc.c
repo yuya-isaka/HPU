@@ -115,6 +115,7 @@ unsigned long dst_phys;
 void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int RANNUM, const int BUSWIDTH)
 {
 
+  printf("0");
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // 自動で決まるパラメータ
@@ -128,6 +129,8 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int RANN
   {
     ARNUM++;
   }
+
+  printf("0");
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -313,6 +316,8 @@ int main()
     close(fd0);
   }
 
+  printf("0k1");
+
   // DMAバッファにユーザ空間から書き込む設定 -----------------------------------------------------
 
   if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
@@ -335,6 +340,8 @@ int main()
     perror("Failed: open /dev/uio1");
     return 0;
   }
+
+  printf("0k2");
 
   // 対応表, 参考
   // https://pknight.hatenablog.com/entry/20100427/1272396732
@@ -380,12 +387,15 @@ int main()
     return 0;
   }
 
+  printf("0k3");
+
   ///////////////////////////////////////////////////////////////////////////////// initial, udmabuf, uio 設定 ///////////////////////////////////////////////////////////////////////////////////
 
   // NGRAM, ADDRNUM, CORENUM, RANNUM, BUSWIDTH
 
   for (int i = 3; i <= 999; i += 3)
   {
+    printf("0k4");
     check(3, i, 4, 1001, 1024);
     xor128(1);
   }
