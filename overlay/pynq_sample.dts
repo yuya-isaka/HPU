@@ -12,8 +12,8 @@
 	fragment@0 {
 		target = <&fpga_full>;
 		overlay0: __overlay__ {
-			#address-cells = <2>;
-			#size-cells = <2>;
+			#address-cells = <1>;
+			#size-cells = <1>;
 			firmware-name = "design_1_wrapper.bit.bin";
 		};
 	};
