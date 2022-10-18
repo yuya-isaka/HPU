@@ -30,7 +30,28 @@ int main()
 		close(fd0);
 	}
 
-	printf("0k1");
+	if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
+	{
+		perror("Failed: open /dev/udmabuf0");
+		return 0;
+	}
+	if ((fd1 = open("/dev/udmabuf1", O_RDWR)) < 0)
+	{
+		perror("Failed: open /dev/udmabuf1");
+		return 0;
+	}
+	if ((dmaf = open("/dev/uio0", O_RDWR | O_SYNC)) < 0)
+	{
+		perror("Falied: open /dev/uio0");
+		return 0;
+	}
+	if ((topf = open("/dev/uio1", O_RDWR | O_SYNC)) < 0)
+	{
+		perror("Failed: open /dev/uio1");
+		return 0;
+	}
+
+	printf("0k2");
 
 	return 0;
 }
