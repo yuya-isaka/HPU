@@ -4,6 +4,10 @@
 #include <unistd.h>
 #include <sys/mman.h>
 
+volatile int *top;
+volatile int *dma;
+volatile int *src;
+volatile int *dst;
 unsigned long src_phys;
 unsigned long dst_phys;
 
@@ -51,7 +55,44 @@ int main()
 		return 0;
 	}
 
-	printf("0k2");
+	top = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, topf, 0);
+	if (top == MAP_FAILED)
+	{
+		perror("mmap top");
+		close(topf);
+		return 0;
+	}
+	// uio0をユーザ空間にマッピング
+	// 4040_0000
+	dma = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, dmaf, 0);
+	if (dma == MAP_FAILED)
+	{
+		perror("mmap dma");
+		close(dmaf);
+		return 0;
+	}
+
+	// udmabuf0をユーザ空間にマッピング
+	// 0x00080000 == 524288
+	// 0000_0000
+	src = (int *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
+	if (src == MAP_FAILED)
+	{
+		perror("mmap src");
+		close(fd0);
+		return 0;
+	}
+	// udmabuf1をユーザ空間にマッピング
+	// 0000_0000
+	dst = (int *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd1, 0);
+	if (dst == MAP_FAILED)
+	{
+		perror("mmap dst");
+		close(fd1);
+		return 0;
+	}
+
+	printf("0k3");
 
 	return 0;
 }
