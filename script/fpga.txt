@@ -1,0 +1,4 @@
+
+echo 0 > /sys/class/fpga_manager/fpga0/flags
+cp output.bin /lib/firmware/
+echo output.bin > /sys/class/fpga_manager/fpga0/firmware
