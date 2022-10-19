@@ -104,18 +104,18 @@ module top
                     .core_result_2(core_result[1]),
                     .core_result_3(core_result[2]),
                     .core_result_4(core_result[3]),
-                    // .core_result_5(core_result[4]),
-                    // .core_result_6(core_result[5]),
-                    // .core_result_7(core_result[6]),
-                    // .core_result_8(core_result[7]),
-                    // .core_result_9(core_result[8]),
-                    // .core_result_10(core_result[9]),
-                    // .core_result_11(core_result[10]),
-                    // .core_result_12(core_result[11]),
-                    // .core_result_13(core_result[12]),
-                    // .core_result_14(core_result[13]),
-                    // .core_result_15(core_result[14]),
-                    // .core_result_16(core_result[15]),
+                    .core_result_5(core_result[4]),
+                    .core_result_6(core_result[5]),
+                    .core_result_7(core_result[6]),
+                    .core_result_8(core_result[7]),
+                    .core_result_9(core_result[8]),
+                    .core_result_10(core_result[9]),
+                    .core_result_11(core_result[10]),
+                    .core_result_12(core_result[11]),
+                    .core_result_13(core_result[12]),
+                    .core_result_14(core_result[13]),
+                    .core_result_15(core_result[14]),
+                    .core_result_16(core_result[15]),
                     // .core_result_17(core_result[16]),
                     // .core_result_18(core_result[17]),
                     // .core_result_19(core_result[18]),
@@ -347,13 +347,13 @@ module top
 
     // コア数可変
     // wire [31:0]         core_result [0:31];
-    wire [DIM:0]         core_result [0:3];
+    wire [DIM:0]         core_result [0:15];
 
     generate
         genvar      i;
         // コア数可変
         // for (i = 0; i < 32; i = i + 1) begin
-        for (i = 0; i < 4; i = i + 1) begin
+        for (i = 0; i < 16; i = i + 1) begin
             core #(.DIM(1023)) core
                  (
                      // in

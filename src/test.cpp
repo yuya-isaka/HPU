@@ -155,6 +155,15 @@ int main(int argc, char **argv)
 	printf("\n ------------------------------- 開始 ------------------------------- \n\n\n");
 
 	// hdcテスト
+	//　縦を次元、横を生成するハイパーベクトルの数
+	//   1 2 3 . . . 999 1000
+	// 1
+	// 2
+	// 3
+	// .
+	// .
+	// 31
+	// 32
 	item_memory_array[0][0] = 88675123;
 	for (int j = 0; j < RANNUM; j++)
 	{
@@ -166,8 +175,13 @@ int main(int argc, char **argv)
 		}
 	}
 
+	// あらかじめPermutationしておく
 	shifter_new();
 
+	// 1024 / 32bit なら 32回実行
+	// 縦は同じハイパーベクトルなので、縦同士を計算させる
+	// 横を全てxorすることを縦の数分繰り返す
+	// すると縦の数の結果が残る。それが今回求めたい1024次元のハイパーベクトル
 	for (int j = 0; j < DIM; j++)
 	{
 		unsigned int *result_array = (unsigned int *)malloc(sizeof(unsigned int) * ARNUM);

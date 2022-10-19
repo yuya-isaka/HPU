@@ -14,10 +14,10 @@ module counter
          input wire                 tmp_rand_bit,
          // コア数可変
          //  input wire [31:0]          core_enable,
-         input wire [3:0]           core_enable,
+         input wire [15:0]           core_enable,
          // コア数可変
          //  input wire [31:0]          core_result,
-         input wire [3:0]           core_result,
+         input wire [15:0]           core_result,
          input wire                 update,
 
          // out
@@ -146,13 +146,13 @@ module counter
 
     // コア数可変
     // wire signed [1:0]      select [0:31];
-    wire signed [1:0]      select [0:3];
+    wire signed [1:0]      select [0:15];
 
     generate
         genvar      k;
         // コア数可変
         // for (k = 0; k < 32; k = k + 1) begin
-        for (k = 0; k < 4; k = k + 1) begin
+        for (k = 0; k < 16; k = k + 1) begin
             selector selector
                      (
                          // in
