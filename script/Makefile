@@ -1,2 +1,2 @@
 generate:
-	python fpga-bit-to-bin.py --flip design_1_wrapper.bit output.bin
+	python3 fpga-bit-to-bin.py --flip design_1_wrapper.bit output.bin
