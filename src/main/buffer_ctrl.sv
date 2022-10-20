@@ -29,22 +29,22 @@ module buffer_ctrl
          input wire [DIM:0]       core_result_14,
          input wire [DIM:0]       core_result_15,
          input wire [DIM:0]       core_result_16,
-         // input wire [31:0]       core_result_17,
-         // input wire [31:0]       core_result_18,
-         // input wire [31:0]       core_result_19,
-         // input wire [31:0]       core_result_20,
-         // input wire [31:0]       core_result_21,
-         // input wire [31:0]       core_result_22,
-         // input wire [31:0]       core_result_23,
-         // input wire [31:0]       core_result_24,
-         // input wire [31:0]       core_result_25,
-         // input wire [31:0]       core_result_26,
-         // input wire [31:0]       core_result_27,
-         // input wire [31:0]       core_result_28,
-         // input wire [31:0]       core_result_29,
-         // input wire [31:0]       core_result_30,
-         // input wire [31:0]       core_result_31,
-         // input wire [31:0]       core_result_32,
+         input wire [DIM:0]       core_result_17,
+         input wire [DIM:0]       core_result_18,
+         input wire [DIM:0]       core_result_19,
+         input wire [DIM:0]       core_result_20,
+         input wire [DIM:0]       core_result_21,
+         input wire [DIM:0]       core_result_22,
+         input wire [DIM:0]       core_result_23,
+         input wire [DIM:0]       core_result_24,
+         input wire [DIM:0]       core_result_25,
+         input wire [DIM:0]       core_result_26,
+         input wire [DIM:0]       core_result_27,
+         input wire [DIM:0]       core_result_28,
+         input wire [DIM:0]       core_result_29,
+         input wire [DIM:0]       core_result_30,
+         input wire [DIM:0]       core_result_31,
+         input wire [DIM:0]       core_result_32,
          input wire              update,
          input wire              last_update,
          input wire              get_fin,
@@ -73,27 +73,27 @@ module buffer_ctrl
                         .tmp_even(tmp_even),
                         .tmp_rand_bit(tmp_rand[i]),
                         // コア数可変
-                        // .core_enable(core_enable[31:0]),
-                        .core_enable(core_enable[15:0]),
+                        .core_enable(core_enable[31:0]),
+                        // .core_enable(core_enable[15:0]),
                         // コア数可変
                         .core_result(
                             {
-                                // core_result_32[i],
-                                // core_result_31[i],
-                                // core_result_30[i],
-                                // core_result_29[i],
-                                // core_result_28[i],
-                                // core_result_27[i],
-                                // core_result_26[i],
-                                // core_result_25[i],
-                                // core_result_24[i],
-                                // core_result_23[i],
-                                // core_result_22[i],
-                                // core_result_21[i],
-                                // core_result_20[i],
-                                // core_result_19[i],
-                                // core_result_18[i],
-                                // core_result_17[i],
+                                core_result_32[i],
+                                core_result_31[i],
+                                core_result_30[i],
+                                core_result_29[i],
+                                core_result_28[i],
+                                core_result_27[i],
+                                core_result_26[i],
+                                core_result_25[i],
+                                core_result_24[i],
+                                core_result_23[i],
+                                core_result_22[i],
+                                core_result_21[i],
+                                core_result_20[i],
+                                core_result_19[i],
+                                core_result_18[i],
+                                core_result_17[i],
                                 core_result_16[i],
                                 core_result_15[i],
                                 core_result_14[i],
@@ -127,13 +127,13 @@ module buffer_ctrl
 
     // コア数可変
     // 立っていたら無視
-    // logic [31:0]        core_enable;
-    logic [15:0]        core_enable;
+    logic [31:0]        core_enable;
+    // logic [15:0]        core_enable;
 
     always_comb begin
                     // コア数可変
-                    // core_enable = 32'd0;
-                    core_enable = 15'd0;
+                    core_enable = 32'd0;
+                    // core_enable = 15'd0;
                     // コア数可変
                     if (last_update & (remainder != 0)) begin
                         core_enable[0] = remainder < 1;
@@ -152,22 +152,22 @@ module buffer_ctrl
                         core_enable[13] = remainder < 14;
                         core_enable[14] = remainder < 15;
                         core_enable[15] = remainder < 16;
-                        // core_enable[16] = remainder < 17;
-                        // core_enable[17] = remainder < 18;
-                        // core_enable[18] = remainder < 19;
-                        // core_enable[19] = remainder < 20;
-                        // core_enable[20] = remainder < 21;
-                        // core_enable[21] = remainder < 22;
-                        // core_enable[22] = remainder < 23;
-                        // core_enable[23] = remainder < 24;
-                        // core_enable[24] = remainder < 25;
-                        // core_enable[25] = remainder < 26;
-                        // core_enable[26] = remainder < 27;
-                        // core_enable[27] = remainder < 28;
-                        // core_enable[28] = remainder < 29;
-                        // core_enable[29] = remainder < 30;
-                        // core_enable[30] = remainder < 31;
-                        // core_enable[31] = remainder < 32;
+                        core_enable[16] = remainder < 17;
+                        core_enable[17] = remainder < 18;
+                        core_enable[18] = remainder < 19;
+                        core_enable[19] = remainder < 20;
+                        core_enable[20] = remainder < 21;
+                        core_enable[21] = remainder < 22;
+                        core_enable[22] = remainder < 23;
+                        core_enable[23] = remainder < 24;
+                        core_enable[24] = remainder < 25;
+                        core_enable[25] = remainder < 26;
+                        core_enable[26] = remainder < 27;
+                        core_enable[27] = remainder < 28;
+                        core_enable[28] = remainder < 29;
+                        core_enable[29] = remainder < 30;
+                        core_enable[30] = remainder < 31;
+                        core_enable[31] = remainder < 32;
                     end
                 end;
 

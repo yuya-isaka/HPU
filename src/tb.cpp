@@ -65,7 +65,7 @@ void putb(unsigned int v)
 
 const int NGRAM = 3;
 const int ADDRNUM = 12;
-const int CORENUM = 16;
+const int CORENUM = 32;
 const int RANNUM = 1000;
 const int DIM = 1024 / 32;
 // top.v DIM

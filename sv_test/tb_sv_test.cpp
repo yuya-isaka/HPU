@@ -98,9 +98,16 @@ int main(int argc, char **argv)
 
   for (int i = 0; i < 10; i++)
   {
-    printf("   %d:  %10u\n", i, verilator_top->rand_num);
-    // putb(tmp);
+    verilator_top->in = i;
+    verilator_top->permutation = 3;
     eval();
+    // printf("   %d:  %10u\n", i, verilator_top->out_1);
+    // printf("   %d:  %10u\n", i, verilator_top->out_2);
+    putb(i);
+    putb(verilator_top->out_1);
+    putb(verilator_top->out_2);
+    putb(verilator_top->out_3);
+    printf("\n");
   }
 
   printf("\n ------------------------------- 終了 ------------------------------- \n\n");
