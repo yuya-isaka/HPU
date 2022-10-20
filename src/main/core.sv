@@ -81,6 +81,7 @@ module core
                           enc <= hv;
                       end
                       else begin
+                        // 次元数可変にするなら、これの左側（hv>>permutation)と右側に分けて、一番右の右側を一番左に持ってくる配線にしたら良いと
                           enc <= enc ^ (hv >> permutation | ( ( hv & ((1'b1 << permutation) - 1'b1) ) << (DIM+1 - permutation) ) );
                       end
                   end
