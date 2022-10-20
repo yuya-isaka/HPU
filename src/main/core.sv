@@ -82,7 +82,40 @@ module core
                       end
                       else begin
                           // 次元数可変にするなら、これの左側（hv>>permutation)と右側に分けて、一番右の右側を一番左に持ってくる配線にしたら良いと
-                          enc <= enc ^ (hv >> permutation | ( ( hv & ((1'b1 << permutation) - 1'b1) ) << (DIM+1 - permutation) ) );
+                          //   enc <= enc ^ (hv >> permutation | ( ( hv & ((1'b1 << permutation) - 1'b1) ) << (DIM+1 - permutation) ) );
+                          if (permutation == 10'd1) begin
+                              enc <= enc ^ ({hv[0], hv[DIM:1]});
+                          end
+                          else if (permutation == 10'd2) begin
+                              enc <= enc ^ ({hv[1:0], hv[DIM:2]});
+                          end
+                          else if (permutation == 10'd3) begin
+                              enc <= enc ^ ({hv[2:0], hv[DIM:3]});
+                          end
+                          else if (permutation == 10'd4) begin
+                              enc <= enc ^ ({hv[3:0], hv[DIM:4]});
+                          end
+                          else if (permutation == 10'd5) begin
+                              enc <= enc ^ ({hv[4:0], hv[DIM:5]});
+                          end
+                          else if (permutation == 10'd6) begin
+                              enc <= enc ^ ({hv[5:0], hv[DIM:6]});
+                          end
+                          else if (permutation == 10'd7) begin
+                              enc <= enc ^ ({hv[6:0], hv[DIM:7]});
+                          end
+                          else if (permutation == 10'd8) begin
+                              enc <= enc ^ ({hv[7:0], hv[DIM:8]});
+                          end
+                          else if (permutation == 10'd9) begin
+                              enc <= enc ^ ({hv[8:0], hv[DIM:9]});
+                          end
+                          else if (permutation == 10'd10) begin
+                              enc <= enc ^ ({hv[9:0], hv[DIM:10]});
+                          end
+                          else if (permutation == 10'd11) begin
+                              enc <= enc ^ ({hv[10:0], hv[DIM:11]});
+                          end
                       end
                   end
               end;
