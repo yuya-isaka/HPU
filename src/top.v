@@ -51,6 +51,8 @@ module top
 
 
     wire        get_v;
+    wire        exec;
+    wire        get_fin;
 
     get_enable get_enable
                (
@@ -62,31 +64,11 @@ module top
 
                    // out
                    .get_ready(S_AXIS_TREADY),
-                   .get_v(get_v)
+                   .get_v(get_v),
+                   .exec(exec),
+                   .get_fin(get_fin)
                );
 
-
-
-    wire        update;
-    wire        exec;
-    wire        last_update;
-    wire        get_fin;
-
-    get_ctrl get_ctrl
-             (
-                 // in
-                 .clk(AXIS_ACLK),
-                 .rst(~run),
-                 .get_v(get_v),
-                 .addr_i(addr_i[19:0]),
-                 .addr_j(addr_j[19:0]),
-
-                 // out
-                 .update(update),
-                 .exec(exec),
-                 .last_update(last_update),
-                 .get_fin(get_fin)
-             );
 
 
     // M_AXIS_TDATA
@@ -98,7 +80,6 @@ module top
                     .tmp_even(even),
                     // 次元数可変
                     .tmp_rand(tmp_rand[DIM:0]),
-                    .remainder(remainder),
                     // コア数可変
                     .core_result_1(core_result[0]),
                     .core_result_2(core_result[1]),
@@ -132,8 +113,8 @@ module top
                     // .core_result_30(core_result[29]),
                     // .core_result_31(core_result[30]),
                     // .core_result_32(core_result[31]),
-                    .update(update),
-                    .last_update(last_update),
+                    // コア数可変
+                    .store(store[3:0]),
                     .get_fin(get_fin),
                     .stream_v(stream_v),
 
@@ -347,13 +328,14 @@ module top
 
     // コア数可変
     // wire [DIM:0]         core_result [0:31];
-    wire [DIM:0]         core_result [0:3];
+    wire [3:0]              store;
+    wire [DIM:0]            core_result [0:3];
 
     generate
         genvar      i;
         // コア数可変
         // for (i = 0; i < 32; i = i + 1) begin
-            for (i = 0; i < 4; i = i + 1) begin
+        for (i = 0; i < 4; i = i + 1) begin
             core #(.DIM(31)) core
                  (
                      // in
@@ -368,11 +350,10 @@ module top
                      .get_v(get_v),
                      // アドレス数可変
                      .get_d(S_AXIS_TDATA[31+32*i:32*i]),
-                     .addr_j(addr_j[19:0]),
                      .exec(exec),
-                     .update(update),
 
                      // out
+                     .store(store[i]),
                      .core_result(core_result[i])
                  );
         end
@@ -486,20 +467,10 @@ module top
     // 状態
     reg             run, gen;
 
-    // N-gram
-    reg [19:0]      addr_j;
-
-    // アドレス数 / N-gram / コア数　(余る場合は+1)
-    // 900 / 3gram / 32コア = 9  あまりを入れて 9 + 1 = 10
-    reg [19:0]      addr_i;
-
-    // 余りの数
-    reg [4:0]       remainder;
-
     // item_memory数 (現状65536最大値, 16bitアドレスで指定)
     reg [15:0]      item_memory_num;
 
-    // アドレス / N-gramが偶数か
+    // 処理する数が偶数か否か
     reg             even;
 
     //================================================================
@@ -510,9 +481,6 @@ module top
         if (~S_AXI_ARESETN) begin
             {run, gen} <= 2'b00;
             item_memory_num <= 16'd0;
-            addr_j <= 20'd0;
-            addr_i <= 20'd0;
-            remainder <= 5'd0;
             even <= 1'd0;
         end
         else if (register_w) begin
@@ -522,12 +490,6 @@ module top
                 10'd04:
                     item_memory_num[15:0] <= write_data[15:0]; // 1000
                 10'd08:
-                    addr_j[19:0] <= write_data[19:0]; // 2
-                10'd12:
-                    addr_i[19:0] <= write_data[19:0]; // 9
-                10'd16:
-                    remainder[4:0] <= write_data[4:0]; // 20
-                10'd20:
                     even <= write_data[0];
                 default:
                     ;
@@ -552,12 +514,6 @@ module top
                 10'd04:
                     S_AXI_RDATA[15:0] <= item_memory_num[15:0];
                 10'd08:
-                    S_AXI_RDATA[19:0] <= addr_j[19:0];
-                10'd12:
-                    S_AXI_RDATA[19:0] <= addr_i[19:0];
-                10'd16:
-                    S_AXI_RDATA[4:0] <= remainder[4:0];
-                10'd20:
                     S_AXI_RDATA <= even;
                 default:
                     ;

@@ -35,8 +35,8 @@ module stream_ctrl
                       get_fin_keep <= 1'b0;
                   end
                   // コア数可変
-                //   else if (get_fin_nn) begin
-                        else if (get_fin) begin
+                  //   else if (get_fin_nn) begin
+                  else if (get_fin) begin
                       get_fin_keep <= 1'b1;
                   end
               end;
@@ -62,7 +62,7 @@ module stream_ctrl
 
                     // コア数可変
                     // if ((get_fin_nn | get_fin_keep) & dst_ready) begin
-                        if ((get_fin | get_fin_keep) & dst_ready) begin
+                    if ((get_fin | get_fin_keep) & dst_ready) begin
                         stream_ok = 1'b1;
                     end
                 end;

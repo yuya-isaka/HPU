@@ -11,145 +11,142 @@ module core
          input wire              update_item,
          input wire [15:0]       item_a,
          input wire [15:0]       item_memory_num,
-         input wire [DIM:0]     rand_num,
+         input wire [DIM:0]      rand_num,
          input wire              get_v,
          input wire [31:0]       get_d,
-         input wire [19:0]       addr_j,
          input wire              exec,
-         input wire              update,
 
+         output reg             store,
          output logic [DIM:0]   core_result
      );
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // BRAMになるはず
     (* ram_style = "block" *)
     reg [DIM:0]      item_memory [0:1023];
 
 
-    reg [DIM:0]      hv;
+    reg [DIM:0]     data;
+    reg [15:0]      inst;
+
     always_ff @(posedge clk) begin
                   if (gen & (item_a != item_memory_num) & update_item) begin
                       item_memory[item_a] <= rand_num;
-                      hv <= 0;
+                      data <= 0;
+                      inst <= 0;
+                      reg_1 <= 0;
+                      reg_2 <= 0;
                   end
                   else if (get_v) begin
-                      hv <= item_memory[get_d];
+                      data <= item_memory[get_d[15:0]];
+                      inst <= get_d[31:16];
                   end
               end;
 
-    // integer i;
-    // initial begin
-    //     for (i=0; i < 100; i++) begin
-    //         item_memory[i] = i;
-    //     end
-    // end
+    // inst
+    // inst[3:0] = permutationの数
+    // inst[4] = reg1, reg2を初期化
+    // inst[5] = 外から入ってきたデータをPermしたものをreg1に格納
+    // inst[6] = reg1とreg2をXorしたものをreg2に格納
+    // inst[7] = reg2の値を吐き出す
 
+    // アドレスx, reg1, reg2を初期化命令 (最初は初期化されているからこれいらない)
+    // 上の命令を実行中、アドレス0, 外から入ってきたデータを、Permしたものをreg1に格納
+    // 上の命令を実行中, アドレスx, reg1とreg2をXorしたものをreg2に格納
+    // 上の命令を実行中、アドレス1、 外から入ってきたデータを,Permしたものをreg1に格納
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // 0. reg1, reg2を初期化
+    // 1. 外から入ってきたデータをPermしたものをreg1に格納
+    // 2. reg1とreg2をXorしたものをreg2に格納
+    // 3. 外から入ってきたデータをPermしたものをreg1に格納
+    // 4. reg1とreg2をXorしたものをreg2に格納
+    // 5. 外から入ってきたデータをPermしたものをreg1に格納
+    // 6. reg1とreg2をXorしたものをreg2に格納
+    // 7. reg2の値を吐き出す
+    // exec
 
+    reg [DIM:0] reg_1;
+    reg [DIM:0] reg_2;
 
-    // 後々要改造（permutation == addr_j)
-    reg [9:0]      permutation;
-
-    always @(posedge clk) begin
-        if (~run) begin
-            permutation <= 10'h0;
-        end
-        else if (exec) begin
-            if (permutation == addr_j) begin
-                permutation <= 10'h0;
-            end
-            else begin
-                permutation <= permutation + 1;
-            end
-        end
-    end;
-
-
-
-    reg [DIM:0]      enc;
+    reg [DIM:0] buff;
 
     always_ff @(posedge clk) begin
                   if (~run) begin
-                      enc <= 0;
+                      reg_1 <= 0;
+                      reg_2 <= 0;
+                      buff <= 0;
+                      store <= 0;
                   end
                   else if (exec) begin
-                      if (update) begin
-                          enc <= hv;
+                      if (inst[4]) begin
+                          reg_1 <= 0;
+                          reg_2 <= 0;
+                          buff <= 0;
+                          store <= 0;
                       end
-                      else begin
-                          // 次元数可変にするなら、これの左側（hv>>permutation)と右側に分けて、一番右の右側を一番左に持ってくる配線にしたら良いと
-                          //   enc <= enc ^ (hv >> permutation | ( ( hv & ((1'b1 << permutation) - 1'b1) ) << (DIM+1 - permutation) ) );
-                          if (permutation == 10'd0) begin
-                              enc <= enc ^ hv;
+                      else if (inst[5]) begin
+                          if (inst[3:0] == 4'd0) begin
+                              reg1 <= data;
                           end
-                          else if (permutation == 10'd1) begin
-                              enc <= enc ^ ({hv[0], hv[DIM:1]});
+                          else if (inst[3:0] == 4'd1) begin
+                              reg1 <= {data[0:0], data[DIM:1]};
                           end
-                          else if (permutation == 10'd2) begin
-                              enc <= enc ^ ({hv[1:0], hv[DIM:2]});
+                          else if (inst[3:0] == 4'd2) begin
+                              reg1 <= {data[1:0], data[DIM:2]};
                           end
-                          else if (permutation == 10'd3) begin
-                              enc <= enc ^ ({hv[2:0], hv[DIM:3]});
+                          else if (inst[3:0] == 4'd3) begin
+                              reg1 <= {data[2:0], data[DIM:3]};
                           end
-                          else if (permutation == 10'd4) begin
-                              enc <= enc ^ ({hv[3:0], hv[DIM:4]});
+                          else if (inst[3:0] == 4'd4) begin
+                              reg1 <= {data[3:0], data[DIM:4]};
                           end
-                          else if (permutation == 10'd5) begin
-                              enc <= enc ^ ({hv[4:0], hv[DIM:5]});
+                          else if (inst[3:0] == 4'd5) begin
+                              reg1 <= {data[4:0], data[DIM:5]};
                           end
-                          else if (permutation == 10'd6) begin
-                              enc <= enc ^ ({hv[5:0], hv[DIM:6]});
+                          else if (inst[3:0] == 4'd6) begin
+                              reg1 <= {data[5:0], data[DIM:6]};
                           end
-                          else if (permutation == 10'd7) begin
-                              enc <= enc ^ ({hv[6:0], hv[DIM:7]});
+                          else if (inst[3:0] == 4'd7) begin
+                              reg1 <= {data[6:0], data[DIM:7]};
                           end
-                          else if (permutation == 10'd8) begin
-                              enc <= enc ^ ({hv[7:0], hv[DIM:8]});
+                          else if (inst[3:0] == 4'd8) begin
+                              reg1 <= {data[7:0], data[DIM:8]};
                           end
-                          else if (permutation == 10'd9) begin
-                              enc <= enc ^ ({hv[8:0], hv[DIM:9]});
+                          else if (inst[3:0] == 4'd9) begin
+                              reg1 <= {data[8:0], data[DIM:9]};
                           end
-                          else if (permutation == 10'd10) begin
-                              enc <= enc ^ ({hv[9:0], hv[DIM:10]});
+                          else if (inst[3:0] == 4'd10) begin
+                              reg1 <= {data[9:0], data[DIM:10]};
                           end
-                          else if (permutation == 10'd11) begin
-                              enc <= enc ^ ({hv[10:0], hv[DIM:11]});
-                          end
-                          else if (permutation == 10'd12) begin
-                              enc <= enc ^ ({hv[11:0], hv[DIM:12]});
-                          end
-                          else if (permutation == 10'd13) begin
-                              enc <= enc ^ ({hv[12:0], hv[DIM:13]});
-                          end
-                          else if (permutation == 10'd14) begin
-                              enc <= enc ^ ({hv[13:0], hv[DIM:14]});
-                          end
-                          else if (permutation == 10'd15) begin
-                              enc <= enc ^ ({hv[14:0], hv[DIM:15]});
-                          end
+                          buff <= 0;
+                          store <= 0;
                       end
-                  end
-              end;
+                      else if (inst[6]) begin
+                          reg_2 <= reg_1 ^ reg_2;
+                          buff <= 0;
+                          store <= 0;
+                      end
+                      else if (inst[7]) begin
+                          buff <= reg_2;
+                          store <= 1;
+                      end
+                  end;
+
+                  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    //================================================================
+                  always_comb begin
+                                  core_result = 0;
+
+                                  if (store) begin
+                                      core_result = buff;
+                                  end
+                              end;
 
 
-    always_comb begin
-                    core_result = 0;
+                  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                    if (update) begin
-                        core_result = enc;
-                    end
-                end;
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-endmodule
+              endmodule
 
 `default_nettype wire
