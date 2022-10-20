@@ -1,8 +1,8 @@
 
 f = open('test.txt', 'w')
 
-for i in range(11, 1024):
-    f.write('else if (permutation == 10\'d%d) begin \n' % i)
-    f.write('enc <= enc ^ ({hv[%d:0], hv[DIM:%d]});\n' % (i-1, i))
+for i in range(0, 1024):
+    f.write('else if (inst[3:0] == 4\'d%d) begin \n' % i)
+    f.write('reg1 <= {data[%d:0], data[DIM:%d]};\n' % (i-1, i))
     f.write('end\n')
 f.close()
