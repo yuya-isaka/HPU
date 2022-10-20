@@ -48,6 +48,26 @@ module top
     // parameter WI = 31;      // 32が何個か-1
     parameter WI = 0;      // 32が何個か-1
 
+    // 計算何をさせるか（0ならxor, 1ならpermutation)
+    wire [3:0]  unit;
+    assign unit = 4'b0101;
+    // 0ユニットをperamutation
+    // 1ユニットをxor
+    // 2ユニットをpermutation
+    // 3ユニットをxor
+
+    // どっちの値を使うか (0ならitem, 1なら横のやつ)
+    wire [3:0]  which;
+    assign which = 4'b1010;
+
+
+    wire [3:0]  core_en;
+    assign core_en = 4'b0101;
+
+
+    wire [3:0]  step;
+    assign step = 4'd2;
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -70,6 +90,7 @@ module top
 
 
     wire        update;
+    wire        tmp_tmp_update;
     wire        exec;
     wire        last_update;
     wire        get_fin;
@@ -82,9 +103,11 @@ module top
                  .get_v(get_v),
                  .addr_i(addr_i[19:0]),
                  .addr_j(addr_j[19:0]),
+                 .step(step[3:0]),
 
                  // out
                  .update(update),
+                 .tmp_tmp_update(tmp_tmp_update),
                  .exec(exec),
                  .last_update(last_update),
                  .get_fin(get_fin)
@@ -102,11 +125,12 @@ module top
                     // 次元数可変
                     .tmp_rand(tmp_rand[DIM:0]),
                     .remainder(remainder),
+                    .core_en(core_en[3:0]),
                     // コア数可変
-                    .core_result_1(core_result[0]),
-                    .core_result_2(core_result[1]),
-                    .core_result_3(core_result[2]),
-                    .core_result_4(core_result[3]),
+                    .core_result_1(core_result_real[0]),
+                    .core_result_2(core_result_real[1]),
+                    .core_result_3(core_result_real[2]),
+                    .core_result_4(core_result_real[3]),
                     // .core_result_5(core_result[4]),
                     // .core_result_6(core_result[5]),
                     // .core_result_7(core_result[6]),
@@ -350,7 +374,11 @@ module top
 
     // コア数可変
     // wire [DIM:0]         core_result [0:31];
-    wire [DIM:0]         core_result [0:3];
+    // nextが必要なため＋１
+    wire [DIM:0]         core_result [0:4];
+    assign core_result[0] = 0;
+
+    wire [DIM:0]         core_result_real [0:3];
 
     generate
         genvar      i;
@@ -375,9 +403,15 @@ module top
                      .addr_j(addr_j[19:0]),
                      .exec(exec),
                      .update(update),
+                     .core_en_bit(core_en[i]),
+                     .tmp_tmp_update(tmp_tmp_update),
+                     .unit_bit(unit[i]),
+                     .which_bit(which[i]),
+                     .core_result_next(core_result[i]),
 
                      // out
-                     .core_result(core_result[i])
+                     .core_result(core_result[i+1]),
+                     .core_result_real(core_result_real[i])
                  );
         end
     endgenerate

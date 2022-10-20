@@ -68,6 +68,7 @@ const int ADDRNUM = 12;
 const int CORENUM = 4;
 const int RANNUM = 1000;
 const int DIM = 32 / 32;
+const int STEP = 2;
 // top.v DIM
 // top.v WI
 // top.v buffer_ctrl DIM
@@ -79,8 +80,8 @@ const int DIM = 32 / 32;
 // 自動で決まるパラメータ
 
 const int ADDRJ = NGRAM - 1;
-const int ADDRI = ((ADDRNUM / NGRAM) - 1) / CORENUM;
-const int REMAINDER = (ADDRNUM / NGRAM) % CORENUM;
+const int ADDRI = ((ADDRNUM / NGRAM) - 1) / (CORENUM / STEP);
+const int REMAINDER = ((ADDRNUM / NGRAM) % CORENUM) * STEP;
 const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -223,14 +224,23 @@ int main(int argc, char **argv)
   int tmp = NGRAM - 1;
   for (int i = 0; i < ADDRNUM; i++)
   {
+    int tmp_step = 0;
     for (int j = 0; j < CORENUM; j++)
     {
-      verilator_top->S_AXIS_TDATA[j] = i + (NGRAM * j);
+      if ((j % STEP) == 0)
+      {
+        verilator_top->S_AXIS_TDATA[j] = i + (NGRAM * tmp_step);
+        tmp_step++;
+      }
+      else
+      {
+        verilator_top->S_AXIS_TDATA[j] = 0;
+      }
     }
     if (i == tmp)
     {
-      i += NGRAM * (CORENUM - 1); // 後でi++であげてくれる。 // 0, 96, 192, 288, 384, 480, 576, 672, 768, 864, 960
-      tmp += (CORENUM * NGRAM);
+      i += NGRAM * ((CORENUM / STEP) - 1); // 後でi++であげてくれる。 // 0, 96, 192, 288, 384, 480, 576, 672, 768, 864, 960
+      tmp += ((CORENUM / STEP) * NGRAM);
     }
     eval();
   }

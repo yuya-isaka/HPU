@@ -13,6 +13,8 @@ module buffer_ctrl
          input wire [DIM:0]       tmp_rand,
          input wire [4:0]        remainder,
          // コア数可変
+         input wire [3:0]            core_en,
+         // コア数可変
          input wire [DIM:0]       core_result_1,
          input wire [DIM:0]       core_result_2,
          input wire [DIM:0]       core_result_3,
@@ -129,18 +131,22 @@ module buffer_ctrl
     // 立っていたら無視
     // logic [31:0]        core_enable;
     logic [3:0]        core_enable;
+    // 1 -> 2
+    // 2 -> 4
+    // 1 -> 3
 
-// 変更点
+    // 変更点
     always_comb begin
                     // コア数可変
                     // core_enable = 32'd0;
-                    core_enable = 4'd0;
+                    // core_enable = 4'd0;
+                    core_enable = core_en; // 0101
                     // コア数可変
                     if (last_update & (remainder != 0)) begin
-                        core_enable[0] = remainder < 1;
-                        core_enable[1] = remainder < 2;
-                        core_enable[2] = remainder < 3;
-                        core_enable[3] = remainder < 4;
+                        core_enable[0] = remainder < 1 & ~core_enable[0];
+                        core_enable[1] = remainder < 2 & ~core_enable[1];
+                        core_enable[2] = remainder < 3 & ~core_enable[2];
+                        core_enable[3] = remainder < 4 & ~core_enable[3];
                         // core_enable[4] = remainder < 5;
                         // core_enable[5] = remainder < 6;
                         // core_enable[6] = remainder < 7;

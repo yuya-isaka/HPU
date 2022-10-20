@@ -8,9 +8,11 @@ module get_ctrl
         input wire              get_v,
         input wire [19:0]       addr_i,
         input wire [19:0]       addr_j,
+        input wire [3:0]        step,
 
         // out
         output wire             update,
+        output reg             tmp_tmp_update,
         output reg              exec,
         output wire             last_update,
         output reg              get_fin
@@ -18,13 +20,53 @@ module get_ctrl
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    wire [19:0] l;
 
-    reg         get_v_n, get_v_nn;
+    agu #(.W(20)) agu_new_2
+        (
+            // in
+            .clk(clk),
+            .rst(rst),
+            .ini(0),
+            .fin(step),
+            .start((tmp_update & i == addr_i)),
+            .en(1),
+
+            // out
+            .data(l),
+            .last(last_update)
+        );
+
+
+    reg         get_v_n, get_v_nn, get_v_nnn;
 
     always_ff @(posedge clk) begin
                   get_v_n <= get_v;
                   get_v_nn <= get_v_n;
+                  get_v_nnn <= get_v_nn;
               end;
+
+    wire [19:0] k;
+    wire tm_update;
+
+    always_ff @(posedge clk) begin
+        tmp_tmp_update <= tm_update;
+    end;
+
+    agu #(.W(20)) agu_new
+        (
+            // in
+            .clk(clk),
+            .rst(rst),
+            .ini(0),
+            .fin(step),
+            .start(get_v_nnn),
+            .en(1),
+
+            // out
+            .data(k),
+            .last(tm_update)
+        );
 
 
     // exec
@@ -33,7 +75,7 @@ module get_ctrl
                       exec <= 1'b0;
                   end
                   else begin
-                      exec <= get_v;
+                      exec <= (get_v | get_v_nn);
                   end
               end;
 
@@ -50,6 +92,7 @@ module get_ctrl
 
 
     wire [19:0]         i;
+    wire tmp_update;
 
     agu #(.W(20)) agu_get_i
         (
@@ -63,7 +106,7 @@ module get_ctrl
 
             // out
             .data(i),
-            .last(last_update)
+            .last(tmp_update)
         );
 
 
