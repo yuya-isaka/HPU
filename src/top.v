@@ -104,34 +104,34 @@ module top
                     .core_result_2(core_result[1]),
                     .core_result_3(core_result[2]),
                     .core_result_4(core_result[3]),
-                    .core_result_5(core_result[4]),
-                    .core_result_6(core_result[5]),
-                    .core_result_7(core_result[6]),
-                    .core_result_8(core_result[7]),
-                    .core_result_9(core_result[8]),
-                    .core_result_10(core_result[9]),
-                    .core_result_11(core_result[10]),
-                    .core_result_12(core_result[11]),
-                    .core_result_13(core_result[12]),
-                    .core_result_14(core_result[13]),
-                    .core_result_15(core_result[14]),
-                    .core_result_16(core_result[15]),
-                    .core_result_17(core_result[16]),
-                    .core_result_18(core_result[17]),
-                    .core_result_19(core_result[18]),
-                    .core_result_20(core_result[19]),
-                    .core_result_21(core_result[20]),
-                    .core_result_22(core_result[21]),
-                    .core_result_23(core_result[22]),
-                    .core_result_24(core_result[23]),
-                    .core_result_25(core_result[24]),
-                    .core_result_26(core_result[25]),
-                    .core_result_27(core_result[26]),
-                    .core_result_28(core_result[27]),
-                    .core_result_29(core_result[28]),
-                    .core_result_30(core_result[29]),
-                    .core_result_31(core_result[30]),
-                    .core_result_32(core_result[31]),
+                    // .core_result_5(core_result[4]),
+                    // .core_result_6(core_result[5]),
+                    // .core_result_7(core_result[6]),
+                    // .core_result_8(core_result[7]),
+                    // .core_result_9(core_result[8]),
+                    // .core_result_10(core_result[9]),
+                    // .core_result_11(core_result[10]),
+                    // .core_result_12(core_result[11]),
+                    // .core_result_13(core_result[12]),
+                    // .core_result_14(core_result[13]),
+                    // .core_result_15(core_result[14]),
+                    // .core_result_16(core_result[15]),
+                    // .core_result_17(core_result[16]),
+                    // .core_result_18(core_result[17]),
+                    // .core_result_19(core_result[18]),
+                    // .core_result_20(core_result[19]),
+                    // .core_result_21(core_result[20]),
+                    // .core_result_22(core_result[21]),
+                    // .core_result_23(core_result[22]),
+                    // .core_result_24(core_result[23]),
+                    // .core_result_25(core_result[24]),
+                    // .core_result_26(core_result[25]),
+                    // .core_result_27(core_result[26]),
+                    // .core_result_28(core_result[27]),
+                    // .core_result_29(core_result[28]),
+                    // .core_result_30(core_result[29]),
+                    // .core_result_31(core_result[30]),
+                    // .core_result_32(core_result[31]),
                     .update(update),
                     .last_update(last_update),
                     .get_fin(get_fin),
@@ -346,14 +346,14 @@ module top
 
 
     // コア数可変
-    wire [DIM:0]         core_result [0:31];
-    // wire [DIM:0]         core_result [0:15];
+    // wire [DIM:0]         core_result [0:31];
+    wire [DIM:0]         core_result [0:3];
 
     generate
         genvar      i;
         // コア数可変
-        for (i = 0; i < 32; i = i + 1) begin
-            // for (i = 0; i < 16; i = i + 1) begin
+        // for (i = 0; i < 32; i = i + 1) begin
+        for (i = 0; i < 4; i = i + 1) begin
             core #(.DIM(1023)) core
                  (
                      // in

@@ -77,13 +77,17 @@ module core
                       enc <= 0;
                   end
                   else if (exec) begin
+                    // 変更点
                       if (update) begin
                           enc <= hv;
                       end
                       else begin
                           // 次元数可変にするなら、これの左側（hv>>permutation)と右側に分けて、一番右の右側を一番左に持ってくる配線にしたら良いと
                           //   enc <= enc ^ (hv >> permutation | ( ( hv & ((1'b1 << permutation) - 1'b1) ) << (DIM+1 - permutation) ) );
-                          if (permutation == 10'd1) begin
+                          if (permutation == 10'd0) begin
+                              enc <= enc ^ hv;
+                          end
+                          else if (permutation == 10'd1) begin
                               enc <= enc ^ ({hv[0], hv[DIM:1]});
                           end
                           else if (permutation == 10'd2) begin
