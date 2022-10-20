@@ -7,7 +7,6 @@ module get_enable
         input wire          gen,
         input wire          run,
         input wire          get_valid,
-        input wire          last,
 
         // out
         output wire         get_ready,
@@ -40,13 +39,24 @@ module get_enable
                   end
               end;
 
+    reg         exec_n;
+
+    always_ff @(posedge clk) begin
+                  if (~run) begin
+                      exec_n <= 1'b0;
+                  end
+                  else begin
+                      exec_n <= exec;
+                  end
+              end;
+
 
     always_ff @(posedge clk) begin
                   if (~run) begin
                       get_fin <= 1'b0;
                   end
                   else begin
-                      get_fin <= last;
+                      get_fin <= (~exec & exec_n);
                   end
               end;
 

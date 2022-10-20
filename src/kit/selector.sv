@@ -22,7 +22,7 @@ module selector
                       // -1
                       sel_bit <= $signed(1'b1);
 
-                      else if (core_result_bit == 1'b0) begin
+                      if (core_result_bit == 1'b0) begin
                           // 1
                           sel_bit <= $signed(1);
                       end

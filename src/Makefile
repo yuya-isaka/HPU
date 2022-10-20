@@ -23,7 +23,6 @@ VERILATOR_MAKE_OPTS = OPT="-O3 -I ../../../"
 DESIGN_SRCS = \
 ./top.v \
 ./main/get_enable.sv \
-./main/get_ctrl.sv \
 ./main/stream_ctrl.sv \
 ./main/buffer_ctrl.sv \
 ./main/core.sv \

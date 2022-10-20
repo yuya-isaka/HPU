@@ -14,6 +14,16 @@ vluint64_t sim_end = sim_start + 3000000;
 VerilatedVcdC *tfp;
 Vtop *verilator_top;
 
+union
+{
+  struct
+  {
+    uint16_t data_0;
+    uint16_t data_1;
+  };
+  uint32_t write_data;
+} conv;
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void eval()
@@ -78,9 +88,9 @@ const int DIM = 32 / 32;
 
 // 自動で決まるパラメータ
 
-const int ADDRJ = NGRAM - 1;
-const int ADDRI = ((ADDRNUM / NGRAM) - 1) / CORENUM;
-const int REMAINDER = (ADDRNUM / NGRAM) % CORENUM;
+// const int ADDRJ = NGRAM - 1;
+// const int ADDRI = ((ADDRNUM / NGRAM) - 1) / CORENUM;
+// const int REMAINDER = (ADDRNUM / NGRAM) % CORENUM;
 const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -166,38 +176,8 @@ int main(int argc, char **argv)
 
   // Parameter セットアップ
 
-  // addr_j
-  verilator_top->S_AXI_AWADDR = 8;
-  verilator_top->S_AXI_WDATA = ADDRJ;
-  verilator_top->S_AXI_AWVALID = 1;
-  verilator_top->S_AXI_WVALID = 1;
-  eval();
-  verilator_top->S_AXI_AWVALID = 0;
-  verilator_top->S_AXI_WVALID = 0;
-  eval();
-
-  // addr_i
-  verilator_top->S_AXI_AWADDR = 12;
-  verilator_top->S_AXI_WDATA = ADDRI;
-  verilator_top->S_AXI_AWVALID = 1;
-  verilator_top->S_AXI_WVALID = 1;
-  eval();
-  verilator_top->S_AXI_AWVALID = 0;
-  verilator_top->S_AXI_WVALID = 0;
-  eval();
-
-  // remainder
-  verilator_top->S_AXI_AWADDR = 16;
-  verilator_top->S_AXI_WDATA = REMAINDER;
-  verilator_top->S_AXI_AWVALID = 1;
-  verilator_top->S_AXI_WVALID = 1;
-  eval();
-  verilator_top->S_AXI_AWVALID = 0;
-  verilator_top->S_AXI_WVALID = 0;
-  eval();
-
   // even
-  verilator_top->S_AXI_AWADDR = 20;
+  verilator_top->S_AXI_AWADDR = 8;
   verilator_top->S_AXI_WDATA = EVEN;
   verilator_top->S_AXI_AWVALID = 1;
   verilator_top->S_AXI_WVALID = 1;
@@ -218,22 +198,135 @@ int main(int argc, char **argv)
   verilator_top->S_AXI_WVALID = 0;
   eval();
 
+  // ==================================================================
+
   // 送信
   verilator_top->S_AXIS_TVALID = 1;
-  int tmp = NGRAM - 1;
-  for (int i = 0; i < ADDRNUM; i++)
+
+  // ↓ここを書き換える==================================================================
+
+  // 0
+  for (int i = 0; i < 4; i++)
   {
-    for (int j = 0; j < CORENUM; j++)
-    {
-      verilator_top->S_AXIS_TDATA[j] = i + (NGRAM * j);
-    }
-    if (i == tmp)
-    {
-      i += NGRAM * (CORENUM - 1); // 後でi++であげてくれる。 // 0, 96, 192, 288, 384, 480, 576, 672, 768, 864, 960
-      tmp += (CORENUM * NGRAM);
-    }
-    eval();
+    conv.data_0 = 0;
+    conv.data_1 = 16;
+    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
   }
+  eval();
+
+  // 1
+  for (int i = 0; i < 4; i++)
+  {
+    conv.data_0 = NGRAM * i;
+    conv.data_1 = 32;
+    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+  }
+  eval();
+
+  // 2
+  for (int i = 0; i < 4; i++)
+  {
+    conv.data_0 = 0;
+    conv.data_1 = 64;
+    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+  }
+  eval();
+
+  // 3
+  for (int i = 0; i < 4; i++)
+  {
+    conv.data_0 = NGRAM * i + 1;
+    conv.data_1 = 33;
+    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+  }
+  eval();
+
+  // 4
+  for (int i = 0; i < 4; i++)
+  {
+    conv.data_0 = 0;
+    conv.data_1 = 64;
+    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+  }
+  eval();
+
+  // 5
+  for (int i = 0; i < 4; i++)
+  {
+    conv.data_0 = NGRAM * i + 2;
+    conv.data_1 = 34;
+    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+  }
+  eval();
+
+  // 6
+  for (int i = 0; i < 4; i++)
+  {
+    conv.data_0 = 0;
+    conv.data_1 = 64;
+    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+  }
+  eval();
+
+  // 7
+  for (int i = 0; i < 4; i++)
+  {
+
+    conv.data_0 = 0;
+    conv.data_1 = 128;
+    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+  }
+  eval();
+
+  // int tmp = NGRAM - 1;
+  // for (int i = 0; i < ADDRNUM; i++)
+  // {
+  //   for (int j = 0; j < CORENUM; j++)
+  //   {
+  //     // 0
+  //     conv.data_0 = 0;
+  //     conv.data_1 = 16;
+
+  //     // 1
+  //     conv.data_0 = 0;
+  //     conv.data_1 = 30;
+
+  //     // 2
+  //     conv.data_0 = 0;
+  //     conv.data_1 = 64;
+
+  //     // 3
+  //     conv.data_0 = 1;
+  //     conv.data_1 = 31;
+
+  //     // 4
+  //     conv.data_0 = 0;
+  //     conv.data_1 = 64;
+
+  //     // 5
+  //     conv.data_0 = 2;
+  //     conv.data_1 = 32;
+
+  //     // 6
+  //     conv.data_0 = 0;
+  //     conv.data_1 = 64;
+
+  //     // 7
+  //     conv.data_0 = 0;
+  //     conv.data_1 = 128;
+
+  //     verilator_top->S_AXIS_TDATA[j] = i + (NGRAM * j);
+  //   }
+  //   if (i == tmp)
+  //   {
+  //     i += NGRAM * (CORENUM - 1); // 後でi++であげてくれる。 // 0, 96, 192, 288, 384, 480, 576, 672, 768, 864, 960
+  //     tmp += (CORENUM * NGRAM);
+  //   }
+  //   eval();
+  // }
+
+  // ↑ここを書き換える==================================================================
+
   verilator_top->S_AXIS_TVALID = 0;
   eval();
 
@@ -242,6 +335,8 @@ int main(int argc, char **argv)
   {
     eval();
   }
+
+  // ==================================================================
 
   printf("\n --------------------------- Output ---------------------------- \n\n\n");
 
@@ -257,144 +352,6 @@ int main(int argc, char **argv)
     // putb(verilator_top->M_AXIS_TDATA[0]);
     eval();
   }
-
-  //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
-
-  // // ２回目
-
-  // // item_memory_num <- 1000;
-  // verilator_top->S_AXI_AWADDR = 4;
-  // verilator_top->S_AXI_WDATA = RANNUM;
-  // verilator_top->S_AXI_AWVALID = 1;
-  // verilator_top->S_AXI_WVALID = 1;
-  // eval();
-  // verilator_top->S_AXI_AWVALID = 0;
-  // verilator_top->S_AXI_WVALID = 0;
-  // eval();
-
-  // // matw <- 1;
-  // verilator_top->S_AXI_AWADDR = 0;
-  // verilator_top->S_AXI_WDATA = 1;
-  // verilator_top->S_AXI_AWVALID = 1;
-  // verilator_top->S_AXI_WVALID = 1;
-  // eval();
-  // verilator_top->S_AXI_AWVALID = 0;
-  // verilator_top->S_AXI_WVALID = 0;
-  // eval();
-
-  // verilator_top->S_AXI_ARVALID = 1;
-  // eval();
-  // eval();
-  // while (0 != verilator_top->S_AXI_RDATA)
-  // {
-  //   eval();
-  // }
-  // verilator_top->S_AXI_ARVALID = 0;
-  // eval();
-
-  // printf("\n  生成！\n");
-  // // matwはここで０になっている
-
-  // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  // // Parameter セットアップ
-
-  // // addr_j
-  // verilator_top->S_AXI_AWADDR = 8;
-  // verilator_top->S_AXI_WDATA = ADDRJ;
-  // verilator_top->S_AXI_AWVALID = 1;
-  // verilator_top->S_AXI_WVALID = 1;
-  // eval();
-  // verilator_top->S_AXI_AWVALID = 0;
-  // verilator_top->S_AXI_WVALID = 0;
-  // eval();
-
-  // // addr_i
-  // verilator_top->S_AXI_AWADDR = 12;
-  // verilator_top->S_AXI_WDATA = ADDRI;
-  // verilator_top->S_AXI_AWVALID = 1;
-  // verilator_top->S_AXI_WVALID = 1;
-  // eval();
-  // verilator_top->S_AXI_AWVALID = 0;
-  // verilator_top->S_AXI_WVALID = 0;
-  // eval();
-
-  // // remainder
-  // verilator_top->S_AXI_AWADDR = 16;
-  // verilator_top->S_AXI_WDATA = REMAINDER;
-  // verilator_top->S_AXI_AWVALID = 1;
-  // verilator_top->S_AXI_WVALID = 1;
-  // eval();
-  // verilator_top->S_AXI_AWVALID = 0;
-  // verilator_top->S_AXI_WVALID = 0;
-  // eval();
-
-  // // even
-  // verilator_top->S_AXI_AWADDR = 20;
-  // verilator_top->S_AXI_WDATA = EVEN;
-  // verilator_top->S_AXI_AWVALID = 1;
-  // verilator_top->S_AXI_WVALID = 1;
-  // eval();
-  // verilator_top->S_AXI_AWVALID = 0;
-  // verilator_top->S_AXI_WVALID = 0;
-  // eval();
-
-  // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  // // run <- 1;
-  // verilator_top->S_AXI_AWADDR = 0;
-  // verilator_top->S_AXI_WDATA = 2;
-  // verilator_top->S_AXI_AWVALID = 1;
-  // verilator_top->S_AXI_WVALID = 1;
-  // eval();
-  // verilator_top->S_AXI_AWVALID = 0;
-  // verilator_top->S_AXI_WVALID = 0;
-  // eval();
-
-  // // 送信
-  // verilator_top->S_AXIS_TVALID = 1;
-  // tmp = NGRAM - 1;
-  // for (int i = 0; i < ADDRNUM; i++)
-  // {
-  //   for (int j = 0; j < CORENUM; j++)
-  //   {
-  //     verilator_top->S_AXIS_TDATA[j] = i + (NGRAM * j);
-  //   }
-  //   if (i == tmp)
-  //   {
-  //     i += NGRAM * (CORENUM - 1); // 後でi++であげてくれる。 // 0, 96, 192, 288, 384, 480, 576, 672, 768, 864, 960
-  //     tmp += (CORENUM * NGRAM);
-  //   }
-  //   eval();
-  // }
-  // verilator_top->S_AXIS_TVALID = 0;
-  // eval();
-
-  // // 演算結果を待つ
-  // while (!verilator_top->M_AXIS_TVALID)
-  // {
-  //   eval();
-  // }
-
-  // printf("\n --------------------------- Output ---------------------------- \n\n");
-
-  // for (int i = 0; i < 1; i++)
-  // {
-  //   // for (int j = 0; j < 32; j++)
-  //   // {
-  //   //   printf("  %u\n\n", verilator_top->M_AXIS_TDATA[j]);
-  //   //   putb(verilator_top->M_AXIS_TDATA[j]);
-  //   // }
-  //   printf("  %u\n\n", verilator_top->M_AXIS_TDATA[0]);
-  //   putb(verilator_top->M_AXIS_TDATA[0]);
-  //   eval();
-  // }
-
-  //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////////////////////////// FPGA停止 run <- 0; last <- 0; //////////////////////////////////////////////////////////////////////
 
   verilator_top->S_AXI_AWADDR = 0;
   verilator_top->S_AXI_WDATA = 0;

@@ -51,6 +51,12 @@ module core
     // inst[6] = reg1とreg2をXorしたものをreg2に格納
     // inst[7] = reg2の値を吐き出す
 
+    // inst[3:0] = 0000, 0001, 0010, 0011 = 0, 1, 2, 3
+    // inst[4] = 10000 = 16
+    // inst[5] = 100000, 100001, 100010, 100011 = 32, 33, 34, 35
+    // inst[6] = 1000000 = 64
+    // inst[7] = 10000000 = 128
+
     // アドレスx, reg1, reg2を初期化命令 (最初は初期化されているからこれいらない)
     // 上の命令を実行中、アドレス0, 外から入ってきたデータを、Permしたものをreg1に格納
     // 上の命令を実行中, アドレスx, reg1とreg2をXorしたものをreg2に格納
@@ -87,37 +93,37 @@ module core
                       end
                       else if (inst[5]) begin
                           if (inst[3:0] == 4'd0) begin
-                              reg1 <= data;
+                              reg_1 <= data;
                           end
                           else if (inst[3:0] == 4'd1) begin
-                              reg1 <= {data[0:0], data[DIM:1]};
+                              reg_1 <= {data[0:0], data[DIM:1]};
                           end
                           else if (inst[3:0] == 4'd2) begin
-                              reg1 <= {data[1:0], data[DIM:2]};
+                              reg_1 <= {data[1:0], data[DIM:2]};
                           end
                           else if (inst[3:0] == 4'd3) begin
-                              reg1 <= {data[2:0], data[DIM:3]};
+                              reg_1 <= {data[2:0], data[DIM:3]};
                           end
                           else if (inst[3:0] == 4'd4) begin
-                              reg1 <= {data[3:0], data[DIM:4]};
+                              reg_1 <= {data[3:0], data[DIM:4]};
                           end
                           else if (inst[3:0] == 4'd5) begin
-                              reg1 <= {data[4:0], data[DIM:5]};
+                              reg_1 <= {data[4:0], data[DIM:5]};
                           end
                           else if (inst[3:0] == 4'd6) begin
-                              reg1 <= {data[5:0], data[DIM:6]};
+                              reg_1 <= {data[5:0], data[DIM:6]};
                           end
                           else if (inst[3:0] == 4'd7) begin
-                              reg1 <= {data[6:0], data[DIM:7]};
+                              reg_1 <= {data[6:0], data[DIM:7]};
                           end
                           else if (inst[3:0] == 4'd8) begin
-                              reg1 <= {data[7:0], data[DIM:8]};
+                              reg_1 <= {data[7:0], data[DIM:8]};
                           end
                           else if (inst[3:0] == 4'd9) begin
-                              reg1 <= {data[8:0], data[DIM:9]};
+                              reg_1 <= {data[8:0], data[DIM:9]};
                           end
                           else if (inst[3:0] == 4'd10) begin
-                              reg1 <= {data[9:0], data[DIM:10]};
+                              reg_1 <= {data[9:0], data[DIM:10]};
                           end
                           buff <= 0;
                           store <= 0;
@@ -131,22 +137,23 @@ module core
                           buff <= reg_2;
                           store <= 1;
                       end
-                  end;
+                  end
+              end;
 
-                  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-                  always_comb begin
-                                  core_result = 0;
-
-                                  if (store) begin
-                                      core_result = buff;
-                                  end
-                              end;
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-                  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    always_comb begin
+                    core_result = 0;
 
-              endmodule
+                    if (store) begin
+                        core_result = buff;
+                    end
+                end;
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+endmodule
 
 `default_nettype wire
