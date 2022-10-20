@@ -106,7 +106,6 @@ int main(int argc, char **argv)
     putb(i);
     putb(verilator_top->out_1);
     putb(verilator_top->out_2);
-    putb(verilator_top->out_3);
     printf("\n");
   }
 
