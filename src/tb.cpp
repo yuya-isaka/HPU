@@ -74,7 +74,7 @@ void putb(unsigned int v)
 // 可変のパラメータ
 
 const int NGRAM = 3;
-const int ADDRNUM = 12;
+const int ADDRNUM = 24; // 現状12の倍数しかできない。その理由は命令をちゃんと設定していないから
 const int CORENUM = 4;
 const int RANNUM = 1000;
 const int DIM = 32 / 32;
@@ -205,125 +205,156 @@ int main(int argc, char **argv)
 
   // ↓ここを書き換える==================================================================
 
-  // 0
-  for (int i = 0; i < 4; i++)
-  {
-    conv.data_0 = 0;
-    conv.data_1 = 16;
-    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  }
-  eval();
-
-  // 1
-  for (int i = 0; i < 4; i++)
-  {
-    conv.data_0 = NGRAM * i;
-    conv.data_1 = 32;
-    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  }
-  eval();
-
-  // 2
-  for (int i = 0; i < 4; i++)
-  {
-    conv.data_0 = 0;
-    conv.data_1 = 64;
-    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  }
-  eval();
-
-  // 3
-  for (int i = 0; i < 4; i++)
-  {
-    conv.data_0 = NGRAM * i + 1;
-    conv.data_1 = 33;
-    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  }
-  eval();
-
-  // 4
-  for (int i = 0; i < 4; i++)
-  {
-    conv.data_0 = 0;
-    conv.data_1 = 64;
-    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  }
-  eval();
-
-  // 5
-  for (int i = 0; i < 4; i++)
-  {
-    conv.data_0 = NGRAM * i + 2;
-    conv.data_1 = 34;
-    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  }
-  eval();
-
-  // 6
-  for (int i = 0; i < 4; i++)
-  {
-    conv.data_0 = 0;
-    conv.data_1 = 64;
-    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  }
-  eval();
-
-  // 7
-  for (int i = 0; i < 4; i++)
-  {
-
-    conv.data_0 = 0;
-    conv.data_1 = 128;
-    verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  }
-  eval();
-
-  // int tmp = NGRAM - 1;
-  // for (int i = 0; i < ADDRNUM; i++)
+  // // 0
+  // for (int i = 0; i < 4; i++)
   // {
-  //   for (int j = 0; j < CORENUM; j++)
-  //   {
-  //     // 0
-  //     conv.data_0 = 0;
-  //     conv.data_1 = 16;
-
-  //     // 1
-  //     conv.data_0 = 0;
-  //     conv.data_1 = 30;
-
-  //     // 2
-  //     conv.data_0 = 0;
-  //     conv.data_1 = 64;
-
-  //     // 3
-  //     conv.data_0 = 1;
-  //     conv.data_1 = 31;
-
-  //     // 4
-  //     conv.data_0 = 0;
-  //     conv.data_1 = 64;
-
-  //     // 5
-  //     conv.data_0 = 2;
-  //     conv.data_1 = 32;
-
-  //     // 6
-  //     conv.data_0 = 0;
-  //     conv.data_1 = 64;
-
-  //     // 7
-  //     conv.data_0 = 0;
-  //     conv.data_1 = 128;
-
-  //     verilator_top->S_AXIS_TDATA[j] = i + (NGRAM * j);
-  //   }
-  //   if (i == tmp)
-  //   {
-  //     i += NGRAM * (CORENUM - 1); // 後でi++であげてくれる。 // 0, 96, 192, 288, 384, 480, 576, 672, 768, 864, 960
-  //     tmp += (CORENUM * NGRAM);
-  //   }
-  //   eval();
+  //   conv.data_0 = 0;
+  //   conv.data_1 = 16;
+  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
   // }
+  // eval();
+
+  // // 1
+  // for (int i = 0; i < 4; i++)
+  // {
+  //   conv.data_0 = NGRAM * i;
+  //   conv.data_1 = 32;
+  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+  // }
+  // eval();
+
+  // // 2
+  // for (int i = 0; i < 4; i++)
+  // {
+  //   conv.data_0 = 0;
+  //   conv.data_1 = 64;
+  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+  // }
+  // eval();
+
+  // // 3
+  // for (int i = 0; i < 4; i++)
+  // {
+  //   conv.data_0 = NGRAM * i + 1;
+  //   conv.data_1 = 33;
+  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+  // }
+  // eval();
+
+  // // 4
+  // for (int i = 0; i < 4; i++)
+  // {
+  //   conv.data_0 = 0;
+  //   conv.data_1 = 64;
+  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+  // }
+  // eval();
+
+  // // 5
+  // for (int i = 0; i < 4; i++)
+  // {
+  //   conv.data_0 = NGRAM * i + 2;
+  //   conv.data_1 = 34;
+  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+  // }
+  // eval();
+
+  // // 6
+  // for (int i = 0; i < 4; i++)
+  // {
+  //   conv.data_0 = 0;
+  //   conv.data_1 = 64;
+  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+  // }
+  // eval();
+
+  // // 7
+  // for (int i = 0; i < 4; i++)
+  // {
+
+  //   conv.data_0 = 0;
+  //   conv.data_1 = 128;
+  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+  // }
+  // eval();
+
+  for (int j = 0; j < ADDRNUM; j++)
+  {
+    // 0
+    for (int i = 0; i < CORENUM; i++)
+    {
+      conv.data_0 = 0;
+      conv.data_1 = 16;
+      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    eval();
+
+    // 1
+    for (int i = 0; i < CORENUM; i++)
+    {
+      conv.data_0 = NGRAM * i + j;
+      conv.data_1 = 32;
+      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    eval();
+
+    // 2
+    for (int i = 0; i < CORENUM; i++)
+    {
+      conv.data_0 = 0;
+      conv.data_1 = 64;
+      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    eval();
+
+    // 3
+    for (int i = 0; i < CORENUM; i++)
+    {
+      conv.data_0 = NGRAM * i + 1 + j;
+      conv.data_1 = 33;
+      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    eval();
+
+    // 4
+    for (int i = 0; i < CORENUM; i++)
+    {
+      conv.data_0 = 0;
+      conv.data_1 = 64;
+      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    eval();
+
+    // 5
+    for (int i = 0; i < CORENUM; i++)
+    {
+      conv.data_0 = NGRAM * i + 2 + j;
+      conv.data_1 = 34;
+      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    eval();
+
+    // 6
+    for (int i = 0; i < CORENUM; i++)
+    {
+      conv.data_0 = 0;
+      conv.data_1 = 64;
+      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    eval();
+
+    // 7
+    for (int i = 0; i < CORENUM; i++)
+    {
+
+      conv.data_0 = 0;
+      conv.data_1 = 128;
+      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    eval();
+
+    j += NGRAM * CORENUM - 1;
+  }
 
   // ↑ここを書き換える==================================================================
 
