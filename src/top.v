@@ -123,7 +123,6 @@ module top
                     // .core_result_32(core_result[31]),
                     // コア数可変
                     .store(store[3:0]),
-                    .get_fin(get_fin),
                     .stream_v(stream_v),
 
                     // out

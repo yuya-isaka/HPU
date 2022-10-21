@@ -46,7 +46,6 @@ module buffer_ctrl
          //  input wire [DIM:0]       core_result_32,
          // コア数可変
          input wire [3:0]           store,
-         input wire                 get_fin,
          input wire                 stream_v,
 
          // out
@@ -125,10 +124,9 @@ module buffer_ctrl
 
     // 4コア
     // 『stream_vが立つタイミングのencoded_hvが求めてた値』
-    // update  ->   update_n
     //         ->   get_fin         ->   stream_v
     //                              ->   sign_bit(最新値)
-    //                              ->   box ↑(sign_bit), update前にselectが組み合わせ回路で求まっている前提
+    //         ->   select          ->   box ↑(sign_bit), update前にselectが組み合わせ回路で求まっている前提
 
 
     // 32コア

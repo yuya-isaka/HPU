@@ -54,8 +54,6 @@ module get_enable
               end;
 
 
-    // コア数可変
-    // 詳しくはbuffer_ctrlの下を参照
     always_ff @(posedge clk) begin
                   if (~run) begin
                       get_fin <= 1'b0;
