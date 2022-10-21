@@ -57,14 +57,13 @@ module buffer_ctrl
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // 次元数可変
     wire [DIM:0]      sign_bit;
 
     generate
         genvar i;
-        // 次元数可変
         for (i = 0; i < DIM+1; i = i + 1) begin
 
+            // 計算数可変
             counter #(.W(30)) counter
                     (
                         // in
@@ -131,14 +130,6 @@ module buffer_ctrl
     //                              ->   sign_bit(最新値)
     //                              ->   box ↑(sign_bit), update前にselectが組み合わせ回路で求まっている前提
 
-    // コア数可変（32ならいらない）
-    // reg [31:0]      encoded_hv;
-    // always_ff @(posedge clk) begin
-    //               if (get_fin) begin
-    //                   encoded_hv <= sign_bit;
-    //               end
-    //           end;
-
 
     // 32コア
     // 『stream_vが立つタイミングのsign_bitが求めてた値』
@@ -150,13 +141,7 @@ module buffer_ctrl
     // stream_d
     always_ff @(posedge clk) begin
                   if (stream_v) begin
-                      // コア数可変
-
-                      // 32コア
                       stream_d <= sign_bit;
-
-                      // 4コア
-                      //   stream_d <= encoded_hv;
                   end
               end;
 

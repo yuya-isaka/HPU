@@ -29,11 +29,11 @@ module counter
 
 
     // コア数可変
-    // reg         update_n, update_nn, update_nnn;
+    // reg         store_n, store_nn, store_nnn;
     // always_ff @(posedge clk) begin
-    //               update_n <= update;
-    //               update_nn <= update_n;
-    //               update_nnn <= update_nn;
+    //               store_n <= store;
+    //               store_nn <= store_n;
+    //               store_nnn <= store_nn;
     //           end;
 
     // コア数可変
@@ -44,8 +44,7 @@ module counter
 
 
     // 分散RAM (符号付き)
-    // warning出る
-    (* ram_style = "block" *)
+    // (* ram_style = "block" *)
     reg signed [W-1:0]      box;
 
     // コア数可変

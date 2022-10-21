@@ -1,5 +1,12 @@
 `default_nettype none
 
+// 可変
+// アドレス数可変
+// 計算数可変
+// バス幅可変
+
+// コア数可変 (色々変える)
+// 次元数可変 (topだけ)
 
 module top
     (
@@ -43,6 +50,7 @@ module top
         input wire              S_AXIS_TVALID
     );
 
+    // 次元数可変
     parameter DIM = 31;    // DIM-1
     parameter WI = 0;      // 32が何個か-1
 
@@ -72,13 +80,13 @@ module top
 
 
     // M_AXIS_TDATA
+    // 次元数可変
     buffer_ctrl #(.DIM(31)) buffer_ctrl
                 (
                     // in
                     .clk(AXIS_ACLK),
                     .rst(~run),
                     .tmp_even(even),
-                    // 次元数可変
                     .tmp_rand(tmp_rand[DIM:0]),
                     // コア数可変
                     .core_result_1(core_result[0]),
@@ -203,14 +211,13 @@ module top
              );
 
 
-    // 次元数可変
     reg [DIM:0]       rand_num;
 
     always @(posedge AXIS_ACLK) begin
         if (~gen) begin
             rand_num <= 0;
         end
-        else if (item_a_tmp == 0) begin
+        else if (item_a_tmp == 0) begin // 次元数可変
             rand_num[31:0] <= rand_num_tmp;
         end
         // else if (item_a_tmp == 1) begin
@@ -309,8 +316,6 @@ module top
     end
 
 
-
-    // 次元数可変
     reg [DIM:0]      tmp_rand;
 
     always @(posedge AXIS_ACLK) begin
@@ -325,10 +330,11 @@ module top
 
     //================================================================
 
+    // コア数可変
+    wire [3:0]              store;
 
     // コア数可変
     // wire [DIM:0]         core_result [0:31];
-    wire [3:0]              store;
     wire [DIM:0]            core_result [0:3];
 
     generate
@@ -336,6 +342,7 @@ module top
         // コア数可変
         // for (i = 0; i < 32; i = i + 1) begin
         for (i = 0; i < 4; i = i + 1) begin
+            // 次元数可変
             core #(.DIM(31)) core
                  (
                      // in
@@ -345,7 +352,6 @@ module top
                      .update_item(update_item),
                      .item_a(item_a[15:0]),
                      .item_memory_num(item_memory_num[15:0]),
-                     // 次元数可変
                      .rand_num(rand_num[DIM:0]),
                      .get_v(get_v),
                      // アドレス数可変
