@@ -52,11 +52,11 @@ module top
 
     // 次元数可変
     // parameter DIM = 31;    // 何次元か-1
-    parameter DIM = 1023;    // 何次元か-1
+    parameter DIM = 511;    // 何次元か-1
 
     // 次元数可変
     // parameter WI = 0;    // 何次元か-1
-    parameter WI = 31;      // 32が何個か-1
+    parameter WI = 15;      // 32が何個か-1
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ module top
     // M_AXIS_TDATA
     // 次元数可変
     // buffer_ctrl #(.DIM(31)) buffer_ctrl
-    buffer_ctrl #(.DIM(1023)) buffer_ctrl
+    buffer_ctrl #(.DIM(511)) buffer_ctrl
                 (
                     // in
                     .clk(AXIS_ACLK),
@@ -271,54 +271,54 @@ module top
         else if (item_a_tmp == 15) begin
             rand_num[511:480] <= rand_num_tmp;
         end
-        else if (item_a_tmp == 16) begin
-            rand_num[543:512] <= rand_num_tmp;
-        end
-        else if (item_a_tmp == 17) begin
-            rand_num[575:544] <= rand_num_tmp;
-        end
-        else if (item_a_tmp == 18) begin
-            rand_num[607:576] <= rand_num_tmp;
-        end
-        else if (item_a_tmp == 19) begin
-            rand_num[639:608] <= rand_num_tmp;
-        end
-        else if (item_a_tmp == 20) begin
-            rand_num[671:640] <= rand_num_tmp;
-        end
-        else if (item_a_tmp == 21) begin
-            rand_num[703:672] <= rand_num_tmp;
-        end
-        else if (item_a_tmp == 22) begin
-            rand_num[735:704] <= rand_num_tmp;
-        end
-        else if (item_a_tmp == 23) begin
-            rand_num[767:736] <= rand_num_tmp;
-        end
-        else if (item_a_tmp == 24) begin
-            rand_num[799:768] <= rand_num_tmp;
-        end
-        else if (item_a_tmp == 25) begin
-            rand_num[831:800] <= rand_num_tmp;
-        end
-        else if (item_a_tmp == 26) begin
-            rand_num[863:832] <= rand_num_tmp;
-        end
-        else if (item_a_tmp == 27) begin
-            rand_num[895:864] <= rand_num_tmp;
-        end
-        else if (item_a_tmp == 28) begin
-            rand_num[927:896] <= rand_num_tmp;
-        end
-        else if (item_a_tmp == 29) begin
-            rand_num[959:928] <= rand_num_tmp;
-        end
-        else if (item_a_tmp == 30) begin
-            rand_num[991:960] <= rand_num_tmp;
-        end
-        else if (item_a_tmp == 31) begin
-            rand_num[1023:992] <= rand_num_tmp;
-        end
+        // else if (item_a_tmp == 16) begin
+        //     rand_num[543:512] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 17) begin
+        //     rand_num[575:544] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 18) begin
+        //     rand_num[607:576] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 19) begin
+        //     rand_num[639:608] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 20) begin
+        //     rand_num[671:640] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 21) begin
+        //     rand_num[703:672] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 22) begin
+        //     rand_num[735:704] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 23) begin
+        //     rand_num[767:736] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 24) begin
+        //     rand_num[799:768] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 25) begin
+        //     rand_num[831:800] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 26) begin
+        //     rand_num[863:832] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 27) begin
+        //     rand_num[895:864] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 28) begin
+        //     rand_num[927:896] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 29) begin
+        //     rand_num[959:928] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 30) begin
+        //     rand_num[991:960] <= rand_num_tmp;
+        // end
+        // else if (item_a_tmp == 31) begin
+        //     rand_num[1023:992] <= rand_num_tmp;
+        // end
     end
 
 
@@ -351,7 +351,7 @@ module top
             // for (i = 0; i < 4; i = i + 1) begin
             // 次元数可変
             // core #(.DIM(31)) core
-            core #(.DIM(1023)) core
+            core #(.DIM(511)) core
                  (
                      // in
                      .clk(AXIS_ACLK),

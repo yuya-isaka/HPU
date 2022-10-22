@@ -74,10 +74,10 @@ void putb(unsigned int v)
 // 可変のパラメータ
 
 const int NGRAM = 3;
-const int ADDRNUM = 24; // 現状12の倍数しかできない。その理由は命令をちゃんと設定していないから
-const int CORENUM = 4;
+const int ADDRNUM = 12; // 現状12の倍数しかできない。その理由は命令をちゃんと設定していないから
+const int CORENUM = 32;
 const int RANNUM = 1000;
-const int DIM = 32 / 32;
+const int DIM = 512 / 32;
 // top.v DIM
 // top.v WI
 // top.v buffer_ctrl DIM
