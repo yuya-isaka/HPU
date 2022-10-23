@@ -8,7 +8,7 @@
 // 可変のパラメータ
 
 const int NGRAM = 3;
-const int ADDRNUM = 12;
+const int ADDRNUM = 96;
 const int RANNUM = 1001;
 const int DIM = 512 / 32;
 
@@ -195,7 +195,7 @@ int main(int argc, char **argv)
 		for (int i = 0; i < ADDRNUM; i++)
 		{
 			result ^= item_memory_array_new[j][i];
-			printf("%d:%u\n", i, item_memory_array_new[j][i]);
+			// printf("%d:%u\n", i, item_memory_array_new[j][i]);
 			tmp += 1;
 			if (tmp == NGRAM)
 			{
@@ -212,7 +212,7 @@ int main(int argc, char **argv)
 		{
 			result_array[num] = item_memory_array[j][RANNUM - 1];
 			// putb(result_array[num]);
-			printf("ランダム：%u\n", result_array[num]);
+			// printf("ランダム：%u\n", result_array[num]);
 		}
 		unsigned int result_real = grab_bit(result_array, ARNUM);
 		// printf("  %x\n", result_real);
