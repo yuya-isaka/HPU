@@ -147,7 +147,7 @@ module core
                       end
                       // コピー
                       else if (inst[6]) begin
-                          reg_2 <= reg_1;
+                          reg_1 <= reg_2;
                           buff <= 0;
                           store <= 0;
                       end

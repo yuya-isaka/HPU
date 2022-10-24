@@ -74,10 +74,10 @@ void putb(unsigned int v)
 // 可変のパラメータ
 
 const int NGRAM = 3;
-const int ADDRNUM = 144; // 現状12の倍数しかできない。その理由は命令をちゃんと設定していないから (4コアの時は12の倍数、３２コアの時は96の倍数)
+const int ADDRNUM = 48; // 現状12の倍数しかできない。その理由は命令をちゃんと設定していないから (4コアの時は12の倍数、３２コアの時は96の倍数)
 const int CORENUM = 16;
 const int RANNUM = 1000;
-const int DIM = 1024 / 32;
+const int DIM = 32 / 32;
 // top.v DIM
 // top.v WI
 // top.v buffer_ctrl DIM
@@ -205,131 +205,46 @@ int main(int argc, char **argv)
 
   // ↓ここを書き換える==================================================================
 
-  // // 0
-  // for (int i = 0; i < 4; i++)
-  // {
-  //   conv.data_0 = 0;
-  //   conv.data_1 = 16;
-  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  // }
-  // eval();
+  // ロード
+  //  0. ロードデータをreg2に格納 (reg0 → reg2)
+  //      a. 0000000000000001
+  //      b. 1
 
-  // // 1
-  // for (int i = 0; i < 4; i++)
-  // {
-  //   conv.data_0 = NGRAM * i;
-  //   conv.data_1 = 32;
-  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  // }
-  // eval();
+  // Permutation
+  //  1. ロードデータを1Permしたものをreg2に格納 (reg0 → Perm → reg2)
+  //      a. 0000000000000010
+  //      b. 2
+  //  2. reg2をPermしたものをreg2に格納 (reg2 → Perm → reg2)
+  //      a. 0000000000000100
+  //      b. 4
 
-  // // 2
-  // for (int i = 0; i < 4; i++)
-  // {
-  //   conv.data_0 = 0;
-  //   conv.data_1 = 64;
-  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  // }
-  // eval();
+  // Xor
+  //  3. ロードデータとreg2をXorしたものをreg2に格納（reg0 Xor reg2 → reg2）
+  //      a. 0000000000001000
+  //      b. 8
+  //  4. reg1とreg2をXorしたものをreg2に格納（reg1 Xor reg2 → reg2）
+  //      a. 0000000000010000
+  //      b. 16
 
-  // // 3
-  // for (int i = 0; i < 4; i++)
-  // {
-  //   conv.data_0 = NGRAM * i + 1;
-  //   conv.data_1 = 33;
-  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  // }
-  // eval();
+  // ストア
+  //  5. reg2の値を吐き出す
+  //      a. 0000000000100000
+  //      b. 32
 
-  // // 4
-  // for (int i = 0; i < 4; i++)
-  // {
-  //   conv.data_0 = 0;
-  //   conv.data_1 = 64;
-  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  // }
-  // eval();
+  // Copy
+  //  6. reg2 → reg1
+  //      a. 0000000001000000
+  //      b. 64
 
-  // // 5
-  // for (int i = 0; i < 4; i++)
-  // {
-  //   conv.data_0 = NGRAM * i + 2;
-  //   conv.data_1 = 34;
-  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  // }
-  // eval();
-
-  // // 6
-  // for (int i = 0; i < 4; i++)
-  // {
-  //   conv.data_0 = 0;
-  //   conv.data_1 = 64;
-  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  // }
-  // eval();
-
-  // // 7
-  // for (int i = 0; i < 4; i++)
-  // {
-
-  //   conv.data_0 = 0;
-  //   conv.data_1 = 128;
-  //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-  // }
-  // eval();
+  // 3-gram 0,6,1,4,6,1,2,4,5
 
   for (int j = 0; j < ADDRNUM; j++)
   {
     // 0
     for (int i = 0; i < CORENUM; i++)
     {
-      conv.data_0 = 0;
-      conv.data_1 = 16;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-    }
-    eval();
-
-    // 1
-    for (int i = 0; i < CORENUM; i++)
-    {
       conv.data_0 = NGRAM * i + j;
-      conv.data_1 = 32;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-    }
-    eval();
-
-    // 2
-    for (int i = 0; i < CORENUM; i++)
-    {
-      conv.data_0 = 0;
-      conv.data_1 = 64;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-    }
-    eval();
-
-    // 3
-    for (int i = 0; i < CORENUM; i++)
-    {
-      conv.data_0 = NGRAM * i + 1 + j;
-      conv.data_1 = 33;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-    }
-    eval();
-
-    // 4
-    for (int i = 0; i < CORENUM; i++)
-    {
-      conv.data_0 = 0;
-      conv.data_1 = 64;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-    }
-    eval();
-
-    // 5
-    for (int i = 0; i < CORENUM; i++)
-    {
-      conv.data_0 = NGRAM * i + 2 + j;
-      conv.data_1 = 34;
+      conv.data_1 = 1;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
     }
     eval();
@@ -343,12 +258,67 @@ int main(int argc, char **argv)
     }
     eval();
 
-    // 7
+    // 1
+    for (int i = 0; i < CORENUM; i++)
+    {
+      conv.data_0 = NGRAM * i + 1 + j;
+      conv.data_1 = 2;
+      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    eval();
+
+    // 4
+    for (int i = 0; i < CORENUM; i++)
+    {
+      conv.data_0 = 0;
+      conv.data_1 = 16;
+      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    eval();
+
+    // 6
+    for (int i = 0; i < CORENUM; i++)
+    {
+      conv.data_0 = 0;
+      conv.data_1 = 64;
+      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    eval();
+
+    // 1
+    for (int i = 0; i < CORENUM; i++)
+    {
+      conv.data_0 = NGRAM * i + 2 + j;
+      conv.data_1 = 2;
+      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    eval();
+
+    // 2
+    for (int i = 0; i < CORENUM; i++)
+    {
+      conv.data_0 = 0;
+      conv.data_1 = 4;
+      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    eval();
+
+    // 4
     for (int i = 0; i < CORENUM; i++)
     {
 
       conv.data_0 = 0;
-      conv.data_1 = 128;
+      conv.data_1 = 16;
+      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    eval();
+
+    // 5
+    for (int i = 0; i < CORENUM; i++)
+    {
+
+      conv.data_0 = 0;
+      conv.data_1 = 32;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
     }
     eval();

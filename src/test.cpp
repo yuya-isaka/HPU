@@ -8,9 +8,9 @@
 // 可変のパラメータ
 
 const int NGRAM = 3;
-const int ADDRNUM = 144;
+const int ADDRNUM = 48;
 const int RANNUM = 1001;
-const int DIM = 1024 / 32;
+const int DIM = 32 / 32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -200,7 +200,7 @@ int main(int argc, char **argv)
 			if (tmp == NGRAM)
 			{
 				// putb(result);
-				// printf("%u\n", result);
+				printf("%u\n", result);
 				result_array[num] = result;
 				tmp = 0;
 				result = 0;
