@@ -28,25 +28,27 @@ module buffer_ctrl
          input wire [DIM:0]       core_result_14,
          input wire [DIM:0]       core_result_15,
          input wire [DIM:0]       core_result_16,
-         input wire [DIM:0]       core_result_17,
-         input wire [DIM:0]       core_result_18,
-         input wire [DIM:0]       core_result_19,
-         input wire [DIM:0]       core_result_20,
-         input wire [DIM:0]       core_result_21,
-         input wire [DIM:0]       core_result_22,
-         input wire [DIM:0]       core_result_23,
-         input wire [DIM:0]       core_result_24,
-         input wire [DIM:0]       core_result_25,
-         input wire [DIM:0]       core_result_26,
-         input wire [DIM:0]       core_result_27,
-         input wire [DIM:0]       core_result_28,
-         input wire [DIM:0]       core_result_29,
-         input wire [DIM:0]       core_result_30,
-         input wire [DIM:0]       core_result_31,
-         input wire [DIM:0]       core_result_32,
+         //  input wire [DIM:0]       core_result_17,
+         //  input wire [DIM:0]       core_result_18,
+         //  input wire [DIM:0]       core_result_19,
+         //  input wire [DIM:0]       core_result_20,
+         //  input wire [DIM:0]       core_result_21,
+         //  input wire [DIM:0]       core_result_22,
+         //  input wire [DIM:0]       core_result_23,
+         //  input wire [DIM:0]       core_result_24,
+         //  input wire [DIM:0]       core_result_25,
+         //  input wire [DIM:0]       core_result_26,
+         //  input wire [DIM:0]       core_result_27,
+         //  input wire [DIM:0]       core_result_28,
+         //  input wire [DIM:0]       core_result_29,
+         //  input wire [DIM:0]       core_result_30,
+         //  input wire [DIM:0]       core_result_31,
+         //  input wire [DIM:0]       core_result_32,
          // コア数可変
+         // 4コア
          //  input wire [3:0]           store,
-         input wire [31:0]           store,
+         // 16コア
+         input wire [15:0]           store,
          input wire                 stream_v,
 
          // out
@@ -64,7 +66,7 @@ module buffer_ctrl
         for (i = 0; i < DIM+1; i = i + 1) begin
 
             // 計算数可変
-            counter #(.W(30)) counter
+            counter #(.W(32)) counter
                     (
                         // in
                         .clk(clk),
@@ -72,27 +74,29 @@ module buffer_ctrl
                         .tmp_even(tmp_even),
                         .tmp_rand_bit(tmp_rand[i]),
                         // コア数可変
+                        // 4コア
                         // .store(store[3:0]),
-                        .store(store[31:0]),
+                        // 16コア
+                        .store(store[15:0]),
                         // コア数可変
                         .core_result(
                             {
-                                core_result_32[i],
-                                core_result_31[i],
-                                core_result_30[i],
-                                core_result_29[i],
-                                core_result_28[i],
-                                core_result_27[i],
-                                core_result_26[i],
-                                core_result_25[i],
-                                core_result_24[i],
-                                core_result_23[i],
-                                core_result_22[i],
-                                core_result_21[i],
-                                core_result_20[i],
-                                core_result_19[i],
-                                core_result_18[i],
-                                core_result_17[i],
+                                // core_result_32[i],
+                                // core_result_31[i],
+                                // core_result_30[i],
+                                // core_result_29[i],
+                                // core_result_28[i],
+                                // core_result_27[i],
+                                // core_result_26[i],
+                                // core_result_25[i],
+                                // core_result_24[i],
+                                // core_result_23[i],
+                                // core_result_22[i],
+                                // core_result_21[i],
+                                // core_result_20[i],
+                                // core_result_19[i],
+                                // core_result_18[i],
+                                // core_result_17[i],
                                 core_result_16[i],
                                 core_result_15[i],
                                 core_result_14[i],
@@ -128,6 +132,12 @@ module buffer_ctrl
     //         ->   get_fin         ->   stream_v
     //                              ->   sign_bit(最新値)
     //         ->   select          ->   box ↑(sign_bit), update前にselectが組み合わせ回路で求まっている前提
+
+    // 16コア
+    // 『stream_vが立つタイミングのsign_bitが求めてた値』
+    // update  ->   get_fin      ->  get_fin_n  ->  stream_v
+    //         ->   update_n     ->  update_nn  ->  sign_bit(最新値)
+    //         ->   select       ->  box_1 ...  ->  box ↑ sign_bitも最新値
 
 
     // 32コア

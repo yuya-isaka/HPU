@@ -14,10 +14,14 @@ module counter
          input wire                 tmp_even,
          input wire                 tmp_rand_bit,
          // コア数可変
-         input wire [31:0]          store,
+         // 16コア
+         input wire [15:0]          store,
+         // 4コア
          //  input wire [3:0]           store,
          // コア数可変
-         input wire [31:0]          core_result,
+         // 16コア
+         input wire [15:0]          core_result,
+         // 4コア
          //  input wire [3:0]           core_result,
 
          // out
@@ -29,14 +33,24 @@ module counter
 
 
     // コア数可変
-    reg         store_n, store_nn, store_nnn;
+    // 32コア
+    // reg         store_n, store_nn, store_nnn;
+    // always_ff @(posedge clk) begin
+    //               store_n <= store;
+    //               store_nn <= store_n;
+    //               store_nnn <= store_nn;
+    //           end;
+
+    // コア数可変
+    // 16コア
+    reg         store_n, store_nn;
     always_ff @(posedge clk) begin
                   store_n <= store;
                   store_nn <= store_n;
-                  store_nnn <= store_nn;
               end;
 
     // コア数可変
+    // 4コア
     // reg         store_n;
     // always_ff @(posedge clk) begin
     //               store_n <= store;
@@ -48,18 +62,18 @@ module counter
     reg signed [W-1:0]      box;
 
     // コア数可変
-    reg signed [W-1:0]      box_11;
-    reg signed [W-1:0]      box_22;
+    // reg signed [W-1:0]      box_11;
+    // reg signed [W-1:0]      box_22;
 
     // コア数可変
     reg signed [W-1:0]      box_1;
     reg signed [W-1:0]      box_2;
     reg signed [W-1:0]      box_3;
     reg signed [W-1:0]      box_4;
-    reg signed [W-1:0]      box_5;
-    reg signed [W-1:0]      box_6;
-    reg signed [W-1:0]      box_7;
-    reg signed [W-1:0]      box_8;
+    // reg signed [W-1:0]      box_5;
+    // reg signed [W-1:0]      box_6;
+    // reg signed [W-1:0]      box_7;
+    // reg signed [W-1:0]      box_8;
 
     // run == 1 にする前に設定する必要性あり
     // $signed(1'b1)にするとバグる
@@ -84,10 +98,10 @@ module counter
                       box_2 <= 0;
                       box_3 <= 0;
                       box_4 <= 0;
-                      box_5 <= 0;
-                      box_6 <= 0;
-                      box_7 <= 0;
-                      box_8 <= 0;
+                      //   box_5 <= 0;
+                      //   box_6 <= 0;
+                      //   box_7 <= 0;
+                      //   box_8 <= 0;
                   end
                   else if (store_n) begin
                       // コア数可変
@@ -108,36 +122,42 @@ module counter
                             + select[13]
                             + select[14]
                             + select[15];
-                      box_5 <=
-                            select[16]
-                            + select[17]
-                            + select[18]
-                            + select[19];
-                      box_6 <=
-                            select[20]
-                            + select[21]
-                            + select[22]
-                            + select[23];
-                      box_7 <=
-                            select[24]
-                            + select[25]
-                            + select[26]
-                            + select[27];
-                      box_8 <=
-                            select[28]
-                            + select[29]
-                            + select[30]
-                            + select[31];
+                      //   box_5 <=
+                      //         select[16]
+                      //         + select[17]
+                      //         + select[18]
+                      //         + select[19];
+                      //   box_6 <=
+                      //         select[20]
+                      //         + select[21]
+                      //         + select[22]
+                      //         + select[23];
+                      //   box_7 <=
+                      //         select[24]
+                      //         + select[25]
+                      //         + select[26]
+                      //         + select[27];
+                      //   box_8 <=
+                      //         select[28]
+                      //         + select[29]
+                      //         + select[30]
+                      //         + select[31];
                   end
+                  //   else if (store_nn) begin
+                  //       // コア数可変
+                  //       box_11 <= box_1 + box_2 + box_3 + box_4;
+                  //       box_22 <= box_5 + box_6 + box_7 + box_8;
+                  //   end
+                  // コア数可変
+                  //   else if (store_nnn) begin
                   else if (store_nn) begin
-                      // コア数可変
-                      box_11 <= box_1 + box_2 + box_3 + box_4;
-                      box_22 <= box_5 + box_6 + box_7 + box_8;
-                  end
-                  else if (store_nnn) begin
                       //   else if (store_n) begin
                       // コア数可変
-                      box <= box + box_11 + box_22;
+                      // 32コア
+                      //   box <= box + box_11 + box_22;
+                      // 16コア
+                      box <= box + box_1 + box_2 + box_3 + box_4;
+                      // 4コア
                       //   box <= box + select[0] + select[1] + select[2] + select[3];
                   end
               end;
@@ -147,13 +167,17 @@ module counter
 
 
     // コア数可変
-    wire signed [1:0]      select [0:31];
+    // 16コア
+    wire signed [1:0]      select [0:15];
+    // 4コア
     // wire signed [1:0]      select [0:3];
 
     generate
         genvar      k;
         // コア数可変
-        for (k = 0; k < 32; k = k + 1) begin
+        // 16コア
+        for (k = 0; k < 16; k = k + 1) begin
+            // 4コア
             // for (k = 0; k < 4; k = k + 1) begin
             selector selector
                      (

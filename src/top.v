@@ -50,13 +50,18 @@ module top
         input wire              S_AXIS_TVALID
     );
 
-    // 次元数可変
-    // parameter DIM = 31;    // 何次元か-1
-    parameter DIM = 511;    // 何次元か-1
 
     // 次元数可変
-    // parameter WI = 0;    // 何次元か-1
-    parameter WI = 15;      // 32が何個か-1
+    // 32次元
+    // parameter DIM = 31;
+    // 1024次元
+    parameter DIM = 1023;
+
+    // 次元数可変
+    // 32次元
+    // parameter WI = 0;
+    // 1024次元
+    parameter WI = 31;
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,8 +90,10 @@ module top
 
     // M_AXIS_TDATA
     // 次元数可変
+    // 32次元
     // buffer_ctrl #(.DIM(31)) buffer_ctrl
-    buffer_ctrl #(.DIM(511)) buffer_ctrl
+    // 1024次元
+    buffer_ctrl #(.DIM(1023)) buffer_ctrl
                 (
                     // in
                     .clk(AXIS_ACLK),
@@ -110,24 +117,26 @@ module top
                     .core_result_14(core_result[13]),
                     .core_result_15(core_result[14]),
                     .core_result_16(core_result[15]),
-                    .core_result_17(core_result[16]),
-                    .core_result_18(core_result[17]),
-                    .core_result_19(core_result[18]),
-                    .core_result_20(core_result[19]),
-                    .core_result_21(core_result[20]),
-                    .core_result_22(core_result[21]),
-                    .core_result_23(core_result[22]),
-                    .core_result_24(core_result[23]),
-                    .core_result_25(core_result[24]),
-                    .core_result_26(core_result[25]),
-                    .core_result_27(core_result[26]),
-                    .core_result_28(core_result[27]),
-                    .core_result_29(core_result[28]),
-                    .core_result_30(core_result[29]),
-                    .core_result_31(core_result[30]),
-                    .core_result_32(core_result[31]),
+                    // .core_result_17(core_result[16]),
+                    // .core_result_18(core_result[17]),
+                    // .core_result_19(core_result[18]),
+                    // .core_result_20(core_result[19]),
+                    // .core_result_21(core_result[20]),
+                    // .core_result_22(core_result[21]),
+                    // .core_result_23(core_result[22]),
+                    // .core_result_24(core_result[23]),
+                    // .core_result_25(core_result[24]),
+                    // .core_result_26(core_result[25]),
+                    // .core_result_27(core_result[26]),
+                    // .core_result_28(core_result[27]),
+                    // .core_result_29(core_result[28]),
+                    // .core_result_30(core_result[29]),
+                    // .core_result_31(core_result[30]),
+                    // .core_result_32(core_result[31]),
                     // コア数可変
-                    .store(store[31:0]),
+                    // 16コア
+                    .store(store[15:0]),
+                    // 4コア
                     // .store(store[3:0]),
                     .stream_v(stream_v),
 
@@ -271,54 +280,54 @@ module top
         else if (item_a_tmp == 15) begin
             rand_num[511:480] <= rand_num_tmp;
         end
-        // else if (item_a_tmp == 16) begin
-        //     rand_num[543:512] <= rand_num_tmp;
-        // end
-        // else if (item_a_tmp == 17) begin
-        //     rand_num[575:544] <= rand_num_tmp;
-        // end
-        // else if (item_a_tmp == 18) begin
-        //     rand_num[607:576] <= rand_num_tmp;
-        // end
-        // else if (item_a_tmp == 19) begin
-        //     rand_num[639:608] <= rand_num_tmp;
-        // end
-        // else if (item_a_tmp == 20) begin
-        //     rand_num[671:640] <= rand_num_tmp;
-        // end
-        // else if (item_a_tmp == 21) begin
-        //     rand_num[703:672] <= rand_num_tmp;
-        // end
-        // else if (item_a_tmp == 22) begin
-        //     rand_num[735:704] <= rand_num_tmp;
-        // end
-        // else if (item_a_tmp == 23) begin
-        //     rand_num[767:736] <= rand_num_tmp;
-        // end
-        // else if (item_a_tmp == 24) begin
-        //     rand_num[799:768] <= rand_num_tmp;
-        // end
-        // else if (item_a_tmp == 25) begin
-        //     rand_num[831:800] <= rand_num_tmp;
-        // end
-        // else if (item_a_tmp == 26) begin
-        //     rand_num[863:832] <= rand_num_tmp;
-        // end
-        // else if (item_a_tmp == 27) begin
-        //     rand_num[895:864] <= rand_num_tmp;
-        // end
-        // else if (item_a_tmp == 28) begin
-        //     rand_num[927:896] <= rand_num_tmp;
-        // end
-        // else if (item_a_tmp == 29) begin
-        //     rand_num[959:928] <= rand_num_tmp;
-        // end
-        // else if (item_a_tmp == 30) begin
-        //     rand_num[991:960] <= rand_num_tmp;
-        // end
-        // else if (item_a_tmp == 31) begin
-        //     rand_num[1023:992] <= rand_num_tmp;
-        // end
+        else if (item_a_tmp == 16) begin
+            rand_num[543:512] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 17) begin
+            rand_num[575:544] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 18) begin
+            rand_num[607:576] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 19) begin
+            rand_num[639:608] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 20) begin
+            rand_num[671:640] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 21) begin
+            rand_num[703:672] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 22) begin
+            rand_num[735:704] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 23) begin
+            rand_num[767:736] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 24) begin
+            rand_num[799:768] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 25) begin
+            rand_num[831:800] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 26) begin
+            rand_num[863:832] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 27) begin
+            rand_num[895:864] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 28) begin
+            rand_num[927:896] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 29) begin
+            rand_num[959:928] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 30) begin
+            rand_num[991:960] <= rand_num_tmp;
+        end
+        else if (item_a_tmp == 31) begin
+            rand_num[1023:992] <= rand_num_tmp;
+        end
     end
 
 
@@ -337,21 +346,29 @@ module top
     //================================================================
 
     // コア数可変
+    // 4コア
     // wire [3:0]              store;
-    wire [31:0]              store;
+    // 16コア
+    wire [15:0]              store;
 
     // コア数可変
+    // 4コア
     // wire [DIM:0]            core_result [0:3];
-    wire [DIM:0]         core_result [0:31];
+    // 16コア
+    wire [DIM:0]         core_result [0:15];
 
     generate
         genvar      i;
         // コア数可変
-        for (i = 0; i < 32; i = i + 1) begin
+        // 16コア
+        for (i = 0; i < 16; i = i + 1) begin
+            // 4コア
             // for (i = 0; i < 4; i = i + 1) begin
             // 次元数可変
+            // 32次元
             // core #(.DIM(31)) core
-            core #(.DIM(511)) core
+            // 1024次元
+            core #(.DIM(1023)) core
                  (
                      // in
                      .clk(AXIS_ACLK),
