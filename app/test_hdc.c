@@ -37,7 +37,7 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 {
   unsigned int result = 0;
 
-  // 次元数かへn
+  // 次元数可変
   unsigned int mask = (int)1 << (32 - 1);
   while (mask)
   {
