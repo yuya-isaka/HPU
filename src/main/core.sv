@@ -29,44 +29,25 @@ module core
     reg [DIM:0]      item_memory [0:1023];
 
 
-    reg [DIM:0]     data;
+    reg [DIM:0]     reg_0;
     reg [15:0]      inst;
 
     always_ff @(posedge clk) begin
                   if (gen & (item_a != item_memory_num) & update_item) begin
                       item_memory[item_a] <= rand_num;
-                      data <= 0;
+                      reg_0 <= 0;
                       inst <= 0;
                   end
                   else if (get_v) begin
-                      data <= item_memory[get_d[15:0]];
+                      reg_0 <= item_memory[get_d[15:0]];
                       inst <= get_d[31:16];
                   end
                   else begin
-                      data <= 0;
+                      reg_0 <= 0;
                       inst <= 0;
                   end
               end;
 
-    // inst
-    // inst[3:0] = permutationの数
-    // inst[4] = reg1, reg2を初期化
-    // inst[5] = 外から入ってきたデータをPermしたものをreg1に格納
-    // inst[6] = reg1とreg2をXorしたものをreg2に格納
-    // inst[7] = reg2の値を吐き出す
-
-    // 命令セット
-    // inst[3:0] = 0000, 0001, 0010, 0011 = 0, 1, 2, 3
-    // inst[4] = 10000 = 16
-    // inst[5] = 100000, 100001, 100010, 100011 = 32, 33, 34, 35
-    // inst[6] = 1000000 = 64
-    // inst[7] = 10000000 = 128
-
-    // 流れ
-    // アドレスx, reg1, reg2を初期化命令 (最初は初期化されているからこれいらない)
-    // 上の命令を実行中、アドレス0, 外から入ってきたデータを、Permしたものをreg1に格納
-    // 上の命令を実行中, アドレスx, reg1とreg2をXorしたものをreg2に格納
-    // 上の命令を実行中、アドレス1、 外から入ってきたデータを,Permしたものをreg1に格納
 
     // N-gram流れ
     // 0. reg1, reg2を初期化
@@ -78,6 +59,42 @@ module core
     // 6. reg1とreg2をXorしたものをreg2に格納
     // 7. reg2の値を吐き出す
     // exec
+
+    //  inst[31:15]の16ビットで指定
+    //      a. 2進数
+    //      b. 10進数
+
+    // ロード
+    //  0. ロードデータをreg2に格納 (reg0 → reg2)
+    //      a. 0000000000000001
+    //      b. 1
+
+    // Permutation
+    //  1. ロードデータを1Permしたものをreg2に格納 (reg0 → Perm → reg2)
+    //      a. 0000000000000010
+    //      b. 2
+    //  2. reg2をPermしたものをreg2に格納 (reg2 → Perm → reg2)
+    //      a. 0000000000000100
+    //      b. 4
+
+    // Xor
+    //  3. ロードデータとreg2をXorしたものをreg2に格納（reg0 Xor reg2 → reg2）
+    //      a. 0000000000001000
+    //      b. 8
+    //  4. reg1とreg2をXorしたものをreg2に格納（reg1 Xor reg2 → reg2）
+    //      a. 0000000000010000
+    //      b. 16
+
+    // ストア
+    //  5. reg2の値を吐き出す
+    //      a. 0000000000100000
+    //      b. 32
+
+    // Copy
+    //  6. reg2 → reg1
+    //      a. 0000000001000000
+    //      b. 64
+
 
 
     reg [DIM:0] reg_1;
@@ -93,58 +110,48 @@ module core
                       store <= 0;
                   end
                   else if (exec) begin
-                      if (inst[4]) begin
-                          reg_1 <= 0;
-                          reg_2 <= 0;
+                      // ロード
+                      if (inst[0]) begin
+                          reg_2 <= reg_0;
                           buff <= 0;
                           store <= 0;
                       end
-                      else if (inst[5]) begin
-                          if (inst[3:0] == 4'd0) begin
-                              reg_1 <= data;
-                          end
-                          else if (inst[3:0] == 4'd1) begin
-                              reg_1 <= {data[0:0], data[DIM:1]};
-                          end
-                          else if (inst[3:0] == 4'd2) begin
-                              reg_1 <= {data[1:0], data[DIM:2]};
-                          end
-                          else if (inst[3:0] == 4'd3) begin
-                              reg_1 <= {data[2:0], data[DIM:3]};
-                          end
-                          else if (inst[3:0] == 4'd4) begin
-                              reg_1 <= {data[3:0], data[DIM:4]};
-                          end
-                          else if (inst[3:0] == 4'd5) begin
-                              reg_1 <= {data[4:0], data[DIM:5]};
-                          end
-                          else if (inst[3:0] == 4'd6) begin
-                              reg_1 <= {data[5:0], data[DIM:6]};
-                          end
-                          else if (inst[3:0] == 4'd7) begin
-                              reg_1 <= {data[6:0], data[DIM:7]};
-                          end
-                          else if (inst[3:0] == 4'd8) begin
-                              reg_1 <= {data[7:0], data[DIM:8]};
-                          end
-                          else if (inst[3:0] == 4'd9) begin
-                              reg_1 <= {data[8:0], data[DIM:9]};
-                          end
-                          else if (inst[3:0] == 4'd10) begin
-                              reg_1 <= {data[9:0], data[DIM:10]};
-                          end
+                      // Perm
+                      else if (inst[1]) begin
+                          reg_2 <= {reg_0[0], reg_0[DIM:1]};
                           buff <= 0;
                           store <= 0;
                       end
-                      else if (inst[6]) begin
+                      // Perm
+                      else if (inst[2]) begin
+                          reg_2 <= {reg_2[0], reg_2[DIM:1]};
+                          buff <= 0;
+                          store <= 0;
+                      end
+                      // Xor
+                      else if (inst[3]) begin
+                          reg_2 <= reg_0 ^ reg_2;
+                          buff <= 0;
+                          store <= 0;
+                      end
+                      // Xor
+                      else if (inst[4]) begin
                           reg_2 <= reg_1 ^ reg_2;
                           buff <= 0;
                           store <= 0;
                       end
-                      else if (inst[7]) begin
+                      // ストア
+                      else if (inst[5]) begin
                           buff <= reg_2;
                           store <= 1;
                       end
+                      // コピー
+                      else if (inst[6]) begin
+                          reg_2 <= reg_1;
+                          buff <= 0;
+                          store <= 0;
+                      end
+                      // ありえない命令
                       else begin
                           reg_1 <= 0;
                           reg_2 <= 0;
