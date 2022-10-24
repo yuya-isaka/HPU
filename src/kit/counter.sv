@@ -122,39 +122,9 @@ module counter
                             + select[13]
                             + select[14]
                             + select[15];
-                      //   box_5 <=
-                      //         select[16]
-                      //         + select[17]
-                      //         + select[18]
-                      //         + select[19];
-                      //   box_6 <=
-                      //         select[20]
-                      //         + select[21]
-                      //         + select[22]
-                      //         + select[23];
-                      //   box_7 <=
-                      //         select[24]
-                      //         + select[25]
-                      //         + select[26]
-                      //         + select[27];
-                      //   box_8 <=
-                      //         select[28]
-                      //         + select[29]
-                      //         + select[30]
-                      //         + select[31];
                   end
-                  //   else if (store_nn) begin
-                  //       // コア数可変
-                  //       box_11 <= box_1 + box_2 + box_3 + box_4;
-                  //       box_22 <= box_5 + box_6 + box_7 + box_8;
-                  //   end
-                  // コア数可変
-                  //   else if (store_nnn) begin
                   else if (store_nn) begin
-                      //   else if (store_n) begin
                       // コア数可変
-                      // 32コア
-                      //   box <= box + box_11 + box_22;
                       // 16コア
                       box <= box + box_1 + box_2 + box_3 + box_4;
                       // 4コア

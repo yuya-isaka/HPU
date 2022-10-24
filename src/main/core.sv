@@ -42,6 +42,10 @@ module core
                       data <= item_memory[get_d[15:0]];
                       inst <= get_d[31:16];
                   end
+                  else begin
+                      data <= 0;
+                      inst <= 0;
+                  end
               end;
 
     // inst
@@ -141,6 +145,18 @@ module core
                           buff <= reg_2;
                           store <= 1;
                       end
+                      else begin
+                          reg_1 <= 0;
+                          reg_2 <= 0;
+                          buff <= 0;
+                          store <= 0;
+                      end
+                  end
+                  else begin
+                      reg_1 <= 0;
+                      reg_2 <= 0;
+                      buff <= 0;
+                      store <= 0;
                   end
               end;
 
