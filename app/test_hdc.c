@@ -194,6 +194,7 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSW
 
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
   int ARNUM = ADDRNUM / NGRAM;
+  const int LAST = ADDRNUM - 48;
   if (EVEN)
   {
     ARNUM++;
@@ -385,9 +386,18 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSW
     {
       if (i < CORENUM)
       {
-        conv.data_0 = 0;
-        conv.data_1 = 32;
-        src[tmp_2] = conv.write_data;
+        if (j == LAST)
+        {
+          conv.data_0 = 0;
+          conv.data_1 = 128;
+          src[tmp_2] = conv.write_data;
+        }
+        else
+        {
+          conv.data_0 = 0;
+          conv.data_1 = 32;
+          src[tmp_2] = conv.write_data;
+        }
       }
       else
       {
