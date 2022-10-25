@@ -43,10 +43,10 @@ module core
                       reg_0 <= item_memory[get_d[15:0]];
                       inst <= get_d[31:16];
                   end
-                  else begin
-                      reg_0 <= 0;
-                      inst <= 0;
-                  end
+                  //   else begin
+                  //       reg_0 <= 0;
+                  //       inst <= 0;
+                  //   end
               end;
 
 
@@ -95,6 +95,11 @@ module core
     //  6. reg2 → reg1
     //      a. 0000000001000000
     //      b. 64
+
+    // ラストストア
+    //  7. reg2の値を最後に吐き出す
+    //      a. 0000000010000000
+    //      b. 128
 
 
 
@@ -153,13 +158,13 @@ module core
                           buff <= 0;
                           store <= 0;
                       end
-                      // ありえない命令
-                      else begin
-                          reg_1 <= 0;
-                          reg_2 <= 0;
-                          buff <= 0;
-                          store <= 0;
-                      end
+                      // ありえない命令 (reg_1とかが不自然に０になったりしたらおかしい), デバッグ用に使える
+                      //   else begin
+                      //       reg_1 <= 0;
+                      //       reg_2 <= 0;
+                      //       buff <= 0;
+                      //       store <= 0;
+                      //   end
                   end
                   else if (exec) begin
                       // ラストストア
