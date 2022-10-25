@@ -74,7 +74,7 @@ void putb(unsigned int v)
 // 可変のパラメータ
 
 const int NGRAM = 3;
-const int ADDRNUM = 144; // 現状12の倍数しかできない。その理由は命令をちゃんと設定していないから (4コアの時は12の倍数、３２コアの時は96の倍数)
+const int ADDRNUM = 48; // 現状12の倍数しかできない。その理由は命令をちゃんと設定していないから (4コアの時は12の倍数、３２コアの時は96の倍数)
 const int LAST = ADDRNUM - 48;
 const int CORENUM = 16;
 const int RANNUM = 1000;
@@ -246,10 +246,180 @@ int main(int argc, char **argv)
 
   for (int j = 0; j < ADDRNUM; j++)
   {
-    // 0
+    // // 0
+    // for (int i = 0; i < CORENUM; i++)
+    // {
+    //   conv.data_0 = NGRAM * i + j;
+    //   conv.data_1 = 1;
+    //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    // }
+    // for (int i = CORENUM; i < 32; i++)
+    // {
+    //   verilator_top->S_AXIS_TDATA[i] = 0;
+    // }
+    // eval();
+
+    // verilator_top->S_AXIS_TVALID = 0;
+    // eval();
+    // eval();
+    // eval();
+    // eval();
+    // verilator_top->S_AXIS_TVALID = 1;
+    // eval();
+
+    // // 6
+    // for (int i = 0; i < CORENUM; i++)
+    // {
+    //   conv.data_0 = 0;
+    //   conv.data_1 = 64;
+    //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    // }
+    // for (int i = CORENUM; i < 32; i++)
+    // {
+    //   verilator_top->S_AXIS_TDATA[i] = 0;
+    // }
+    // eval();
+
+    // verilator_top->S_AXIS_TVALID = 0;
+    // eval();
+    // eval();
+    // eval();
+    // eval();
+    // verilator_top->S_AXIS_TVALID = 1;
+    // eval();
+
+    // // 1
+    // for (int i = 0; i < CORENUM; i++)
+    // {
+    //   conv.data_0 = NGRAM * i + 1 + j;
+    //   conv.data_1 = 2;
+    //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    // }
+    // for (int i = CORENUM; i < 32; i++)
+    // {
+    //   verilator_top->S_AXIS_TDATA[i] = 0;
+    // }
+    // eval();
+
+    // verilator_top->S_AXIS_TVALID = 0;
+    // eval();
+    // eval();
+    // eval();
+    // eval();
+    // verilator_top->S_AXIS_TVALID = 1;
+    // eval();
+
+    // // 4
+    // for (int i = 0; i < CORENUM; i++)
+    // {
+    //   conv.data_0 = 0;
+    //   conv.data_1 = 16;
+    //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    // }
+    // for (int i = CORENUM; i < 32; i++)
+    // {
+    //   verilator_top->S_AXIS_TDATA[i] = 0;
+    // }
+    // eval();
+
+    // verilator_top->S_AXIS_TVALID = 0;
+    // eval();
+    // eval();
+    // eval();
+    // eval();
+    // verilator_top->S_AXIS_TVALID = 1;
+    // eval();
+
+    // // 6
+    // for (int i = 0; i < CORENUM; i++)
+    // {
+    //   conv.data_0 = 0;
+    //   conv.data_1 = 64;
+    //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    // }
+    // for (int i = CORENUM; i < 32; i++)
+    // {
+    //   verilator_top->S_AXIS_TDATA[i] = 0;
+    // }
+    // eval();
+
+    // verilator_top->S_AXIS_TVALID = 0;
+    // eval();
+    // eval();
+    // eval();
+    // eval();
+    // verilator_top->S_AXIS_TVALID = 1;
+    // eval();
+
+    // // 1
+    // for (int i = 0; i < CORENUM; i++)
+    // {
+    //   conv.data_0 = NGRAM * i + 2 + j;
+    //   conv.data_1 = 2;
+    //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    // }
+    // for (int i = CORENUM; i < 32; i++)
+    // {
+    //   verilator_top->S_AXIS_TDATA[i] = 0;
+    // }
+    // eval();
+
+    // verilator_top->S_AXIS_TVALID = 0;
+    // eval();
+    // eval();
+    // eval();
+    // eval();
+    // verilator_top->S_AXIS_TVALID = 1;
+    // eval();
+
+    // // 2
+    // for (int i = 0; i < CORENUM; i++)
+    // {
+    //   conv.data_0 = 0;
+    //   conv.data_1 = 4;
+    //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    // }
+    // for (int i = CORENUM; i < 32; i++)
+    // {
+    //   verilator_top->S_AXIS_TDATA[i] = 0;
+    // }
+    // eval();
+
+    // verilator_top->S_AXIS_TVALID = 0;
+    // eval();
+    // eval();
+    // eval();
+    // eval();
+    // verilator_top->S_AXIS_TVALID = 1;
+    // eval();
+
+    // // 4
+    // for (int i = 0; i < CORENUM; i++)
+    // {
+
+    //   conv.data_0 = 0;
+    //   conv.data_1 = 16;
+    //   verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    // }
+    // for (int i = CORENUM; i < 32; i++)
+    // {
+    //   verilator_top->S_AXIS_TDATA[i] = 0;
+    // }
+    // eval();
+
+    // verilator_top->S_AXIS_TVALID = 0;
+    // eval();
+    // eval();
+    // eval();
+    // eval();
+    // verilator_top->S_AXIS_TVALID = 1;
+    // eval();
+
+    // 4
     for (int i = 0; i < CORENUM; i++)
     {
-      conv.data_0 = NGRAM * i + j;
+
+      conv.data_0 = 0;
       conv.data_1 = 1;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
     }
@@ -259,160 +429,18 @@ int main(int argc, char **argv)
     }
     eval();
 
-    verilator_top->S_AXIS_TVALID = 0;
-    eval();
-    eval();
-    eval();
-    eval();
-    verilator_top->S_AXIS_TVALID = 1;
-    eval();
-
-    // 6
-    for (int i = 0; i < CORENUM; i++)
-    {
-      conv.data_0 = 0;
-      conv.data_1 = 64;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-    }
-    for (int i = CORENUM; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    verilator_top->S_AXIS_TVALID = 0;
-    eval();
-    eval();
-    eval();
-    eval();
-    verilator_top->S_AXIS_TVALID = 1;
-    eval();
-
-    // 1
-    for (int i = 0; i < CORENUM; i++)
-    {
-      conv.data_0 = NGRAM * i + 1 + j;
-      conv.data_1 = 2;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-    }
-    for (int i = CORENUM; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    verilator_top->S_AXIS_TVALID = 0;
-    eval();
-    eval();
-    eval();
-    eval();
-    verilator_top->S_AXIS_TVALID = 1;
-    eval();
-
-    // 4
-    for (int i = 0; i < CORENUM; i++)
-    {
-      conv.data_0 = 0;
-      conv.data_1 = 16;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-    }
-    for (int i = CORENUM; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    verilator_top->S_AXIS_TVALID = 0;
-    eval();
-    eval();
-    eval();
-    eval();
-    verilator_top->S_AXIS_TVALID = 1;
-    eval();
-
-    // 6
-    for (int i = 0; i < CORENUM; i++)
-    {
-      conv.data_0 = 0;
-      conv.data_1 = 64;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-    }
-    for (int i = CORENUM; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    verilator_top->S_AXIS_TVALID = 0;
-    eval();
-    eval();
-    eval();
-    eval();
-    verilator_top->S_AXIS_TVALID = 1;
-    eval();
-
-    // 1
-    for (int i = 0; i < CORENUM; i++)
-    {
-      conv.data_0 = NGRAM * i + 2 + j;
-      conv.data_1 = 2;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-    }
-    for (int i = CORENUM; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    verilator_top->S_AXIS_TVALID = 0;
-    eval();
-    eval();
-    eval();
-    eval();
-    verilator_top->S_AXIS_TVALID = 1;
-    eval();
-
-    // 2
-    for (int i = 0; i < CORENUM; i++)
-    {
-      conv.data_0 = 0;
-      conv.data_1 = 4;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-    }
-    for (int i = CORENUM; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    verilator_top->S_AXIS_TVALID = 0;
-    eval();
-    eval();
-    eval();
-    eval();
-    verilator_top->S_AXIS_TVALID = 1;
-    eval();
-
     // 4
     for (int i = 0; i < CORENUM; i++)
     {
 
-      conv.data_0 = 0;
-      conv.data_1 = 16;
+      conv.data_0 = 1;
+      conv.data_1 = 1;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
     }
     for (int i = CORENUM; i < 32; i++)
     {
       verilator_top->S_AXIS_TDATA[i] = 0;
     }
-    eval();
-
-    verilator_top->S_AXIS_TVALID = 0;
-    eval();
-    eval();
-    eval();
-    eval();
-    verilator_top->S_AXIS_TVALID = 1;
     eval();
 
     if (j == LAST)
