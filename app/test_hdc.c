@@ -406,6 +406,8 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSW
     // }
   }
 
+  printf("aaaaa\n");
+
   // AXI DMA 送信の設定（UIO経由）
   dma[0x00 / 4] = 1;
   dma[0x18 / 4] = src_phys;
@@ -417,9 +419,13 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSW
   dma[0x48 / 4] = dst_phys;
   dma[0x58 / 4] = (BUSWIDTH / 32) * 4; // 32個 * 4バイト = 128バイト = 1024ビット
 
+  printf("bbbbb\n");
+
   // 演算終了を待つ
   while ((dma[0x34 / 4] & 0x1000) != 0x1000)
     ;
+
+  printf("ccccc\n");
 
   /////////////////////////////////////////////////////////////////////////////////////// 結果確認 //////////////////////////////////////////////////////////////////////////////////
 
