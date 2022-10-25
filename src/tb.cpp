@@ -74,10 +74,11 @@ void putb(unsigned int v)
 // 可変のパラメータ
 
 const int NGRAM = 3;
-const int ADDRNUM = 192; // 現状12の倍数しかできない。その理由は命令をちゃんと設定していないから (4コアの時は12の倍数、３２コアの時は96の倍数)
+const int ADDRNUM = 144; // 現状12の倍数しかできない。その理由は命令をちゃんと設定していないから (4コアの時は12の倍数、３２コアの時は96の倍数)
+const int LAST = ADDRNUM - 48;
 const int CORENUM = 16;
 const int RANNUM = 1000;
-const int DIM = 1024 / 32;
+const int DIM = 32 / 32;
 // top.v DIM
 // top.v WI
 // top.v buffer_ctrl DIM
@@ -236,6 +237,11 @@ int main(int argc, char **argv)
   //      a. 0000000001000000
   //      b. 64
 
+  // ラストストア
+  // 7. 最後
+  //      a. 0000000010000000
+  //      a. 128
+
   // 3-gram 0,6,1,4,6,1,2,4,5
 
   for (int j = 0; j < ADDRNUM; j++)
@@ -313,15 +319,30 @@ int main(int argc, char **argv)
     }
     eval();
 
-    // 5
-    for (int i = 0; i < CORENUM; i++)
+    if (j == LAST)
     {
+      // 7
+      for (int i = 0; i < CORENUM; i++)
+      {
 
-      conv.data_0 = 0;
-      conv.data_1 = 32;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+        conv.data_0 = 0;
+        conv.data_1 = 128;
+        verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+      }
+      eval();
     }
-    eval();
+    else
+    {
+      // 5
+      for (int i = 0; i < CORENUM; i++)
+      {
+
+        conv.data_0 = 0;
+        conv.data_1 = 32;
+        verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+      }
+      eval();
+    }
 
     j += NGRAM * CORENUM - 1;
   }

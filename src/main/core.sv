@@ -18,7 +18,8 @@ module core
          input wire              exec,
 
          output reg             store,
-         output logic [DIM:0]   core_result
+         output logic [DIM:0]   core_result,
+         output reg             last
      );
 
 
@@ -108,8 +109,9 @@ module core
                       reg_2 <= 0;
                       buff <= 0;
                       store <= 0;
+                      last <= 0;
                   end
-                  else if (exec) begin
+                  else if (exec & get_v) begin
                       // ロード
                       if (inst[0]) begin
                           reg_2 <= reg_0;
@@ -159,11 +161,20 @@ module core
                           store <= 0;
                       end
                   end
+                  else if (exec) begin
+                      // ラストストア
+                      if (inst[7]) begin
+                          buff <= reg_2;
+                          store <= 1;
+                          last <= 1;
+                      end
+                  end
                   else begin
-                      reg_1 <= 0;
-                      reg_2 <= 0;
+                      //   reg_1 <= 0;
+                      //   reg_2 <= 0;
                       buff <= 0;
                       store <= 0;
+                      last <= 0;
                   end
               end;
 

@@ -6,7 +6,8 @@ module stream_ctrl
         // in
         input wire              clk,
         input wire              rst,
-        input wire              get_fin,
+        // input wire              get_fin,
+        input wire [15:0]             last,
         input wire              dst_ready,
 
         // out
@@ -29,28 +30,34 @@ module stream_ctrl
 
     // コア数可変
     // 16コア
-    reg         get_fin_n;
+    // reg         get_fin_n;
+    // always_ff @(posedge clk) begin
+    //               get_fin_n <= get_fin;
+    //           end;
+
+    reg         last_n, last_nn;
     always_ff @(posedge clk) begin
-                  get_fin_n <= get_fin;
+                  last_n <= last;
+                  last_nn <= last_n;
               end;
 
 
-    reg         get_fin_keep;
+    reg         last_keep;
     always_ff @(posedge clk) begin
                   if (rst) begin
-                      get_fin_keep <= 1'b0;
+                      last_keep <= 1'b0;
                   end
                   else if (stream_ok) begin
-                      get_fin_keep <= 1'b0;
+                      last_keep <= 1'b0;
                   end
                   // コア数可変
                   // 32コア
                   //   else if (get_fin_nn) begin
                   // 16コア
-                  else if (get_fin_n) begin
+                  else if (last_nn) begin
                       // 4コア
                       //   else if (get_fin) begin
-                      get_fin_keep <= 1'b1;
+                      last_keep <= 1'b1;
                   end
               end;
 
@@ -77,7 +84,7 @@ module stream_ctrl
                     // 32コア
                     // if ((get_fin_nn | get_fin_keep) & dst_ready) begin
                     // 16コア
-                    if ((get_fin_n | get_fin_keep) & dst_ready) begin
+                    if ((last_nn | last_keep) & dst_ready) begin
                         // 4コア
                         // if ((get_fin | get_fin_keep) & dst_ready) begin
                         stream_ok = 1'b1;
