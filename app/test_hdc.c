@@ -504,7 +504,7 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSW
     free(result_array);
   }
 
-  for (int j = 0; j < 2; j++)
+  for (int j = 0; j < 32; j++)
   {
     printf("%u\n", dst[j]);
   }
