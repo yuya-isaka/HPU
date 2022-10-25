@@ -78,7 +78,7 @@ const int ADDRNUM = 144; // 現状12の倍数しかできない。その理由�
 const int LAST = ADDRNUM - 48;
 const int CORENUM = 16;
 const int RANNUM = 1000;
-const int DIM = 32 / 32;
+const int DIM = 1024 / 32;
 // top.v DIM
 // top.v WI
 // top.v buffer_ctrl DIM
