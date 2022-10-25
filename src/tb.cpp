@@ -255,6 +255,14 @@ int main(int argc, char **argv)
     }
     eval();
 
+    verilator_top->S_AXIS_TVALID = 0;
+    eval();
+    eval();
+    eval();
+    eval();
+    verilator_top->S_AXIS_TVALID = 1;
+    eval();
+
     // 6
     for (int i = 0; i < CORENUM; i++)
     {
@@ -262,6 +270,14 @@ int main(int argc, char **argv)
       conv.data_1 = 64;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
     }
+    eval();
+
+    verilator_top->S_AXIS_TVALID = 0;
+    eval();
+    eval();
+    eval();
+    eval();
+    verilator_top->S_AXIS_TVALID = 1;
     eval();
 
     // 1
@@ -273,6 +289,14 @@ int main(int argc, char **argv)
     }
     eval();
 
+    verilator_top->S_AXIS_TVALID = 0;
+    eval();
+    eval();
+    eval();
+    eval();
+    verilator_top->S_AXIS_TVALID = 1;
+    eval();
+
     // 4
     for (int i = 0; i < CORENUM; i++)
     {
@@ -280,6 +304,14 @@ int main(int argc, char **argv)
       conv.data_1 = 16;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
     }
+    eval();
+
+    verilator_top->S_AXIS_TVALID = 0;
+    eval();
+    eval();
+    eval();
+    eval();
+    verilator_top->S_AXIS_TVALID = 1;
     eval();
 
     // 6
@@ -291,6 +323,14 @@ int main(int argc, char **argv)
     }
     eval();
 
+    verilator_top->S_AXIS_TVALID = 0;
+    eval();
+    eval();
+    eval();
+    eval();
+    verilator_top->S_AXIS_TVALID = 1;
+    eval();
+
     // 1
     for (int i = 0; i < CORENUM; i++)
     {
@@ -298,6 +338,14 @@ int main(int argc, char **argv)
       conv.data_1 = 2;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
     }
+    eval();
+
+    verilator_top->S_AXIS_TVALID = 0;
+    eval();
+    eval();
+    eval();
+    eval();
+    verilator_top->S_AXIS_TVALID = 1;
     eval();
 
     // 2
@@ -309,6 +357,14 @@ int main(int argc, char **argv)
     }
     eval();
 
+    verilator_top->S_AXIS_TVALID = 0;
+    eval();
+    eval();
+    eval();
+    eval();
+    verilator_top->S_AXIS_TVALID = 1;
+    eval();
+
     // 4
     for (int i = 0; i < CORENUM; i++)
     {
@@ -317,6 +373,14 @@ int main(int argc, char **argv)
       conv.data_1 = 16;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
     }
+    eval();
+
+    verilator_top->S_AXIS_TVALID = 0;
+    eval();
+    eval();
+    eval();
+    eval();
+    verilator_top->S_AXIS_TVALID = 1;
     eval();
 
     if (j == LAST)
