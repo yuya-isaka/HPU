@@ -135,8 +135,7 @@ module buffer_ctrl
 
     // 16コア
     // 『stream_vが立つタイミングのsign_bitが求めてた値』
-    // update  ->   get_fin      ->  get_fin_n  ->  stream_v
-    //         ->   update_n     ->  update_nn  ->  sign_bit(最新値)
+    // last     ->   last_n      ->  last_nn  ->  stream_v
     //         ->   select       ->  box_1 ...  ->  box ↑ sign_bitも最新値
 
 
