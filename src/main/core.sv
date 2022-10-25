@@ -33,6 +33,7 @@ module core
     reg [15:0]      inst;
 
     always_ff @(posedge clk) begin
+        // 最後だけはランダムな値に使うから
                   if (gen & (item_a != item_memory_num) & update_item) begin
                       item_memory[item_a] <= rand_num;
                       reg_0 <= 0;
