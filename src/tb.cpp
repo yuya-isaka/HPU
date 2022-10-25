@@ -462,6 +462,10 @@ int main(int argc, char **argv)
     eval();
   }
 
+  eval();
+  eval();
+  eval();
+
   // ==================================================================
 
   printf("\n --------------------------- Output ---------------------------- \n\n\n");
@@ -478,6 +482,13 @@ int main(int argc, char **argv)
     // putb(verilator_top->M_AXIS_TDATA[0]);
     eval();
   }
+  eval();
+  eval();
+  eval();
+  eval();
+  eval();
+  eval();
+  eval();
 
   verilator_top->S_AXI_AWADDR = 0;
   verilator_top->S_AXI_WDATA = 0;
