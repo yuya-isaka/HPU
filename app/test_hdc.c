@@ -386,42 +386,6 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSW
     {
       if (i < CORENUM)
       {
-        conv.data_0 = 0;
-        conv.data_1 = 1;
-        src[tmp_2] = conv.write_data;
-      }
-      else
-      {
-        src[tmp_2] = 0;
-      }
-      tmp_2++;
-      send_num++;
-    }
-    // ------------------------------------------------------
-
-    // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 32); i++)
-    {
-      if (i < CORENUM)
-      {
-        conv.data_0 = 1;
-        conv.data_1 = 1;
-        src[tmp_2] = conv.write_data;
-      }
-      else
-      {
-        src[tmp_2] = 0;
-      }
-      tmp_2++;
-      send_num++;
-    }
-    // ------------------------------------------------------
-
-    // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 32); i++)
-    {
-      if (i < CORENUM)
-      {
         if (j == LAST)
         {
           conv.data_0 = 0;
