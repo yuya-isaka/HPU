@@ -237,149 +237,149 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSW
   int tmp_2 = 0;
   for (int j = 0; j < ADDRNUM; j++)
   {
-    // // 1024bit ---------------------------------------------
-    // for (int i = 0; i < (BUSWIDTH / 32); i++)
-    // {
-    //   if (i < CORENUM)
-    //   {
-    //     conv.data_0 = NGRAM * i + j;
-    //     conv.data_1 = 1;
-    //     src[tmp_2] = conv.write_data;
-    //   }
-    //   else
-    //   {
-    //     src[tmp_2] = 0;
-    //   }
-    //   tmp_2++;
-    //   send_num++;
-    // }
-    // // ------------------------------------------------------
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
+    {
+      if (i < CORENUM)
+      {
+        conv.data_0 = NGRAM * i + j;
+        conv.data_1 = 1;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
+    }
+    // ------------------------------------------------------
 
-    // // 1024bit ---------------------------------------------
-    // for (int i = 0; i < (BUSWIDTH / 32); i++)
-    // {
-    //   if (i < CORENUM)
-    //   {
-    //     conv.data_0 = 0;
-    //     conv.data_1 = 64;
-    //     src[tmp_2] = conv.write_data;
-    //   }
-    //   else
-    //   {
-    //     src[tmp_2] = 0;
-    //   }
-    //   tmp_2++;
-    //   send_num++;
-    // }
-    // // ------------------------------------------------------
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
+    {
+      if (i < CORENUM)
+      {
+        conv.data_0 = 0;
+        conv.data_1 = 64;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
+    }
+    // ------------------------------------------------------
 
-    // // 1024bit ---------------------------------------------
-    // for (int i = 0; i < (BUSWIDTH / 32); i++)
-    // {
-    //   if (i < CORENUM)
-    //   {
-    //     conv.data_0 = NGRAM * i + 1 + j;
-    //     conv.data_1 = 2;
-    //     src[tmp_2] = conv.write_data;
-    //   }
-    //   else
-    //   {
-    //     src[tmp_2] = 0;
-    //   }
-    //   tmp_2++;
-    //   send_num++;
-    // }
-    // // ------------------------------------------------------
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
+    {
+      if (i < CORENUM)
+      {
+        conv.data_0 = NGRAM * i + 1 + j;
+        conv.data_1 = 2;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
+    }
+    // ------------------------------------------------------
 
-    // // 1024bit ---------------------------------------------
-    // for (int i = 0; i < (BUSWIDTH / 32); i++)
-    // {
-    //   if (i < CORENUM)
-    //   {
-    //     conv.data_0 = 0;
-    //     conv.data_1 = 16;
-    //     src[tmp_2] = conv.write_data;
-    //   }
-    //   else
-    //   {
-    //     src[tmp_2] = 0;
-    //   }
-    //   tmp_2++;
-    //   send_num++;
-    // }
-    // // ------------------------------------------------------
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
+    {
+      if (i < CORENUM)
+      {
+        conv.data_0 = 0;
+        conv.data_1 = 16;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
+    }
+    // ------------------------------------------------------
 
-    // // 1024bit ---------------------------------------------
-    // for (int i = 0; i < (BUSWIDTH / 32); i++)
-    // {
-    //   if (i < CORENUM)
-    //   {
-    //     conv.data_0 = 0;
-    //     conv.data_1 = 64;
-    //     src[tmp_2] = conv.write_data;
-    //   }
-    //   else
-    //   {
-    //     src[tmp_2] = 0;
-    //   }
-    //   tmp_2++;
-    //   send_num++;
-    // }
-    // // ------------------------------------------------------
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
+    {
+      if (i < CORENUM)
+      {
+        conv.data_0 = 0;
+        conv.data_1 = 64;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
+    }
+    // ------------------------------------------------------
 
-    // // 1024bit ---------------------------------------------
-    // for (int i = 0; i < (BUSWIDTH / 32); i++)
-    // {
-    //   if (i < CORENUM)
-    //   {
-    //     conv.data_0 = NGRAM * i + 2 + j;
-    //     conv.data_1 = 2;
-    //     src[tmp_2] = conv.write_data;
-    //   }
-    //   else
-    //   {
-    //     src[tmp_2] = 0;
-    //   }
-    //   tmp_2++;
-    //   send_num++;
-    // }
-    // // ------------------------------------------------------
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
+    {
+      if (i < CORENUM)
+      {
+        conv.data_0 = NGRAM * i + 2 + j;
+        conv.data_1 = 2;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
+    }
+    // ------------------------------------------------------
 
-    // // 1024bit ---------------------------------------------
-    // for (int i = 0; i < (BUSWIDTH / 32); i++)
-    // {
-    //   if (i < CORENUM)
-    //   {
-    //     conv.data_0 = 0;
-    //     conv.data_1 = 4;
-    //     src[tmp_2] = conv.write_data;
-    //   }
-    //   else
-    //   {
-    //     src[tmp_2] = 0;
-    //   }
-    //   tmp_2++;
-    //   send_num++;
-    // }
-    // // ------------------------------------------------------
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
+    {
+      if (i < CORENUM)
+      {
+        conv.data_0 = 0;
+        conv.data_1 = 4;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
+    }
+    // ------------------------------------------------------
 
-    // // 1024bit ---------------------------------------------
-    // for (int i = 0; i < (BUSWIDTH / 32); i++)
-    // {
-    //   if (i < CORENUM)
-    //   {
-    //     conv.data_0 = 0;
-    //     conv.data_1 = 16;
-    //     src[tmp_2] = conv.write_data;
-    //   }
-    //   else
-    //   {
-    //     src[tmp_2] = 0;
-    //   }
-    //   tmp_2++;
-    //   send_num++;
-    // }
-    // // ------------------------------------------------------
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
+    {
+      if (i < CORENUM)
+      {
+        conv.data_0 = 0;
+        conv.data_1 = 16;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
+    }
+    // ------------------------------------------------------
 
     // 1024bit ---------------------------------------------
     for (int i = 0; i < (BUSWIDTH / 32); i++)

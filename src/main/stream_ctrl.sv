@@ -138,7 +138,7 @@ module stream_ctrl
         (
             // in
             .ini(8'd0),
-            .fin(8'd0),
+            .fin(8'd1),
             .start(start),
             .clk(clk),
             .rst(rst),
