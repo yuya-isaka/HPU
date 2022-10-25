@@ -73,6 +73,7 @@ void shifter_new(const int NGRAM)
   int num = 0;
   for (int i = 0; i < RANNUM; i++)
   {
+    // ちゃんと初期化したら上手くいった
     unsigned int result_tmp[DIM];
     for (int j = 0; j < DIM; j++)
     {
