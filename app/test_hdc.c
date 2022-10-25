@@ -471,9 +471,9 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSW
     // printf("  %u\n", result_real);
     // putb(result_real);
     // printf("\n");
-    if (result_real != dst[0])
+    if (result_real != dst[j])
     {
-      printf("Error %u %u\n", result_real, dst[0]);
+      printf("Error %u %u\n", result_real, dst[j]);
     }
     else
     {
