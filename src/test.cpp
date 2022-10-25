@@ -8,7 +8,7 @@
 // 可変のパラメータ
 
 const int NGRAM = 3;
-const int ADDRNUM = 192;
+const int ADDRNUM = 96;
 const int RANNUM = 1001;
 const int DIM = 1024 / 32;
 
