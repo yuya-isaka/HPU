@@ -1,9 +1,32 @@
 // include
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h> // uint16_t
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// const int RANNUM = 1001;
+// const int DIM = 1024 / 32;
+#define RANNUM 1001
+#define DIM 1024 / 32
+
+unsigned int item_memory_array[DIM][RANNUM];
+unsigned int item_memory_array_new[DIM][RANNUM];
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+union
+{
+  struct
+  {
+    uint16_t data_0;
+    uint16_t data_1;
+  };
+  uint32_t write_data;
+} conv;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -31,6 +54,52 @@ unsigned int shifter(unsigned int v, unsigned int num)
 
   tmp_v = tmp_v | tmp;
   return tmp_v;
+}
+
+unsigned int shifter_2(unsigned int *v, unsigned int num)
+{
+  // num回 論理右シフト
+  unsigned int tmp_v = *v >> num;
+
+  // 右にシフトしたやつを取り出して、左に(32-num)回 論理左シフト
+  unsigned int tmp_num = (1 << num) - 1;
+  *v = (*v & tmp_num) << (32 - num);
+
+  return tmp_v;
+}
+
+void shifter_new(const int NGRAM)
+{
+  int num = 0;
+  for (int i = 0; i < RANNUM; i++)
+  {
+    unsigned int result_tmp[DIM];
+    for (int j = 0; j < DIM; j++)
+    {
+      unsigned int tmp = item_memory_array[j][i];
+      unsigned int tmp_v = shifter_2(&tmp, num);
+      result_tmp[j] |= tmp_v;
+      if (j == 0)
+      {
+        result_tmp[DIM - 1] |= tmp;
+      }
+      else
+      {
+        result_tmp[j - 1] |= tmp;
+      }
+    }
+
+    for (int j = 0; j < DIM; j++)
+    {
+      item_memory_array_new[j][i] = result_tmp[j];
+    }
+
+    num++;
+    if (num == NGRAM)
+    {
+      num = 0;
+    }
+  }
 }
 
 unsigned int grab_bit(unsigned int result_array[], size_t size)
@@ -107,21 +176,17 @@ unsigned long dst_phys;
 // const int NGRAM = 3;
 // const int ADDRNUM = 900;
 // const int CORENUM = 4;
-// const int RANNUM = 1001;
 // const int BUSWIDTH = 1024;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int RANNUM, const int BUSWIDTH)
+void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSWIDTH)
 {
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // 自動で決まるパラメータ
 
-  const int ADDRJ = NGRAM - 1;
-  const int ADDRI = ((ADDRNUM / NGRAM) - 1) / CORENUM;
-  const int REMAINDER = (ADDRNUM / NGRAM) % CORENUM;
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
   int ARNUM = ADDRNUM / NGRAM;
   if (EVEN)
@@ -151,17 +216,8 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int RANN
 
   //////////////////////////////////////////////////////////////////////////////////////// run ///////////////////////////////////////////////////////////////////////////////////////////////
 
-  // addr_j
-  top[0x08 / 4] = ADDRJ;
-
-  // addr_i
-  top[0x0c / 4] = ADDRI;
-
-  // remainder
-  top[0x10 / 4] = REMAINDER;
-
   // even
-  top[0x14 / 4] = EVEN;
+  top[0x08 / 4] = EVEN;
 
   //////////////////////////////////////////////////////////////////////////////////////// run ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -173,21 +229,176 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int RANN
   int send_num = 0;
   int tmp = NGRAM - 1;
   int tmp_2 = 0;
-  for (int i = 0; i < ADDRNUM; i++)
+  for (int j = 0; j < ADDRNUM; j++)
   {
-    // 1024bit
-    for (int j = 0; j < (BUSWIDTH / 32); j++)
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
     {
-      src[tmp_2] = i + (NGRAM * j);
+      if (i < CORENUM)
+      {
+        conv.data_0 = NGRAM * i + j;
+        conv.data_1 = 1;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
       tmp_2++;
       send_num++;
     }
+    // ------------------------------------------------------
 
-    if (i == tmp)
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
     {
-      i += NGRAM * (CORENUM - 1);
-      tmp += (CORENUM * NGRAM); // 32個分を同時に送っているから32 * NGRAM
+      if (i < CORENUM)
+      {
+        conv.data_0 = 0;
+        conv.data_1 = 64;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
     }
+    // ------------------------------------------------------
+
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
+    {
+      if (i < CORENUM)
+      {
+        conv.data_0 = NGRAM * i + 1 + j;
+        conv.data_1 = 2;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
+    }
+    // ------------------------------------------------------
+
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
+    {
+      if (i < CORENUM)
+      {
+        conv.data_0 = 0;
+        conv.data_1 = 16;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
+    }
+    // ------------------------------------------------------
+
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
+    {
+      if (i < CORENUM)
+      {
+        conv.data_0 = 0;
+        conv.data_1 = 64;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
+    }
+    // ------------------------------------------------------
+
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
+    {
+      if (i < CORENUM)
+      {
+        conv.data_0 = NGRAM * i + 2 + j;
+        conv.data_1 = 2;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
+    }
+    // ------------------------------------------------------
+
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
+    {
+      if (i < CORENUM)
+      {
+        conv.data_0 = 0;
+        conv.data_1 = 4;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
+    }
+    // ------------------------------------------------------
+
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
+    {
+      if (i < CORENUM)
+      {
+        conv.data_0 = 0;
+        conv.data_1 = 16;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
+    }
+    // ------------------------------------------------------
+
+    // 1024bit ---------------------------------------------
+    for (int i = 0; i < (BUSWIDTH / 32); i++)
+    {
+      if (i < CORENUM)
+      {
+        conv.data_0 = 0;
+        conv.data_1 = 32;
+        src[tmp_2] = conv.write_data;
+      }
+      else
+      {
+        src[tmp_2] = 0;
+      }
+      tmp_2++;
+      send_num++;
+    }
+    // ------------------------------------------------------
+
+    j += NGRAM * CORENUM - 1;
+    // if (j == tmp)
+    // {
+    //   j += NGRAM * (CORENUM - 1);
+    //   tmp += (CORENUM * NGRAM); // 32個分を同時に送っているから32 * NGRAM
+    // }
   }
 
   // AXI DMA 送信の設定（UIO経由）
@@ -210,62 +421,67 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int RANN
   // printf("\n ------------------------- Sample Output -------------------------- \n\n");
 
   // 理想の計算
-  unsigned int item_memory_array[RANNUM];
-  item_memory_array[0] = 88675123;
-  for (unsigned int i = 1; i < RANNUM; i++)
+  item_memory_array[0][0] = 88675123;
+  for (unsigned int j = 0; j < RANNUM; j++)
   {
-    item_memory_array[i] = xor128(0);
-  }
-
-  unsigned int *result_array = (unsigned int *)malloc(sizeof(unsigned int) * ARNUM);
-  if (result_array == NULL)
-  {
-    exit(0);
-  }
-  unsigned int result = 0;
-  tmp = 0;
-  int num = 0;
-  for (unsigned int i = 0; i < ADDRNUM; i++)
-  {
-    result ^= shifter(item_memory_array[i], tmp);
-    tmp += 1;
-    if (tmp == NGRAM)
+    for (int i = 0; i < DIM; i++)
     {
-      // putb(result);
-      result_array[num] = result;
-      tmp = 0;
-      result = 0;
-      num += 1;
+      if (i == 0 && j == 0)
+        continue;
+      item_memory_array[i][j] = xor128(0);
     }
   }
 
-  // 多数決関数用
-  if (EVEN)
+  shifter_new(NGRAM);
+
+  for (int j = 0; j < DIM; j++)
   {
-    result_array[num] = item_memory_array[RANNUM - 1];
-    // putb(result_array[num]);
-    // printf("%u", item_memory_array[RANNUM - 1]);
+    unsigned int *result_array = (unsigned int *)malloc(sizeof(unsigned int) * ARNUM);
+    if (result_array == NULL)
+    {
+      exit(0);
+    }
+    unsigned int result = 0;
+    int tmp = 0;
+    int num = 0;
+    for (int i = 0; i < ADDRNUM; i++)
+    {
+      result ^= item_memory_array_new[j][i];
+      // printf("%d:%u\n", i, item_memory_array_new[j][i]);
+      tmp += 1;
+      if (tmp == NGRAM)
+      {
+        // putb(result);
+        // printf("%u\n", result);
+        result_array[num] = result;
+        tmp = 0;
+        result = 0;
+        num += 1;
+      }
+    }
+    // 多数決関数用
+    if (EVEN)
+    {
+      result_array[num] = item_memory_array[j][RANNUM - 1];
+      // putb(result_array[num]);
+      // printf("ランダム：%u\n", result_array[num]);
+    }
+    unsigned int result_real = grab_bit(result_array, ARNUM);
+    // printf("  %x\n", result_real);
+    // printf("  %u\n", result_real);
+    // putb(result_real);
+    // printf("\n");
+    if (result_real != dst[0])
+    {
+      printf("Error %u %u\n", result_real, dst[0]);
+    }
+    else
+    {
+      printf("Success\n");
+    }
+
+    free(result_array);
   }
-
-  unsigned int result_real = grab_bit(result_array, ARNUM);
-  // printf("%u\n", result_real);
-  // putb(result_real);
-
-  if (result_real != dst[0])
-  {
-    printf("Error %u %u\n", result_real, dst[0]);
-  }
-  else
-  {
-    printf("Success\n");
-  }
-
-  // printf("%u\n", dst[0]);
-  // putb(dst[0]);
-  // printf("%u\n", dst[1]);
-  // putb(dst[1]);
-
-  free(result_array);
 
   /////////////////////////////////////////////////////////////////////////////////////////  終了 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -370,13 +586,16 @@ int main()
 
   ///////////////////////////////////////////////////////////////////////////////// initial, udmabuf, uio 設定 ///////////////////////////////////////////////////////////////////////////////////
 
-  // NGRAM, ADDRNUM, CORENUM, RANNUM, BUSWIDTH
+  // NGRAM, ADDRNUM, CORENUM, BUSWIDTH
 
-  for (int i = 3; i <= 999; i += 3)
-  {
-    check(3, i, 4, 1001, 1024);
-    xor128(1);
-  }
+  // for (int i = 3; i <= 999; i += 3)
+  // {
+  //   check(3, i, 16, 1001, 1024);
+  //   xor128(1);
+  // }
+  check(3, 48, 16, 1024);
+  xor128(1);
+  check(3, 96, 16, 1024);
 
   printf("\n ------------------------------ 終了 -------------------------------- \n\n");
 
