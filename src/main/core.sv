@@ -159,12 +159,12 @@ module core
                           store <= 0;
                       end
                       // ありえない命令 (reg_1とかが不自然に０になったりしたらおかしい), デバッグ用に使える
-                      //   else begin
-                      //       reg_1 <= 0;
-                      //       reg_2 <= 0;
-                      //       buff <= 0;
-                      //       store <= 0;
-                      //   end
+                    //   else begin
+                    //       reg_1 <= 0;
+                    //       reg_2 <= 0;
+                    //       buff <= 0;
+                    //       store <= 0;
+                    //   end
                   end
                   else if (exec) begin
                       // ラストストア
@@ -174,18 +174,18 @@ module core
                           last <= 1;
                       end
                   end
-                  else if (last) begin
-                    buff <= 0;
-                    store <= 0;
-                    last <= 0;
-                  end
-                //   else begin
-                //       //   reg_1 <= 0;
-                //       //   reg_2 <= 0;
-                //     //   buff <= 0;
-                //     //   store <= 0;
-                //     //   last <= 0;
+                //   else if (last) begin
+                //       buff <= 0;
+                //       store <= 0;
+                //       last <= 0;
                 //   end
+                  //   else begin
+                  //       //   reg_1 <= 0;
+                  //       //   reg_2 <= 0;
+                  //     //   buff <= 0;
+                  //     //   store <= 0;
+                  //     //   last <= 0;
+                  //   end
               end;
 
 
