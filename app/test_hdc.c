@@ -76,6 +76,10 @@ void shifter_new(const int NGRAM)
     unsigned int result_tmp[DIM];
     for (int j = 0; j < DIM; j++)
     {
+      result_tmp[j] = 0;
+    }
+    for (int j = 0; j < DIM; j++)
+    {
       unsigned int tmp = item_memory_array[j][i];
       unsigned int tmp_v = shifter_2(&tmp, num);
       result_tmp[j] |= tmp_v;
@@ -594,8 +598,8 @@ int main()
   //   xor128(1);
   // }
   check(3, 48, 16, 1024);
-  xor128(1);
-  check(3, 96, 16, 1024);
+  // xor128(1);
+  // check(3, 96, 16, 1024);
 
   printf("\n ------------------------------ 終了 -------------------------------- \n\n");
 
