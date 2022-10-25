@@ -103,6 +103,7 @@ module counter
                       //   box_7 <= 0;
                       //   box_8 <= 0;
                   end
+
                   else if (store_n) begin
                       // コア数可変
                       box_1 <= select[0]
@@ -123,6 +124,7 @@ module counter
                             + select[14]
                             + select[15];
                   end
+
                   else if (store_nn) begin
                       // コア数可変
                       // 16コア
