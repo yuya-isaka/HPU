@@ -253,6 +253,10 @@ int main(int argc, char **argv)
       conv.data_1 = 1;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
     }
+    for (int i = CORENUM; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
+    }
     eval();
 
     verilator_top->S_AXIS_TVALID = 0;
@@ -269,6 +273,10 @@ int main(int argc, char **argv)
       conv.data_0 = 0;
       conv.data_1 = 64;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    for (int i = CORENUM; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
     }
     eval();
 
@@ -287,6 +295,10 @@ int main(int argc, char **argv)
       conv.data_1 = 2;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
     }
+    for (int i = CORENUM; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
+    }
     eval();
 
     verilator_top->S_AXIS_TVALID = 0;
@@ -303,6 +315,10 @@ int main(int argc, char **argv)
       conv.data_0 = 0;
       conv.data_1 = 16;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    for (int i = CORENUM; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
     }
     eval();
 
@@ -321,6 +337,10 @@ int main(int argc, char **argv)
       conv.data_1 = 64;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
     }
+    for (int i = CORENUM; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
+    }
     eval();
 
     verilator_top->S_AXIS_TVALID = 0;
@@ -337,6 +357,10 @@ int main(int argc, char **argv)
       conv.data_0 = NGRAM * i + 2 + j;
       conv.data_1 = 2;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    for (int i = CORENUM; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
     }
     eval();
 
@@ -355,6 +379,10 @@ int main(int argc, char **argv)
       conv.data_1 = 4;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
     }
+    for (int i = CORENUM; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
+    }
     eval();
 
     verilator_top->S_AXIS_TVALID = 0;
@@ -372,6 +400,10 @@ int main(int argc, char **argv)
       conv.data_0 = 0;
       conv.data_1 = 16;
       verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+    }
+    for (int i = CORENUM; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
     }
     eval();
 
@@ -393,6 +425,10 @@ int main(int argc, char **argv)
         conv.data_1 = 128;
         verilator_top->S_AXIS_TDATA[i] = conv.write_data;
       }
+      for (int i = CORENUM; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
       eval();
     }
     else
@@ -404,6 +440,10 @@ int main(int argc, char **argv)
         conv.data_0 = 0;
         conv.data_1 = 32;
         verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+      }
+      for (int i = CORENUM; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
       }
       eval();
     }

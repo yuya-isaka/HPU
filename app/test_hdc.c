@@ -11,7 +11,7 @@
 // const int RANNUM = 1001;
 // const int DIM = 1024 / 32;
 #define RANNUM 1001
-#define DIM 1024 / 32
+#define DIM 32 / 32
 
 unsigned int item_memory_array[DIM][RANNUM];
 unsigned int item_memory_array_new[DIM][RANNUM];

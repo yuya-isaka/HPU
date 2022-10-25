@@ -37,8 +37,19 @@ module stream_ctrl
 
     reg         last_n, last_nn;
     always_ff @(posedge clk) begin
-                  last_n <= last;
-                  last_nn <= last_n;
+                  if (rst) begin
+                      last_n <= 1'b0;
+                      last_nn <= 1'b0;
+                  end
+                  else begin
+                      if (last != 0) begin
+                          last_n <= 1'b1;
+                      end
+                      else begin
+                          last_n <= 1'b0;
+                      end
+                      last_nn <= last_n;
+                  end
               end;
 
 
