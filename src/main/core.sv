@@ -45,6 +45,7 @@ module core
                   end
                   // これのおかげで、Gtktermで見た時のデータ→命令の並びができて嬉しい
                   else begin
+                      // reg_0は保持しなくていい
                       reg_0 <= 0;
                       inst <= 0;
                   end
@@ -109,6 +110,7 @@ module core
 
     reg [DIM:0] buff;
 
+    // reg_1, reg_2は値を保持しておく必要がある（reg_0はその度にロードされるから保持しなくていい）
     always_ff @(posedge clk) begin
                   if (~run) begin
                       reg_1 <= 0;

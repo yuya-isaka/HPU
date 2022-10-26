@@ -69,7 +69,7 @@ module top
 
     wire        get_v;
     wire        exec;
-    wire        get_fin;
+    // wire        get_fin;
 
     get_enable get_enable
                (
@@ -82,8 +82,8 @@ module top
                    // out
                    .get_ready(S_AXIS_TREADY),
                    .get_v(get_v),
-                   .exec(exec),
-                   .get_fin(get_fin)
+                   .exec(exec)
+                   //    .get_fin(get_fin)
                );
 
 
@@ -154,7 +154,7 @@ module top
                     .clk(AXIS_ACLK),
                     .rst(~run),
                     .last(last[15:0]),
-                    .get_fin(get_fin),
+                    // .get_fin(get_fin),
                     .get_v(get_v),
                     .dst_ready(M_AXIS_TREADY),
 
