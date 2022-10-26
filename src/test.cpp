@@ -5,18 +5,16 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// 可変のパラメータ
+// 可変パラメータ
 
-const int NGRAM = 3;
-const int ADDRNUM = 96;
-const int RANNUM = 1001;
 const int DIM = 32 / 32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// 自動で決まるパラメータ
+// 変わらん
 
-const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
+const int RANNUM = 1024;
+const int BUSWIDTH = 1024;
 unsigned int item_memory_array[DIM][RANNUM];
 unsigned int item_memory_array_new[DIM][RANNUM];
 
@@ -35,19 +33,6 @@ void putb(unsigned int v)
 	printf("  0"), putchar('b'), printb(v), putchar('\n');
 }
 
-unsigned int shifter(unsigned int v, unsigned int num)
-{
-	// num回 論理右シフト
-	unsigned int tmp = v >> num;
-
-	// 右にシフトしたやつを取り出して、左に(32-num)回 論理左シフト
-	unsigned int tmp_num = (1 << num) - 1;
-	unsigned int tmp_v = (v & tmp_num) << ((sizeof(v) * 8) - num);
-
-	tmp_v = tmp_v | tmp;
-	return tmp_v;
-}
-
 unsigned int shifter_2(unsigned int *v, unsigned int num)
 {
 	// num回 論理右シフト
@@ -60,7 +45,7 @@ unsigned int shifter_2(unsigned int *v, unsigned int num)
 	return tmp_v;
 }
 
-void shifter_new()
+void shifter_new(const int NGRAM)
 {
 	int num = 0;
 	for (int i = 0; i < RANNUM; i++)
@@ -116,9 +101,7 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 	return result;
 }
 
-// 周期が2^128
-// 32bitごとに結果（LFSRは１bitごと）
-unsigned int xor128(void)
+unsigned int xor128(int reset)
 {
 	// 内部で値を保持（seed） パターン１
 	// static unsigned int x = 2380889285;
@@ -132,38 +115,45 @@ unsigned int xor128(void)
 	static unsigned int z = 521288629;
 	static unsigned int w = 88675123;
 
-	// 前回のxを使う
-	unsigned int t = x ^ (x << 11);
-	// 更新
-	x = y;
-	y = z;
-	z = w;
+	if (reset)
+	{
+		x = 123456789;
+		y = 362436069;
+		z = 521288629;
+		w = 88675123;
+		return 0;
+	}
+	else
+	{
 
-	return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+		// 前回のxを使う
+		unsigned int t = x ^ (x << 11);
+		// 更新
+		x = y;
+		y = z;
+		z = w;
+
+		return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char **argv)
+void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
 {
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 	int ARNUM = ADDRNUM / NGRAM;
 	if (EVEN)
 	{
 		ARNUM++;
 	}
+	const int LAST = ADDRNUM - 48;
 
-	printf("\n ------------------------------- 開始 ------------------------------- \n\n\n");
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// hdcテスト
-	//　縦を次元、横を生成するハイパーベクトルの数
-	//   1 2 3 . . . 999 1000
-	// 1
-	// 2
-	// 3
-	// .
-	// .
-	// 31
-	// 32
 	item_memory_array[0][0] = 88675123;
 	for (int j = 0; j < RANNUM; j++)
 	{
@@ -171,12 +161,12 @@ int main(int argc, char **argv)
 		{
 			if (i == 0 && j == 0)
 				continue;
-			item_memory_array[i][j] = xor128();
+			item_memory_array[i][j] = xor128(0);
 		}
 	}
 
-	// あらかじめPermutationしておく
-	shifter_new();
+	// あらかじめPermutation
+	shifter_new(NGRAM);
 
 	// 1024 / 32bit なら 32回実行
 	// 縦は同じハイパーベクトルなので、縦同士を計算させる
@@ -199,8 +189,8 @@ int main(int argc, char **argv)
 			tmp += 1;
 			if (tmp == NGRAM)
 			{
+				// printf("%u\n", result);
 				// putb(result);
-				printf("%u\n", result);
 				result_array[num] = result;
 				tmp = 0;
 				result = 0;
@@ -211,17 +201,38 @@ int main(int argc, char **argv)
 		if (EVEN)
 		{
 			result_array[num] = item_memory_array[j][RANNUM - 1];
-			// putb(result_array[num]);
 			// printf("ランダム：%u\n", result_array[num]);
+			// putb(result_array[num]);
 		}
 		unsigned int result_real = grab_bit(result_array, ARNUM);
-		// printf("  %x\n", result_real);
 		printf("  %u\n", result_real);
-		putb(result_real);
+		// putb(result_real);
 		printf("\n");
 
 		free(result_array);
 	}
 
+	return;
+}
+
+int main(int argc, char **argv)
+{
+	printf("\n ------------------------------- 開始 ------------------------------- \n\n\n");
+
+	const int NGRAM = 3;
+	const int CORENUM = 16;
+	int ADDRNUM = 0;
+
+	for (int i = 48; i < RANNUM; i += 48)
+	{
+		ADDRNUM = i;
+
+		check(NGRAM, CORENUM, ADDRNUM);
+		xor128(1);
+
+		printf(" --------\n\n");
+	}
+
 	printf("\n ------------------------------- 終了 ------------------------------- \n");
+	return 0;
 }

@@ -7,6 +7,19 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// 可変パラメータ
+
+// 結果を何個出力するかに使う
+const int DIM = 32 / 32;
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// 変わらん
+
+const int RANNUM = 1024;
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 vluint64_t main_time = 0;
 vluint64_t sim_start = 0;
 vluint64_t sim_end = sim_start + 3000000;
@@ -71,33 +84,11 @@ void putb(unsigned int v)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// 可変のパラメータ
-
-const int NGRAM = 3;
-const int ADDRNUM = 96; // 現状12の倍数しかできない。その理由は命令をちゃんと設定していないから (4コアの時は12の倍数、３２コアの時は96の倍数)
-const int LAST = ADDRNUM - 48;
-const int CORENUM = 16;
-const int RANNUM = 1000;
-const int DIM = 32 / 32;
-// top.v DIM
-// top.v WI
-// top.v buffer_ctrl DIM
-// top.v rand_numの代入部分
-// top.v core DIM
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 自動で決まるパラメータ
-
-// const int ADDRJ = NGRAM - 1;
-// const int ADDRI = ((ADDRNUM / NGRAM) - 1) / CORENUM;
-// const int REMAINDER = (ADDRNUM / NGRAM) % CORENUM;
-const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-int main(int argc, char **argv)
+void check(const int NGRAM, const int CORENUM, const int ADDRNUM, int argc, char **argv, const int DEBUG)
 {
+
+  const int LAST = ADDRNUM - 48;
+  const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 
   ////////////////////////////////////////////////////////////////////////////// Verilator setup /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -110,8 +101,6 @@ int main(int argc, char **argv)
   main_time = 0;
 
   //////////////////////////////////////////////////////////////////////////////// initial begin ///////////////////////////////////////////////////////////////////////////////////////////
-
-  printf("\n ---------------------------- 開始 ----------------------------- \n");
 
   verilator_top->S_AXI_BREADY = 1;
   verilator_top->S_AXI_WSTRB = 15;
@@ -142,7 +131,7 @@ int main(int argc, char **argv)
 
   // item_memory_num <- 1000;
   verilator_top->S_AXI_AWADDR = 4;
-  verilator_top->S_AXI_WDATA = RANNUM;
+  verilator_top->S_AXI_WDATA = RANNUM - 1;
   verilator_top->S_AXI_AWVALID = 1;
   verilator_top->S_AXI_WVALID = 1;
   eval();
@@ -170,7 +159,7 @@ int main(int argc, char **argv)
   verilator_top->S_AXI_ARVALID = 0;
   eval();
 
-  printf("\n  生成！\n");
+  // printf("\n  生成！\n");
   // matwはここで０になっている
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -259,13 +248,21 @@ int main(int argc, char **argv)
     }
     eval();
 
-    // verilator_top->S_AXIS_TVALID = 0;
-    // eval();
-    // eval();
-    // eval();
-    // eval();
-    // verilator_top->S_AXIS_TVALID = 1;
-    // eval();
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      eval();
+      // ----------------------------------------------
+    }
 
     // 6
     for (int i = 0; i < CORENUM; i++)
@@ -280,13 +277,21 @@ int main(int argc, char **argv)
     }
     eval();
 
-    // verilator_top->S_AXIS_TVALID = 0;
-    // eval();
-    // eval();
-    // eval();
-    // eval();
-    // verilator_top->S_AXIS_TVALID = 1;
-    // eval();
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      eval();
+      // ----------------------------------------------
+    }
 
     // 1
     for (int i = 0; i < CORENUM; i++)
@@ -301,13 +306,21 @@ int main(int argc, char **argv)
     }
     eval();
 
-    // verilator_top->S_AXIS_TVALID = 0;
-    // eval();
-    // eval();
-    // eval();
-    // eval();
-    // verilator_top->S_AXIS_TVALID = 1;
-    // eval();
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      eval();
+      // ----------------------------------------------
+    }
 
     // 4
     for (int i = 0; i < CORENUM; i++)
@@ -322,17 +335,21 @@ int main(int argc, char **argv)
     }
     eval();
 
-    verilator_top->S_AXIS_TVALID = 0;
-    for (int i = 0; i < 32; i++)
+    if (DEBUG)
     {
-      verilator_top->S_AXIS_TDATA[i] = 0;
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      eval();
+      // ----------------------------------------------
     }
-    eval();
-    eval();
-    eval();
-    eval();
-    verilator_top->S_AXIS_TVALID = 1;
-    eval();
 
     // 6
     for (int i = 0; i < CORENUM; i++)
@@ -347,17 +364,21 @@ int main(int argc, char **argv)
     }
     eval();
 
-    verilator_top->S_AXIS_TVALID = 0;
-    for (int i = 0; i < 32; i++)
+    if (DEBUG)
     {
-      verilator_top->S_AXIS_TDATA[i] = 0;
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      eval();
+      // ----------------------------------------------
     }
-    eval();
-    eval();
-    eval();
-    eval();
-    verilator_top->S_AXIS_TVALID = 1;
-    eval();
 
     // 1
     for (int i = 0; i < CORENUM; i++)
@@ -372,20 +393,21 @@ int main(int argc, char **argv)
     }
     eval();
 
-    // セット --------------------------------
-    verilator_top->S_AXIS_TVALID = 0;
-    for (int i = 0; i < 32; i++)
+    if (DEBUG)
     {
-      verilator_top->S_AXIS_TDATA[i] = 0;
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      eval();
+      // ----------------------------------------------
     }
-    eval();
-    eval();
-    eval();
-    eval();
-
-    // セット ------------------------------
-    verilator_top->S_AXIS_TVALID = 1;
-    eval();
 
     // 2
     for (int i = 0; i < CORENUM; i++)
@@ -400,20 +422,21 @@ int main(int argc, char **argv)
     }
     eval();
 
-    // セット --------------------------------
-    verilator_top->S_AXIS_TVALID = 0;
-    for (int i = 0; i < 32; i++)
+    if (DEBUG)
     {
-      verilator_top->S_AXIS_TDATA[i] = 0;
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      eval();
+      // ----------------------------------------------
     }
-    eval();
-    eval();
-    eval();
-    eval();
-
-    // セット ------------------------------
-    verilator_top->S_AXIS_TVALID = 1;
-    eval();
 
     // 4
     for (int i = 0; i < CORENUM; i++)
@@ -429,20 +452,21 @@ int main(int argc, char **argv)
     }
     eval();
 
-    // セット --------------------------------
-    verilator_top->S_AXIS_TVALID = 0;
-    for (int i = 0; i < 32; i++)
+    if (DEBUG)
     {
-      verilator_top->S_AXIS_TDATA[i] = 0;
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      eval();
+      // ----------------------------------------------
     }
-    eval();
-    eval();
-    eval();
-    eval();
-
-    // セット ------------------------------
-    verilator_top->S_AXIS_TVALID = 1;
-    eval();
 
     if (j == LAST)
     {
@@ -482,6 +506,7 @@ int main(int argc, char **argv)
 
   // ↑ここを書き換える==================================================================
 
+  // 最後の送信途中で止まる対策 -----------------------------
   verilator_top->S_AXIS_TVALID = 0;
   for (int i = 0; i < 32; i++)
   {
@@ -490,6 +515,7 @@ int main(int argc, char **argv)
   eval();
   eval();
   eval();
+  // ----------------------------------------------
 
   // 演算結果を待つ
   while (!verilator_top->M_AXIS_TVALID)
@@ -501,26 +527,22 @@ int main(int argc, char **argv)
   eval();
   eval();
 
-  // ==================================================================
+  /////////////////////////////////////////////////////////////////////////////////////////  Output ////////////////////////////////////////////////////////////////////////////////////
 
-  printf("\n --------------------------- Output ---------------------------- \n\n\n");
+  // printf("\n --------------------------- Output ---------------------------- \n\n\n");
 
   for (int i = 0; i < 1; i++)
   {
     for (int j = 0; j < DIM; j++)
     {
       printf("  %u\n", verilator_top->M_AXIS_TDATA[j]);
-      putb(verilator_top->M_AXIS_TDATA[j]);
+      // putb(verilator_top->M_AXIS_TDATA[j]);
       printf("\n");
     }
     // printf("  %u\n\n", verilator_top->M_AXIS_TDATA[0]);
     // putb(verilator_top->M_AXIS_TDATA[0]);
     eval();
   }
-  eval();
-  eval();
-  eval();
-  eval();
   eval();
   eval();
   eval();
@@ -543,8 +565,33 @@ int main(int argc, char **argv)
 
   /////////////////////////////////////////////////////////////////////////////////////////  終了 ////////////////////////////////////////////////////////////////////////////////////
 
-  printf("\n --------------------------- 終了 ------------------------------- \n\n");
   delete verilator_top;
   tfp->close();
+  return;
+}
+
+int main(int argc, char **argv)
+{
+  printf("\n ================================================= 開始 ================================================= \n\n");
+
+  const int NGRAM = 3;
+  const int CORENUM = 16;
+  int DEBUG = 0;
+  int ADDRNUM = 0;
+
+  for (int i = 48; i < RANNUM; i += 48)
+  {
+    ADDRNUM = i;
+
+    DEBUG = 0;
+    check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
+    DEBUG = 1;
+    check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
+
+    printf(" --------\n\n");
+  }
+
+  printf("\n ================================================= 終了 ================================================= \n\n");
+
   return 0;
 }

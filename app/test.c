@@ -8,11 +8,17 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// const int RANNUM = 1001;
-// const int DIM = 1024 / 32;
-#define RANNUM 1001
+// 可変パラメータ
+
+// 理想の計算に必要
 #define DIM 32 / 32
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// 変わらん
+
+#define RANNUM 1024
+#define BUSWIDTH 1024
 unsigned int item_memory_array[DIM][RANNUM];
 unsigned int item_memory_array_new[DIM][RANNUM];
 
@@ -176,16 +182,7 @@ unsigned long dst_phys;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// 可変のパラメータ
-
-// const int NGRAM = 3;
-// const int ADDRNUM = 900;
-// const int CORENUM = 4;
-// const int BUSWIDTH = 1024;
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSWIDTH)
+void check(const int NGRAM, const int ADDRNUM, const int CORENUM)
 {
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -194,11 +191,11 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSW
 
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
   int ARNUM = ADDRNUM / NGRAM;
-  const int LAST = ADDRNUM - 48;
   if (EVEN)
   {
     ARNUM++;
   }
+  const int LAST = ADDRNUM - 48;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -233,7 +230,6 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSW
   // printf("\n ------------------------- Sample Input --------------------------- \n\n");
 
   int send_num = 0;
-  int tmp = NGRAM - 1;
   int tmp_2 = 0;
   for (int j = 0; j < ADDRNUM; j++)
   {
@@ -409,11 +405,6 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSW
     // ------------------------------------------------------
 
     j += NGRAM * CORENUM - 1;
-    // if (j == tmp)
-    // {
-    //   j += NGRAM * (CORENUM - 1);
-    //   tmp += (CORENUM * NGRAM); // 32個分を同時に送っているから32 * NGRAM
-    // }
   }
 
   // AXI DMA 送信の設定（UIO経由）
@@ -466,8 +457,8 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSW
       tmp += 1;
       if (tmp == NGRAM)
       {
-        // putb(result);
         // printf("%u\n", result);
+        // putb(result);
         result_array[num] = result;
         tmp = 0;
         result = 0;
@@ -478,14 +469,12 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSW
     if (EVEN)
     {
       result_array[num] = item_memory_array[j][RANNUM - 1];
-      // putb(result_array[num]);
       // printf("ランダム：%u\n", result_array[num]);
+      // putb(result_array[num]);
     }
     unsigned int result_real = grab_bit(result_array, ARNUM);
-    // printf("  %x\n", result_real);
     // printf("  %u\n", result_real);
     // putb(result_real);
-    // printf("\n");
     if (result_real != dst[j])
     {
       printf("Error %u %u\n", result_real, dst[j]);
@@ -497,11 +486,6 @@ void check(const int NGRAM, const int ADDRNUM, const int CORENUM, const int BUSW
 
     free(result_array);
   }
-
-  // for (int j = 0; j < 32; j++)
-  // {
-  //   printf("%u\n", dst[j]);
-  // }
 
   /////////////////////////////////////////////////////////////////////////////////////////  終了 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -606,16 +590,15 @@ int main()
 
   ///////////////////////////////////////////////////////////////////////////////// initial, udmabuf, uio 設定 ///////////////////////////////////////////////////////////////////////////////////
 
-  // NGRAM, ADDRNUM, CORENUM, BUSWIDTH
+  const int NGRAM = 3;
+  const int CORENUM = 16;
+  int ADDRNUM = 0;
 
-  // for (int i = 3; i <= 999; i += 3)
-  // {
-  //   check(3, i, 16, 1001, 1024);
-  //   xor128(1);
-  // }
-  for (int i = 48; i <= 999; i += 48)
+  for (int i = 48; i <= RANNUM; i += 48)
   {
-    check(3, i, 16, 1024);
+    ADDRNUM = i;
+
+    check(NGRAM, CORENUM, ADDRNUM);
     xor128(1);
   }
 
