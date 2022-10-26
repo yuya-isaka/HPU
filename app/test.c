@@ -500,7 +500,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
 int main()
 {
 
-  printf("\n ------------------------------ 開始 -------------------------------- \n");
+  printf("\n ------------------------------ 開始 -------------------------------- \n\n");
 
   int fd0, fd1, dmaf, topf;
 
