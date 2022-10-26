@@ -1,20 +1,20 @@
+
 `default_nettype none
 
 
 module stream_ctrl
     (
         // in
-        input wire              clk,
-        input wire              rst,
-        // input wire              get_fin,
-        input wire              get_v,
-        input wire [15:0]             last,
-        input wire              dst_ready,
+        input wire                  clk,
+        input wire                  rst,
+        input wire                  get_v,
+        input wire [15:0]           last,
+        input wire                  dst_ready,
 
         // out
-        output reg              dst_valid,
-        output reg              dst_last,
-        output logic            stream_v
+        output reg                  dst_valid,
+        output reg                  dst_last,
+        output logic                stream_v
     );
 
 
@@ -23,17 +23,11 @@ module stream_ctrl
 
     // コア数可変
     // 32コア
-    // reg         get_fin_n, get_fin_nn;
+    // reg         last_n, last_nn, last_nnn;
     // always_ff @(posedge clk) begin
     //               get_fin_n <= get_fin;
     //               get_fin_nn <= get_fin_n;
-    //           end;
-
-    // コア数可変
-    // 16コア
-    // reg         get_fin_n;
-    // always_ff @(posedge clk) begin
-    //               get_fin_n <= get_fin;
+    //               last_nnn <= get_fin_nn;
     //           end;
 
     reg         last_n, last_nn;
@@ -53,25 +47,6 @@ module stream_ctrl
                   end
               end;
 
-    // reg         get_fin_keep;
-    // always_ff @(posedge clk) begin
-    //               if (rst) begin
-    //                   get_fin_keep <= 1'b0;
-    //               end
-    //               else if (stream_ok | get_v) begin
-    //                   get_fin_keep <= 1'b0;
-    //               end
-    //               // コア数可変
-    //               // 32コア
-    //               //   else if (get_fin_nn) begin
-    //               // 16コア
-    //               else if (get_fin) begin
-    //                   // 4コア
-    //                   //   else if (get_fin) begin
-    //                   get_fin_keep <= 1'b1;
-    //               end
-    //           end;
-
 
     reg         last_keep;
     always_ff @(posedge clk) begin
@@ -83,11 +58,11 @@ module stream_ctrl
                   end
                   // コア数可変
                   // 32コア
-                  //   else if (get_fin_nn) begin
+                  //   else if (lst_nnn) begin
+                  // 4コア
+                  //   else if (last) begin
                   // 16コア
                   else if (last_nn) begin
-                      // 4コア
-                      //   else if (get_fin) begin
                       last_keep <= 1'b1;
                   end
               end;
@@ -113,12 +88,11 @@ module stream_ctrl
 
                     // コア数可変
                     // 32コア
-                    // if ((get_fin_nn | get_fin_keep) & dst_ready) begin
+                    // if ((last_nnn | last_keep) & dst_ready) begin
+                    // 4コア
+                    // if ((last | last_keep) & dst_ready) begin
                     // 16コア
-                    // if ((last_nn | last_keep) & (get_fin | get_fin_keep) & dst_ready) begin
                     if ((last_nn | last_keep) & dst_ready) begin
-                        // 4コア
-                        // if ((get_fin | get_fin_keep) & dst_ready) begin
                         stream_ok = 1'b1;
                     end
                 end;
@@ -187,7 +161,6 @@ module stream_ctrl
 
 
     assign stream_v = stream_active & dst_ready;
-    // assign stream_a = i;
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

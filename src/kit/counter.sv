@@ -1,31 +1,31 @@
+
 `default_nettype none
 
 
 module counter
     #(
-         // addr_iが100万以上になったら増やす必要あり
-         //  parameter W = 20
+         // addr_iが10億以上になったら増やす必要あり
          parameter W = 30
      )
      (
          // in
-         input wire			        clk,
-         input wire                 rst,
-         input wire                 tmp_even,
-         input wire                 tmp_rand_bit,
+         input wire			            clk,
+         input wire                     rst,
+         input wire                     tmp_even,
+         input wire                     tmp_rand_bit,
          // コア数可変
          // 16コア
-         input wire [15:0]          store,
+         input wire [15:0]              store,
          // 4コア
-         //  input wire [3:0]           store,
+         //  input wire [3:0]               store,
          // コア数可変
          // 16コア
-         input wire [15:0]          core_result,
+         input wire [15:0]              core_result,
          // 4コア
-         //  input wire [3:0]           core_result,
+         //  input wire [3:0]               core_result,
 
          // out
-         output logic 		        sign_bit
+         output logic 		            sign_bit
      );
 
 

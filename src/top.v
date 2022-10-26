@@ -1,4 +1,6 @@
+
 `default_nettype none
+
 
 // 可変
 // アドレス数可変
@@ -11,43 +13,43 @@
 module top
     (
         // AXI Lite Slave Interface
-        input wire              S_AXI_ACLK,
-        input wire              S_AXI_ARESETN,
-        input wire [31:0]       S_AXI_AWADDR,
-        input wire              S_AXI_AWVALID,
-        output wire             S_AXI_AWREADY,
-        input wire [31:0]       S_AXI_WDATA,
-        input wire [3:0]        S_AXI_WSTRB,
-        input wire              S_AXI_WVALID,
-        output wire             S_AXI_WREADY,
-        output wire [1:0]       S_AXI_BRESP,
-        output wire             S_AXI_BVALID,
-        input wire              S_AXI_BREADY,
-        input wire [31:0]       S_AXI_ARADDR,
-        input wire              S_AXI_ARVALID,
-        output wire             S_AXI_ARREADY,
-        output reg [31:0]       S_AXI_RDATA,
-        output wire [1:0]       S_AXI_RRESP,
-        output wire             S_AXI_RVALID,
-        input wire              S_AXI_RREADY,
+        input wire                  S_AXI_ACLK,
+        input wire                  S_AXI_ARESETN,
+        input wire [31:0]           S_AXI_AWADDR,
+        input wire                  S_AXI_AWVALID,
+        output wire                 S_AXI_AWREADY,
+        input wire [31:0]           S_AXI_WDATA,
+        input wire [3:0]            S_AXI_WSTRB,
+        input wire                  S_AXI_WVALID,
+        output wire                 S_AXI_WREADY,
+        output wire [1:0]           S_AXI_BRESP,
+        output wire                 S_AXI_BVALID,
+        input wire                  S_AXI_BREADY,
+        input wire [31:0]           S_AXI_ARADDR,
+        input wire                  S_AXI_ARVALID,
+        output wire                 S_AXI_ARREADY,
+        output reg [31:0]           S_AXI_RDATA,
+        output wire [1:0]           S_AXI_RRESP,
+        output wire                 S_AXI_RVALID,
+        input wire                  S_AXI_RREADY,
 
         // AXI Stream Master Interface
-        input wire              AXIS_ACLK,
-        input wire              AXIS_ARESETN,
-        output wire             M_AXIS_TVALID,
+        input wire                  AXIS_ACLK,
+        input wire                  AXIS_ARESETN,
+        output wire                 M_AXIS_TVALID,
         //　バス幅可変
-        output wire [1023:0]    M_AXIS_TDATA,
-        output wire [7:0]       M_AXIS_TSTRB,
-        output wire             M_AXIS_TLAST,
-        input wire              M_AXIS_TREADY,
+        output wire [1023:0]        M_AXIS_TDATA,
+        output wire [7:0]           M_AXIS_TSTRB,
+        output wire                 M_AXIS_TLAST,
+        input wire                  M_AXIS_TREADY,
 
         // AXI Stream Slave Interface
-        output wire             S_AXIS_TREADY,
+        output wire                 S_AXIS_TREADY,
         // バス幅可変
-        input wire [1023:0]     S_AXIS_TDATA,
-        input wire [7:0]        S_AXIS_TSTRB,
-        input wire              S_AXIS_TLAST,
-        input wire              S_AXIS_TVALID
+        input wire [1023:0]         S_AXIS_TDATA,
+        input wire [7:0]            S_AXIS_TSTRB,
+        input wire                  S_AXIS_TLAST,
+        input wire                  S_AXIS_TVALID
     );
 
 
@@ -69,7 +71,6 @@ module top
 
     wire        get_v;
     wire        exec;
-    // wire        get_fin;
 
     get_enable get_enable
                (
@@ -83,7 +84,6 @@ module top
                    .get_ready(S_AXIS_TREADY),
                    .get_v(get_v),
                    .exec(exec)
-                   //    .get_fin(get_fin)
                );
 
 
@@ -154,7 +154,6 @@ module top
                     .clk(AXIS_ACLK),
                     .rst(~run),
                     .last(last[15:0]),
-                    // .get_fin(get_fin),
                     .get_v(get_v),
                     .dst_ready(M_AXIS_TREADY),
 
@@ -346,16 +345,16 @@ module top
     //================================================================
 
     // コア数可変
-    // 4コア
-    // wire [3:0]              store;
     // 16コア
     wire [15:0]              store;
+    // 4コア
+    // wire [3:0]              store;
 
     // コア数可変
-    // 4コア
-    // wire [DIM:0]            core_result [0:3];
     // 16コア
     wire [DIM:0]         core_result [0:15];
+    // 4コア
+    // wire [DIM:0]            core_result [0:3];
 
     // コア数可変
     wire [15:0]               last;
