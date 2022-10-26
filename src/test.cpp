@@ -200,7 +200,7 @@ int main(int argc, char **argv)
 			if (tmp == NGRAM)
 			{
 				// putb(result);
-				// printf("%u\n", result);
+				printf("%u\n", result);
 				result_array[num] = result;
 				tmp = 0;
 				result = 0;

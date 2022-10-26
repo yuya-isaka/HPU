@@ -116,7 +116,7 @@ module core
                       store <= 0;
                       last <= 0;
                   end
-                  else if (exec & get_v) begin
+                  else if (exec) begin
                       // ロード
                       if (inst[0]) begin
                           reg_2 <= reg_0;
@@ -158,6 +158,11 @@ module core
                           buff <= 0;
                           store <= 0;
                       end
+                      else if (inst[7]) begin
+                          buff <= reg_2;
+                          store <= 1;
+                          last <= 1;
+                      end
                       // ありえない命令 (reg_1とかが不自然に０になったりしたらおかしい), デバッグ用に使える
                     //   else begin
                     //       reg_1 <= 0;
@@ -166,19 +171,19 @@ module core
                     //       store <= 0;
                     //   end
                   end
-                  else if (exec) begin
-                      // ラストストア
-                      if (inst[7]) begin
-                          buff <= reg_2;
-                          store <= 1;
-                          last <= 1;
-                      end
-                  end
-                  else if (last) begin
-                      buff <= 0;
-                      store <= 0;
-                      last <= 0;
-                  end
+                //   else if (exec) begin
+                //       // ラストストア
+                //       if (inst[7]) begin
+                //           buff <= reg_2;
+                //           store <= 1;
+                //           last <= 1;
+                //       end
+                //   end
+                //   else if (last) begin
+                //       buff <= 0;
+                //       store <= 0;
+                //       last <= 0;
+                //   end
                   //   else begin
                   //       //   reg_1 <= 0;
                   //       //   reg_2 <= 0;
