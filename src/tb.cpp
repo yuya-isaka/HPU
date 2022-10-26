@@ -74,7 +74,7 @@ void putb(unsigned int v)
 // 可変のパラメータ
 
 const int NGRAM = 3;
-const int ADDRNUM = 144; // 現状12の倍数しかできない。その理由は命令をちゃんと設定していないから (4コアの時は12の倍数、３２コアの時は96の倍数)
+const int ADDRNUM = 96; // 現状12の倍数しかできない。その理由は命令をちゃんと設定していないから (4コアの時は12の倍数、３２コアの時は96の倍数)
 const int LAST = ADDRNUM - 48;
 const int CORENUM = 16;
 const int RANNUM = 1000;
@@ -323,6 +323,10 @@ int main(int argc, char **argv)
     eval();
 
     verilator_top->S_AXIS_TVALID = 0;
+    for (int i = 0; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
+    }
     eval();
     eval();
     eval();
@@ -343,13 +347,17 @@ int main(int argc, char **argv)
     }
     eval();
 
-    // verilator_top->S_AXIS_TVALID = 0;
-    // eval();
-    // eval();
-    // eval();
-    // eval();
-    // verilator_top->S_AXIS_TVALID = 1;
-    // eval();
+    verilator_top->S_AXIS_TVALID = 0;
+    for (int i = 0; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
+    }
+    eval();
+    eval();
+    eval();
+    eval();
+    verilator_top->S_AXIS_TVALID = 1;
+    eval();
 
     // 1
     for (int i = 0; i < CORENUM; i++)
@@ -364,13 +372,20 @@ int main(int argc, char **argv)
     }
     eval();
 
-    // verilator_top->S_AXIS_TVALID = 0;
-    // eval();
-    // eval();
-    // eval();
-    // eval();
-    // verilator_top->S_AXIS_TVALID = 1;
-    // eval();
+    // セット --------------------------------
+    verilator_top->S_AXIS_TVALID = 0;
+    for (int i = 0; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
+    }
+    eval();
+    eval();
+    eval();
+    eval();
+
+    // セット ------------------------------
+    verilator_top->S_AXIS_TVALID = 1;
+    eval();
 
     // 2
     for (int i = 0; i < CORENUM; i++)
@@ -385,13 +400,20 @@ int main(int argc, char **argv)
     }
     eval();
 
-    // verilator_top->S_AXIS_TVALID = 0;
-    // eval();
-    // eval();
-    // eval();
-    // eval();
-    // verilator_top->S_AXIS_TVALID = 1;
-    // eval();
+    // セット --------------------------------
+    verilator_top->S_AXIS_TVALID = 0;
+    for (int i = 0; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
+    }
+    eval();
+    eval();
+    eval();
+    eval();
+
+    // セット ------------------------------
+    verilator_top->S_AXIS_TVALID = 1;
+    eval();
 
     // 4
     for (int i = 0; i < CORENUM; i++)
@@ -407,13 +429,20 @@ int main(int argc, char **argv)
     }
     eval();
 
-    // verilator_top->S_AXIS_TVALID = 0;
-    // eval();
-    // eval();
-    // eval();
-    // eval();
-    // verilator_top->S_AXIS_TVALID = 1;
-    // eval();
+    // セット --------------------------------
+    verilator_top->S_AXIS_TVALID = 0;
+    for (int i = 0; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
+    }
+    eval();
+    eval();
+    eval();
+    eval();
+
+    // セット ------------------------------
+    verilator_top->S_AXIS_TVALID = 1;
+    eval();
 
     if (j == LAST)
     {
@@ -452,15 +481,14 @@ int main(int argc, char **argv)
   }
 
   // ↑ここを書き換える==================================================================
-  eval();
-  eval();
-  eval();
-  eval();
-  eval();
-  eval();
-  eval();
 
   verilator_top->S_AXIS_TVALID = 0;
+  for (int i = 0; i < 32; i++)
+  {
+    verilator_top->S_AXIS_TDATA[i] = 0;
+  }
+  eval();
+  eval();
   eval();
 
   // 演算結果を待つ

@@ -83,7 +83,7 @@ module top
                    .get_ready(S_AXIS_TREADY),
                    .get_v(get_v),
                    .exec(exec),
-                      .get_fin(get_fin)
+                   .get_fin(get_fin)
                );
 
 
@@ -155,7 +155,7 @@ module top
                     .rst(~run),
                     .last(last[15:0]),
                     .get_fin(get_fin),
-                   .get_v(get_v),
+                    .get_v(get_v),
                     .dst_ready(M_AXIS_TREADY),
 
                     // out

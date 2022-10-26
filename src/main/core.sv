@@ -43,10 +43,11 @@ module core
                       reg_0 <= item_memory[get_d[15:0]];
                       inst <= get_d[31:16];
                   end
-                  //   else begin
-                  //       reg_0 <= 0;
-                  //       inst <= 0;
-                  //   end
+                  // これのおかげで、Gtktermで見た時のデータ→命令の並びができて嬉しい
+                  else begin
+                      reg_0 <= 0;
+                      inst <= 0;
+                  end
               end;
 
 
@@ -158,39 +159,19 @@ module core
                           buff <= 0;
                           store <= 0;
                       end
+                      // ラストストア
                       else if (inst[7]) begin
                           buff <= reg_2;
                           store <= 1;
                           last <= 1;
                       end
-                      // ありえない命令 (reg_1とかが不自然に０になったりしたらおかしい), デバッグ用に使える
-                    //   else begin
-                    //       reg_1 <= 0;
-                    //       reg_2 <= 0;
-                    //       buff <= 0;
-                    //       store <= 0;
-                    //   end
                   end
-                //   else if (exec) begin
-                //       // ラストストア
-                //       if (inst[7]) begin
-                //           buff <= reg_2;
-                //           store <= 1;
-                //           last <= 1;
-                //       end
-                //   end
-                //   else if (last) begin
-                //       buff <= 0;
-                //       store <= 0;
-                //       last <= 0;
-                //   end
-                  //   else begin
-                  //       //   reg_1 <= 0;
-                  //       //   reg_2 <= 0;
-                  //     //   buff <= 0;
-                  //     //   store <= 0;
-                  //     //   last <= 0;
-                  //   end
+                  // ラストビットが立ってたら落とす→counterのstore_nnが綺麗に動く
+                  else if (last) begin
+                      buff <= 0;
+                      store <= 0;
+                      last <= 0;
+                  end
               end;
 
 
