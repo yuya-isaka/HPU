@@ -12,8 +12,8 @@ module get_enable
         // out
         output wire         get_ready,
         output logic        get_v,
-        output logic        exec
-        // output logic        get_fin
+        output logic        exec,
+        output logic        get_fin
     );
 
 
@@ -42,26 +42,26 @@ module get_enable
               end;
 
 
-    // reg         exec_n;
+    reg         exec_n;
 
-    // always_ff @(posedge clk) begin
-    //               if (~run) begin
-    //                   exec_n <= 1'b0;
-    //               end
-    //               else begin
-    //                   exec_n <= exec;
-    //               end
-    //           end;
+    always_ff @(posedge clk) begin
+                  if (~run) begin
+                      exec_n <= 1'b0;
+                  end
+                  else begin
+                      exec_n <= exec;
+                  end
+              end;
 
 
-    // always_ff @(posedge clk) begin
-    //               if (~run) begin
-    //                   get_fin <= 1'b0;
-    //               end
-    //               else begin
-    //                   get_fin <= (~exec & exec_n);
-    //               end
-    //           end;
+    always_ff @(posedge clk) begin
+                  if (~run) begin
+                      get_fin <= 1'b0;
+                  end
+                  else begin
+                      get_fin <= (~exec & exec_n);
+                  end
+              end;
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

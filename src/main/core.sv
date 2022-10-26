@@ -174,11 +174,11 @@ module core
                           last <= 1;
                       end
                   end
-                //   else if (last) begin
-                //       buff <= 0;
-                //       store <= 0;
-                //       last <= 0;
-                //   end
+                  else if (last) begin
+                      buff <= 0;
+                      store <= 0;
+                      last <= 0;
+                  end
                   //   else begin
                   //       //   reg_1 <= 0;
                   //       //   reg_2 <= 0;

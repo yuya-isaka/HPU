@@ -6,7 +6,8 @@ module stream_ctrl
         // in
         input wire              clk,
         input wire              rst,
-        // input wire              get_fin,
+        input wire              get_fin,
+        input wire              get_v,
         input wire [15:0]             last,
         input wire              dst_ready,
 
@@ -49,6 +50,25 @@ module stream_ctrl
                           last_n <= 1'b0;
                       end
                       last_nn <= last_n;
+                  end
+              end;
+
+    reg         get_fin_keep;
+    always_ff @(posedge clk) begin
+                  if (rst) begin
+                      get_fin_keep <= 1'b0;
+                  end
+                  else if (stream_ok | get_v) begin
+                      get_fin_keep <= 1'b0;
+                  end
+                  // コア数可変
+                  // 32コア
+                  //   else if (get_fin_nn) begin
+                  // 16コア
+                  else if (get_fin) begin
+                      // 4コア
+                      //   else if (get_fin) begin
+                      get_fin_keep <= 1'b1;
                   end
               end;
 
@@ -95,7 +115,7 @@ module stream_ctrl
                     // 32コア
                     // if ((get_fin_nn | get_fin_keep) & dst_ready) begin
                     // 16コア
-                    if ((last_nn | last_keep) & dst_ready) begin
+                    if ((last_nn | last_keep) & (get_fin | get_fin_keep) & dst_ready) begin
                         // 4コア
                         // if ((get_fin | get_fin_keep) & dst_ready) begin
                         stream_ok = 1'b1;
