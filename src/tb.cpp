@@ -11,7 +11,7 @@
 
 // 結果を何個出力するかに使う
 // const int DIM = 32 / 32;
-const int DIM 1024 / 32;
+const int DIM = 1024 / 32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -596,9 +596,10 @@ int main(int argc, char **argv)
   // 1回だけ
   ADDRNUM = 48;
   DEBUG = 0;
-  check(NGRAM, CORENUM, ADDRNUM);
+  check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
+  printf(" --------\n\n");
   DEBUG = 1;
-  check(NGRAM, CORENUM, ADDRNUM);
+  check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
 
   printf("\n ================================================= 終了 ================================================= \n\n");
 
