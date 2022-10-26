@@ -11,7 +11,8 @@
 // 可変パラメータ
 
 // 理想の計算に必要
-#define DIM 32 / 32
+// #define DIM 32 / 32
+#define DIM 1024 / 32
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -594,13 +595,18 @@ int main()
   const int CORENUM = 16;
   int ADDRNUM = 0;
 
-  for (int i = 48; i <= RANNUM; i += 48)
-  {
-    ADDRNUM = i;
+  // 何回か
+  // for (int i = 48; i <= RANNUM; i += 48)
+  // {
+  //   ADDRNUM = i;
 
-    check(NGRAM, CORENUM, ADDRNUM);
-    xor128(1);
-  }
+  //   check(NGRAM, CORENUM, ADDRNUM);
+  //   xor128(1);
+  // }
+
+  // 1回だけ
+  ADDRNUM = 48;
+  check(NGRAM, CORENUM, ADDRNUM);
 
   printf("\n ------------------------------ 終了 -------------------------------- \n\n");
 

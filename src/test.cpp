@@ -7,7 +7,8 @@
 
 // 可変パラメータ
 
-const int DIM = 32 / 32;
+// const int DIM = 32 / 32;
+const int DIM = 1024 / 32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -223,15 +224,20 @@ int main(int argc, char **argv)
 	const int CORENUM = 16;
 	int ADDRNUM = 0;
 
-	for (int i = 48; i < RANNUM; i += 48)
-	{
-		ADDRNUM = i;
+	// 何回か
+	// for (int i = 48; i < RANNUM; i += 48)
+	// {
+	// 	ADDRNUM = i;
 
-		check(NGRAM, CORENUM, ADDRNUM);
-		xor128(1);
+	// 	check(NGRAM, CORENUM, ADDRNUM);
+	// 	xor128(1);
 
-		printf(" --------\n\n");
-	}
+	// 	printf(" --------\n\n");
+	// }
+
+	// 1回だけ
+	ADDRNUM = 48;
+	check(NGRAM, CORENUM, ADDRNUM);
 
 	printf("\n ------------------------------- 終了 ------------------------------- \n");
 	return 0;
