@@ -15,14 +15,18 @@ module counter
          input wire                     tmp_rand_bit,
          // コア数可変
          // 16コア
-         input wire [15:0]              store,
+         //  input wire [15:0]              store,
          // 4コア
          //  input wire [3:0]               store,
+         // 2コア
+         input wire [1:0]               store,
          // コア数可変
          // 16コア
-         input wire [15:0]              core_result,
+         //  input wire [15:0]              core_result,
          // 4コア
          //  input wire [3:0]               core_result,
+         // 2コア
+         input wire [1:0]               core_result,
 
          // out
          output logic 		            sign_bit
@@ -67,9 +71,9 @@ module counter
 
     // コア数可変
     reg signed [W-1:0]      box_1;
-    reg signed [W-1:0]      box_2;
-    reg signed [W-1:0]      box_3;
-    reg signed [W-1:0]      box_4;
+    // reg signed [W-1:0]      box_2;
+    // reg signed [W-1:0]      box_3;
+    // reg signed [W-1:0]      box_4;
     // reg signed [W-1:0]      box_5;
     // reg signed [W-1:0]      box_6;
     // reg signed [W-1:0]      box_7;
@@ -95,9 +99,9 @@ module counter
                       end
                       // コア数可変
                       box_1 <= 0;
-                      box_2 <= 0;
-                      box_3 <= 0;
-                      box_4 <= 0;
+                      //   box_2 <= 0;
+                      //   box_3 <= 0;
+                      //   box_4 <= 0;
                       //   box_5 <= 0;
                       //   box_6 <= 0;
                       //   box_7 <= 0;
@@ -106,31 +110,37 @@ module counter
 
                   else if (store_n) begin
                       // コア数可変
+                      // 2コア
                       box_1 <= select[0]
-                            + select[1]
-                            + select[2]
-                            + select[3];
-                      box_2 <= select[4]
-                            + select[5]
-                            + select[6]
-                            + select[7];
-                      box_3 <= select[8]
-                            + select[9]
-                            + select[10]
-                            + select[11];
-                      box_4 <=
-                            select[12]
-                            + select[13]
-                            + select[14]
-                            + select[15];
+                            + select[1];
+                      // 16コア
+                      //   box_1 <= select[0]
+                      //         + select[1]
+                      //         + select[2]
+                      //         + select[3];
+                      //   box_2 <= select[4]
+                      //         + select[5]
+                      //         + select[6]
+                      //         + select[7];
+                      //   box_3 <= select[8]
+                      //         + select[9]
+                      //         + select[10]
+                      //         + select[11];
+                      //   box_4 <=
+                      //         select[12]
+                      //         + select[13]
+                      //         + select[14]
+                      //         + select[15];
                   end
 
                   else if (store_nn) begin
                       // コア数可変
                       // 16コア
-                      box <= box + box_1 + box_2 + box_3 + box_4;
+                      //   box <= box + box_1 + box_2 + box_3 + box_4;
                       // 4コア
                       //   box <= box + select[0] + select[1] + select[2] + select[3];
+                      // 2コア
+                      box <= box + box_1;
                   end
               end;
 
@@ -140,17 +150,21 @@ module counter
 
     // コア数可変
     // 16コア
-    wire signed [1:0]      select [0:15];
+    // wire signed [1:0]      select [0:15];
     // 4コア
     // wire signed [1:0]      select [0:3];
+    // 2コア
+    wire signed [1:0]      select [0:1];
 
     generate
         genvar      k;
         // コア数可変
         // 16コア
-        for (k = 0; k < 16; k = k + 1) begin
-            // 4コア
-            // for (k = 0; k < 4; k = k + 1) begin
+        // for (k = 0; k < 16; k = k + 1) begin
+        // 4コア
+        // for (k = 0; k < 4; k = k + 1) begin
+        // 2コア
+        for (k = 0; k < 2; k = k + 1) begin
             selector selector
                      (
                          // in

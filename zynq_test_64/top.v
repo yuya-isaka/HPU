@@ -38,7 +38,7 @@ module top
         input wire                  AXIS_ARESETN,
         output wire                 M_AXIS_TVALID,
         //　バス幅可変
-        output wire [1023:0]        M_AXIS_TDATA,
+        output wire [63:0]        M_AXIS_TDATA,
         output wire [7:0]           M_AXIS_TSTRB,
         output wire                 M_AXIS_TLAST,
         input wire                  M_AXIS_TREADY,
@@ -46,7 +46,7 @@ module top
         // AXI Stream Slave Interface
         output wire                 S_AXIS_TREADY,
         // バス幅可変
-        input wire [1023:0]         S_AXIS_TDATA,
+        input wire [63:0]         S_AXIS_TDATA,
         input wire [7:0]            S_AXIS_TSTRB,
         input wire                  S_AXIS_TLAST,
         input wire                  S_AXIS_TVALID
@@ -87,6 +87,7 @@ module top
                );
 
 
+    reg [1023:0]        stream_tmp;
 
     // M_AXIS_TDATA
     // 次元数可変
@@ -101,20 +102,20 @@ module top
                     // コア数可変
                     .core_result_1(core_result[0]),
                     .core_result_2(core_result[1]),
-                    .core_result_3(core_result[2]),
-                    .core_result_4(core_result[3]),
-                    .core_result_5(core_result[4]),
-                    .core_result_6(core_result[5]),
-                    .core_result_7(core_result[6]),
-                    .core_result_8(core_result[7]),
-                    .core_result_9(core_result[8]),
-                    .core_result_10(core_result[9]),
-                    .core_result_11(core_result[10]),
-                    .core_result_12(core_result[11]),
-                    .core_result_13(core_result[12]),
-                    .core_result_14(core_result[13]),
-                    .core_result_15(core_result[14]),
-                    .core_result_16(core_result[15]),
+                    // .core_result_3(core_result[2]),
+                    // .core_result_4(core_result[3]),
+                    // .core_result_5(core_result[4]),
+                    // .core_result_6(core_result[5]),
+                    // .core_result_7(core_result[6]),
+                    // .core_result_8(core_result[7]),
+                    // .core_result_9(core_result[8]),
+                    // .core_result_10(core_result[9]),
+                    // .core_result_11(core_result[10]),
+                    // .core_result_12(core_result[11]),
+                    // .core_result_13(core_result[12]),
+                    // .core_result_14(core_result[13]),
+                    // .core_result_15(core_result[14]),
+                    // .core_result_16(core_result[15]),
                     // .core_result_17(core_result[16]),
                     // .core_result_18(core_result[17]),
                     // .core_result_19(core_result[18]),
@@ -133,20 +134,80 @@ module top
                     // .core_result_32(core_result[31]),
                     // コア数可変
                     // 16コア
-                    .store(store[15:0]),
+                    // .store(store[15:0]),
                     // 4コア
                     // .store(store[3:0]),
+                    // 2コア
+                    .store(store[1:0]),
                     .stream_v(stream_v),
 
                     // out
                     // バス幅可変
-                    .stream_d(M_AXIS_TDATA[1023:0])
+                    // .stream_d(M_AXIS_TDATA[63:0])
+                    .stream_d(stream_tmp)
                 );
+
+    always @* begin
+        M_AXIS_TDATA[63:0] <= 0;
+
+        if (M_AXIS_TVALID) begin
+            if (stream_a == 0) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[63:0];
+            end
+            else if (stream_a == 1) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[127:64];
+            end
+            else if (stream_a == 2) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[191:128];
+            end
+            else if (stream_a == 3) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[255:192];
+            end
+            else if (stream_a == 4) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[319:256];
+            end
+            else if (stream_a == 5) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[383:320];
+            end
+            else if (stream_a == 6) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[447:384];
+            end
+            else if (stream_a == 7) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[511:448];
+            end
+            else if (stream_a == 8) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[575:512];
+            end
+            else if (stream_a == 9) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[639:576];
+            end
+            else if (stream_a == 10) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[703:640];
+            end
+            else if (stream_a == 11) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[767:704];
+            end
+            else if (stream_a == 12) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[831:768];
+            end
+            else if (stream_a == 13) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[895:832];
+            end
+            else if (stream_a == 14) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[959:896];
+            end
+            else if (stream_a == 15) begin
+                M_AXIS_TDATA[63:0] = stream_tmp[1023:960];
+            end
+        end
+
+    end
 
 
     // M_AXIS_TVALID
     // M_AXIS_TLAST
     wire              stream_v;
+    wire [7:0]        stream_a;
 
     stream_ctrl stream_ctrl
                 (
@@ -160,7 +221,8 @@ module top
                     // out
                     .dst_valid(M_AXIS_TVALID),
                     .dst_last(M_AXIS_TLAST),
-                    .stream_v(stream_v)
+                    .stream_v(stream_v),
+                    .stream_a(stream_a)
                 );
 
 
@@ -346,26 +408,35 @@ module top
 
     // コア数可変
     // 16コア
-    wire [15:0]              store;
+    // wire [15:0]              store;
     // 4コア
     // wire [3:0]              store;
+    // 2コア
+    wire [1:0]              store;
 
     // コア数可変
     // 16コア
-    wire [DIM:0]         core_result [0:15];
+    // wire [DIM:0]         core_result [0:15];
     // 4コア
     // wire [DIM:0]            core_result [0:3];
+    // 2コア
+    wire [DIM:0]            core_result [0:1];
 
     // コア数可変
-    wire [15:0]               last;
+    // 16コア
+    // wire [15:0]               last;
+    // 2コア
+    wire [1:0]               last;
 
     generate
         genvar      i;
         // コア数可変
         // 16コア
-        for (i = 0; i < 16; i = i + 1) begin
-            // 4コア
-            // for (i = 0; i < 4; i = i + 1) begin
+        // for (i = 0; i < 16; i = i + 1) begin
+        // 4コア
+        // for (i = 0; i < 4; i = i + 1) begin
+        // 2コア
+        for (i = 0; i < 2; i = i + 1) begin
             // 次元数可変
             // core #(.DIM(1023)) core
             core #(.DIM(31)) core

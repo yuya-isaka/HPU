@@ -14,7 +14,8 @@ module stream_ctrl
         // out
         output reg                  dst_valid,
         output reg                  dst_last,
-        output logic                stream_v
+        output logic                stream_v,
+        output logic [7:0]          stream_a
     );
 
 
@@ -134,7 +135,7 @@ module stream_ctrl
         (
             // in
             .ini(8'd0),
-            .fin(8'd0),
+            .fin(8'd15),
             .start(start),
             .clk(clk),
             .rst(rst),
@@ -161,6 +162,7 @@ module stream_ctrl
 
 
     assign stream_v = stream_active & dst_ready;
+    assign stream_a = i;
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -15,20 +15,20 @@ module buffer_ctrl
          // コア数可変
          input wire [DIM:0]             core_result_1,
          input wire [DIM:0]             core_result_2,
-         input wire [DIM:0]             core_result_3,
-         input wire [DIM:0]             core_result_4,
-         input wire [DIM:0]             core_result_5,
-         input wire [DIM:0]             core_result_6,
-         input wire [DIM:0]             core_result_7,
-         input wire [DIM:0]             core_result_8,
-         input wire [DIM:0]             core_result_9,
-         input wire [DIM:0]             core_result_10,
-         input wire [DIM:0]             core_result_11,
-         input wire [DIM:0]             core_result_12,
-         input wire [DIM:0]             core_result_13,
-         input wire [DIM:0]             core_result_14,
-         input wire [DIM:0]             core_result_15,
-         input wire [DIM:0]             core_result_16,
+         //  input wire [DIM:0]             core_result_3,
+         //  input wire [DIM:0]             core_result_4,
+         //  input wire [DIM:0]             core_result_5,
+         //  input wire [DIM:0]             core_result_6,
+         //  input wire [DIM:0]             core_result_7,
+         //  input wire [DIM:0]             core_result_8,
+         //  input wire [DIM:0]             core_result_9,
+         //  input wire [DIM:0]             core_result_10,
+         //  input wire [DIM:0]             core_result_11,
+         //  input wire [DIM:0]             core_result_12,
+         //  input wire [DIM:0]             core_result_13,
+         //  input wire [DIM:0]             core_result_14,
+         //  input wire [DIM:0]             core_result_15,
+         //  input wire [DIM:0]             core_result_16,
          //  input wire [DIM:0]             core_result_17,
          //  input wire [DIM:0]             core_result_18,
          //  input wire [DIM:0]             core_result_19,
@@ -46,10 +46,12 @@ module buffer_ctrl
          //  input wire [DIM:0]             core_result_31,
          //  input wire [DIM:0]             core_result_32,
          // コア数可変
+         // 2コア
+         input wire [1:0]               store,
          // 4コア
          //  input wire [3:0]               store,
          // 16コア
-         input wire [15:0]              store,
+         //  input wire [15:0]              store,
          input wire                     stream_v,
 
          // out
@@ -76,9 +78,11 @@ module buffer_ctrl
                         .tmp_rand_bit(tmp_rand[i]),
                         // コア数可変
                         // 16コア
-                        .store(store[15:0]),
+                        // .store(store[15:0]),
                         // 4コア
                         // .store(store[3:0]),
+                        // 2コア
+                        .store(store[1:0]),
                         // コア数可変
                         .core_result(
                             {
@@ -98,20 +102,20 @@ module buffer_ctrl
                                 // core_result_19[i],
                                 // core_result_18[i],
                                 // core_result_17[i],
-                                core_result_16[i],
-                                core_result_15[i],
-                                core_result_14[i],
-                                core_result_13[i],
-                                core_result_12[i],
-                                core_result_11[i],
-                                core_result_10[i],
-                                core_result_9[i],
-                                core_result_8[i],
-                                core_result_7[i],
-                                core_result_6[i],
-                                core_result_5[i],
-                                core_result_4[i],
-                                core_result_3[i],
+                                // core_result_16[i],
+                                // core_result_15[i],
+                                // core_result_14[i],
+                                // core_result_13[i],
+                                // core_result_12[i],
+                                // core_result_11[i],
+                                // core_result_10[i],
+                                // core_result_9[i],
+                                // core_result_8[i],
+                                // core_result_7[i],
+                                // core_result_6[i],
+                                // core_result_5[i],
+                                // core_result_4[i],
+                                // core_result_3[i],
                                 core_result_2[i],
                                 core_result_1[i]
                             }
