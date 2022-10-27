@@ -87,7 +87,7 @@ module top
                );
 
 
-    reg [1023:0]        stream_tmp;
+    wire [1023:0]        stream_tmp;
 
     // M_AXIS_TDATA
     // 次元数可変
