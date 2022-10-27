@@ -15,7 +15,9 @@ module core
          input wire [15:0]              item_memory_num,
          input wire [DIM:0]             rand_num,
          input wire                     get_v,
-         input wire [31:0]              get_d,
+         // アドレス幅可変
+         //  input wire [31:0]              get_d,
+         input wire [15:0]              get_d,
          input wire                     exec,
 
          output reg                     store,
@@ -32,6 +34,7 @@ module core
 
 
     reg [DIM:0]     reg_0;
+    // 16bit保持
     reg [15:0]      inst;
 
     always_ff @(posedge clk) begin
@@ -41,8 +44,14 @@ module core
                       inst <= 0;
                   end
                   else if (get_v) begin
-                      reg_0 <= item_memory[get_d[15:0]];
-                      inst <= get_d[31:16];
+                      // アドレスが必要か否か
+                      if (get_d[15]) begin
+                          reg_0 <= item_memory[get_d[9:0]];
+                          inst <= get_d[15:0];
+                      end
+                      else begin
+                          inst <= get_d[15:0];
+                      end
                   end
                   // これのおかげで、Gtktermで見た時のデータ→命令の並びができて嬉しい
                   else begin
@@ -121,52 +130,70 @@ module core
                       last <= 0;
                   end
                   else if (exec) begin
-                      // ロード
-                      if (inst[0]) begin
-                          reg_2 <= reg_0;
-                          buff <= 0;
-                          store <= 0;
+                      // アドレス必要
+                      if (inst[15]) begin
+                          // load
+                          if (inst[14]) begin
+                              reg_2 <= reg_0;
+                              buff <= 0;
+                              store <= 0;
+                          end
+                          // l.rshift
+                          else if (inst[13]) begin
+                              reg_2 <= {reg_0[0], reg_0[DIM:1]};
+                              buff <= 0;
+                              store <= 0;
+                          end
+                          // l.lshift
+                          else if (inst[12]) begin
+                              reg_2 <= {reg_0[DIM-1:0], reg_0[DIM]};
+                              buff <= 0;
+                              store <= 0;
+                          end
+                          // l.xor
+                          else if (inst[11]) begin
+                              reg_2 <= reg_0 ^ reg_2;
+                              buff <= 0;
+                              store <= 0;
+                          end
                       end
-                      // Perm
-                      else if (inst[1]) begin
-                          reg_2 <= {reg_0[0], reg_0[DIM:1]};
-                          buff <= 0;
-                          store <= 0;
-                      end
-                      // Perm
-                      else if (inst[2]) begin
-                          reg_2 <= {reg_2[0], reg_2[DIM:1]};
-                          buff <= 0;
-                          store <= 0;
-                      end
-                      // Xor
-                      else if (inst[3]) begin
-                          reg_2 <= reg_0 ^ reg_2;
-                          buff <= 0;
-                          store <= 0;
-                      end
-                      // Xor
-                      else if (inst[4]) begin
-                          reg_2 <= reg_1 ^ reg_2;
-                          buff <= 0;
-                          store <= 0;
-                      end
-                      // ストア
-                      else if (inst[5]) begin
-                          buff <= reg_2;
-                          store <= 1;
-                      end
-                      // コピー
-                      else if (inst[6]) begin
-                          reg_1 <= reg_2;
-                          buff <= 0;
-                          store <= 0;
-                      end
-                      // ラストストア
-                      else if (inst[7]) begin
-                          buff <= reg_2;
-                          store <= 1;
-                          last <= 1;
+                      // アドレスいらん
+                      else begin
+                          // rshift
+                          else if (inst[14]) begin
+                              reg_2 <= {reg_2[0], reg_2[DIM:1]};
+                              buff <= 0;
+                              store <= 0;
+                          end
+                          // lshift
+                          else if (inst[13]) begin
+                              reg_2 <= {reg_2[DIM-1:0], reg_2[DIM]};
+                              buff <= 0;
+                              store <= 0;
+                          end
+                          // xor
+                          else if (inst[12]) begin
+                              reg_2 <= reg_1 ^ reg_2;
+                              buff <= 0;
+                              store <= 0;
+                          end
+                          // store
+                          else if (inst[11]) begin
+                              buff <= reg_2;
+                              store <= 1;
+                          end
+                          // lastore
+                          else if (inst[10]) begin
+                              buff <= reg_2;
+                              store <= 1;
+                              last <= 1;
+                          end
+                          // move
+                          else if (inst[9]) begin
+                              reg_1 <= reg_2;
+                              buff <= 0;
+                              store <= 0;
+                          end
                       end
                   end
                   // ラストビットが立ってたら落とす→counterのstore_nnが綺麗に動く

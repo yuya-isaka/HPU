@@ -381,7 +381,8 @@ module top
                      .rand_num(rand_num[DIM:0]),
                      .get_v(get_v),
                      // アドレス数可変
-                     .get_d(S_AXIS_TDATA[31+32*i:32*i]),
+                     //  .get_d(S_AXIS_TDATA[31+32*i:32*i]),
+                     .get_d(S_AXIS_TDATA[15+16*i:16*i]),
                      .exec(exec),
 
                      // out
