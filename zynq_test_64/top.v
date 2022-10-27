@@ -216,7 +216,8 @@ module top
                     // in
                     .clk(AXIS_ACLK),
                     .rst(~run),
-                    .last(last[15:0]),
+                    // コア数可変
+                    .last(last[1:0]),
                     .get_v(get_v),
                     .dst_ready(M_AXIS_TREADY),
 
