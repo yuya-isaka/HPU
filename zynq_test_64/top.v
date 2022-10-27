@@ -148,7 +148,7 @@ module top
                 );
 
     always @* begin
-        M_AXIS_TDATA[63:0] <= 0;
+        M_AXIS_TDATA[63:0] = 0;
 
         if (M_AXIS_TVALID) begin
             if (stream_a == 0) begin
