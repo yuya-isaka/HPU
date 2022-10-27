@@ -147,61 +147,63 @@ module top
                     .stream_d(stream_tmp)
                 );
 
-    always @* begin
-        M_AXIS_TDATA[63:0] = 0;
+    assign M_AXIS_TDATA[63:0] = stream_tmp[63:0];
 
-        if (M_AXIS_TVALID) begin
-            if (stream_a == 0) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[63:0];
-            end
-            else if (stream_a == 1) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[127:64];
-            end
-            else if (stream_a == 2) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[191:128];
-            end
-            else if (stream_a == 3) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[255:192];
-            end
-            else if (stream_a == 4) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[319:256];
-            end
-            else if (stream_a == 5) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[383:320];
-            end
-            else if (stream_a == 6) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[447:384];
-            end
-            else if (stream_a == 7) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[511:448];
-            end
-            else if (stream_a == 8) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[575:512];
-            end
-            else if (stream_a == 9) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[639:576];
-            end
-            else if (stream_a == 10) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[703:640];
-            end
-            else if (stream_a == 11) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[767:704];
-            end
-            else if (stream_a == 12) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[831:768];
-            end
-            else if (stream_a == 13) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[895:832];
-            end
-            else if (stream_a == 14) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[959:896];
-            end
-            else if (stream_a == 15) begin
-                M_AXIS_TDATA[63:0] = stream_tmp[1023:960];
-            end
-        end
+    // always @* begin
+    //     M_AXIS_TDATA[63:0] = 0;
 
-    end
+    //     if (M_AXIS_TVALID) begin
+    //         if (stream_a == 0) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[63:0];
+    //         end
+    //         else if (stream_a == 1) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[127:64];
+    //         end
+    //         else if (stream_a == 2) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[191:128];
+    //         end
+    //         else if (stream_a == 3) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[255:192];
+    //         end
+    //         else if (stream_a == 4) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[319:256];
+    //         end
+    //         else if (stream_a == 5) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[383:320];
+    //         end
+    //         else if (stream_a == 6) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[447:384];
+    //         end
+    //         else if (stream_a == 7) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[511:448];
+    //         end
+    //         else if (stream_a == 8) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[575:512];
+    //         end
+    //         else if (stream_a == 9) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[639:576];
+    //         end
+    //         else if (stream_a == 10) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[703:640];
+    //         end
+    //         else if (stream_a == 11) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[767:704];
+    //         end
+    //         else if (stream_a == 12) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[831:768];
+    //         end
+    //         else if (stream_a == 13) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[895:832];
+    //         end
+    //         else if (stream_a == 14) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[959:896];
+    //         end
+    //         else if (stream_a == 15) begin
+    //             M_AXIS_TDATA[63:0] = stream_tmp[1023:960];
+    //         end
+    //     end
+
+    // end
 
 
     // M_AXIS_TVALID
@@ -243,7 +245,7 @@ module top
                 item_a_tmp <= item_a_tmp + 5'd1;
             end
         end
-    end;
+    end
 
 
     reg             update_item;
