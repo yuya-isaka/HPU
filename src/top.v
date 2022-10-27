@@ -153,6 +153,7 @@ module top
                     // in
                     .clk(AXIS_ACLK),
                     .rst(~run),
+                    // コア数可変
                     .last(last[15:0]),
                     .get_v(get_v),
                     .dst_ready(M_AXIS_TREADY),
@@ -181,7 +182,7 @@ module top
                 item_a_tmp <= item_a_tmp + 5'd1;
             end
         end
-    end;
+    end
 
 
     reg             update_item;

@@ -8,6 +8,7 @@ module stream_ctrl
         input wire                  clk,
         input wire                  rst,
         input wire                  get_v,
+        // コア数可変
         input wire [15:0]           last,
         input wire                  dst_ready,
 
