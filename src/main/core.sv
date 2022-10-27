@@ -160,7 +160,7 @@ module core
                       // アドレスいらん
                       else begin
                           // rshift
-                          else if (inst[14]) begin
+                          if (inst[14]) begin
                               reg_2 <= {reg_2[0], reg_2[DIM:1]};
                               buff <= 0;
                               store <= 0;

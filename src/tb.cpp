@@ -82,6 +82,72 @@ void putb(unsigned int v)
   printf("  0"), putchar('b'), printb(v), printf("\n");
 }
 
+uint16_t instruction(int addr_flag, unsigned int inst_num, uint16_t addr)
+{
+  if (addr_flag)
+  {
+    uint16_t result = 0;
+    if (inst_num == 1)
+    {
+      uint16_t inst = 3 << 14;
+      result = inst | addr;
+    }
+    else if (inst_num == 2)
+    {
+      uint16_t inst = 5 << 13;
+      result = inst | addr;
+    }
+    else if (inst_num == 4)
+    {
+      uint16_t inst = 9 << 12;
+      result = inst | addr;
+    }
+    else if (inst_num == 6)
+    {
+      uint16_t inst = 17 << 11;
+      result = inst | addr;
+    }
+    else
+    {
+      printf("error");
+    }
+    return result;
+  }
+  else
+  {
+    uint16_t inst = 0;
+    if (inst_num == 3)
+    {
+      inst = 1 << 14;
+    }
+    else if (inst_num == 5)
+    {
+      inst = 1 << 13;
+    }
+    else if (inst_num == 7)
+    {
+      inst = 1 << 12;
+    }
+    else if (inst_num == 8)
+    {
+      inst = 1 << 11;
+    }
+    else if (inst_num == 9)
+    {
+      inst = 1 << 10;
+    }
+    else if (inst_num == 10)
+    {
+      inst = 1 << 9;
+    }
+    else
+    {
+      printf("error");
+    }
+    return inst;
+  }
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void check(const int NGRAM, const int CORENUM, const int ADDRNUM, int argc, char **argv, const int DEBUG)
@@ -231,76 +297,25 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, int argc, char
   //      a. 0000000010000000
   //      a. 128
 
-  // 3-gram 0,6,1,4,6,1,2,4,5
+  // 3-gram 1,10,2,7,10,2,3,7,(8 or 9)
 
+  int tmp = 0;
   for (int j = 0; j < ADDRNUM; j++)
   {
-    // 0
-    for (int i = 0; i < CORENUM; i++)
-    {
-      conv.data_0 = NGRAM * i + j;
-      conv.data_1 = 1;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-    }
-    for (int i = CORENUM; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    if (DEBUG)
-    {
-      // 送信途中で止まる対策 -----------------------------
-      verilator_top->S_AXIS_TVALID = 0;
-      for (int i = 0; i < 32; i++)
-      {
-        verilator_top->S_AXIS_TDATA[i] = 0;
-      }
-      eval();
-      eval();
-      eval();
-      verilator_top->S_AXIS_TVALID = 1;
-      eval();
-      // ----------------------------------------------
-    }
-
-    // 6
-    for (int i = 0; i < CORENUM; i++)
-    {
-      conv.data_0 = 0;
-      conv.data_1 = 64;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-    }
-    for (int i = CORENUM; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    if (DEBUG)
-    {
-      // 送信途中で止まる対策 -----------------------------
-      verilator_top->S_AXIS_TVALID = 0;
-      for (int i = 0; i < 32; i++)
-      {
-        verilator_top->S_AXIS_TDATA[i] = 0;
-      }
-      eval();
-      eval();
-      eval();
-      verilator_top->S_AXIS_TVALID = 1;
-      eval();
-      // ----------------------------------------------
-    }
-
     // 1
-    for (int i = 0; i < CORENUM; i++)
+    tmp = 0;
+    for (int i = 0; i < CORENUM; i += 2)
     {
-      conv.data_0 = NGRAM * i + 1 + j;
-      conv.data_1 = 2;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+      uint16_t addr = NGRAM * i + j;
+      conv.data_0 = instruction(1, 1, addr);
+
+      addr = NGRAM * (i + 1) + j;
+      conv.data_1 = instruction(1, 1, addr);
+
+      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      tmp++;
     }
-    for (int i = CORENUM; i < 32; i++)
+    for (int i = tmp; i < 32; i++)
     {
       verilator_top->S_AXIS_TDATA[i] = 0;
     }
@@ -322,72 +337,16 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, int argc, char
       // ----------------------------------------------
     }
 
-    // 4
-    for (int i = 0; i < CORENUM; i++)
+    // 10
+    tmp = 0;
+    for (int i = 0; i < CORENUM; i += 2)
     {
-      conv.data_0 = 0;
-      conv.data_1 = 16;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+      conv.data_0 = instruction(0, 10, 0);
+      conv.data_1 = instruction(0, 10, 0);
+      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      tmp++;
     }
-    for (int i = CORENUM; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    if (DEBUG)
-    {
-      // 送信途中で止まる対策 -----------------------------
-      verilator_top->S_AXIS_TVALID = 0;
-      for (int i = 0; i < 32; i++)
-      {
-        verilator_top->S_AXIS_TDATA[i] = 0;
-      }
-      eval();
-      eval();
-      eval();
-      verilator_top->S_AXIS_TVALID = 1;
-      eval();
-      // ----------------------------------------------
-    }
-
-    // 6
-    for (int i = 0; i < CORENUM; i++)
-    {
-      conv.data_0 = 0;
-      conv.data_1 = 64;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-    }
-    for (int i = CORENUM; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    if (DEBUG)
-    {
-      // 送信途中で止まる対策 -----------------------------
-      verilator_top->S_AXIS_TVALID = 0;
-      for (int i = 0; i < 32; i++)
-      {
-        verilator_top->S_AXIS_TDATA[i] = 0;
-      }
-      eval();
-      eval();
-      eval();
-      verilator_top->S_AXIS_TVALID = 1;
-      eval();
-      // ----------------------------------------------
-    }
-
-    // 1
-    for (int i = 0; i < CORENUM; i++)
-    {
-      conv.data_0 = NGRAM * i + 2 + j;
-      conv.data_1 = 2;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
-    }
-    for (int i = CORENUM; i < 32; i++)
+    for (int i = tmp; i < 32; i++)
     {
       verilator_top->S_AXIS_TDATA[i] = 0;
     }
@@ -410,13 +369,17 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, int argc, char
     }
 
     // 2
-    for (int i = 0; i < CORENUM; i++)
+    tmp = 0;
+    for (int i = 0; i < CORENUM; i += 2)
     {
-      conv.data_0 = 0;
-      conv.data_1 = 4;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+      uint16_t addr = NGRAM * i + 1 + j;
+      conv.data_0 = instruction(1, 2, addr);
+      addr = NGRAM * (i + 1) + 1 + j;
+      conv.data_1 = instruction(1, 2, addr);
+      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      tmp++;
     }
-    for (int i = CORENUM; i < 32; i++)
+    for (int i = tmp; i < 32; i++)
     {
       verilator_top->S_AXIS_TDATA[i] = 0;
     }
@@ -438,15 +401,142 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, int argc, char
       // ----------------------------------------------
     }
 
-    // 4
-    for (int i = 0; i < CORENUM; i++)
+    // 7
+    tmp = 0;
+    for (int i = 0; i < CORENUM; i += 2)
     {
-
-      conv.data_0 = 0;
-      conv.data_1 = 16;
-      verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+      conv.data_0 = instruction(0, 7, 0);
+      conv.data_1 = instruction(0, 7, 0);
+      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      tmp++;
     }
-    for (int i = CORENUM; i < 32; i++)
+    for (int i = tmp; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
+    }
+    eval();
+
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      eval();
+      // ----------------------------------------------
+    }
+
+    // 10
+    tmp = 0;
+    for (int i = 0; i < CORENUM; i += 2)
+    {
+      conv.data_0 = instruction(0, 10, 0);
+      conv.data_1 = instruction(0, 10, 0);
+      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      tmp++;
+    }
+    for (int i = tmp; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
+    }
+    eval();
+
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      eval();
+      // ----------------------------------------------
+    }
+
+    // 2
+    tmp = 0;
+    for (int i = 0; i < CORENUM; i += 2)
+    {
+      uint16_t addr = NGRAM * i + 2 + j;
+      conv.data_0 = instruction(1, 2, addr);
+      addr = NGRAM * (i + 1) + 2 + j;
+      conv.data_1 = instruction(1, 2, addr);
+      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      tmp++;
+    }
+    for (int i = tmp; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
+    }
+    eval();
+
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      eval();
+      // ----------------------------------------------
+    }
+
+    // 3
+    tmp = 0;
+    for (int i = 0; i < CORENUM; i += 2)
+    {
+      conv.data_0 = instruction(0, 3, 0);
+      conv.data_1 = instruction(0, 3, 0);
+      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      tmp++;
+    }
+    for (int i = tmp; i < 32; i++)
+    {
+      verilator_top->S_AXIS_TDATA[i] = 0;
+    }
+    eval();
+
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      eval();
+      // ----------------------------------------------
+    }
+
+    // 7
+    tmp = 0;
+    for (int i = 0; i < CORENUM; i += 2)
+    {
+      conv.data_0 = instruction(0, 7, 0);
+      conv.data_1 = instruction(0, 7, 0);
+      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      tmp++;
+    }
+    for (int i = tmp; i < 32; i++)
     {
       verilator_top->S_AXIS_TDATA[i] = 0;
     }
@@ -470,15 +560,17 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, int argc, char
 
     if (j == LAST)
     {
-      // 7
-      for (int i = 0; i < CORENUM; i++)
+      // 9
+      tmp = 0;
+      for (int i = 0; i < CORENUM; i += 2)
       {
 
-        conv.data_0 = 0;
-        conv.data_1 = 128;
-        verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+        conv.data_0 = instruction(0, 9, 0);
+        conv.data_1 = instruction(0, 9, 0);
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
       }
-      for (int i = CORENUM; i < 32; i++)
+      for (int i = tmp; i < 32; i++)
       {
         verilator_top->S_AXIS_TDATA[i] = 0;
       }
@@ -486,15 +578,17 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, int argc, char
     }
     else
     {
-      // 5
-      for (int i = 0; i < CORENUM; i++)
+      // 8
+      tmp = 0;
+      for (int i = 0; i < CORENUM; i += 2)
       {
 
-        conv.data_0 = 0;
-        conv.data_1 = 32;
-        verilator_top->S_AXIS_TDATA[i] = conv.write_data;
+        conv.data_0 = instruction(0, 8, 0);
+        conv.data_1 = instruction(0, 8, 0);
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
       }
-      for (int i = CORENUM; i < 32; i++)
+      for (int i = tmp; i < 32; i++)
       {
         verilator_top->S_AXIS_TDATA[i] = 0;
       }
