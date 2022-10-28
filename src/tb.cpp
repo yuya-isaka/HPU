@@ -9,8 +9,9 @@
 
 // 可変パラメータ
 
-// 結果を何個出力するかに使う
-const int DIM = 32 / 32;
+// 次元数可変 (結果を何個出力するかに使う)
+// const int DIM = 32 / 32;
+const int DIM = 1024 / 32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -627,6 +628,8 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, int argc, char
   return;
 }
 
+// ----------------------------------------------------------------------------------------------------------------------------------------------
+
 int main(int argc, char **argv)
 {
   printf("\n ================================================= 開始 ================================================= \n\n");
@@ -636,17 +639,29 @@ int main(int argc, char **argv)
   int DEBUG = 0;
   int ADDRNUM = 0;
 
-  for (int i = 48; i < RANNUM; i += 48)
-  {
-    ADDRNUM = i;
+  // for (int i = 48; i < RANNUM; i += 48)
+  // {
+  //   ADDRNUM = i;
 
-    DEBUG = 0;
-    check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
-    DEBUG = 1;
-    check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
+  //   DEBUG = 0;
+  //   check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
+  //   DEBUG = 1;
+  //   check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
 
-    printf(" --------\n\n");
-  }
+  //   printf(" --------\n\n");
+  // }
+
+  ADDRNUM = 48;
+  DEBUG = 0;
+  check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
+  DEBUG = 1;
+  check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
+  printf(" --------\n\n");
+  ADDRNUM = 96;
+  DEBUG = 0;
+  check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
+  DEBUG = 1;
+  check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
 
   printf("\n ================================================= 終了 ================================================= \n\n");
 

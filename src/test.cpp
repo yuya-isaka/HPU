@@ -7,7 +7,9 @@
 
 // 可変パラメータ
 
-const int DIM = 32 / 32;
+// 次元数可変
+// const int DIM = 32 / 32;
+const int DIM = 1024 / 32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -216,6 +218,8 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
 	return;
 }
 
+// ----------------------------------------------------------------------------------------------------------------------------------------------
+
 int main(int argc, char **argv)
 {
 	printf("\n ------------------------------- 開始 ------------------------------- \n\n\n");
@@ -224,15 +228,23 @@ int main(int argc, char **argv)
 	const int CORENUM = 16;
 	int ADDRNUM = 0;
 
-	for (int i = 48; i < RANNUM; i += 48)
-	{
-		ADDRNUM = i;
+	// for (int i = 48; i < RANNUM; i += 48)
+	// {
+	// 	ADDRNUM = i;
 
-		check(NGRAM, CORENUM, ADDRNUM);
-		xor128(1);
+	// 	check(NGRAM, CORENUM, ADDRNUM);
+	// 	xor128(1);
 
-		printf(" --------\n\n");
-	}
+	// 	printf(" --------\n\n");
+	// }
+
+	ADDRNUM = 48;
+	check(NGRAM, CORENUM, ADDRNUM);
+	xor128(1);
+	printf(" --------\n\n");
+	ADDRNUM = 96;
+	check(NGRAM, CORENUM, ADDRNUM);
+	xor128(1);
 
 	printf("\n ------------------------------- 終了 ------------------------------- \n");
 	return 0;
