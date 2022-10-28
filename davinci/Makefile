@@ -1,16 +1,22 @@
 
-hdc: hdc.c
+hdc:
 	gcc -Wall -o hdc hdc.c -lm
 
-hdc-o: hdc.c
+hdc-o:
 	gcc -Wall -O2 -o hdc hdc.c -lm
 
-.PHONY: clean
-clean:
-	rm -f hdc
 
 linux:
 	arm-linux-gnueabihf-gcc -Wall -o hdc hdc.c -lm
+	arm-linux-gnueabihf-gcc -Wall -o hdc-pl hdc-pl.c -lm
 
 linux-o:
 	arm-linux-gnueabihf-gcc -Wall -O2 -o hdc hdc.c -lm
+	arm-linux-gnueabihf-gcc -Wall -O2 -o hdc-pl hdc-pl.c -lm
+
+
+clean:
+	rm -f hdc
+
+
+.PHONY: clean
