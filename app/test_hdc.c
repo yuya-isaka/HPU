@@ -552,11 +552,11 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
     // putb(result_real);
     if (result_real != dst[j])
     {
-      printf("Error %u %u\n", result_real, dst[j]);
+      printf("  Error %u %u\n", result_real, dst[j]);
     }
     else
     {
-      printf("Success\n");
+      printf("  Success\n");
     }
 
     free(result_array);
