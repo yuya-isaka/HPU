@@ -15,7 +15,6 @@ const int DIM = 32 / 32;
 
 // 追加されるランダムな値はRANNUM-1番目
 const int RANNUM = 1024;
-const int BUSWIDTH = 1024;
 unsigned int item_memory_array[DIM][RANNUM];
 unsigned int item_memory_array_new[DIM][RANNUM];
 
