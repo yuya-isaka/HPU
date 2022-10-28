@@ -3,6 +3,11 @@ check:
 	arm-linux-gnueabihf-gcc test_hdc_pre.c -o test_hdc_pre
 	arm-linux-gnueabihf-gcc test_hdc_next.c -o test_hdc_next
 
+check-o:
+	arm-linux-gnueabihf-gcc -O2 test_hdc.c -o test_hdc
+	arm-linux-gnueabihf-gcc -O2 test_hdc_pre.c -o test_hdc_pre
+	arm-linux-gnueabihf-gcc -O2 test_hdc_next.c -o test_hdc_next
+
 # sudo ./test_hdc
 
 %: %.c
