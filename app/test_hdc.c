@@ -26,18 +26,6 @@ unsigned int item_memory_array_new[DIM][RANNUM];
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-union
-{
-  struct
-  {
-    uint16_t data_0;
-    uint16_t data_1;
-  };
-  uint32_t write_data;
-} conv;
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 void printb(unsigned int v)
 {
   unsigned int mask = (int)1 << (sizeof(v) * 8 - 1);
@@ -243,7 +231,7 @@ uint16_t instruction(int addr_flag, unsigned int inst_num, uint16_t addr)
 
 volatile int *top;
 volatile int *dma;
-volatile int *src;
+volatile uint16_t *src;
 volatile int *dst;
 unsigned long src_phys;
 unsigned long dst_phys;
@@ -302,16 +290,14 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
   for (int j = 0; j < ADDRNUM; j++)
   {
     // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i += 2)
+    // 16bit命令ごとに入れるから64回必要
+    for (int i = 0; i < (BUSWIDTH / 16); i++)
     {
       if (i < CORENUM)
       {
         uint16_t addr = NGRAM * i + j;
-        conv.data_0 = instruction(1, 1, addr);
-
-        addr = NGRAM * (i + 1) + j;
-        conv.data_1 = instruction(1, 1, addr);
-        src[tmp_2] = conv.write_data;
+        uint16_t inst = instruction(1, 1, addr);
+        src[tmp_2] = inst;
       }
       else
       {
@@ -323,13 +309,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
     // ------------------------------------------------------
 
     // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i += 2)
+    for (int i = 0; i < (BUSWIDTH / 16); i++)
     {
       if (i < CORENUM)
       {
-        conv.data_0 = instruction(0, 10, 0);
-        conv.data_1 = instruction(0, 10, 0);
-        src[tmp_2] = conv.write_data;
+        uint16_t inst = instruction(0, 10, 0);
+        src[tmp_2] = inst;
       }
       else
       {
@@ -341,15 +326,13 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
     // ------------------------------------------------------
 
     // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i += 2)
+    for (int i = 0; i < (BUSWIDTH / 16); i++)
     {
       if (i < CORENUM)
       {
         uint16_t addr = NGRAM * i + 1 + j;
-        conv.data_0 = instruction(1, 2, addr);
-        addr = NGRAM * (i + 1) + 1 + j;
-        conv.data_1 = instruction(1, 2, addr);
-        src[tmp_2] = conv.write_data;
+        uint16_t inst = instruction(1, 2, addr);
+        src[tmp_2] = inst;
       }
       else
       {
@@ -361,13 +344,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
     // ------------------------------------------------------
 
     // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i += 2)
+    for (int i = 0; i < (BUSWIDTH / 16); i++)
     {
       if (i < CORENUM)
       {
-        conv.data_0 = instruction(0, 7, 0);
-        conv.data_1 = instruction(0, 7, 0);
-        src[tmp_2] = conv.write_data;
+        uint16_t inst = instruction(0, 7, 0);
+        src[tmp_2] = inst;
       }
       else
       {
@@ -379,13 +361,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
     // ------------------------------------------------------
 
     // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i += 2)
+    for (int i = 0; i < (BUSWIDTH / 16); i++)
     {
       if (i < CORENUM)
       {
-        conv.data_0 = instruction(0, 10, 0);
-        conv.data_1 = instruction(0, 10, 0);
-        src[tmp_2] = conv.write_data;
+        uint16_t inst = instruction(0, 10, 0);
+        src[tmp_2] = inst;
       }
       else
       {
@@ -397,15 +378,13 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
     // ------------------------------------------------------
 
     // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i += 2)
+    for (int i = 0; i < (BUSWIDTH / 16); i++)
     {
       if (i < CORENUM)
       {
         uint16_t addr = NGRAM * i + 2 + j;
-        conv.data_0 = instruction(1, 2, addr);
-        addr = NGRAM * (i + 1) + 2 + j;
-        conv.data_1 = instruction(1, 2, addr);
-        src[tmp_2] = conv.write_data;
+        uint16_t inst = instruction(1, 2, addr);
+        src[tmp_2] = inst;
       }
       else
       {
@@ -417,13 +396,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
     // ------------------------------------------------------
 
     // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i += 2)
+    for (int i = 0; i < (BUSWIDTH / 16); i++)
     {
       if (i < CORENUM)
       {
-        conv.data_0 = instruction(0, 3, 0);
-        conv.data_1 = instruction(0, 3, 0);
-        src[tmp_2] = conv.write_data;
+        uint16_t inst = instruction(0, 3, 0);
+        src[tmp_2] = inst;
       }
       else
       {
@@ -435,13 +413,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
     // ------------------------------------------------------
 
     // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i += 2)
+    for (int i = 0; i < (BUSWIDTH / 16); i++)
     {
       if (i < CORENUM)
       {
-        conv.data_0 = instruction(0, 7, 0);
-        conv.data_1 = instruction(0, 7, 0);
-        src[tmp_2] = conv.write_data;
+        uint16_t inst = instruction(0, 7, 0);
+        src[tmp_2] = inst;
       }
       else
       {
@@ -453,21 +430,19 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
     // ------------------------------------------------------
 
     // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i += 2)
+    for (int i = 0; i < (BUSWIDTH / 16); i++)
     {
       if (i < CORENUM)
       {
         if (j == LAST)
         {
-          conv.data_0 = instruction(0, 9, 0);
-          conv.data_1 = instruction(0, 9, 0);
-          src[tmp_2] = conv.write_data;
+          uint16_t inst = instruction(0, 9, 0);
+          src[tmp_2] = inst;
         }
         else
         {
-          conv.data_0 = instruction(0, 8, 0);
-          conv.data_1 = instruction(0, 8, 0);
-          src[tmp_2] = conv.write_data;
+          uint16_t inst = instruction(0, 8, 0);
+          src[tmp_2] = inst;
         }
       }
       else
@@ -485,7 +460,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
   // AXI DMA 送信の設定（UIO経由）
   dma[0x00 / 4] = 1;
   dma[0x18 / 4] = src_phys;
-  dma[0x28 / 4] = send_num * 4;
+  dma[0x28 / 4] = send_num * 2; // 16ビットがsend_num個
 
   // 受信設定
   // 送信チャネルの設定前に受信チャネルを設定すると変になるっぽい
@@ -647,7 +622,7 @@ int main()
   // udmabuf0をユーザ空間にマッピング
   // 0x00080000 == 524288
   // 0000_0000
-  src = (int *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
+  src = (uint16_t *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
   if (src == MAP_FAILED)
   {
     perror("mmap src");
