@@ -15,10 +15,10 @@ __attribute__((destructor)) static void destructor()
 // -------------------------------------------  パラメータ設定 ---------------------------------------------------
 
 // n-gram
-const int NGRAM = 4;
+const int NGRAM = 3;
 
 // 次元数
-const int LENGTH = 10000;
+const int LENGTH = 1000;
 
 // 学習対象の個数（英語、フランス語）
 int train_num = 2;
