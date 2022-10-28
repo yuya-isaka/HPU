@@ -16,6 +16,7 @@ const int DIM = 32 / 32;
 
 // 変わらん
 
+// 追加されるランダムな値はRANNUM-1番目
 const int RANNUM = 1024;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +198,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, int argc, char
 
   // item_memory_num <- 1000;
   verilator_top->S_AXI_AWADDR = 4;
-  verilator_top->S_AXI_WDATA = RANNUM - 1;
+  verilator_top->S_AXI_WDATA = RANNUM - 1; // 1023番目をランダムな値に使う
   verilator_top->S_AXI_AWVALID = 1;
   verilator_top->S_AXI_WVALID = 1;
   eval();

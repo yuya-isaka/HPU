@@ -127,15 +127,15 @@ module stream_ctrl
               end;
 
 
-    wire [7:0]      i;
+    wire [1:0]      i;
     wire            last_stream;
 
     // 各コアで違う結果を返したい時に使うかも？
-    agu #(.W(8)) agu_stream_i
+    agu #(.W(2)) agu_stream_i
         (
             // in
-            .ini(8'd0),
-            .fin(8'd0),
+            .ini(2'd0),
+            .fin(2'd0),
             .start(start),
             .clk(clk),
             .rst(rst),

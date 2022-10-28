@@ -13,6 +13,7 @@ const int DIM = 32 / 32;
 
 // 変わらん
 
+// 追加されるランダムな値はRANNUM-1番目
 const int RANNUM = 1024;
 const int BUSWIDTH = 1024;
 unsigned int item_memory_array[DIM][RANNUM];
@@ -200,6 +201,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
 		// 多数決関数用
 		if (EVEN)
 		{
+			// RANNUM-1を追加するランダム値に使う
 			result_array[num] = item_memory_array[j][RANNUM - 1];
 			// printf("ランダム：%u\n", result_array[num]);
 			// putb(result_array[num]);
