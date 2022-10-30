@@ -35,117 +35,10 @@ int test_num = 2;
 // テストデータ指定
 const char *test_path[] = {"data/decorate/t1", "data/decorate/t2"};
 
-// --------------------------------------------- ハイパーベクトル、メモリアロケート、メモリフリー　---------------------------------------------------------
-
-typedef struct
-{
-	uint8_t *values;
-} HyperVector;
-
-int allocateMemoryHyperVector(HyperVector *v)
-{
-	v->values = (uint8_t *)calloc(LENGTH, sizeof(uint8_t));
-	// 確保できなかったらエラー
-	if (v->values == NULL)
-	{
-		return -1;
-	}
-	return 0;
-}
-
-void freeMemoryHyperVector(HyperVector *v)
-{
-	free(v->values);
-}
-
-// ------------------------------------------------- HDCアプリ, メモリアロケート, メモリフリー, 追加 ----------------------------------------------------
-
-typedef struct
-{
-	HyperVector *data;
-	int size;
-} HDC;
-
-int allocateMemoryHDC(HDC *v, int size)
-{
-	v->data = (HyperVector *)calloc(size, sizeof(HyperVector));
-	// 確保できなかったらエラー
-	if (v->data == NULL)
-	{
-		return -1;
-	}
-	for (int i = 0; i < size; i++)
-	{
-		allocateMemoryHyperVector(&v->data[i]);
-	}
-	v->size = size;
-	return 0;
-}
-
-void freeMemoryHDC(HDC *v)
-{
-	for (int i = 0; i < v->size; i++)
-	{
-		freeMemoryHyperVector(&v->data[i]);
-	}
-	free(v->data);
-	v->size = 0;
-}
-
-int append(HDC *v, HyperVector *newv)
-{
-	HDC tmp;
-	allocateMemoryHDC(&tmp, v->size);
-
-	// 一時的に格納
-	for (int i = 0; i < v->size; i++)
-	{
-		for (int j = 0; j < LENGTH; j++)
-		{
-			tmp.data[i].values[j] = v->data[i].values[j];
-		}
-	}
-
-	freeMemoryHDC(v);
-
-	// 一個増やして再度確保
-	v->size = tmp.size + 1;
-	v->data = (HyperVector *)calloc(v->size, sizeof(HyperVector));
-	// 確保できなかったらエラー
-	if (v->data == NULL)
-	{
-		return -1;
-	}
-
-	for (int i = 0; i < v->size; i++)
-	{
-		allocateMemoryHyperVector(&v->data[i]);
-	}
-
-	for (int i = 0; i < v->size - 1; i++)
-	{
-		for (int j = 0; j < LENGTH; j++)
-		{
-			v->data[i].values[j] = tmp.data[i].values[j];
-		}
-	}
-	for (int j = 0; j < LENGTH; j++)
-	{
-
-		v->data[v->size - 1].values[j] = newv->values[j];
-	}
-
-	freeMemoryHDC(&tmp);
-
-	return 0;
-}
-
 // --------------------------------------------------------- エンコード関数 ---------------------------------------------------------------
 
 void encoding(HDC *HDCascii, const char *path, uint8_t *values)
 {
-	clock_t startEncoding = clock();
-
 	// ファイルオープン
 	FILE *file;
 	file = fopen(path, "r");
@@ -358,13 +251,7 @@ int main(int argc, char const *argv[])
 {
 	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
 
-	clock_t start = clock();
-
-	// HDCアプリ作成 (ascii)
-	HDC HDCascii;
-	allocateMemoryHDC(&HDCascii, 127);
-
-	// 127文字生成
+	// 26文字用のランダムハイパーベクトル生成
 	for (int i = 0; i < 127; i++)
 	{
 		// Random生成
@@ -378,45 +265,12 @@ int main(int argc, char const *argv[])
 
 	// ----------------------------------------- Encoding ---------------------------------------------
 
-	clock_t startEncoding = clock();
-
-	// HDCアプリ作成 (学習後の訓練データを格納)
-	HDC HDCtrained;
-	allocateMemoryHDC(&HDCtrained, train_num);
-
 	// train_num (英語とフランス語なら２)
 	for (int i = 0; i < train_num; i++)
 	{
 		// HDCtrained.data[i].values の値を更新
 		encoding(&HDCascii, train_path[i], HDCtrained.data[i].values);
 	}
-
-	clock_t endEncoding = clock();
-
-	const double time_encoding_training = ((double)(endEncoding - startEncoding)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n  Encoding Training Data time: %lf[ms]\n\n", time_encoding_training);
-
-	// ---
-
-	startEncoding = clock();
-
-	// HDCアプリ作成　（学習後のテストデータを格納)
-	HDC HDCtested;
-	allocateMemoryHDC(&HDCtested, test_num);
-
-	// test_num (英語とフランス語なら２)
-	for (int i = 0; i < test_num; i++)
-	{
-		// HDCtested.data[i].values の値を更新
-		encoding(&HDCascii, test_path[i], HDCtested.data[i].values);
-	}
-
-	endEncoding = clock();
-
-	const double time_encoding_test = ((double)(endEncoding - startEncoding)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n  Encoding Test Data time: %lf[ms]\n\n", time_encoding_test);
-
-	printf("\n  All Encoding time: %lf[ms]\n\n\n", time_encoding_training + time_encoding_test);
 
 	// ---------------------------------------- 類似度チェック （推論） ---------------------------------------
 
