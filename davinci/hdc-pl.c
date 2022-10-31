@@ -1,16 +1,92 @@
 
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h> // uint16_t
 #include <time.h>
 #include <string.h>
 #include <math.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
+
+volatile int *top;
+volatile int *dma;
+volatile uint16_t *src;
+volatile int *dst;
+unsigned long src_phys;
+unsigned long dst_phys;
 
 // --------------------------------------- メモリリークチェック、デストラクター -----------------------------------------
 
 __attribute__((destructor)) static void destructor()
 {
 	system("leaks -q a.out");
+}
+
+uint16_t instruction(int addr_flag, unsigned int inst_num, uint16_t addr)
+{
+	if (addr_flag)
+	{
+		uint16_t result = 0;
+		if (inst_num == 1)
+		{
+			uint16_t inst = 3 << 14;
+			result = inst | addr;
+		}
+		else if (inst_num == 2)
+		{
+			uint16_t inst = 5 << 13;
+			result = inst | addr;
+		}
+		else if (inst_num == 4)
+		{
+			uint16_t inst = 9 << 12;
+			result = inst | addr;
+		}
+		else if (inst_num == 6)
+		{
+			uint16_t inst = 17 << 11;
+			result = inst | addr;
+		}
+		else
+		{
+			printf("error");
+		}
+		return result;
+	}
+	else
+	{
+		uint16_t inst = 0;
+		if (inst_num == 3)
+		{
+			inst = 1 << 14;
+		}
+		else if (inst_num == 5)
+		{
+			inst = 1 << 13;
+		}
+		else if (inst_num == 7)
+		{
+			inst = 1 << 12;
+		}
+		else if (inst_num == 8)
+		{
+			inst = 1 << 11;
+		}
+		else if (inst_num == 9)
+		{
+			inst = 1 << 10;
+		}
+		else if (inst_num == 10)
+		{
+			inst = 1 << 9;
+		}
+		else
+		{
+			printf("error");
+		}
+		return inst;
+	}
 }
 
 // -------------------------------------------  パラメータ設定 ---------------------------------------------------
@@ -37,7 +113,7 @@ const char *test_path[] = {"data/decorate/t1", "data/decorate/t2"};
 
 // --------------------------------------------------------- エンコード関数 ---------------------------------------------------------------
 
-void encoding(HDC *HDCascii, const char *path, uint8_t *values)
+unsigned int **encoding(const char *path, const int NGRAM, int *EVEN, const unsigned int INSTRUCTION_NUM, const unsigned int CORENUM)
 {
 	// ファイルオープン
 	FILE *file;
@@ -64,185 +140,95 @@ void encoding(HDC *HDCascii, const char *path, uint8_t *values)
 	// printf("%s\n", content);		  		// myname...
 	// printf("%lu\n", strlen(content)); 	// 27
 
-	clock_t endEncoding = clock();
-	double time_encoding = ((double)(endEncoding - startEncoding)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n    File read time: %lf[ms]\n", time_encoding);
-
 	// ngramの数（パラメータから計算）
 	int all_ngram = strlen(content) - NGRAM + 1;
 
-	startEncoding = clock();
+	*EVEN = ((all_ngram / NGRAM) % 2) == 0;
 
-	// 符号化後の値を入れるHDCアプリ作成
-	HDC HDCtarget;
-	allocateMemoryHDC(&HDCtarget, all_ngram);
-
-	// 先頭から順番にN-gramハイパーベクトルを生成してHDCtargetに格納
-	// 最外ループ
+	// ポインタ型を格納する配列をポインタ宣言
+	unsigned int **src;
+	unsigned int **ascii_array;
+	// 該当ポインタにキャストして、数分確保
+	ascii_array = (unsigned int **)calloc(all_ngram, sizeof(unsigned int));
+	src = (unsigned int **)calloc(all_ngram, sizeof(unsigned int));
 	for (int i = 0; i < all_ngram; i++)
 	{
-		// debug
-		// printf("\n---------- %d/%d ----------\n", i, all_ngram);
+		ascii_array[i] = (unsigned int *)calloc(NGRAM, sizeof(unsigned int));
+		src[i] = (unsigned int *)calloc(INSTRUCTION_NUM, sizeof(unsigned int));
+	}
+	// ↓
+	// src[all_ngram][NGRAM]が完成
 
-		// 先頭からngram分のセットを作成
-		// mynameis...
-		// ↓
-		// ascii_number_n = [109, 121, 110] // m, y, n
-		int ascii_number_n[NGRAM];
+	for (int i = 0; i < all_ngram; i++)
+	{
 		for (int j = 0; j < NGRAM; j++)
 		{
-			ascii_number_n[j] = (unsigned char)(content[i + j]);
+			ascii_array[i][j] = (unsigned char)(content[i + j]);
 		}
-
-		HyperVector result;
-		allocateMemoryHyperVector(&result);
-		// 毎ループresultを更新
-		for (int j = 0; j < NGRAM; j++)
-		{
-			if (j == 0)
-			{
-				HyperVector ascii_vector;
-				allocateMemoryHyperVector(&ascii_vector);
-				for (int k = 0; k < LENGTH; k++)
-				{
-					// 欲しいasciiを取り出し
-					ascii_vector.values[k] = HDCascii->data[ascii_number_n[j]].values[k];
-				}
-				// Rotate (右シフト)
-				HyperVector tmp_vector;
-				allocateMemoryHyperVector(&tmp_vector);
-				int rotatenum = LENGTH - (NGRAM - 1) % LENGTH;
-				int basenum = 0;
-				for (int k = rotatenum; k < LENGTH; k++, basenum++)
-				{
-					tmp_vector.values[basenum] = ascii_vector.values[k];
-				}
-				for (int k = 0; k < rotatenum; k++, basenum++)
-				{
-					tmp_vector.values[basenum] = ascii_vector.values[k];
-				}
-				for (int k = 0; k < LENGTH; k++)
-				{
-					result.values[k] = tmp_vector.values[k];
-				}
-				freeMemoryHyperVector(&ascii_vector);
-				freeMemoryHyperVector(&tmp_vector);
-				continue;
-			}
-
-			HyperVector next_ascii_vector;
-			allocateMemoryHyperVector(&next_ascii_vector);
-			for (int k = 0; k < LENGTH; k++)
-			{
-				// 欲しいasciiを取り出し
-				next_ascii_vector.values[k] = HDCascii->data[ascii_number_n[j]].values[k];
-			}
-			if (NGRAM - j - 1 != 0)
-			{
-				// Rotate (右シフト)
-				HyperVector tmp_vector;
-				allocateMemoryHyperVector(&tmp_vector);
-				int rotatenum = (LENGTH - (NGRAM - 1) + j) % LENGTH;
-				int basenum = 0;
-				for (int k = rotatenum; k < LENGTH; k++, basenum++)
-				{
-					tmp_vector.values[basenum] = next_ascii_vector.values[k];
-				}
-				for (int k = 0; k < rotatenum; k++, basenum++)
-				{
-					tmp_vector.values[basenum] = next_ascii_vector.values[k];
-				}
-				for (int k = 0; k < LENGTH; k++)
-				{
-					next_ascii_vector.values[k] = tmp_vector.values[k];
-				}
-				freeMemoryHyperVector(&tmp_vector);
-			}
-
-			// Xor
-			for (int k = 0; k < LENGTH; k++)
-			{
-				result.values[k] = result.values[k] ^ next_ascii_vector.values[k];
-			}
-
-			freeMemoryHyperVector(&next_ascii_vector);
-		}
-
-		// resultを格納
-		for (int j = 0; j < LENGTH; j++)
-		{
-			HDCtarget.data[i].values[j] = result.values[j];
-		}
-
-		freeMemoryHyperVector(&result);
 	}
 
-	endEncoding = clock();
-	time_encoding = ((double)(endEncoding - startEncoding)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n    Encoding time: %lf[ms]\n", time_encoding);
-
-	startEncoding = clock();
-
-	// 偶数だったら多数決できないので、ランダムな値(ハイパーベクトル)を追加
-	if ((all_ngram % 2) == 0)
+	for (int i = 0; i < all_ngram; i++)
 	{
-		HyperVector tmp_vector;
-		allocateMemoryHyperVector(&tmp_vector);
-		srand(128);
-		for (int j = 0; j < LENGTH; j++)
+		// 1
+		int tmp = 0;
+		uint16_t addr = ascii_array[i][0];
+		uint16_t inst = instruction(1, 1, addr);
+		src[i][tmp] = inst;
+		tmp++;
+
+		// 10
+		inst = instruction(0, 10, 0);
+		src[i][tmp] = inst;
+		tmp++;
+
+		// 2
+		addr = ascii_array[i][1];
+		inst = instruction(1, 2, addr);
+		src[i][tmp] = inst;
+		tmp++;
+
+		// 7
+		inst = instruction(0, 7, 0);
+		src[i][tmp] = inst;
+		tmp++;
+
+		// 10
+		inst = instruction(0, 10, 0);
+		src[i][tmp] = inst;
+		tmp++;
+
+		// 2
+		addr = ascii_array[i][2];
+		inst = instruction(1, 2, addr);
+		src[i][tmp] = inst;
+		tmp++;
+
+		// 3
+		inst = instruction(0, 3, 0);
+		src[i][tmp] = inst;
+		tmp++;
+
+		// 7
+		inst = instruction(0, 7, 0);
+		src[i][tmp] = inst;
+		tmp++;
+
+		// 8 or 9
+		if (i == (all_ngram - 1))
 		{
-			uint8_t value = rand() % 2;
-			tmp_vector.values[j] = value;
-		}
-		append(&HDCtarget, &tmp_vector);
-		all_ngram += 1; // 値を一個増やしたので更新
-		freeMemoryHyperVector(&tmp_vector);
-	}
-
-	endEncoding = clock();
-	time_encoding = ((double)(endEncoding - startEncoding)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n    Append time: %lf[ms]\n", time_encoding);
-
-	// ------------------------------------------ 最後の加算 -----------------------------------------
-
-	startEncoding = clock();
-
-	HyperVector trained;
-	allocateMemoryHyperVector(&trained);
-
-	int thr = all_ngram / 2 + 1;
-	for (int i = 0; i < LENGTH; i++)
-	{
-		// all_ngram個のi番目の要素を足し合わせる
-		int sum = 0;
-		for (int j = 0; j < all_ngram; j++)
-		{
-			sum += HDCtarget.data[j].values[i];
-		}
-
-		if (thr <= sum)
-		{
-			trained.values[i] = 1;
+			inst = instruction(0, 9, 0);
+			src[i][tmp] = inst;
+			tmp++;
 		}
 		else
 		{
-			trained.values[i] = 0;
+			inst = instruction(0, 8, 0);
+			src[i][tmp] = inst;
+			tmp++;
 		}
 	}
 
-	for (int i = 0; i < LENGTH; i++)
-	{
-		values[i] = trained.values[i];
-	}
-
-	endEncoding = clock();
-	time_encoding = ((double)(endEncoding - startEncoding)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n    Final add time: %lf[ms]\n", time_encoding);
-
-	// 解放
-	free(content);
-	freeMemoryHDC(&HDCtarget);
-	freeMemoryHyperVector(&trained);
+	return src;
 }
 
 // --------------------------------------------------------------- main program ----------------------------------------------------------------------
@@ -251,104 +237,174 @@ int main(int argc, char const *argv[])
 {
 	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
 
-	// 26文字用のランダムハイパーベクトル生成
-	for (int i = 0; i < 127; i++)
+	int fd0, fd1, dmaf, topf;
+
+	// DMAバッファの物理アドレスを取得 ------------------------------------------------------------
+
+	if ((fd0 = open("/sys/class/u-dma-buf/udmabuf0/phys_addr", O_RDONLY)) != -1)
 	{
-		// Random生成
-		srand(i);
-		for (int j = 0; j < LENGTH; j++)
-		{
-			uint8_t value = rand() % 2;
-			HDCascii.data[i].values[j] = value;
-		}
+		char attr[1024];
+		read(fd0, attr, 1024);
+		sscanf(attr, "%lx", &src_phys);
+		close(fd0);
+	}
+	if ((fd0 = open("/sys/class/u-dma-buf/udmabuf1/phys_addr", O_RDONLY)) != -1)
+	{
+		char attr[1024];
+		read(fd0, attr, 1024);
+		sscanf(attr, "%lx", &dst_phys);
+		close(fd0);
 	}
 
-	// ----------------------------------------- Encoding ---------------------------------------------
+	// DMAバッファにユーザ空間から書き込む設定 -----------------------------------------------------
+
+	if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
+	{
+		perror("Failed: open /dev/udmabuf0");
+		return 0;
+	}
+	if ((fd1 = open("/dev/udmabuf1", O_RDWR)) < 0)
+	{
+		perror("Failed: open /dev/udmabuf1");
+		return 0;
+	}
+	if ((dmaf = open("/dev/uio0", O_RDWR | O_SYNC)) < 0)
+	{
+		perror("Falied: open /dev/uio0");
+		return 0;
+	}
+	if ((topf = open("/dev/uio1", O_RDWR | O_SYNC)) < 0)
+	{
+		perror("Failed: open /dev/uio1");
+		return 0;
+	}
+
+	// 対応表, 参考
+	// https://pknight.hatenablog.com/entry/20100427/1272396732
+
+	// uio1をユーザ空間にマッピング
+	// (int *)にキャスト (汎用ポインタがここでは返ってくるので，何かしらにキャストする必要がある)
+	// 0x1000 == 4096
+	// 40000_0000
+	top = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, topf, 0);
+	if (top == MAP_FAILED)
+	{
+		perror("mmap top");
+		close(topf);
+		return 0;
+	}
+	// uio0をユーザ空間にマッピング
+	// 4040_0000
+	dma = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, dmaf, 0);
+	if (dma == MAP_FAILED)
+	{
+		perror("mmap dma");
+		close(dmaf);
+		return 0;
+	}
+
+	// udmabuf0をユーザ空間にマッピング
+	// 0x00080000 == 524288
+	// 0000_0000
+	src = (uint16_t *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
+	if (src == MAP_FAILED)
+	{
+		perror("mmap src");
+		close(fd0);
+		return 0;
+	}
+	// udmabuf1をユーザ空間にマッピング
+	// 0000_0000
+	dst = (int *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd1, 0);
+	if (dst == MAP_FAILED)
+	{
+		perror("mmap dst");
+		close(fd1);
+		return 0;
+	}
+
+	const int NGRAM = 3;
+	int EVEN;
+
+	// dma reset
+	dma[0x30 / 4] = 4;
+	dma[0x00 / 4] = 4;
+	while (dma[0x00 / 4] & 0x4)
+		;
+
+	// item_memory_num (乱数の数)
+	top[0x04 / 4] = 130 - 1;
+
+	// gen <- 1;
+	top[0x00 / 4] = 1;
+
+	// 乱数生成終了を待つ
+	while (top[0x00 / 4] & 0x1)
+		;
+
+	///////////////
 
 	// train_num (英語とフランス語なら２)
 	for (int i = 0; i < train_num; i++)
 	{
-		// HDCtrained.data[i].values の値を更新
-		encoding(&HDCascii, train_path[i], HDCtrained.data[i].values);
-	}
+		unsigned int **tmp;
+		const unsigned int INSTRUCTION_NUM = 9;
+		const unsigned int CORENUM = 16;
+		tmp = encoding(train_path[i], NGRAM, &EVEN, INSTRUCTION_NUM, CORENUM);
+		// even
+		top[0x08 / 4] = EVEN;
 
-	// ---------------------------------------- 類似度チェック （推論） ---------------------------------------
+		// run <- 1;
+		top[0x00 / 4] = 2;
 
-	clock_t startSimilarity = clock();
-	// （cosine類似度チェック）
-	// distance = A・B/|A||B|
-	// |A| ... Aのnorm
-	const char *test_lang[] = {"English", "French"};
-	puts("  期待");
-	for (int i = 0; i < test_num; i++)
-	{
-		printf("  test %d → %s\n", i, test_lang[i]);
-	}
-	puts("");
+		int send_num = 0;
 
-	puts("  結果");
-	const char *train_lang[] = {"English", "French"};
-	for (int i = 0; i < test_num; i++)
-	{
-		int match = -1; // 最終的にマッチした番号が入る
-		double max_cosine = -2.0;
-		for (int j = 0; j < train_num; j++)
+		size_t length = (sizeof(src) / sizeof(unsigned int *));
+		// 応急処置 ----------
+		int remainder = length % 48;
+		length -= remainder;
+		// ------------------
+		for (int j = 0; j < length; j += (1024 / CORENUM))
 		{
-
-			// 内積
-			int dot_result = 0;
-			for (int k = 0; k < LENGTH; k++)
+			for (int k = 0; k < INSTRUCTION_NUM; k++)
 			{
-				dot_result += HDCtested.data[i].values[k] & HDCtrained.data[j].values[k];
-			}
-
-			// norm for train
-			int train_sum = 0;
-			for (int k = 0; k < LENGTH; k++)
-			{
-				train_sum += HDCtrained.data[j].values[k];
-			}
-			double train_norm = (double)sqrt((double)train_sum);
-
-			// norm for test
-			int test_sum = 0;
-			for (int k = 0; k < LENGTH; k++)
-			{
-				test_sum += HDCtested.data[i].values[k];
-			}
-			double test_norm = (double)sqrt((double)test_sum);
-
-			// cosineチェック
-			double cosine = (double)dot_result / (test_norm * train_norm);
-			if (cosine > max_cosine)
-			{
-				max_cosine = cosine;
-				match = j; // 更新
+				for (int l = 0; l < (1024 / CORENUM); l++)
+				{
+					if (l < CORENUM)
+					{
+						src[send_num] = tmp[j + l][k];
+					}
+					else
+					{
+						src[send_num] = 0;
+					}
+					send_num++;
+				}
 			}
 		}
-		if (match == -1)
+		// AXI DMA 送信の設定（UIO経由）
+		dma[0x00 / 4] = 1;
+		dma[0x18 / 4] = src_phys;
+		dma[0x28 / 4] = send_num * 2; // 16ビットがsend_num個
+
+		// 受信設定
+		// 送信チャネルの設定前に受信チャネルを設定すると変になるっぽい
+		dma[0x30 / 4] = 1;
+		dma[0x48 / 4] = dst_phys;
+		dma[0x58 / 4] = (1024 / 32) * 4; // 32個 * 4バイト = 128バイト = 1024ビット
+
+		// 演算終了を待つ
+		while ((dma[0x34 / 4] & 0x1000) != 0x1000)
+			;
+
+		for (int j = 0; j < (1024 / 32); j++)
 		{
-			puts("  could not find match language");
+			printf("%u", dst[j]);
 		}
-		else
-		{
-			printf("  test %d → %s\n", i, train_lang[match]);
-		}
+
+		// run <- 0;
+		top[0x00 / 4] = 0;
 	}
-
-	clock_t endSimilarity = clock();
-
-	const double time_similarity = ((double)(endSimilarity - startSimilarity)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n  Similarity time: %lf[ms]\n\n", time_similarity);
-
-	freeMemoryHDC(&HDCascii);
-	freeMemoryHDC(&HDCtrained);
-	freeMemoryHDC(&HDCtested);
-
-	clock_t end = clock();
-
-	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\n  time %lf[ms]\n", time);
 
 	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
 
