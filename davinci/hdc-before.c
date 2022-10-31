@@ -2,7 +2,6 @@
 // ユーザに使ってもらう関数たち
 // HDC
 // generate
-// get_addr
 // shift
 // xor
 // move
@@ -31,11 +30,11 @@ int main(int argc, char const *argv[])
 	int train_num = 2;
 	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 
-	HDC(2, 16);
+	int core_num = 16;
+	HDC(train_num, core_num);
 
 	// 割り当てたいキーワードをユーザが選定
-	const char *keyword[] = {"a", "b", "c", "d"};
-	generate(27, keyword); // 27個のハイパーベクトルとキーワードがセットになったitem_memoryが生成
+	generate(27); // 27個のハイパーベクトルとキーワードがセットになったitem_memoryが生成
 
 	for (int i = 0; i < train_num; i++)
 	{
@@ -70,7 +69,7 @@ int main(int argc, char const *argv[])
 		{
 			for (int j = 0; j < NGRAM; j++)
 			{
-				int addr = get_addr(train_data[i + j]);
+				int addr = train_data[i + j] - 97;
 				shift(addr, j, core_num);
 
 				// 0番目以外はxor
