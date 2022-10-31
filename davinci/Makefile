@@ -20,3 +20,6 @@ clean:
 
 
 .PHONY: clean
+
+test:
+	gcc -Wall -o test_hash test_hash.c
