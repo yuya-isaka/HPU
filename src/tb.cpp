@@ -7,16 +7,6 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// 可変パラメータ
-
-// 次元数可変 (結果を何個出力するかに使う)
-// const int DIM = 32 / 32;
-const int DIM = 1024 / 32;
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 変わらん
-
 // 追加されるランダムな値はRANNUM-1番目
 const int RANNUM = 1024;
 
@@ -152,11 +142,19 @@ uint16_t instruction(int addr_flag, unsigned int inst_num, uint16_t addr)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void check(const int NGRAM, const int CORENUM, const int ADDRNUM, int argc, char **argv, const int DEBUG)
+void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM, int argc, char **argv, const int DEBUG)
 {
 
-  const int LAST = ADDRNUM - 48;
+  // 最低限 = NGRAMの倍数(3の倍数)であることは保証されている（今回のテストケースではそれしか対応していないから）
+  // 16コアすべてを使わないケースがあるか調べる
+  const int REMAINDAR = (ADDRNUM / 3) % 16;
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
+  int LAST = (ADDRNUM / 3) / 16;
+  if (REMAINDAR == 0)
+  {
+    LAST--;
+  }
+  LAST *= NGRAM * CORENUM;
 
   ////////////////////////////////////////////////////////////////////////////// Verilator setup /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -266,271 +264,30 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, int argc, char
   int tmp = 0;
   for (int j = 0; j < ADDRNUM; j++)
   {
-    // 1
-    tmp = 0;
-    for (int i = 0; i < CORENUM; i += 2)
-    {
-      uint16_t addr = NGRAM * i + j;
-      conv.data_0 = instruction(1, 1, addr);
 
-      addr = NGRAM * (i + 1) + j;
-      conv.data_1 = instruction(1, 1, addr);
+    if (REMAINDAR != 0 && j == LAST)
+    {
 
-      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-      tmp++;
-    }
-    for (int i = tmp; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    if (DEBUG)
-    {
-      // 送信途中で止まる対策 -----------------------------
-      verilator_top->S_AXIS_TVALID = 0;
-      for (int i = 0; i < 32; i++)
-      {
-        verilator_top->S_AXIS_TDATA[i] = 0;
-      }
-      eval();
-      eval();
-      eval();
-      verilator_top->S_AXIS_TVALID = 1;
-      eval();
-      // ----------------------------------------------
-    }
-
-    // 10
-    tmp = 0;
-    for (int i = 0; i < CORENUM; i += 2)
-    {
-      conv.data_0 = instruction(0, 10, 0);
-      conv.data_1 = instruction(0, 10, 0);
-      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-      tmp++;
-    }
-    for (int i = tmp; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    if (DEBUG)
-    {
-      // 送信途中で止まる対策 -----------------------------
-      verilator_top->S_AXIS_TVALID = 0;
-      for (int i = 0; i < 32; i++)
-      {
-        verilator_top->S_AXIS_TDATA[i] = 0;
-      }
-      eval();
-      eval();
-      eval();
-      verilator_top->S_AXIS_TVALID = 1;
-      eval();
-      // ----------------------------------------------
-    }
-
-    // 2
-    tmp = 0;
-    for (int i = 0; i < CORENUM; i += 2)
-    {
-      uint16_t addr = NGRAM * i + 1 + j;
-      conv.data_0 = instruction(1, 2, addr);
-      addr = NGRAM * (i + 1) + 1 + j;
-      conv.data_1 = instruction(1, 2, addr);
-      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-      tmp++;
-    }
-    for (int i = tmp; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    if (DEBUG)
-    {
-      // 送信途中で止まる対策 -----------------------------
-      verilator_top->S_AXIS_TVALID = 0;
-      for (int i = 0; i < 32; i++)
-      {
-        verilator_top->S_AXIS_TDATA[i] = 0;
-      }
-      eval();
-      eval();
-      eval();
-      verilator_top->S_AXIS_TVALID = 1;
-      eval();
-      // ----------------------------------------------
-    }
-
-    // 7
-    tmp = 0;
-    for (int i = 0; i < CORENUM; i += 2)
-    {
-      conv.data_0 = instruction(0, 7, 0);
-      conv.data_1 = instruction(0, 7, 0);
-      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-      tmp++;
-    }
-    for (int i = tmp; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    if (DEBUG)
-    {
-      // 送信途中で止まる対策 -----------------------------
-      verilator_top->S_AXIS_TVALID = 0;
-      for (int i = 0; i < 32; i++)
-      {
-        verilator_top->S_AXIS_TDATA[i] = 0;
-      }
-      eval();
-      eval();
-      eval();
-      verilator_top->S_AXIS_TVALID = 1;
-      eval();
-      // ----------------------------------------------
-    }
-
-    // 10
-    tmp = 0;
-    for (int i = 0; i < CORENUM; i += 2)
-    {
-      conv.data_0 = instruction(0, 10, 0);
-      conv.data_1 = instruction(0, 10, 0);
-      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-      tmp++;
-    }
-    for (int i = tmp; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    if (DEBUG)
-    {
-      // 送信途中で止まる対策 -----------------------------
-      verilator_top->S_AXIS_TVALID = 0;
-      for (int i = 0; i < 32; i++)
-      {
-        verilator_top->S_AXIS_TDATA[i] = 0;
-      }
-      eval();
-      eval();
-      eval();
-      verilator_top->S_AXIS_TVALID = 1;
-      eval();
-      // ----------------------------------------------
-    }
-
-    // 2
-    tmp = 0;
-    for (int i = 0; i < CORENUM; i += 2)
-    {
-      uint16_t addr = NGRAM * i + 2 + j;
-      conv.data_0 = instruction(1, 2, addr);
-      addr = NGRAM * (i + 1) + 2 + j;
-      conv.data_1 = instruction(1, 2, addr);
-      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-      tmp++;
-    }
-    for (int i = tmp; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    if (DEBUG)
-    {
-      // 送信途中で止まる対策 -----------------------------
-      verilator_top->S_AXIS_TVALID = 0;
-      for (int i = 0; i < 32; i++)
-      {
-        verilator_top->S_AXIS_TDATA[i] = 0;
-      }
-      eval();
-      eval();
-      eval();
-      verilator_top->S_AXIS_TVALID = 1;
-      eval();
-      // ----------------------------------------------
-    }
-
-    // 3
-    tmp = 0;
-    for (int i = 0; i < CORENUM; i += 2)
-    {
-      conv.data_0 = instruction(0, 3, 0);
-      conv.data_1 = instruction(0, 3, 0);
-      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-      tmp++;
-    }
-    for (int i = tmp; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    if (DEBUG)
-    {
-      // 送信途中で止まる対策 -----------------------------
-      verilator_top->S_AXIS_TVALID = 0;
-      for (int i = 0; i < 32; i++)
-      {
-        verilator_top->S_AXIS_TDATA[i] = 0;
-      }
-      eval();
-      eval();
-      eval();
-      verilator_top->S_AXIS_TVALID = 1;
-      eval();
-      // ----------------------------------------------
-    }
-
-    // 7
-    tmp = 0;
-    for (int i = 0; i < CORENUM; i += 2)
-    {
-      conv.data_0 = instruction(0, 7, 0);
-      conv.data_1 = instruction(0, 7, 0);
-      verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-      tmp++;
-    }
-    for (int i = tmp; i < 32; i++)
-    {
-      verilator_top->S_AXIS_TDATA[i] = 0;
-    }
-    eval();
-
-    if (DEBUG)
-    {
-      // 送信途中で止まる対策 -----------------------------
-      verilator_top->S_AXIS_TVALID = 0;
-      for (int i = 0; i < 32; i++)
-      {
-        verilator_top->S_AXIS_TDATA[i] = 0;
-      }
-      eval();
-      eval();
-      eval();
-      verilator_top->S_AXIS_TVALID = 1;
-      eval();
-      // ----------------------------------------------
-    }
-
-    if (j == LAST)
-    {
-      // 9
+      // 1
       tmp = 0;
-      for (int i = 0; i < CORENUM; i += 2)
+      for (int i = 0; i < REMAINDAR; i++)
       {
-
-        conv.data_0 = instruction(0, 9, 0);
-        conv.data_1 = instruction(0, 9, 0);
+        uint16_t addr = NGRAM * i + j;
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(1, 1, addr);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(1, 1, addr);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (REMAINDAR % 2 != 0)
+      {
         verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
         tmp++;
       }
@@ -539,16 +296,375 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, int argc, char
         verilator_top->S_AXIS_TDATA[i] = 0;
       }
       eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // 10
+      tmp = 0;
+      for (int i = 0; i < REMAINDAR; i++)
+      {
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(0, 10, 0);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(0, 10, 0);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (REMAINDAR % 2 != 0)
+      {
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // 2
+      tmp = 0;
+      for (int i = 0; i < REMAINDAR; i++)
+      {
+        uint16_t addr = NGRAM * i + 1 + j;
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(1, 2, addr);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(1, 2, addr);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (REMAINDAR % 2 != 0)
+      {
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // 7
+      tmp = 0;
+      for (int i = 0; i < REMAINDAR; i++)
+      {
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(0, 7, 0);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(0, 7, 0);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (REMAINDAR % 2 != 0)
+      {
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // 10
+      tmp = 0;
+      for (int i = 0; i < REMAINDAR; i++)
+      {
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(0, 10, 0);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(0, 10, 0);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (REMAINDAR % 2 != 0)
+      {
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // 2
+      tmp = 0;
+      for (int i = 0; i < REMAINDAR; i++)
+      {
+        uint16_t addr = NGRAM * i + 2 + j;
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(1, 2, addr);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(1, 2, addr);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (REMAINDAR % 2 != 0)
+      {
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // 3
+      tmp = 0;
+      for (int i = 0; i < REMAINDAR; i++)
+      {
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(0, 3, 0);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(0, 3, 0);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (REMAINDAR % 2 != 0)
+      {
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // 7
+      tmp = 0;
+      for (int i = 0; i < REMAINDAR; i++)
+      {
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(0, 7, 0);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(0, 7, 0);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (REMAINDAR % 2 != 0)
+      {
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // 9
+      tmp = 0;
+      for (int i = 0; i < REMAINDAR; i++)
+      {
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(0, 9, 0);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(0, 9, 0);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (REMAINDAR % 2 != 0)
+      {
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      j += NGRAM * CORENUM - 1;
     }
     else
     {
-      // 8
+      // 1
       tmp = 0;
       for (int i = 0; i < CORENUM; i += 2)
       {
+        uint16_t addr = NGRAM * i + j;
+        conv.data_0 = instruction(1, 1, addr);
 
-        conv.data_0 = instruction(0, 8, 0);
-        conv.data_1 = instruction(0, 8, 0);
+        addr = NGRAM * (i + 1) + j;
+        conv.data_1 = instruction(1, 1, addr);
+
         verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
         tmp++;
       }
@@ -557,9 +673,283 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, int argc, char
         verilator_top->S_AXIS_TDATA[i] = 0;
       }
       eval();
-    }
 
-    j += NGRAM * CORENUM - 1;
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // 10
+      tmp = 0;
+      for (int i = 0; i < CORENUM; i += 2)
+      {
+        conv.data_0 = instruction(0, 10, 0);
+        conv.data_1 = instruction(0, 10, 0);
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // 2
+      tmp = 0;
+      for (int i = 0; i < CORENUM; i += 2)
+      {
+        uint16_t addr = NGRAM * i + 1 + j;
+        conv.data_0 = instruction(1, 2, addr);
+        addr = NGRAM * (i + 1) + 1 + j;
+        conv.data_1 = instruction(1, 2, addr);
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // 7
+      tmp = 0;
+      for (int i = 0; i < CORENUM; i += 2)
+      {
+        conv.data_0 = instruction(0, 7, 0);
+        conv.data_1 = instruction(0, 7, 0);
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // 10
+      tmp = 0;
+      for (int i = 0; i < CORENUM; i += 2)
+      {
+        conv.data_0 = instruction(0, 10, 0);
+        conv.data_1 = instruction(0, 10, 0);
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // 2
+      tmp = 0;
+      for (int i = 0; i < CORENUM; i += 2)
+      {
+        uint16_t addr = NGRAM * i + 2 + j;
+        conv.data_0 = instruction(1, 2, addr);
+        addr = NGRAM * (i + 1) + 2 + j;
+        conv.data_1 = instruction(1, 2, addr);
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // 3
+      tmp = 0;
+      for (int i = 0; i < CORENUM; i += 2)
+      {
+        conv.data_0 = instruction(0, 3, 0);
+        conv.data_1 = instruction(0, 3, 0);
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // 7
+      tmp = 0;
+      for (int i = 0; i < CORENUM; i += 2)
+      {
+        conv.data_0 = instruction(0, 7, 0);
+        conv.data_1 = instruction(0, 7, 0);
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      if (j == LAST)
+      {
+        // 9
+        tmp = 0;
+        for (int i = 0; i < CORENUM; i += 2)
+        {
+
+          conv.data_0 = instruction(0, 9, 0);
+          conv.data_1 = instruction(0, 9, 0);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+        for (int i = tmp; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+      }
+      else
+      {
+        // 8
+        tmp = 0;
+        for (int i = 0; i < CORENUM; i += 2)
+        {
+
+          conv.data_0 = instruction(0, 8, 0);
+          conv.data_1 = instruction(0, 8, 0);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+        for (int i = tmp; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+      }
+
+      j += NGRAM * CORENUM - 1;
+    }
   }
 
   // ↑ここを書き換える==================================================================
@@ -638,30 +1028,27 @@ int main(int argc, char **argv)
   const int CORENUM = 16;
   int DEBUG = 0;
   int ADDRNUM = 0;
+  // 次元数可変 (結果を何個出力するかに使う)
+  // const int DIM = 32 / 32;
+  const int DIM = 32 / 32;
 
-  // for (int i = 48; i < RANNUM; i += 48)
-  // {
-  //   ADDRNUM = i;
+  for (int i = 3; i < RANNUM; i += 3)
+  {
+    ADDRNUM = i;
 
-  //   DEBUG = 0;
-  //   check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
-  //   DEBUG = 1;
-  //   check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
+    DEBUG = 1;
+    check(NGRAM, CORENUM, ADDRNUM, DIM, argc, argv, DEBUG);
 
-  //   printf(" --------\n\n");
-  // }
+    printf(" --------\n\n");
+  }
 
-  ADDRNUM = 48;
-  DEBUG = 0;
-  check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
-  DEBUG = 1;
-  check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
-  printf(" --------\n\n");
-  ADDRNUM = 96;
-  DEBUG = 0;
-  check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
-  DEBUG = 1;
-  check(NGRAM, CORENUM, ADDRNUM, argc, argv, DEBUG);
+  // ADDRNUM = 51;
+  // DEBUG = 1;
+  // check(NGRAM, CORENUM, ADDRNUM, DIM, argc, argv, DEBUG);
+  // printf(" --------\n\n");
+  // ADDRNUM = 54;
+  // DEBUG = 1;
+  // check(NGRAM, CORENUM, ADDRNUM, DIM, argc, argv, DEBUG);
 
   printf("\n ================================================= 終了 ================================================= \n\n");
 

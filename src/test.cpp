@@ -5,16 +5,13 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// 可変パラメータ
-
 // 次元数可変
-// const int DIM = 32 / 32;
-const int DIM = 1024 / 32;
+const int DIM = 32 / 32;
+// const int DIM = 1024 / 32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 変わらん
-
 // 追加されるランダムな値はRANNUM-1番目
 const int RANNUM = 1024;
 unsigned int item_memory_array[DIM][RANNUM];
@@ -152,7 +149,6 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
 	{
 		ARNUM++;
 	}
-	const int LAST = ADDRNUM - 48;
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -228,23 +224,23 @@ int main(int argc, char **argv)
 	const int CORENUM = 16;
 	int ADDRNUM = 0;
 
-	// for (int i = 48; i < RANNUM; i += 48)
-	// {
-	// 	ADDRNUM = i;
+	for (int i = 3; i < RANNUM; i += 3)
+	{
+		ADDRNUM = i;
 
-	// 	check(NGRAM, CORENUM, ADDRNUM);
-	// 	xor128(1);
+		check(NGRAM, CORENUM, ADDRNUM);
+		xor128(1);
 
-	// 	printf(" --------\n\n");
-	// }
+		printf(" --------\n\n");
+	}
 
-	ADDRNUM = 48;
-	check(NGRAM, CORENUM, ADDRNUM);
-	xor128(1);
-	printf(" --------\n\n");
-	ADDRNUM = 96;
-	check(NGRAM, CORENUM, ADDRNUM);
-	xor128(1);
+	// ADDRNUM = 51;
+	// check(NGRAM, CORENUM, ADDRNUM);
+	// xor128(1);
+	// printf(" --------\n\n");
+	// ADDRNUM = 54;
+	// check(NGRAM, CORENUM, ADDRNUM);
+	// xor128(1);
 
 	printf("\n ------------------------------- 終了 ------------------------------- \n");
 	return 0;

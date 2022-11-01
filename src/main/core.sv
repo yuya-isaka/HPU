@@ -194,10 +194,15 @@ module core
                               buff <= 0;
                               store <= 0;
                           end
+                          // nop (すべて0のはず)
+                          else begin
+                            buff <= 0;
+                            store <= 0;
+                          end
                       end
                   end
                   // ラストビットが立ってたら落とす→counterのstore_nnが綺麗に動く
-                  // lastが立つ前にget_vが落ちてるはず(そういう設計じゃないとおかしい, ラストの命令は最後に使わないとエラー)
+                  // lastが立つ前にget_vとexecが落ちてるはず(そういう設計じゃないとおかしい, ラストの命令は最後に使わないとエラー)
                   else if (last) begin
                       buff <= 0;
                       store <= 0;
