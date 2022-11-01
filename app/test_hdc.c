@@ -11,8 +11,8 @@
 // 可変パラメータ
 
 // 次元数可変 (理想の計算に必要)
-// #define DIM 32 / 32
-#define DIM 1024 / 32
+#define DIM 32 / 32
+// #define DIM 1024 / 32
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -245,13 +245,19 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
 
   // 自動で決まるパラメータ
 
+  const int REMAINDAR = (ADDRNUM / 3) % 16;
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
+  int LAST = (ADDRNUM / 3) / 16;
+  if (REMAINDAR == 0)
+  {
+    LAST--;
+  }
+  LAST *= NGRAM * CORENUM;
   int ARNUM = ADDRNUM / NGRAM;
   if (EVEN)
   {
     ARNUM++;
   }
-  const int LAST = ADDRNUM - 48;
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -286,175 +292,322 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
   // printf("\n ------------------------- Sample Input --------------------------- \n\n");
 
   int send_num = 0;
-  int tmp_2 = 0;
+
   for (int j = 0; j < ADDRNUM; j++)
   {
-    // 1024bit ---------------------------------------------
-    // 16bit命令ごとに入れるから64回必要
-    for (int i = 0; i < (BUSWIDTH / 16); i++)
+    if (REMAINDAR != 0 && j == LAST)
     {
-      if (i < CORENUM)
+      // 1024bit ---------------------------------------------
+      // 16bit命令ごとに入れるから64回必要
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
       {
-        uint16_t addr = NGRAM * i + j;
-        uint16_t inst = instruction(1, 1, addr);
-        src[tmp_2] = inst;
-      }
-      else
-      {
-        src[tmp_2] = 0;
-      }
-      tmp_2++;
-      send_num++;
-    }
-    // ------------------------------------------------------
-
-    // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i++)
-    {
-      if (i < CORENUM)
-      {
-        uint16_t inst = instruction(0, 10, 0);
-        src[tmp_2] = inst;
-      }
-      else
-      {
-        src[tmp_2] = 0;
-      }
-      tmp_2++;
-      send_num++;
-    }
-    // ------------------------------------------------------
-
-    // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i++)
-    {
-      if (i < CORENUM)
-      {
-        uint16_t addr = NGRAM * i + 1 + j;
-        uint16_t inst = instruction(1, 2, addr);
-        src[tmp_2] = inst;
-      }
-      else
-      {
-        src[tmp_2] = 0;
-      }
-      tmp_2++;
-      send_num++;
-    }
-    // ------------------------------------------------------
-
-    // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i++)
-    {
-      if (i < CORENUM)
-      {
-        uint16_t inst = instruction(0, 7, 0);
-        src[tmp_2] = inst;
-      }
-      else
-      {
-        src[tmp_2] = 0;
-      }
-      tmp_2++;
-      send_num++;
-    }
-    // ------------------------------------------------------
-
-    // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i++)
-    {
-      if (i < CORENUM)
-      {
-        uint16_t inst = instruction(0, 10, 0);
-        src[tmp_2] = inst;
-      }
-      else
-      {
-        src[tmp_2] = 0;
-      }
-      tmp_2++;
-      send_num++;
-    }
-    // ------------------------------------------------------
-
-    // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i++)
-    {
-      if (i < CORENUM)
-      {
-        uint16_t addr = NGRAM * i + 2 + j;
-        uint16_t inst = instruction(1, 2, addr);
-        src[tmp_2] = inst;
-      }
-      else
-      {
-        src[tmp_2] = 0;
-      }
-      tmp_2++;
-      send_num++;
-    }
-    // ------------------------------------------------------
-
-    // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i++)
-    {
-      if (i < CORENUM)
-      {
-        uint16_t inst = instruction(0, 3, 0);
-        src[tmp_2] = inst;
-      }
-      else
-      {
-        src[tmp_2] = 0;
-      }
-      tmp_2++;
-      send_num++;
-    }
-    // ------------------------------------------------------
-
-    // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i++)
-    {
-      if (i < CORENUM)
-      {
-        uint16_t inst = instruction(0, 7, 0);
-        src[tmp_2] = inst;
-      }
-      else
-      {
-        src[tmp_2] = 0;
-      }
-      tmp_2++;
-      send_num++;
-    }
-    // ------------------------------------------------------
-
-    // 1024bit ---------------------------------------------
-    for (int i = 0; i < (BUSWIDTH / 16); i++)
-    {
-      if (i < CORENUM)
-      {
-        if (j == LAST)
+        if (i < REMAINDAR)
         {
-          uint16_t inst = instruction(0, 9, 0);
-          src[tmp_2] = inst;
+          uint16_t addr = NGRAM * i + j;
+          uint16_t inst = instruction(1, 1, addr);
+          src[send_num] = inst;
         }
         else
         {
-          uint16_t inst = instruction(0, 8, 0);
-          src[tmp_2] = inst;
+          src[send_num] = 0;
         }
+        send_num++;
       }
-      else
-      {
-        src[tmp_2] = 0;
-      }
-      tmp_2++;
-      send_num++;
-    }
-    // ------------------------------------------------------
+      // ------------------------------------------------------
 
-    j += NGRAM * CORENUM - 1;
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < REMAINDAR)
+        {
+          uint16_t inst = instruction(0, 10, 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < REMAINDAR)
+        {
+          uint16_t addr = NGRAM * i + 1 + j;
+          uint16_t inst = instruction(1, 2, addr);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < REMAINDAR)
+        {
+          uint16_t inst = instruction(0, 7, 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < REMAINDAR)
+        {
+          uint16_t inst = instruction(0, 10, 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < REMAINDAR)
+        {
+          uint16_t addr = NGRAM * i + 2 + j;
+          uint16_t inst = instruction(1, 2, addr);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < REMAINDAR)
+        {
+          uint16_t inst = instruction(0, 3, 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < REMAINDAR)
+        {
+          uint16_t inst = instruction(0, 7, 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < REMAINDAR)
+        {
+          // LASTは確定済みなので９を代入
+          uint16_t inst = instruction(0, 9, 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      j += NGRAM * CORENUM - 1;
+    }
+    else
+    {
+      // 1024bit ---------------------------------------------
+      // 16bit命令ごとに入れるから64回必要
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < CORENUM)
+        {
+          uint16_t addr = NGRAM * i + j;
+          uint16_t inst = instruction(1, 1, addr);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < CORENUM)
+        {
+          uint16_t inst = instruction(0, 10, 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < CORENUM)
+        {
+          uint16_t addr = NGRAM * i + 1 + j;
+          uint16_t inst = instruction(1, 2, addr);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < CORENUM)
+        {
+          uint16_t inst = instruction(0, 7, 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < CORENUM)
+        {
+          uint16_t inst = instruction(0, 10, 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < CORENUM)
+        {
+          uint16_t addr = NGRAM * i + 2 + j;
+          uint16_t inst = instruction(1, 2, addr);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < CORENUM)
+        {
+          uint16_t inst = instruction(0, 3, 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < CORENUM)
+        {
+          uint16_t inst = instruction(0, 7, 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < CORENUM)
+        {
+          if (j == LAST)
+          {
+            uint16_t inst = instruction(0, 9, 0);
+            src[send_num] = inst;
+          }
+          else
+          {
+            uint16_t inst = instruction(0, 8, 0);
+            src[send_num] = inst;
+          }
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      j += NGRAM * CORENUM - 1;
+    }
   }
 
   // AXI DMA 送信の設定（UIO経由）
@@ -645,7 +798,7 @@ int main()
   const int CORENUM = 16;
   int ADDRNUM = 0;
 
-  for (int i = 48; i <= RANNUM; i += 48)
+  for (int i = 3; i <= RANNUM; i += 3)
   {
     ADDRNUM = i;
 

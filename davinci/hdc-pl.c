@@ -162,6 +162,9 @@ int main(int argc, char const *argv[])
 		close(dmaf);
 		return 0;
 	}
+	// 0x00080000個のバイト
+	// 524288バイト
+	// 今回はuint16なので、262144が限界→今このせいでsegmentation fault
 	src = (uint16_t *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
 	if (src == MAP_FAILED)
 	{
@@ -193,8 +196,8 @@ int main(int argc, char const *argv[])
 	const int bus_width = 1024;
 	const int instruction_bit = 16;
 	const int train_num = 2;
-	const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
+	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const int ngram = 3;
 	const int core_num = 16;
 	const int instruction_num = 9;
@@ -338,6 +341,7 @@ int main(int argc, char const *argv[])
 				src[send_num] = 0;
 				send_num++;
 			}
+			printf("%d\n", send_num);
 		}
 
 		// ---------------------------------------------
