@@ -1,26 +1,7 @@
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h> // uint16_t
+#include <stdint.h>
 #include <string.h>
-#include <fcntl.h>	  // open
-#include <unistd.h>	  // read
-#include <sys/mman.h> // mmap
-
-volatile int *top;
-volatile int *dma;
-volatile uint16_t *src;
-volatile int *dst;
-unsigned long src_phys;
-unsigned long dst_phys;
-
-// --------------------------------------- メモリリークチェック、デストラクター -------------------------
-
-__attribute__((destructor)) static void destructor()
-{
-	system("leaks -q a.out");
-}
-// ------------------------------------------------------------------------------------------------
 
 void makeArray(uint16_t ***a, const int y, const int x)
 {
@@ -108,90 +89,9 @@ uint16_t get_bit(int addr_flag, unsigned int inst_num, uint16_t addr)
 
 int main(int argc, char const *argv[])
 {
-	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
-
-	int fd0, fd1, dmaf, topf;
-
-	if ((fd0 = open("/sys/class/u-dma-buf/udmabuf0/phys_addr", O_RDONLY)) != -1)
-	{
-		char attr[1024];
-		read(fd0, attr, 1024);
-		sscanf(attr, "%lx", &src_phys);
-		close(fd0);
-	}
-	if ((fd0 = open("/sys/class/u-dma-buf/udmabuf1/phys_addr", O_RDONLY)) != -1)
-	{
-		char attr[1024];
-		read(fd0, attr, 1024);
-		sscanf(attr, "%lx", &dst_phys);
-		close(fd0);
-	}
-
-	if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
-	{
-		perror("Failed: open /dev/udmabuf0");
-		return 0;
-	}
-	if ((fd1 = open("/dev/udmabuf1", O_RDWR)) < 0)
-	{
-		perror("Failed: open /dev/udmabuf1");
-		return 0;
-	}
-	if ((dmaf = open("/dev/uio0", O_RDWR | O_SYNC)) < 0)
-	{
-		perror("Falied: open /dev/uio0");
-		return 0;
-	}
-	if ((topf = open("/dev/uio1", O_RDWR | O_SYNC)) < 0)
-	{
-		perror("Failed: open /dev/uio1");
-		return 0;
-	}
-
-	top = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, topf, 0);
-	if (top == MAP_FAILED)
-	{
-		perror("mmap top");
-		close(topf);
-		return 0;
-	}
-	dma = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, dmaf, 0);
-	if (dma == MAP_FAILED)
-	{
-		perror("mmap dma");
-		close(dmaf);
-		return 0;
-	}
-	src = (uint16_t *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
-	if (src == MAP_FAILED)
-	{
-		perror("mmap src");
-		close(fd0);
-		return 0;
-	}
-	dst = (int *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd1, 0);
-	if (dst == MAP_FAILED)
-	{
-		perror("mmap dst");
-		close(fd1);
-		return 0;
-	}
-
-	dma[0x30 / 4] = 4;
-	dma[0x00 / 4] = 4;
-	while (dma[0x00 / 4] & 0x4)
-		;
-
-	top[0x04 / 4] = 26;
-	top[0x00 / 4] = 1;
-	while (top[0x00 / 4] & 0x1)
-		;
-
 	// ---------------------------------------------
 	uint16_t **src_tmp;
 	uint16_t **ascii_array;
-	const int bus_width = 1024;
-	const int instruction_bit = 16;
 	const int train_num = 2;
 	const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
 	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
@@ -251,9 +151,6 @@ int main(int argc, char const *argv[])
 				ascii_array[i][j] = (unsigned char)(content[i + j]) - 97;
 			}
 		}
-
-		top[0x08 / 4] = even;
-		top[0x00 / 4] = 2;
 		// コード---------------------------------------------
 
 		int instruction = 0;
@@ -325,47 +222,19 @@ int main(int argc, char const *argv[])
 			core = (core + 1) % core_num;
 		}
 
-		int send_num = 0;
 		for (int j = 0; j < all_instruction; j++)
 		{
 			for (int i = 0; i < core_num; i++)
 			{
-				src[send_num] = src_tmp[i][j];
-				send_num++;
+				printf("%7d ", src_tmp[i][j]);
 			}
-			for (int i = core_num; i < (bus_width / instruction_bit); i++)
-			{
-				src[send_num] = 0;
-				send_num++;
-			}
+			printf("\n");
 		}
 
 		// ---------------------------------------------
 		freeArray(&ascii_array, ngram);
 		freeArray(&src_tmp, core_num);
-
-		dma[0x00 / 4] = 1;
-		dma[0x18 / 4] = src_phys;
-		dma[0x28 / 4] = send_num * 2; // 16ビットがsend_num個
-
-		dma[0x30 / 4] = 1;
-		dma[0x48 / 4] = dst_phys;
-		dma[0x58 / 4] = (bus_width / 32) * 4; // 32個 * 4バイト = 128バイト = 1024ビット
-
-		while ((dma[0x34 / 4] & 0x1000) != 0x1000)
-			;
-
-		for (int j = 0; j < (1024 / 32); j++)
-		{
-			printf("%u\n", dst[j]);
-		}
-
-		top[0x00 / 4] = 0;
-
-		printf("\n");
 	}
-
-	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
 
 	return 0;
 }
