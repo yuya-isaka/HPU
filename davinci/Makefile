@@ -10,14 +10,16 @@ hdc-o:
 linux:
 	arm-linux-gnueabihf-gcc -Wall -o hdc hdc.c -lm
 	arm-linux-gnueabihf-gcc -Wall -o hdc-pl hdc-pl.c -lm
+	arm-linux-gnueabihf-g++ -Wall -o hdc-pl-cpp hdc-pl.cpp -lm
 
 linux-o:
 	arm-linux-gnueabihf-gcc -Wall -O2 -o hdc hdc.c -lm
 	arm-linux-gnueabihf-gcc -Wall -O2 -o hdc-pl hdc-pl.c -lm
+	arm-linux-gnueabihf-g++ -Wall -O2 -o hdc-pl-cpp hdc-pl.cpp -lm
 
 
 clean:
-	rm -f hdc hdc-pl hdc-pl-2
+	rm -f hdc hdc-pl hdc-pl-2 hdc-pl-cpp
 
 
 .PHONY: clean

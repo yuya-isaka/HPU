@@ -6,7 +6,6 @@
 #include <fcntl.h>	  // open
 #include <unistd.h>	  // read
 #include <sys/mman.h> // mmap
-#include <time.h>
 
 volatile int *top;
 volatile int *dma;
@@ -109,7 +108,6 @@ uint16_t get_bit(int addr_flag, unsigned int inst_num, uint16_t addr)
 
 int main(int argc, char const *argv[])
 {
-	clock_t start = clock();
 	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
 
 	int fd0, fd1, dmaf, topf;
@@ -121,7 +119,6 @@ int main(int argc, char const *argv[])
 		sscanf(attr, "%lx", &src_phys);
 		close(fd0);
 	}
-	// printf("src_phys: %lx\n", src_phys);
 	if ((fd0 = open("/sys/class/u-dma-buf/udmabuf1/phys_addr", O_RDONLY)) != -1)
 	{
 		char attr[1024];
@@ -129,7 +126,6 @@ int main(int argc, char const *argv[])
 		sscanf(attr, "%lx", &dst_phys);
 		close(fd0);
 	}
-	// printf("dst_phys: %lx\n", dst_phys);
 
 	if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
 	{
@@ -169,14 +165,14 @@ int main(int argc, char const *argv[])
 	// 0x00080000個のバイト
 	// 524288バイト
 	// 今回はuint16なので、262144が限界→今このせいでsegmentation fault
-	src = (uint16_t *)mmap(NULL, 0x1DCD6500, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
+	src = (uint16_t *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
 	if (src == MAP_FAILED)
 	{
 		perror("mmap src");
 		close(fd0);
 		return 0;
 	}
-	dst = (int *)mmap(NULL, 0x3D0900, PROT_READ | PROT_WRITE, MAP_SHARED, fd1, 0);
+	dst = (int *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd1, 0);
 	if (dst == MAP_FAILED)
 	{
 		perror("mmap dst");
@@ -184,10 +180,10 @@ int main(int argc, char const *argv[])
 		return 0;
 	}
 
-	// dma[0x30 / 4] = 4;
-	// dma[0x00 / 4] = 4;
-	// while (dma[0x00 / 4] & 0x4)
-	// 	;
+	dma[0x30 / 4] = 4;
+	dma[0x00 / 4] = 4;
+	while (dma[0x00 / 4] & 0x4)
+		;
 
 	top[0x04 / 4] = 26;
 	top[0x00 / 4] = 1;
@@ -208,13 +204,9 @@ int main(int argc, char const *argv[])
 	int all_ngram = 0;
 	int even = 0;
 	// -------------------------------------------
-	for (int l = 0; l < train_num; l++)
+	for (int i = 0; i < train_num; i++)
 	{
-		dma[0x30 / 4] = 4;
-		dma[0x00 / 4] = 4;
-		while (dma[0x00 / 4] & 0x4)
-			;
-		const char *path = train_path[l];
+		const char *path = train_path[i];
 		FILE *file;
 		file = fopen(path, "r");
 		if (file == NULL)
@@ -224,8 +216,7 @@ int main(int argc, char const *argv[])
 		}
 		int ch;
 		int num = 0;
-		// while ((ch = fgetc(file)) != EOF) // ubuntu:EOF == -1,  petalinux:EOF == 255
-		while (((ch = fgetc(file)) != EOF) && ((ch = fgetc(file) != 255))) // ubuntu:EOF == -1,  petalinux:EOF == 255
+		while ((ch = fgetc(file)) != EOF) // ubuntu:EOF == -1,  petalinux:EOF == 255
 		{
 			num++;
 		}
@@ -350,6 +341,7 @@ int main(int argc, char const *argv[])
 				src[send_num] = 0;
 				send_num++;
 			}
+			printf("%d\n", send_num);
 		}
 
 		// ---------------------------------------------
@@ -378,9 +370,6 @@ int main(int argc, char const *argv[])
 	}
 
 	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
-	clock_t end = clock();
-	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\n  time %lf[ms]\n", time);
 
 	return 0;
 }

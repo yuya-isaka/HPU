@@ -363,5 +363,6 @@ vivado_prj_5
 kako
 sim
 *.vcd
+boot
 
 hdc
