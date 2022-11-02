@@ -116,20 +116,20 @@ int main(int argc, char const *argv[])
 
 	if ((fd0 = open("/sys/class/u-dma-buf/udmabuf0/phys_addr", O_RDONLY)) != -1)
 	{
-		unsigned char attr[1024];
+		char attr[1024];
 		read(fd0, attr, 1024);
 		sscanf(attr, "%lx", &src_phys);
 		close(fd0);
 	}
-	printf("src_phys: %lx\n", src_phys);
+	// printf("src_phys: %lx\n", src_phys);
 	if ((fd0 = open("/sys/class/u-dma-buf/udmabuf1/phys_addr", O_RDONLY)) != -1)
 	{
-		unsigned char attr[1024];
+		char attr[1024];
 		read(fd0, attr, 1024);
 		sscanf(attr, "%lx", &dst_phys);
 		close(fd0);
 	}
-	printf("dst_phys: %lx\n", dst_phys);
+	// printf("dst_phys: %lx\n", dst_phys);
 
 	if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
 	{
@@ -184,19 +184,12 @@ int main(int argc, char const *argv[])
 		return 0;
 	}
 
-	// dma[0x30 / 4] = 4;
-	// dma[0x00 / 4] = 4;
-	// while (dma[0x00 / 4] & 0x4)
-	// 	;
-
 	top[0x04 / 4] = 26;
 	top[0x00 / 4] = 1;
 	while (top[0x00 / 4] & 0x1)
 		;
 
 	// ---------------------------------------------
-	uint16_t **src_tmp;
-	uint16_t **ascii_array;
 	const int bus_width = 1024;
 	const int instruction_bit = 16;
 	const int train_num = 2;
@@ -208,12 +201,17 @@ int main(int argc, char const *argv[])
 	int all_ngram = 0;
 	int even = 0;
 	// -------------------------------------------
+
 	for (int l = 0; l < train_num; l++)
 	{
 		dma[0x30 / 4] = 4;
 		dma[0x00 / 4] = 4;
 		while (dma[0x00 / 4] & 0x4)
 			;
+
+		uint16_t **src_tmp;
+		uint16_t **ascii_array;
+
 		const char *path = train_path[l];
 		FILE *file;
 		file = fopen(path, "r");
