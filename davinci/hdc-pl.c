@@ -116,20 +116,20 @@ int main(int argc, char const *argv[])
 
 	if ((fd0 = open("/sys/class/u-dma-buf/udmabuf0/phys_addr", O_RDONLY)) != -1)
 	{
-		char attr[1024];
+		unsigned char attr[1024];
 		read(fd0, attr, 1024);
 		sscanf(attr, "%lx", &src_phys);
 		close(fd0);
 	}
-	// printf("src_phys: %lx\n", src_phys);
+	printf("src_phys: %lx\n", src_phys);
 	if ((fd0 = open("/sys/class/u-dma-buf/udmabuf1/phys_addr", O_RDONLY)) != -1)
 	{
-		char attr[1024];
+		unsigned char attr[1024];
 		read(fd0, attr, 1024);
 		sscanf(attr, "%lx", &dst_phys);
 		close(fd0);
 	}
-	// printf("dst_phys: %lx\n", dst_phys);
+	printf("dst_phys: %lx\n", dst_phys);
 
 	if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
 	{
