@@ -234,6 +234,7 @@ int main(int argc, char const *argv[])
 		// ---------------------------------------------
 		freeArray(&ascii_array, ngram);
 		freeArray(&src_tmp, core_num);
+		printf("\n");
 	}
 
 	return 0;

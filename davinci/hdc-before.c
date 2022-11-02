@@ -62,7 +62,15 @@ int main(int argc, char const *argv[])
 		// ngramの数（パラメータから計算）
 		const int NGRAM = 3;
 		int all_ngram = strlen(train_data) - NGRAM + 1;
-		even(all_ngram);
+
+		if (all_ngram % 2 == 0)
+		{
+			random_add();
+			// ランダムとADDを分解するかの議論がまた必要
+		}
+		// even(all_ngram);
+		// ↑ 微妙
+		// レイヤーが違う、抽象的じゃない
 
 		int core_num ＝ 0;
 		for (int i = 0; i < all_ngram; i++)

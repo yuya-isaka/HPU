@@ -18,20 +18,38 @@ unsigned long dst_phys;
 // 動的 //////////////////////////////////////////////////////////////////////////////////////////
 
 // 次元数 (現状変えられない)
-const int HVLENGTH = 1000; // デフォルト
+const int HVLENGTH = 1024; // デフォルト
 // バス幅 (現状変えられない)
 const int BUS_MAX = 1024; // デフォルト
 
 // ランダム生成の数
 const int RANDAM_MAX = 1024; // デフォルト
-// HDC演算の実行回数 (asm_array[EXEC_NUM][][])
+int RANDAM = 0;
+// エンコーディングの実行回数 (asm_array[EXEC_NUM][][9])
 const int EXEC_NUM = 1; // デフォルト
 // コア数 (asm_array[][CORE_NUM][])
 const int CORE_MAX = 16; // デフォルト
-// 一まとまりの命令数 (asm_array[][][INSTRUCTION_NUM])
-const int INSTRUCTION_NUM = 0; // デフォルト
+int CORE_NUM = 0;
+// 一まとまりの命令数 (asm_array[][][9小命令 * 大命令 / CORE_NUM])
+// CORE_NUMにおける命令の総数
+// 9, 3, 16
+// 9小命令 * 大命令 == 全ての命令数
+// 全ての命令数 / CORE_NUM == 小命令 * (大命令 / CORE_NUM)
+// 小命令はそれ以上分けられない（セット） = 小命令はレジスタを共有しているから分けられない
+
+// int num = 大命令 / CORE_NUM;
+// if (大命令　　% CORE_NUM != 0) {
+//	num++;
+//}
+// int all_num = 小命令 * num;
+
+// 言葉に置き換える
+// 大命令 ... スレッド（もっといい言葉に）
+// 小命令 ... 段数
+
+const int INSTRUCTION_NUM = 9; // N-gram 9命令 * (all_ngram / 16)
 // 計算する数が偶数か奇数か
-const int EXEC = 0; // デフォルト
+const int EVEN = 0; // デフォルト
 // asm_array
 const int asm_array[EXEC_NUM][CORE_NUM][INSTRUCTION_NUM];
 
