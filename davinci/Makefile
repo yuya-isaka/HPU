@@ -1,10 +1,12 @@
 
 check:
 	gcc -Wall -o hdc hdc.c -lm
+	gcc -Wall -o hdc-xorshift hdc-xorshift.c -lm
 	gcc -Wall -o hdc-pl-2 hdc-pl-2.c -lm
 
 hdc-o:
 	gcc -Wall -O2 -o hdc hdc.c -lm
+	gcc -Wall -O2 -o hdc-xorshift hdc-xorshift.c -lm
 
 
 linux:

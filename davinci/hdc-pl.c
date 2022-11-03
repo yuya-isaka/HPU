@@ -46,21 +46,25 @@ uint16_t get_bit(int addr_flag, unsigned int inst_num, uint16_t addr)
 	if (addr_flag)
 	{
 		uint16_t result = 0;
+		// load
 		if (inst_num == 1)
 		{
 			uint16_t inst = 3 << 14;
 			result = inst | addr;
 		}
+		// l.rshift
 		else if (inst_num == 2)
 		{
 			uint16_t inst = 5 << 13;
 			result = inst | addr;
 		}
+		// l.lshift
 		else if (inst_num == 4)
 		{
 			uint16_t inst = 9 << 12;
 			result = inst | addr;
 		}
+		// l.xor
 		else if (inst_num == 6)
 		{
 			uint16_t inst = 17 << 11;
@@ -75,26 +79,32 @@ uint16_t get_bit(int addr_flag, unsigned int inst_num, uint16_t addr)
 	else
 	{
 		uint16_t inst = 0;
+		// rshift
 		if (inst_num == 3)
 		{
 			inst = 1 << 14;
 		}
+		// lshift
 		else if (inst_num == 5)
 		{
 			inst = 1 << 13;
 		}
+		// xor
 		else if (inst_num == 7)
 		{
 			inst = 1 << 12;
 		}
+		// store
 		else if (inst_num == 8)
 		{
 			inst = 1 << 11;
 		}
+		// lastore
 		else if (inst_num == 9)
 		{
 			inst = 1 << 10;
 		}
+		// move
 		else if (inst_num == 10)
 		{
 			inst = 1 << 9;
@@ -193,8 +203,8 @@ int main(int argc, char const *argv[])
 	const int bus_width = 1024;
 	const int instruction_bit = 16;
 	const int train_num = 2;
-	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
+	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const int ngram = 3;
 	const int core_num = 16;
 	const int instruction_num = 9;
@@ -233,8 +243,8 @@ int main(int argc, char const *argv[])
 		fclose(file);
 		all_ngram = strlen(content) - ngram + 1;
 		even = all_ngram % 2 == 0;
-		// printf("content: %s\n", content); // myname...
-		// printf("all_ngram: %d\n", all_ngram);
+		printf("content: %s\n", content); // myname...
+		printf("all_ngram: %d\n", all_ngram);
 		// printf("even: %d\n", even);
 
 		int all_instruction = all_ngram / core_num;

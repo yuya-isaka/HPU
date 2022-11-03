@@ -152,15 +152,32 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	item_memory_array[0][0] = 88675123;
+	// item_memory_array[0][0] = 88675123;
+	// for (int j = 0; j < RANNUM; j++)
+	// {
+	// 	printf("%d\n", j);
+	// 	for (int i = 0; i < DIM; i++)
+	// 	{
+	// 		if (i == 0 && j == 0)
+	// 			continue;
+	// 		item_memory_array[i][j] = xor128(0);
+	// 		printf("%u\n", item_memory_array[i][j]);
+	// 	}
+	// 	return;
+	// }
+
 	for (int j = 0; j < RANNUM; j++)
 	{
 		for (int i = 0; i < DIM; i++)
 		{
-			if (i == 0 && j == 0)
+			if (i == 0)
+			{
+				item_memory_array[i][j] = 88675123;
 				continue;
+			}
 			item_memory_array[i][j] = xor128(0);
 		}
+		xor128(1);
 	}
 
 	// あらかじめPermutation
@@ -234,13 +251,13 @@ int main(int argc, char **argv)
 	// 	printf(" --------\n\n");
 	// }
 
-	ADDRNUM = 51;
+	ADDRNUM = 3;
 	check(NGRAM, CORENUM, ADDRNUM);
-	xor128(1);
-	printf(" --------\n\n");
-	ADDRNUM = 54;
-	check(NGRAM, CORENUM, ADDRNUM);
-	xor128(1);
+	// xor128(1);
+	// printf(" --------\n\n");
+	// ADDRNUM = 54;
+	// check(NGRAM, CORENUM, ADDRNUM);
+	// xor128(1);
 
 	printf("\n ------------------------------- 終了 ------------------------------- \n");
 	return 0;

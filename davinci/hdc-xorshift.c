@@ -7,9 +7,45 @@
 
 // --------------------------------------- メモリリークチェック、デストラクター -----------------------------------------
 
-__attribute__((destructor)) static void destructor()
+// __attribute__((destructor)) static void destructor()
+// {
+// 	system("leaks -q a.out");
+// }
+
+unsigned int xor128(int reset)
 {
-	system("leaks -q a.out");
+	// 内部で値を保持（seed） パターン１
+	// static unsigned int x = 2380889285;
+	// static unsigned int y = 1631889387;
+	// static unsigned int z = 1698655726;
+	// static unsigned int w = 2336862850;
+
+	// 内部で値を保持（seed） パターン２
+	static unsigned int x = 123456789;
+	static unsigned int y = 362436069;
+	static unsigned int z = 521288629;
+	static unsigned int w = 88675123;
+
+	if (reset)
+	{
+		x = 123456789;
+		y = 362436069;
+		z = 521288629;
+		w = 88675123;
+		return 0;
+	}
+	else
+	{
+
+		// 前回のxを使う
+		unsigned int t = x ^ (x << 11);
+		// 更新
+		x = y;
+		y = z;
+		z = w;
+
+		return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+	}
 }
 
 // -------------------------------------------  パラメータ設定 ---------------------------------------------------
@@ -19,14 +55,15 @@ const int NGRAM = 3;
 
 // 次元数
 const int LENGTH = 1024;
+const int DIM = LENGTH / 32;
 
 // 学習対象の個数（英語、フランス語）
 int train_num = 2;
 
 // 訓練データ指定
-// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"}; // 文字数少なめ
+const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"}; // 文字数少なめ
 // const char *train_path[] = {"data/decorate/en2", "data/decorate/fr2"}; // 文字数少なめよりは多め
-const char *train_path[] = {"data/decorate/en", "data/decorate/fr"}; // 文字数多め
+// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"}; // 文字数多め
 
 // テストの個数（英語、フランス語）
 int test_num = 2;
@@ -139,11 +176,30 @@ int append(HDC *v, HyperVector *newv)
 	return 0;
 }
 
+void printb(HyperVector *v)
+{
+	const unsigned int mask = 1;
+	for (int j = 0; j < LENGTH; j += 32)
+	{
+		unsigned int result = 0;
+		unsigned int n = 31;
+		unsigned int l = j;
+		do
+		{
+			uint8_t tmp = v->values[l];
+			uint8_t value = (mask & tmp ? 1 : 0);
+			result += (value << n);
+			l++;
+		} while (n--);
+		printf("%u\n", result);
+	}
+	printf("\n");
+}
+
 // --------------------------------------------------------- エンコード関数 ---------------------------------------------------------------
 
 void encoding(HDC *HDCascii, const char *path, uint8_t *values)
 {
-	clock_t startEncoding = clock();
 
 	// ファイルオープン
 	FILE *file;
@@ -157,6 +213,8 @@ void encoding(HDC *HDCascii, const char *path, uint8_t *values)
 	// 何文字?
 	int ch;
 	int num = 0;
+	// while (((ch = fgetc(file)) != EOF)) // ubuntu:EOF == -1,  petalinux:EOF == 255
+	// while (((ch = fgetc(file)) != EOF) && ((ch = fgetc(file) != -1))) // ubuntu:EOF == -1,  petalinux:EOF == 255
 	while (((ch = fgetc(file)) != EOF) && ((ch = fgetc(file) != 255))) // ubuntu:EOF == -1,  petalinux:EOF == 255
 	{
 		num++;
@@ -170,14 +228,9 @@ void encoding(HDC *HDCascii, const char *path, uint8_t *values)
 	// printf("%s\n", content);		  		// myname...
 	// printf("%lu\n", strlen(content)); 	// 27
 
-	clock_t endEncoding = clock();
-	double time_encoding = ((double)(endEncoding - startEncoding)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n    File read time: %lf[ms]\n", time_encoding);
-
 	// ngramの数（パラメータから計算）
 	int all_ngram = strlen(content) - NGRAM + 1;
-
-	startEncoding = clock();
+	printf("all_ngram: %d\n", all_ngram);
 
 	// 符号化後の値を入れるHDCアプリ作成
 	HDC HDCtarget;
@@ -197,7 +250,7 @@ void encoding(HDC *HDCascii, const char *path, uint8_t *values)
 		int ascii_number_n[NGRAM];
 		for (int j = 0; j < NGRAM; j++)
 		{
-			ascii_number_n[j] = (unsigned char)(content[i + j]);
+			ascii_number_n[j] = (unsigned char)(content[i + j] - 97);
 		}
 
 		HyperVector result;
@@ -283,35 +336,22 @@ void encoding(HDC *HDCascii, const char *path, uint8_t *values)
 		freeMemoryHyperVector(&result);
 	}
 
-	endEncoding = clock();
-	time_encoding = ((double)(endEncoding - startEncoding)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n    Encoding time: %lf[ms]\n", time_encoding);
-
-	startEncoding = clock();
-
 	// 偶数だったら多数決できないので、ランダムな値(ハイパーベクトル)を追加
 	if ((all_ngram % 2) == 0)
 	{
 		HyperVector tmp_vector;
 		allocateMemoryHyperVector(&tmp_vector);
-		srand(128);
+		// printf("%ld\n", sizeof(unsigned int)); // 4
 		for (int j = 0; j < LENGTH; j++)
 		{
-			uint8_t value = rand() % 2;
-			tmp_vector.values[j] = value;
+			tmp_vector.values[j] = HDCascii->data[26].values[j];
 		}
 		append(&HDCtarget, &tmp_vector);
 		all_ngram += 1; // 値を一個増やしたので更新
 		freeMemoryHyperVector(&tmp_vector);
 	}
 
-	endEncoding = clock();
-	time_encoding = ((double)(endEncoding - startEncoding)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n    Append time: %lf[ms]\n", time_encoding);
-
 	// ------------------------------------------ 最後の加算 -----------------------------------------
-
-	startEncoding = clock();
 
 	HyperVector trained;
 	allocateMemoryHyperVector(&trained);
@@ -340,15 +380,25 @@ void encoding(HDC *HDCascii, const char *path, uint8_t *values)
 	{
 		values[i] = trained.values[i];
 	}
-
-	endEncoding = clock();
-	time_encoding = ((double)(endEncoding - startEncoding)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n    Final add time: %lf[ms]\n", time_encoding);
+	// printb(&trained);
 
 	// 解放
 	free(content);
 	freeMemoryHDC(&HDCtarget);
 	freeMemoryHyperVector(&trained);
+}
+
+void printbb(unsigned int v)
+{
+	unsigned int mask = (int)1 << (sizeof(v) * 8 - 1);
+	do
+		putchar(mask & v ? '1' : '0');
+	while (mask >>= 1);
+}
+
+void putb(unsigned int v)
+{
+	printf("  0"), putchar('b'), printbb(v), putchar('\n');
 }
 
 // --------------------------------------------------------------- main program ----------------------------------------------------------------------
@@ -357,143 +407,57 @@ int main(int argc, char const *argv[])
 {
 	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
 
-	clock_t start = clock();
-
-	// HDCアプリ作成 (ascii)
 	HDC HDCascii;
-	allocateMemoryHDC(&HDCascii, 127);
+	allocateMemoryHDC(&HDCascii, 27);
 
-	// 127文字生成
-	for (int i = 0; i < 127; i++)
+	for (int i = 0; i < 27; i++)
 	{
-		// Random生成
-		srand(i);
-		for (int j = 0; j < LENGTH; j++)
+		for (int j = 0; j < LENGTH; j += 32)
 		{
-			uint8_t value = rand() % 2;
-			HDCascii.data[i].values[j] = value;
+			unsigned int tmp = 0;
+			if (i == 0 && j == 0)
+			{
+				tmp = 88675123;
+			}
+			else
+			{
+				tmp = xor128(0);
+			}
+			// putb(tmp);
+			unsigned int mask = (int)1 << (sizeof(tmp) * 8 - 1);
+			unsigned int l = j;
+			do
+			{
+				uint8_t value = (mask & tmp ? 1 : 0);
+				// printf("%u", value);
+				HDCascii.data[i].values[l] = value;
+				l++;
+			} while (mask >>= 1);
+			// printf("\n");
+			// printf("\n");
 		}
+		// printf("%d\n", i);
+		if (i == 0)
+		{
+			printb(&HDCascii.data[i]);
+		}
+		// printb(&HDCascii.data[i]);
 	}
+	// printf("\n");
 
-	// ----------------------------------------- Encoding ---------------------------------------------
+	puts("\n  -------------------------------------- Encoding ---------------------------------------\n");
 
-	clock_t startEncoding = clock();
-
-	// HDCアプリ作成 (学習後の訓練データを格納)
 	HDC HDCtrained;
 	allocateMemoryHDC(&HDCtrained, train_num);
 
-	// train_num (英語とフランス語なら２)
 	for (int i = 0; i < train_num; i++)
 	{
-		// HDCtrained.data[i].values の値を更新
 		encoding(&HDCascii, train_path[i], HDCtrained.data[i].values);
+		printb(&HDCtrained.data[i]);
 	}
-
-	clock_t endEncoding = clock();
-
-	const double time_encoding_training = ((double)(endEncoding - startEncoding)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n  Encoding Training Data time: %lf[ms]\n\n", time_encoding_training);
-
-	// ---
-
-	startEncoding = clock();
-
-	// HDCアプリ作成　（学習後のテストデータを格納)
-	HDC HDCtested;
-	allocateMemoryHDC(&HDCtested, test_num);
-
-	// test_num (英語とフランス語なら２)
-	for (int i = 0; i < test_num; i++)
-	{
-		// HDCtested.data[i].values の値を更新
-		encoding(&HDCascii, test_path[i], HDCtested.data[i].values);
-	}
-
-	endEncoding = clock();
-
-	const double time_encoding_test = ((double)(endEncoding - startEncoding)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n  Encoding Test Data time: %lf[ms]\n\n", time_encoding_test);
-
-	printf("\n  All Encoding time: %lf[ms]\n\n\n", time_encoding_training + time_encoding_test);
-
-	// ---------------------------------------- 類似度チェック （推論） ---------------------------------------
-
-	clock_t startSimilarity = clock();
-	// （cosine類似度チェック）
-	// distance = A・B/|A||B|
-	// |A| ... Aのnorm
-	const char *test_lang[] = {"English", "French"};
-	puts("  期待");
-	for (int i = 0; i < test_num; i++)
-	{
-		printf("  test %d → %s\n", i, test_lang[i]);
-	}
-	puts("");
-
-	puts("  結果");
-	const char *train_lang[] = {"English", "French"};
-	for (int i = 0; i < test_num; i++)
-	{
-		int match = -1; // 最終的にマッチした番号が入る
-		double max_cosine = -2.0;
-		for (int j = 0; j < train_num; j++)
-		{
-
-			// 内積
-			int dot_result = 0;
-			for (int k = 0; k < LENGTH; k++)
-			{
-				dot_result += HDCtested.data[i].values[k] & HDCtrained.data[j].values[k];
-			}
-
-			// norm for train
-			int train_sum = 0;
-			for (int k = 0; k < LENGTH; k++)
-			{
-				train_sum += HDCtrained.data[j].values[k];
-			}
-			double train_norm = (double)sqrt((double)train_sum);
-
-			// norm for test
-			int test_sum = 0;
-			for (int k = 0; k < LENGTH; k++)
-			{
-				test_sum += HDCtested.data[i].values[k];
-			}
-			double test_norm = (double)sqrt((double)test_sum);
-
-			// cosineチェック
-			double cosine = (double)dot_result / (test_norm * train_norm);
-			if (cosine > max_cosine)
-			{
-				max_cosine = cosine;
-				match = j; // 更新
-			}
-		}
-		if (match == -1)
-		{
-			puts("  could not find match language");
-		}
-		else
-		{
-			printf("  test %d → %s\n", i, train_lang[match]);
-		}
-	}
-
-	clock_t endSimilarity = clock();
-
-	const double time_similarity = ((double)(endSimilarity - startSimilarity)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n  Similarity time: %lf[ms]\n\n", time_similarity);
 
 	freeMemoryHDC(&HDCascii);
 	freeMemoryHDC(&HDCtrained);
-	freeMemoryHDC(&HDCtested);
-
-	clock_t end = clock();
-
-	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\n  time %lf[ms]\n", time);
 
 	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
 
