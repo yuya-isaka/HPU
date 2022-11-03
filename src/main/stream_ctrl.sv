@@ -9,7 +9,10 @@ module stream_ctrl
         input wire                  rst,
         input wire                  get_v,
         // コア数可変
-        input wire [15:0]           last,
+        // 16コア
+        // input wire [15:0]           last,
+        // 1コア
+        input wire            last,
         input wire                  dst_ready,
 
         // out

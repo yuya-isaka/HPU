@@ -235,7 +235,7 @@ int main(int argc, char **argv)
 	printf("\n ------------------------------- 開始 ------------------------------- \n\n\n");
 
 	const int NGRAM = 3;
-	const int CORENUM = 16;
+	const int CORENUM = 1;
 	int ADDRNUM = 0;
 
 	for (int i = 3; i < RANNUM; i += 3)

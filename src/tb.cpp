@@ -645,6 +645,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
         tmp++;
       }
+      // 残り埋める
       for (int i = tmp; i < 32; i++)
       {
         verilator_top->S_AXIS_TDATA[i] = 0;
@@ -657,17 +658,28 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
     {
       // 1
       tmp = 0;
-      for (int i = 0; i < CORENUM; i += 2)
+      for (int i = 0; i < CORENUM; i++)
       {
         uint16_t addr = NGRAM * i + j;
-        conv.data_0 = instruction(1, 1, addr);
-
-        addr = NGRAM * (i + 1) + j;
-        conv.data_1 = instruction(1, 1, addr);
-
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(1, 1, addr);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(1, 1, addr);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (CORENUM % 2 != 0)
+      {
         verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
         tmp++;
       }
+      // 残り埋める
       for (int i = tmp; i < 32; i++)
       {
         verilator_top->S_AXIS_TDATA[i] = 0;
@@ -692,13 +704,27 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 
       // 10
       tmp = 0;
-      for (int i = 0; i < CORENUM; i += 2)
+      for (int i = 0; i < CORENUM; i++)
       {
-        conv.data_0 = instruction(0, 10, 0);
-        conv.data_1 = instruction(0, 10, 0);
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(0, 10, 0);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(0, 10, 0);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (CORENUM % 2 != 0)
+      {
         verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
         tmp++;
       }
+      // 残り埋める
       for (int i = tmp; i < 32; i++)
       {
         verilator_top->S_AXIS_TDATA[i] = 0;
@@ -723,15 +749,28 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 
       // 2
       tmp = 0;
-      for (int i = 0; i < CORENUM; i += 2)
+      for (int i = 0; i < CORENUM; i++)
       {
         uint16_t addr = NGRAM * i + 1 + j;
-        conv.data_0 = instruction(1, 2, addr);
-        addr = NGRAM * (i + 1) + 1 + j;
-        conv.data_1 = instruction(1, 2, addr);
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(1, 2, addr);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(1, 2, addr);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (CORENUM % 2 != 0)
+      {
         verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
         tmp++;
       }
+      // 残り埋める
       for (int i = tmp; i < 32; i++)
       {
         verilator_top->S_AXIS_TDATA[i] = 0;
@@ -756,13 +795,27 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 
       // 7
       tmp = 0;
-      for (int i = 0; i < CORENUM; i += 2)
+      for (int i = 0; i < CORENUM; i++)
       {
-        conv.data_0 = instruction(0, 7, 0);
-        conv.data_1 = instruction(0, 7, 0);
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(0, 7, 0);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(0, 7, 0);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (CORENUM % 2 != 0)
+      {
         verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
         tmp++;
       }
+      // 残り埋める
       for (int i = tmp; i < 32; i++)
       {
         verilator_top->S_AXIS_TDATA[i] = 0;
@@ -787,13 +840,27 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 
       // 10
       tmp = 0;
-      for (int i = 0; i < CORENUM; i += 2)
+      for (int i = 0; i < CORENUM; i++)
       {
-        conv.data_0 = instruction(0, 10, 0);
-        conv.data_1 = instruction(0, 10, 0);
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(0, 10, 0);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(0, 10, 0);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (CORENUM % 2 != 0)
+      {
         verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
         tmp++;
       }
+      // 残り埋める
       for (int i = tmp; i < 32; i++)
       {
         verilator_top->S_AXIS_TDATA[i] = 0;
@@ -818,15 +885,28 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 
       // 2
       tmp = 0;
-      for (int i = 0; i < CORENUM; i += 2)
+      for (int i = 0; i < CORENUM; i++)
       {
         uint16_t addr = NGRAM * i + 2 + j;
-        conv.data_0 = instruction(1, 2, addr);
-        addr = NGRAM * (i + 1) + 2 + j;
-        conv.data_1 = instruction(1, 2, addr);
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(1, 2, addr);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(1, 2, addr);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (CORENUM % 2 != 0)
+      {
         verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
         tmp++;
       }
+      // 残り埋める
       for (int i = tmp; i < 32; i++)
       {
         verilator_top->S_AXIS_TDATA[i] = 0;
@@ -851,13 +931,27 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 
       // 3
       tmp = 0;
-      for (int i = 0; i < CORENUM; i += 2)
+      for (int i = 0; i < CORENUM; i++)
       {
-        conv.data_0 = instruction(0, 3, 0);
-        conv.data_1 = instruction(0, 3, 0);
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(0, 3, 0);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(0, 3, 0);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (CORENUM % 2 != 0)
+      {
         verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
         tmp++;
       }
+      // 残り埋める
       for (int i = tmp; i < 32; i++)
       {
         verilator_top->S_AXIS_TDATA[i] = 0;
@@ -882,13 +976,27 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 
       // 7
       tmp = 0;
-      for (int i = 0; i < CORENUM; i += 2)
+      for (int i = 0; i < CORENUM; i++)
       {
-        conv.data_0 = instruction(0, 7, 0);
-        conv.data_1 = instruction(0, 7, 0);
+        if (i % 2 == 0)
+        {
+          conv.data_0 = instruction(0, 7, 0);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = instruction(0, 7, 0);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (CORENUM % 2 != 0)
+      {
         verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
         tmp++;
       }
+      // 残り埋める
       for (int i = tmp; i < 32; i++)
       {
         verilator_top->S_AXIS_TDATA[i] = 0;
@@ -915,14 +1023,27 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       {
         // 9
         tmp = 0;
-        for (int i = 0; i < CORENUM; i += 2)
+        for (int i = 0; i < CORENUM; i++)
         {
-
-          conv.data_0 = instruction(0, 9, 0);
-          conv.data_1 = instruction(0, 9, 0);
+          if (i % 2 == 0)
+          {
+            conv.data_0 = instruction(0, 9, 0);
+            conv.data_1 = 0;
+          }
+          else
+          {
+            conv.data_1 = instruction(0, 9, 0);
+            verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+            tmp++;
+          }
+        }
+        // 奇数のとき最後の代入ができていない
+        if (CORENUM % 2 != 0)
+        {
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
+        // 残り埋める
         for (int i = tmp; i < 32; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
@@ -933,14 +1054,27 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       {
         // 8
         tmp = 0;
-        for (int i = 0; i < CORENUM; i += 2)
+        for (int i = 0; i < CORENUM; i++)
         {
-
-          conv.data_0 = instruction(0, 8, 0);
-          conv.data_1 = instruction(0, 8, 0);
+          if (i % 2 == 0)
+          {
+            conv.data_0 = instruction(0, 8, 0);
+            conv.data_1 = 0;
+          }
+          else
+          {
+            conv.data_1 = instruction(0, 8, 0);
+            verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+            tmp++;
+          }
+        }
+        // 奇数のとき最後の代入ができていない
+        if (CORENUM % 2 != 0)
+        {
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
+        // 残り埋める
         for (int i = tmp; i < 32; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
@@ -1025,7 +1159,7 @@ int main(int argc, char **argv)
   printf("\n ================================================= 開始 ================================================= \n\n");
 
   const int NGRAM = 3;
-  const int CORENUM = 16;
+  const int CORENUM = 1;
   int DEBUG = 0;
   int ADDRNUM = 0;
   // 次元数可変 (結果を何個出力するかに使う)
