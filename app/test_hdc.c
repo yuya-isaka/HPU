@@ -11,8 +11,8 @@
 // 可変パラメータ
 
 // 次元数可変 (理想の計算に必要)
-// #define DIM 32 / 32
-#define DIM 1024 / 32
+#define DIM 32 / 32
+// #define DIM 1024 / 32
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -107,7 +107,6 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 {
   unsigned int result = 0;
 
-  // 次元数可変
   unsigned int mask = (int)1 << (32 - 1);
   while (mask)
   {

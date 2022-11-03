@@ -6,8 +6,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 次元数可変
-// const int DIM = 32 / 32;
-const int DIM = 1024 / 32;
+const int DIM = 32 / 32;
+// const int DIM = 1024 / 32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -152,33 +152,30 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// item_memory_array[0][0] = 88675123;
-	// for (int j = 0; j < RANNUM; j++)
-	// {
-	// 	printf("%d\n", j);
-	// 	for (int i = 0; i < DIM; i++)
-	// 	{
-	// 		if (i == 0 && j == 0)
-	// 			continue;
-	// 		item_memory_array[i][j] = xor128(0);
-	// 		printf("%u\n", item_memory_array[i][j]);
-	// 	}
-	// 	return;
-	// }
-
+	item_memory_array[0][0] = 88675123;
 	for (int j = 0; j < RANNUM; j++)
 	{
 		for (int i = 0; i < DIM; i++)
 		{
-			if (i == 0)
-			{
-				item_memory_array[i][j] = 88675123;
+			if (i == 0 && j == 0)
 				continue;
-			}
 			item_memory_array[i][j] = xor128(0);
 		}
-		xor128(1);
 	}
+
+	// for (int j = 0; j < RANNUM; j++)
+	// {
+	// 	for (int i = 0; i < DIM; i++)
+	// 	{
+	// 		if (i == 0)
+	// 		{
+	// 			item_memory_array[i][j] = 88675123;
+	// 			continue;
+	// 		}
+	// 		item_memory_array[i][j] = xor128(0);
+	// 	}
+	// 	xor128(1);
+	// }
 
 	// あらかじめPermutation
 	shifter_new(NGRAM);
@@ -241,18 +238,18 @@ int main(int argc, char **argv)
 	const int CORENUM = 16;
 	int ADDRNUM = 0;
 
-	// for (int i = 3; i < RANNUM; i += 3)
-	// {
-	// 	ADDRNUM = i;
+	for (int i = 3; i < RANNUM; i += 3)
+	{
+		ADDRNUM = i;
 
-	// 	check(NGRAM, CORENUM, ADDRNUM);
-	// 	xor128(1);
+		check(NGRAM, CORENUM, ADDRNUM);
+		xor128(1);
 
-	// 	printf(" --------\n\n");
-	// }
+		printf(" --------\n\n");
+	}
 
-	ADDRNUM = 3;
-	check(NGRAM, CORENUM, ADDRNUM);
+	// ADDRNUM = 3;
+	// check(NGRAM, CORENUM, ADDRNUM);
 	// xor128(1);
 	// printf(" --------\n\n");
 	// ADDRNUM = 54;
