@@ -1160,7 +1160,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 
 int main(int argc, char **argv)
 {
-  printf("\n ================================================= 開始 ================================================= \n\n");
+  printf("\n ====================================== 開始 ========================================= \n\n");
 
   const int NGRAM = 3;
   const int CORENUM = 2;
@@ -1177,7 +1177,7 @@ int main(int argc, char **argv)
     DEBUG = 1;
     check(NGRAM, CORENUM, ADDRNUM, DIM, argc, argv, DEBUG);
 
-    printf(" --------\n\n");
+    printf(" -------------------\n\n");
   }
 
   // ADDRNUM = 51;
@@ -1188,7 +1188,7 @@ int main(int argc, char **argv)
   // DEBUG = 1;
   // check(NGRAM, CORENUM, ADDRNUM, DIM, argc, argv, DEBUG);
 
-  printf("\n ================================================= 終了 ================================================= \n\n");
+  printf("\n ======================================= 終了 ========================================= \n\n");
 
   return 0;
 }

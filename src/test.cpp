@@ -245,7 +245,7 @@ int main(int argc, char **argv)
 		check(NGRAM, CORENUM, ADDRNUM);
 		xor128(1);
 
-		printf(" --------\n\n");
+		printf(" -------------------\n\n");
 	}
 
 	// ADDRNUM = 3;
