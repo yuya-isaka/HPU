@@ -17,10 +17,10 @@ unsigned long dst_phys;
 
 // --------------------------------------- メモリリークチェック、デストラクター -------------------------
 
-__attribute__((destructor)) static void destructor()
-{
-	system("leaks -q a.out");
-}
+// __attribute__((destructor)) static void destructor()
+// {
+// 	system("leaks -q a.out");
+// }
 // ------------------------------------------------------------------------------------------------
 
 void makeArray(uint16_t ***a, const int y, const int x)
@@ -176,9 +176,7 @@ int main(int argc, char const *argv[])
 		close(dmaf);
 		return 0;
 	}
-	// 0x00080000個のバイト
-	// 524288バイト
-	// 今回はuint16なので、262144が限界→今このせいでsegmentation fault
+	// 500MB
 	src = (uint16_t *)mmap(NULL, 0x1DCD6500, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
 	if (src == MAP_FAILED)
 	{
@@ -186,6 +184,7 @@ int main(int argc, char const *argv[])
 		close(fd0);
 		return 0;
 	}
+	// 4MB
 	dst = (int *)mmap(NULL, 0x3D0900, PROT_READ | PROT_WRITE, MAP_SHARED, fd1, 0);
 	if (dst == MAP_FAILED)
 	{
@@ -194,6 +193,8 @@ int main(int argc, char const *argv[])
 		return 0;
 	}
 
+	//
+	// ランダムジェネレート生成
 	top[0x04 / 4] = 26;
 	top[0x00 / 4] = 1;
 	while (top[0x00 / 4] & 0x1)

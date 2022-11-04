@@ -1,19 +1,22 @@
+// 自動生成include ---------------------------
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h> // uint16_t
-#include <time.h>
 #include <string.h>
 #include <math.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
+// ----------------------------------------
 
+// 自動生成グローバル変数 ---------------------
 volatile int *top;
 volatile int *dma;
 volatile uint16_t *src;
 volatile int *dst;
 unsigned long src_phys;
 unsigned long dst_phys;
+// ----------------------------------------
 
 // 動的 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -55,10 +58,8 @@ const int asm_array[EXEC_NUM][CORE_NUM][INSTRUCTION_NUM];
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char const *argv[])
+void check()
 {
-	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
-
 	int fd0, fd1, dmaf, topf;
 
 	// DMAバッファの物理アドレスを取得 ------------------------------------------------------------
