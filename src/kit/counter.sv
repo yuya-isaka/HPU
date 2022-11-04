@@ -5,7 +5,8 @@
 module counter
     #(
          // addr_iが10億以上になったら増やす必要あり
-         parameter W = 30
+         parameter W = 30,
+         parameter CORENUM = 16
      )
      (
          // in
@@ -14,19 +15,13 @@ module counter
          input wire                     tmp_even,
          input wire                     tmp_rand_bit,
          // コア数可変
-         // 16コア
-         //  input wire [15:0]              store,
-         // 4コア
-         //  input wire [3:0]               store,
+         input wire [CORENUM-1:0]              store,
          // 1コア
-         input wire                store,
+         //  input wire                store,
          // コア数可変
-         // 16コア
-         //  input wire [15:0]              core_result,
-         // 4コア
-         //  input wire [3:0]               core_result,
+         input wire [CORENUM-1:0]              core_result,
          // 1コア
-         input wire                core_result,
+         //  input wire                core_result,
 
          // out
          output logic 		            sign_bit
@@ -110,7 +105,7 @@ module counter
 
                   else if (store_n) begin
                       // コア数可変
-                      box_1 <= select;
+                      box_1 <= select[0] + select[1];
                       //   box_1 <= select[0]
                       //         + select[1]
                       //         + select[2]
@@ -146,35 +141,28 @@ module counter
 
 
     // コア数可変
-    // 16コア
-    // wire signed [1:0]      select [0:15];
-    // 4コア
-    // wire signed [1:0]      select [0:3];
+    wire signed [1:0]      select [0:CORENUM-1];
     // 1コア
-    wire signed [1:0]      select;
+    // wire signed [1:0]      select;
 
     generate
         genvar      k;
-        // コア数可変
-        // 1コア
-        for (k = 0; k < 1; k = k + 1) begin
-            // 16コア
-            // for (k = 0; k < 16; k = k + 1) begin
-            // 4コア
-            // for (k = 0; k < 4; k = k + 1) begin
+        for (k = 0; k < CORENUM; k = k + 1) begin
             selector selector
                      (
                          // in
                          .clk(clk),
                          // コア数可変
-                         //  .store_bit(store[k]),
-                         //  .core_result_bit(core_result[k]),
-                         .store_bit(store),
-                         .core_result_bit(core_result),
+                         .store_bit(store[k]),
+                         //  .store_bit(store),
+                         // コア数可変
+                         .core_result_bit(core_result[k]),
+                         //  .core_result_bit(core_result),
 
                          // out
-                         //  .sel_bit(select[k])
-                         .sel_bit(select)
+                         // コア数可変
+                         .sel_bit(select[k])
+                         //  .sel_bit(select)
                      );
         end
     endgenerate

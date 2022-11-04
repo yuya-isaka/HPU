@@ -85,6 +85,12 @@ module top
     // -----------------------
 
 
+    // コア数可変 (1コアだけ色々変えるとこあり)
+    // 2コア -------------------
+    parameter CORENUM = 2;
+    // ------------------------
+
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -107,9 +113,10 @@ module top
 
 
 
+    // コア数可変
     // 次元数可変
-    // buffer_ctrl #(.DIM(1023)) buffer_ctrl
-    buffer_ctrl #(.DIM(31)) buffer_ctrl
+    // buffer_ctrl #(.DIM(1023), .CORENUM(2)) buffer_ctrl
+    buffer_ctrl #(.DIM(31), .CORENUM(2)) buffer_ctrl
                 (
                     // in
                     .clk(AXIS_ACLK),
@@ -118,10 +125,10 @@ module top
                     .tmp_rand(tmp_rand[DIM:0]),
                     // コア数可変
                     // 1コア
-                    .core_result_1(core_result),
+                    // .core_result_1(core_result),
                     // それ以外
-                    // .core_result_1(core_result[0]),
-                    // .core_result_2(core_result[1]),
+                    .core_result_1(core_result[0]),
+                    .core_result_2(core_result[1]),
                     // .core_result_3(core_result[2]),
                     // .core_result_4(core_result[3]),
                     // .core_result_5(core_result[4]),
@@ -153,12 +160,9 @@ module top
                     // .core_result_31(core_result[30]),
                     // .core_result_32(core_result[31]),
                     // コア数可変
-                    // 16コア
-                    // .store(store[15:0]),
-                    // 4コア
-                    // .store(store[3:0]),
+                    .store(store[CORENUM-1:0]),
                     // 1コア
-                    .store(store),
+                    // .store(store),
                     .stream_v(stream_v),
 
                     // out
@@ -170,15 +174,16 @@ module top
 
     wire              stream_v;
 
-    stream_ctrl stream_ctrl
+    stream_ctrl #(.CORENUM(2)) stream_ctrl
                 (
                     // in
                     .clk(AXIS_ACLK),
                     .rst(~run),
                     // コア数可変
-                    // .last(last[15:0]),
+                    // 16コア
+                    .last(last[CORENUM-1:0]),
                     // 1コア
-                    .last(last),
+                    // .last(last),
                     .get_v(get_v),
                     .dst_ready(M_AXIS_TREADY),
 
@@ -371,36 +376,23 @@ module top
     //================================================================
 
     // コア数可変
-    // 16コア
-    // wire [15:0]              store;
-    // 4コア
-    // wire [3:0]              store;
+    wire [CORENUM-1:0]              store;
     // 1コア
-    wire                       store;
+    // wire                       store;
 
     // コア数可変
-    // 16コア
-    // wire [DIM:0]         core_result [0:15];
-    // 4コア
-    // wire [DIM:0]            core_result [0:3];
+    wire [DIM:0]         core_result [0:CORENUM-1];
     // 1コア
-    wire [DIM:0]                core_result;
+    // wire [DIM:0]                core_result;
 
     // コア数可変
-    // 16コア
-    // wire [15:0]               last;
+    wire [CORENUM-1:0]               last;
     // 1コア
-    wire                last;
+    // wire                last;
 
     generate
         genvar      i;
-        // コア数可変
-        // 1コア
-        for (i = 0; i < 1; i = i + 1) begin
-            // 16コア
-            // for (i = 0; i < 16; i = i + 1) begin
-            // 4コア
-            // for (i = 0; i < 4; i = i + 1) begin
+        for (i = 0; i < CORENUM; i = i + 1) begin
             // 次元数可変
             // core #(.DIM(1023)) core
             core #(.DIM(31)) core
@@ -421,13 +413,14 @@ module top
 
                      // out
                      //  コア数可変
-                     //  .store(store[i]),
-                     .store(store),
-                     //  .core_result(core_result[i]),
-                     .core_result(core_result),
+                     .store(store[i]),
+                     //  .store(store),
                      // コア数可変
-                     //  .last(last[i])
-                     .last(last)
+                     .core_result(core_result[i]),
+                     //  .core_result(core_result),
+                     // コア数可変
+                     .last(last[i])
+                     //  .last(last)
                  );
         end
     endgenerate

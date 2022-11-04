@@ -3,23 +3,25 @@
 
 
 module stream_ctrl
-    (
-        // in
-        input wire                  clk,
-        input wire                  rst,
-        input wire                  get_v,
-        // コア数可変
-        // 16コア
-        // input wire [15:0]           last,
-        // 1コア
-        input wire            last,
-        input wire                  dst_ready,
+    #(
+         parameter CORENUM = 16
+     )
+     (
+         // in
+         input wire                  clk,
+         input wire                  rst,
+         input wire                  get_v,
+         // コア数可変
+         input wire [CORENUM-1:0]           last,
+         // 1コア
+         // input wire            last,
+         input wire                  dst_ready,
 
-        // out
-        output reg                  dst_valid,
-        output reg                  dst_last,
-        output logic                stream_v
-    );
+         // out
+         output reg                  dst_valid,
+         output reg                  dst_last,
+         output logic                stream_v
+     );
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -4,7 +4,8 @@
 
 module buffer_ctrl
     #(
-         parameter DIM = 1023
+         parameter DIM = 1023,
+         parameter CORENUM = 16
      )
      (
          // in
@@ -14,7 +15,7 @@ module buffer_ctrl
          input wire [DIM:0]             tmp_rand,
          // コア数可変
          input wire [DIM:0]             core_result_1,
-         //  input wire [DIM:0]             core_result_2,
+         input wire [DIM:0]             core_result_2,
          //  input wire [DIM:0]             core_result_3,
          //  input wire [DIM:0]             core_result_4,
          //  input wire [DIM:0]             core_result_5,
@@ -46,12 +47,9 @@ module buffer_ctrl
          //  input wire [DIM:0]             core_result_31,
          //  input wire [DIM:0]             core_result_32,
          // コア数可変
+         input wire [CORENUM-1:0]              store,
          // 1コア
-         input wire                store,
-         // 4コア
-         //  input wire [3:0]               store,
-         // 16コア
-         //  input wire [15:0]              store,
+         //  input wire                store,
          input wire                     stream_v,
 
          // out
@@ -68,8 +66,9 @@ module buffer_ctrl
         genvar i;
         for (i = 0; i < DIM+1; i = i + 1) begin
 
-            // 計算数可変
-            counter #(.W(30)) counter
+            // コア数可変
+            // 計算数可変 (現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分)
+            counter #(.W(30), .CORENUM(2)) counter
                     (
                         // in
                         .clk(clk),
@@ -77,12 +76,9 @@ module buffer_ctrl
                         .tmp_even(tmp_even),
                         .tmp_rand_bit(tmp_rand[i]),
                         // コア数可変
-                        // 16コア
-                        // .store(store[15:0]),
-                        // 4コア
-                        // .store(store[3:0]),
+                        .store(store[CORENUM-1:0]),
                         // 1コア
-                        .store(store),
+                        // .store(store),
                         // コア数可変
                         .core_result(
                             {
@@ -116,7 +112,7 @@ module buffer_ctrl
                                 // core_result_5[i],
                                 // core_result_4[i],
                                 // core_result_3[i],
-                                // core_result_2[i],
+                                core_result_2[i],
                                 core_result_1[i]
                             }
                         ),
