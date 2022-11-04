@@ -207,7 +207,7 @@ int main(int argc, char const *argv[])
 	const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
 	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const int ngram = 3;
-	const int core_num = 1;
+	const int core_num = 2;
 	const int instruction_num = 9;
 	int all_ngram = 0;
 	int even = 0;
