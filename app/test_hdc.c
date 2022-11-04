@@ -244,9 +244,9 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
 
   // 自動で決まるパラメータ
 
-  const int REMAINDAR = (ADDRNUM / 3) % 16;
+  const int REMAINDAR = (ADDRNUM / NGRAM) % CORENUM;
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
-  int LAST = (ADDRNUM / 3) / 16;
+  int LAST = (ADDRNUM / NGRAM) / CORENUM;
   if (REMAINDAR == 0)
   {
     LAST--;
@@ -447,7 +447,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
 
       j += NGRAM * CORENUM - 1;
     }
-    else
+    else // =========================================================================================
     {
       // 1024bit ---------------------------------------------
       // 16bit命令ごとに入れるから64回必要
@@ -794,7 +794,7 @@ int main()
   ///////////////////////////////////////////////////////////////////////////////// initial, udmabuf, uio 設定 ///////////////////////////////////////////////////////////////////////////////////
 
   const int NGRAM = 3;
-  const int CORENUM = 16;
+  const int CORENUM = 1;
   int ADDRNUM = 0;
 
   for (int i = 3; i <= RANNUM; i += 3)
