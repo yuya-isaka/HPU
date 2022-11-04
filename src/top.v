@@ -87,7 +87,7 @@ module top
 
     // コア数可変
     // 2コア -------------------
-    parameter CORENUM = 4;
+    parameter CORENUM = 1;
     // ------------------------
 
 
@@ -116,7 +116,7 @@ module top
     // コア数可変
     // 次元数可変
     // buffer_ctrl #(.DIM(1023), .CORENUM(2)) buffer_ctrl
-    buffer_ctrl #(.DIM(31), .CORENUM(4)) buffer_ctrl
+    buffer_ctrl #(.DIM(31), .CORENUM(1)) buffer_ctrl
                 (
                     // in
                     .clk(AXIS_ACLK),
@@ -124,11 +124,12 @@ module top
                     .tmp_even(even),
                     .tmp_rand(tmp_rand[DIM:0]),
                     // 1コア
+                    .core_result_1(core_result),
                     // コア数可変
-                    .core_result_1(core_result[0]),
-                    .core_result_2(core_result[1]),
-                    .core_result_3(core_result[2]),
-                    .core_result_4(core_result[3]),
+                    // .core_result_1(core_result[0]),
+                    // .core_result_2(core_result[1]),
+                    // .core_result_3(core_result[2]),
+                    // .core_result_4(core_result[3]),
                     // .core_result_5(core_result[4]),
                     // .core_result_6(core_result[5]),
                     // .core_result_7(core_result[6]),
@@ -158,7 +159,8 @@ module top
                     // .core_result_31(core_result[30]),
                     // .core_result_32(core_result[31]),
                     // 1コア
-                    .store(store[CORENUM-1:0]),
+                    // .store(store[CORENUM-1:0]),
+                    .store(store),
                     .stream_v(stream_v),
 
                     // out
@@ -176,7 +178,8 @@ module top
                     .clk(AXIS_ACLK),
                     .rst(~run),
                     // 1コア
-                    .last(last[CORENUM-1:0]),
+                    // .last(last[CORENUM-1:0]),
+                    .last(last),
                     .get_v(get_v),
                     .dst_ready(M_AXIS_TREADY),
 
@@ -368,11 +371,17 @@ module top
 
     //================================================================
 
-    wire [CORENUM-1:0]              store;
+    // 1コア
+    // wire [CORENUM-1:0]              store;
+    wire                            store;
 
-    wire [DIM:0]                    core_result [0:CORENUM-1];
+    // 1コア
+    // wire [DIM:0]                    core_result [0:CORENUM-1];
+    wire [DIM:0]                    core_result;
 
-    wire [CORENUM-1:0]              last;
+    // 1コア
+    // wire [CORENUM-1:0]              last;
+    wire                            last;
 
     generate
         genvar      i;
@@ -397,11 +406,14 @@ module top
 
                      // out
                      // 1コア
-                     .store(store[i]),
+                     //  .store(store[i]),
+                     .store(store),
                      // 1コア
-                     .core_result(core_result[i]),
+                     //  .core_result(core_result[i]),
+                     .core_result(core_result),
                      // 1コア
-                     .last(last[i])
+                     //  .last(last[i])
+                     .last(last)
                  );
         end
     endgenerate
