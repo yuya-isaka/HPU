@@ -8,7 +8,7 @@
 // 計算数可変
 // バス幅可変
 // --------------------
-// コア数可変 (色々変える)
+// コア数可変 (1コア専用の部分は、『1コア』とコメント。storeするタイミングをずらすやつは『タイミング可変』とコメント)
 // 次元数可変 (topだけ)
 // --------------------
 
@@ -85,7 +85,7 @@ module top
     // -----------------------
 
 
-    // コア数可変 (1コアだけ色々変えるとこあり)
+    // コア数可変
     // 2コア -------------------
     parameter CORENUM = 2;
     // ------------------------
@@ -124,9 +124,6 @@ module top
                     .tmp_even(even),
                     .tmp_rand(tmp_rand[DIM:0]),
                     // コア数可変
-                    // 1コア
-                    // .core_result_1(core_result),
-                    // それ以外
                     .core_result_1(core_result[0]),
                     .core_result_2(core_result[1]),
                     // .core_result_3(core_result[2]),
@@ -159,10 +156,7 @@ module top
                     // .core_result_30(core_result[29]),
                     // .core_result_31(core_result[30]),
                     // .core_result_32(core_result[31]),
-                    // コア数可変
                     .store(store[CORENUM-1:0]),
-                    // 1コア
-                    // .store(store),
                     .stream_v(stream_v),
 
                     // out
@@ -179,11 +173,7 @@ module top
                     // in
                     .clk(AXIS_ACLK),
                     .rst(~run),
-                    // コア数可変
-                    // 16コア
                     .last(last[CORENUM-1:0]),
-                    // 1コア
-                    // .last(last),
                     .get_v(get_v),
                     .dst_ready(M_AXIS_TREADY),
 
@@ -375,20 +365,11 @@ module top
 
     //================================================================
 
-    // コア数可変
     wire [CORENUM-1:0]              store;
-    // 1コア
-    // wire                       store;
 
-    // コア数可変
     wire [DIM:0]         core_result [0:CORENUM-1];
-    // 1コア
-    // wire [DIM:0]                core_result;
 
-    // コア数可変
     wire [CORENUM-1:0]               last;
-    // 1コア
-    // wire                last;
 
     generate
         genvar      i;
@@ -412,15 +393,9 @@ module top
                      .exec(exec),
 
                      // out
-                     //  コア数可変
                      .store(store[i]),
-                     //  .store(store),
-                     // コア数可変
                      .core_result(core_result[i]),
-                     //  .core_result(core_result),
-                     // コア数可変
                      .last(last[i])
-                     //  .last(last)
                  );
         end
     endgenerate

@@ -11,10 +11,7 @@ module stream_ctrl
          input wire                  clk,
          input wire                  rst,
          input wire                  get_v,
-         // コア数可変
          input wire [CORENUM-1:0]           last,
-         // 1コア
-         // input wire            last,
          input wire                  dst_ready,
 
          // out
@@ -27,7 +24,7 @@ module stream_ctrl
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // コア数可変
+    // タイミング可変
     // 32コア
     // reg         last_n, last_nn, last_nnn;
     // always_ff @(posedge clk) begin
@@ -62,7 +59,7 @@ module stream_ctrl
                   else if (stream_ok) begin
                       last_keep <= 1'b0;
                   end
-                  // コア数可変
+                  // タイミング可変
                   // 32コア
                   //   else if (lst_nnn) begin
                   // 4コア
@@ -92,7 +89,7 @@ module stream_ctrl
     always_comb begin
                     stream_ok = 1'b0;
 
-                    // コア数可変
+                    // タイミング可変
                     // 32コア
                     // if ((last_nnn | last_keep) & dst_ready) begin
                     // 4コア

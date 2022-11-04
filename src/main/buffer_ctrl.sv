@@ -46,10 +46,7 @@ module buffer_ctrl
          //  input wire [DIM:0]             core_result_30,
          //  input wire [DIM:0]             core_result_31,
          //  input wire [DIM:0]             core_result_32,
-         // コア数可変
          input wire [CORENUM-1:0]              store,
-         // 1コア
-         //  input wire                store,
          input wire                     stream_v,
 
          // out
@@ -75,10 +72,7 @@ module buffer_ctrl
                         .rst(rst),
                         .tmp_even(tmp_even),
                         .tmp_rand_bit(tmp_rand[i]),
-                        // コア数可変
                         .store(store[CORENUM-1:0]),
-                        // 1コア
-                        // .store(store),
                         // コア数可変
                         .core_result(
                             {

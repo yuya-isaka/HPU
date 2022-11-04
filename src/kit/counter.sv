@@ -14,14 +14,8 @@ module counter
          input wire                     rst,
          input wire                     tmp_even,
          input wire                     tmp_rand_bit,
-         // コア数可変
          input wire [CORENUM-1:0]              store,
-         // 1コア
-         //  input wire                store,
-         // コア数可変
          input wire [CORENUM-1:0]              core_result,
-         // 1コア
-         //  input wire                core_result,
 
          // out
          output logic 		            sign_bit
@@ -31,7 +25,7 @@ module counter
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // コア数可変
+    // タイミング可変
     // 32コア
     // reg         store_n, store_nn, store_nnn;
     // always_ff @(posedge clk) begin
@@ -40,7 +34,7 @@ module counter
     //               store_nnn <= store_nn;
     //           end;
 
-    // コア数可変
+    // タイミング可変
     // 16コア
     reg         store_n, store_nn;
     always_ff @(posedge clk) begin
@@ -48,7 +42,7 @@ module counter
                   store_nn <= store_n;
               end;
 
-    // コア数可変
+    // タイミング可変
     // 4コア
     // reg         store_n;
     // always_ff @(posedge clk) begin
@@ -140,10 +134,7 @@ module counter
     //================================================================
 
 
-    // コア数可変
     wire signed [1:0]      select [0:CORENUM-1];
-    // 1コア
-    // wire signed [1:0]      select;
 
     generate
         genvar      k;
@@ -152,17 +143,11 @@ module counter
                      (
                          // in
                          .clk(clk),
-                         // コア数可変
                          .store_bit(store[k]),
-                         //  .store_bit(store),
-                         // コア数可変
                          .core_result_bit(core_result[k]),
-                         //  .core_result_bit(core_result),
 
                          // out
-                         // コア数可変
                          .sel_bit(select[k])
-                         //  .sel_bit(select)
                      );
         end
     endgenerate
