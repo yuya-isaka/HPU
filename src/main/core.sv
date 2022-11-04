@@ -196,8 +196,8 @@ module core
                           end
                           // nop (すべて0のはず)
                           else begin
-                            buff <= 0;
-                            store <= 0;
+                              buff <= 0;
+                              store <= 0;
                           end
                       end
                   end

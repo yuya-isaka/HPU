@@ -117,7 +117,10 @@ module top
                     .tmp_even(even),
                     .tmp_rand(tmp_rand[DIM:0]),
                     // コア数可変
-                    .core_result_1(core_result[0]),
+                    // 1コア
+                    .core_result_1(core_result),
+                    // それ以外
+                    // .core_result_1(core_result[0]),
                     // .core_result_2(core_result[1]),
                     // .core_result_3(core_result[2]),
                     // .core_result_4(core_result[3]),
@@ -394,8 +397,8 @@ module top
         // コア数可変
         // 1コア
         for (i = 0; i < 1; i = i + 1) begin
-        // 16コア
-        // for (i = 0; i < 16; i = i + 1) begin
+            // 16コア
+            // for (i = 0; i < 16; i = i + 1) begin
             // 4コア
             // for (i = 0; i < 4; i = i + 1) begin
             // 次元数可変
@@ -417,12 +420,13 @@ module top
                      .exec(exec),
 
                      // out
-                     // コア数可変
-                    //  .store(store[i]),
+                     //  コア数可変
+                     //  .store(store[i]),
                      .store(store),
-                     .core_result(core_result[i]),
+                     //  .core_result(core_result[i]),
+                     .core_result(core_result),
                      // コア数可変
-                    //  .last(last[i])
+                     //  .last(last[i])
                      .last(last)
                  );
         end

@@ -146,15 +146,19 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 {
 
   // 最低限 = NGRAMの倍数(3の倍数)であることは保証されている（今回のテストケースではそれしか対応していないから）
+  // NGRAMで３このアドレスを渡す必要があるので、ADDRNUMは３の倍数であることが保証されている
+  // もしNGRAMを４とかにするなら、テストケースでは4の倍数にする。（例えば0, 1, 2, 3 を使って、１つのハイパーベクトルを生成するようなテストケースを生成する感じ。test.cppgそんな感じにshifter_newで作ってしまっている）
+  // test.cppではaddrnumの3,4,5は同じ値になる。そういう設計にしている
+  // tb.cppは止まるけどそれはなんで？ → LASTが0のままで最後のlastoreが立たないから
   // 16コアすべてを使わないケースがあるか調べる
-  const int REMAINDAR = (ADDRNUM / 3) % 16;
+  const int REMAINDAR = (ADDRNUM / NGRAM) % CORENUM;
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
-  int LAST = (ADDRNUM / 3) / 16;
+  int LAST = (ADDRNUM / NGRAM) / CORENUM;
   if (REMAINDAR == 0)
   {
     LAST--;
   }
-  LAST *= NGRAM * CORENUM;
+  LAST *= NGRAM * CORENUM; // 3
 
   ////////////////////////////////////////////////////////////////////////////// Verilator setup /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -623,7 +627,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 9
+      // 9 (ここは必ずラストの命令)
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
@@ -653,7 +657,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       eval();
 
       j += NGRAM * CORENUM - 1;
-    }
+    } /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     else
     {
       // 1

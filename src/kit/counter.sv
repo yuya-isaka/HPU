@@ -15,18 +15,18 @@ module counter
          input wire                     tmp_rand_bit,
          // コア数可変
          // 16コア
-        //  input wire [15:0]              store,
+         //  input wire [15:0]              store,
          // 4コア
          //  input wire [3:0]               store,
          // 1コア
-          input wire                store,
+         input wire                store,
          // コア数可変
          // 16コア
-        //  input wire [15:0]              core_result,
+         //  input wire [15:0]              core_result,
          // 4コア
          //  input wire [3:0]               core_result,
          // 1コア
-          input wire                core_result,
+         input wire                core_result,
 
          // out
          output logic 		            sign_bit
@@ -99,9 +99,9 @@ module counter
                       end
                       // コア数可変
                       box_1 <= 0;
-                    //   box_2 <= 0;
-                    //   box_3 <= 0;
-                    //   box_4 <= 0;
+                      //   box_2 <= 0;
+                      //   box_3 <= 0;
+                      //   box_4 <= 0;
                       //   box_5 <= 0;
                       //   box_6 <= 0;
                       //   box_7 <= 0;
@@ -110,30 +110,30 @@ module counter
 
                   else if (store_n) begin
                       // コア数可変
-                      box_1 <= select[0];
-                    //   box_1 <= select[0]
-                    //         + select[1]
-                    //         + select[2]
-                    //         + select[3];
-                    //   box_2 <= select[4]
-                    //         + select[5]
-                    //         + select[6]
-                    //         + select[7];
-                    //   box_3 <= select[8]
-                    //         + select[9]
-                    //         + select[10]
-                    //         + select[11];
-                    //   box_4 <=
-                    //         select[12]
-                    //         + select[13]
-                    //         + select[14]
-                    //         + select[15];
+                      box_1 <= select;
+                      //   box_1 <= select[0]
+                      //         + select[1]
+                      //         + select[2]
+                      //         + select[3];
+                      //   box_2 <= select[4]
+                      //         + select[5]
+                      //         + select[6]
+                      //         + select[7];
+                      //   box_3 <= select[8]
+                      //         + select[9]
+                      //         + select[10]
+                      //         + select[11];
+                      //   box_4 <=
+                      //         select[12]
+                      //         + select[13]
+                      //         + select[14]
+                      //         + select[15];
                   end
 
                   else if (store_nn) begin
                       // コア数可変
                       // 16コア
-                    //   box <= box + box_1 + box_2 + box_3 + box_4;
+                      //   box <= box + box_1 + box_2 + box_3 + box_4;
                       // 4コア
                       //   box <= box + select[0] + select[1] + select[2] + select[3];
                       // 1コア
@@ -158,8 +158,8 @@ module counter
         // コア数可変
         // 1コア
         for (k = 0; k < 1; k = k + 1) begin
-        // 16コア
-        // for (k = 0; k < 16; k = k + 1) begin
+            // 16コア
+            // for (k = 0; k < 16; k = k + 1) begin
             // 4コア
             // for (k = 0; k < 4; k = k + 1) begin
             selector selector
@@ -167,13 +167,13 @@ module counter
                          // in
                          .clk(clk),
                          // コア数可変
-                        //  .store_bit(store[k]),
-                        //  .core_result_bit(core_result[k]),
+                         //  .store_bit(store[k]),
+                         //  .core_result_bit(core_result[k]),
                          .store_bit(store),
                          .core_result_bit(core_result),
 
                          // out
-                        //  .sel_bit(select[k])
+                         //  .sel_bit(select[k])
                          .sel_bit(select)
                      );
         end
