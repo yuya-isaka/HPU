@@ -87,7 +87,7 @@ module top
 
     // コア数可変
     // 2コア -------------------
-    parameter CORENUM = 2;
+    parameter CORENUM = 4;
     // ------------------------
 
 
@@ -116,7 +116,7 @@ module top
     // コア数可変
     // 次元数可変
     // buffer_ctrl #(.DIM(1023), .CORENUM(2)) buffer_ctrl
-    buffer_ctrl #(.DIM(31), .CORENUM(2)) buffer_ctrl
+    buffer_ctrl #(.DIM(31), .CORENUM(4)) buffer_ctrl
                 (
                     // in
                     .clk(AXIS_ACLK),
@@ -127,8 +127,8 @@ module top
                     // コア数可変
                     .core_result_1(core_result[0]),
                     .core_result_2(core_result[1]),
-                    // .core_result_3(core_result[2]),
-                    // .core_result_4(core_result[3]),
+                    .core_result_3(core_result[2]),
+                    .core_result_4(core_result[3]),
                     // .core_result_5(core_result[4]),
                     // .core_result_6(core_result[5]),
                     // .core_result_7(core_result[6]),

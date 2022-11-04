@@ -102,11 +102,12 @@ module counter
                   else if (store_n) begin
                       // 1コア
                       // コア数可変
-                      box_1 <= select[0] + select[1];
-                      //   box_1 <= select[0]
-                      //         + select[1]
-                      //         + select[2]
-                      //         + select[3];
+                      // 2コア
+                      //   box_1 <= select[0] + select[1];
+                      box_1 <= select[0]
+                            + select[1]
+                            + select[2]
+                            + select[3];
                       //   box_2 <= select[4]
                       //         + select[5]
                       //         + select[6]
