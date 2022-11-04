@@ -11,8 +11,8 @@ module core
          input wire                     run,
          input wire                     gen,
          input wire                     update_item,
-         input wire [9:0]              item_a,
-         input wire [9:0]              item_memory_num,
+         input wire [9:0]               item_a,
+         input wire [9:0]               item_memory_num,
          input wire [DIM:0]             rand_num,
          input wire                     get_v,
          // アドレス幅可変

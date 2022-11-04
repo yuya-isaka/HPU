@@ -8,16 +8,16 @@ module stream_ctrl
      )
      (
          // in
-         input wire                  clk,
-         input wire                  rst,
-         input wire                  get_v,
+         input wire                         clk,
+         input wire                         rst,
+         input wire                         get_v,
          input wire [CORENUM-1:0]           last,
-         input wire                  dst_ready,
+         input wire                         dst_ready,
 
          // out
-         output reg                  dst_valid,
-         output reg                  dst_last,
-         output logic                stream_v
+         output reg                         dst_valid,
+         output reg                         dst_last,
+         output logic                       stream_v
      );
 
 

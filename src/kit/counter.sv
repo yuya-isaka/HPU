@@ -4,21 +4,21 @@
 
 module counter
     #(
-         // addr_iが10億以上になったら増やす必要あり
+         // 現状1GBが限界なため30bitでOK
          parameter W = 30,
          parameter CORENUM = 16
      )
      (
          // in
-         input wire			            clk,
-         input wire                     rst,
-         input wire                     tmp_even,
-         input wire                     tmp_rand_bit,
-         input wire [CORENUM-1:0]              store,
-         input wire [CORENUM-1:0]              core_result,
+         input wire			                clk,
+         input wire                         rst,
+         input wire                         tmp_even,
+         input wire                         tmp_rand_bit,
+         input wire [CORENUM-1:0]           store,
+         input wire [CORENUM-1:0]           core_result,
 
          // out
-         output logic 		            sign_bit
+         output logic 		                sign_bit
      );
 
 

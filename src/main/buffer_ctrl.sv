@@ -9,13 +9,13 @@ module buffer_ctrl
      )
      (
          // in
-         input wire                     clk,
-         input wire                     rst,
-         input wire                     tmp_even,
-         input wire [DIM:0]             tmp_rand,
+         input wire                         clk,
+         input wire                         rst,
+         input wire                         tmp_even,
+         input wire [DIM:0]                 tmp_rand,
          // コア数可変
-         input wire [DIM:0]             core_result_1,
-         input wire [DIM:0]             core_result_2,
+         input wire [DIM:0]                 core_result_1,
+         input wire [DIM:0]                 core_result_2,
          //  input wire [DIM:0]             core_result_3,
          //  input wire [DIM:0]             core_result_4,
          //  input wire [DIM:0]             core_result_5,
@@ -46,11 +46,11 @@ module buffer_ctrl
          //  input wire [DIM:0]             core_result_30,
          //  input wire [DIM:0]             core_result_31,
          //  input wire [DIM:0]             core_result_32,
-         input wire [CORENUM-1:0]              store,
-         input wire                     stream_v,
+         input wire [CORENUM-1:0]           store,
+         input wire                         stream_v,
 
          // out
-         output logic [1023:0]          stream_d
+         output logic [1023:0]              stream_d
      );
 
 
@@ -74,6 +74,7 @@ module buffer_ctrl
                         .tmp_rand_bit(tmp_rand[i]),
                         .store(store[CORENUM-1:0]),
                         // コア数可変
+                        // この順番で渡す必要がある
                         .core_result(
                             {
                                 // core_result_32[i],

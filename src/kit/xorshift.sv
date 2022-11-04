@@ -4,11 +4,11 @@
 module xorshift
     (
         // in
-        input wire                  clk,
-        input wire                  gen,
+        input wire                      clk,
+        input wire                      gen,
 
         // out
-        output logic [31:0]         rand_num
+        output logic [31:0]             rand_num
     );
 
 

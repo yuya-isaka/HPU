@@ -12,16 +12,16 @@ module agu
      )
      (
          // in
-         input wire             clk,
-         input wire             rst,
-         input wire [W-1:0]     ini,
-         input wire [W-1:0]     fin,
-         input wire             start,
-         input wire             en,
+         input wire                 clk,
+         input wire                 rst,
+         input wire [W-1:0]         ini,
+         input wire [W-1:0]         fin,
+         input wire                 start,
+         input wire                 en,
 
          // out
-         output reg [W-1:0]     data,
-         output logic           last
+         output reg [W-1:0]         data,
+         output logic               last
      );
 
 

@@ -367,9 +367,9 @@ module top
 
     wire [CORENUM-1:0]              store;
 
-    wire [DIM:0]         core_result [0:CORENUM-1];
+    wire [DIM:0]                    core_result [0:CORENUM-1];
 
-    wire [CORENUM-1:0]               last;
+    wire [CORENUM-1:0]              last;
 
     generate
         genvar      i;
