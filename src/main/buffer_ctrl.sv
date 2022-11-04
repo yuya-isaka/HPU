@@ -46,6 +46,7 @@ module buffer_ctrl
          //  input wire [DIM:0]             core_result_30,
          //  input wire [DIM:0]             core_result_31,
          //  input wire [DIM:0]             core_result_32,
+         // 1コア
          input wire [CORENUM-1:0]           store,
          input wire                         stream_v,
 
@@ -72,6 +73,7 @@ module buffer_ctrl
                         .rst(rst),
                         .tmp_even(tmp_even),
                         .tmp_rand_bit(tmp_rand[i]),
+                        // 1コア
                         .store(store[CORENUM-1:0]),
                         // コア数可変
                         // この順番で渡す必要がある

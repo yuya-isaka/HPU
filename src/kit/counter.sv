@@ -14,7 +14,9 @@ module counter
          input wire                         rst,
          input wire                         tmp_even,
          input wire                         tmp_rand_bit,
+         // 1コア
          input wire [CORENUM-1:0]           store,
+         // 1コア
          input wire [CORENUM-1:0]           core_result,
 
          // out
@@ -98,6 +100,7 @@ module counter
                   end
 
                   else if (store_n) begin
+                      // 1コア
                       // コア数可変
                       box_1 <= select[0] + select[1];
                       //   box_1 <= select[0]
@@ -134,6 +137,7 @@ module counter
     //================================================================
 
 
+    // 1コア
     wire signed [1:0]      select [0:CORENUM-1];
 
     generate
@@ -143,10 +147,13 @@ module counter
                      (
                          // in
                          .clk(clk),
+                         // 1コア
                          .store_bit(store[k]),
+                         // 1コア
                          .core_result_bit(core_result[k]),
 
                          // out
+                         // 1コア
                          .sel_bit(select[k])
                      );
         end

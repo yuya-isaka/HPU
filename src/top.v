@@ -123,6 +123,7 @@ module top
                     .rst(~run),
                     .tmp_even(even),
                     .tmp_rand(tmp_rand[DIM:0]),
+                    // 1コア
                     // コア数可変
                     .core_result_1(core_result[0]),
                     .core_result_2(core_result[1]),
@@ -156,6 +157,7 @@ module top
                     // .core_result_30(core_result[29]),
                     // .core_result_31(core_result[30]),
                     // .core_result_32(core_result[31]),
+                    // 1コア
                     .store(store[CORENUM-1:0]),
                     .stream_v(stream_v),
 
@@ -173,6 +175,7 @@ module top
                     // in
                     .clk(AXIS_ACLK),
                     .rst(~run),
+                    // 1コア
                     .last(last[CORENUM-1:0]),
                     .get_v(get_v),
                     .dst_ready(M_AXIS_TREADY),
@@ -393,8 +396,11 @@ module top
                      .exec(exec),
 
                      // out
+                     // 1コア
                      .store(store[i]),
+                     // 1コア
                      .core_result(core_result[i]),
+                     // 1コア
                      .last(last[i])
                  );
         end
