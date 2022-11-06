@@ -351,9 +351,7 @@ Top.anno.json
 Top.fir
 rtl
 
-
 *.dump
-# *.bin
 
 vivado_prj
 vivado_prj_2
