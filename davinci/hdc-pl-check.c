@@ -89,7 +89,7 @@ uint16_t get_bit(int addr_flag, unsigned int inst_num, uint16_t addr)
 
 int main(int argc, char const *argv[])
 {
-	printf("\n");
+	printf("\n\n");
 	// ---------------------------------------------
 	uint16_t **src_tmp;
 	uint16_t **ascii_array;
