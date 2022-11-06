@@ -1,4 +1,4 @@
-// iclude
+
 #include "verilated.h"
 #include "verilated_vcd_c.h"
 #include "Vtop.h"
@@ -19,6 +19,9 @@ vluint64_t sim_end = sim_start + 3000000;
 VerilatedVcdC *tfp;
 Vtop *verilator_top;
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// データをまとめて格納するユニオン型
 union
 {
   struct
@@ -29,14 +32,11 @@ union
   uint32_t write_data;
 } conv;
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+// 1クロック進みながら２回評価　（立ち下がり、立ち上がり）
 void eval()
 {
-  // Neg edge
   verilator_top->S_AXI_ACLK = 0;
   verilator_top->AXIS_ACLK = 0;
-  // 立ち下がりの評価
   verilator_top->eval();
 
   if ((sim_start <= main_time) & ((main_time < sim_end) | (sim_end == 0)))
@@ -45,10 +45,8 @@ void eval()
   }
   main_time += 5;
 
-  // Pos edge
   verilator_top->S_AXI_ACLK = 1;
   verilator_top->AXIS_ACLK = 1;
-  // 立ち上がりの評価
   verilator_top->eval();
 
   if ((main_time >= sim_start) & ((main_time < sim_end) | (sim_end == 0)))
@@ -60,40 +58,47 @@ void eval()
   return;
 }
 
+// 渡された32ビットのvを、バイナリでコマンドライン出力
 void printb(unsigned int v)
 {
+  // sizeof(v) == 4バイト
   unsigned int mask = (int)1 << (sizeof(v) * 8 - 1);
-  // printf("%lu\n", sizeof(v));
   do
     putchar(mask & v ? '1' : '0');
   while (mask >>= 1);
 }
 
+// printbを使いつつ整形して、バイナリをコマンドライン出力
 void putb(unsigned int v)
 {
   printf("  0"), putchar('b'), printb(v), printf("\n");
 }
 
+// 簡易アセンブラ
 uint16_t instruction(int addr_flag, unsigned int inst_num, uint16_t addr)
 {
   if (addr_flag)
   {
     uint16_t result = 0;
+    // load
     if (inst_num == 1)
     {
       uint16_t inst = 3 << 14;
       result = inst | addr;
     }
+    // l.rshift
     else if (inst_num == 2)
     {
       uint16_t inst = 5 << 13;
       result = inst | addr;
     }
+    // l.lshift
     else if (inst_num == 4)
     {
       uint16_t inst = 9 << 12;
       result = inst | addr;
     }
+    // l.xor
     else if (inst_num == 6)
     {
       uint16_t inst = 17 << 11;
@@ -108,26 +113,32 @@ uint16_t instruction(int addr_flag, unsigned int inst_num, uint16_t addr)
   else
   {
     uint16_t inst = 0;
+    // rshift
     if (inst_num == 3)
     {
       inst = 1 << 14;
     }
+    // lshift
     else if (inst_num == 5)
     {
       inst = 1 << 13;
     }
+    // xor
     else if (inst_num == 7)
     {
       inst = 1 << 12;
     }
+    // store
     else if (inst_num == 8)
     {
       inst = 1 << 11;
     }
+    // lastore
     else if (inst_num == 9)
     {
       inst = 1 << 10;
     }
+    // move
     else if (inst_num == 10)
     {
       inst = 1 << 9;
@@ -142,23 +153,33 @@ uint16_t instruction(int addr_flag, unsigned int inst_num, uint16_t addr)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// N-gram専用check関数
+// 簡易アセンブラを使って、直接アセンブラを記述 (関数使ったやつに書き直す)
+//    NGRAM   = 1 ~
+//    CORENUM = 1 - 16
+//    ADDRNUM = NGRAMの倍数 (shifter_newを使ったテストをしているから。また、LASTが０のままになりtb.cppでは止まる。test.cppでは動くけどNGRAMの倍数以外は同じ値が出る)
+//    DIM     = 32 or 1024
+//    argc    ... Verilatorに必要
+//    **argv  ... Verilatorに必要
+//    DEBUG   = DMA中断するか否か
 void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM, int argc, char **argv, const int DEBUG)
 {
 
-  // 最低限 = NGRAMの倍数(3の倍数)であることは保証されている（今回のテストケースではそれしか対応していないから）
-  // NGRAMで３このアドレスを渡す必要があるので、ADDRNUMは３の倍数であることが保証されている
-  // もしNGRAMを４とかにするなら、テストケースでは4の倍数にする。（例えば0, 1, 2, 3 を使って、１つのハイパーベクトルを生成するようなテストケースを生成する感じ。test.cppgそんな感じにshifter_newで作ってしまっている）
-  // test.cppではaddrnumの3,4,5は同じ値になる。そういう設計にしている
-  // tb.cppは止まるけどそれはなんで？ → LASTが0のままで最後のlastoreが立たないから
-  // 16コアすべてを使わないケースがあるか調べる
+  // CORENUMの数すべてを使わないケースがあるか調べる
   const int REMAINDAR = (ADDRNUM / NGRAM) % CORENUM;
+
+  // ADDRNUM(計算する個数)が偶数か否かを設定(後で変えるかも)
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
+
+  // 最後の送信
   int LAST = (ADDRNUM / NGRAM) / CORENUM;
+  // CORENUMの倍数だったらきっちりコアを使い切るので、最後の数が１個減る
   if (REMAINDAR == 0)
   {
     LAST--;
   }
-  LAST *= NGRAM * CORENUM; // 3
+  // 最後の送信がいつかを求める
+  LAST *= NGRAM * CORENUM;
 
   ////////////////////////////////////////////////////////////////////////////// Verilator setup /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -209,7 +230,8 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
   verilator_top->S_AXI_WVALID = 0;
   eval();
 
-  // matw <- 1;
+  // gen <- 1;
+  // ランダムなハイパーベクトルを自動生成
   verilator_top->S_AXI_AWADDR = 0;
   verilator_top->S_AXI_WDATA = 1;
   verilator_top->S_AXI_AWVALID = 1;
@@ -228,9 +250,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
   }
   verilator_top->S_AXI_ARVALID = 0;
   eval();
-
-  // printf("\n  生成！\n");
-  // matwはここで０になっている
+  // ---- matwはここで０になっている ----
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -258,8 +278,6 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
   verilator_top->S_AXI_WVALID = 0;
   eval();
 
-  // ==================================================================
-
   // 送信
   verilator_top->S_AXIS_TVALID = 1;
 
@@ -272,7 +290,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
     if (REMAINDAR != 0 && j == LAST)
     {
 
-      // 1
+      // 1 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
@@ -317,7 +335,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 10
+      // 10 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
@@ -361,7 +379,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 2
+      // 2 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
@@ -406,7 +424,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 7
+      // 7 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
@@ -450,7 +468,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 10
+      // 10 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
@@ -494,7 +512,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 2
+      // 2 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
@@ -539,7 +557,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 3
+      // 3 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
@@ -583,7 +601,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 7
+      // 7 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
@@ -627,7 +645,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 9 (ここは必ずラストの命令)
+      // 9 (ここは必ずラストの命令) -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
@@ -660,7 +678,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
     } /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     else
     {
-      // 1
+      // 1 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
@@ -706,7 +724,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 10
+      // 10 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
@@ -751,7 +769,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 2
+      // 2 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
@@ -797,7 +815,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 7
+      // 7 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
@@ -842,7 +860,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 10
+      // 10 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
@@ -887,7 +905,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 2
+      // 2 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
@@ -933,7 +951,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 3
+      // 3 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
@@ -978,7 +996,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 7
+      // 7 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
@@ -1025,7 +1043,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 
       if (j == LAST)
       {
-        // 9
+        // 9 -------------------------------------------------------------------
         tmp = 0;
         for (int i = 0; i < CORENUM; i++)
         {
@@ -1056,7 +1074,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       }
       else
       {
-        // 8
+        // 8 -------------------------------------------------------------------
         tmp = 0;
         for (int i = 0; i < CORENUM; i++)
         {
@@ -1086,13 +1104,14 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         eval();
       }
 
+      // 更新
       j += NGRAM * CORENUM - 1;
     }
   }
 
   // ↑ここを書き換える==================================================================
 
-  // 最後の送信途中で止まる対策 -----------------------------
+  // 最後の送信途中で止まる対策 --------------
   verilator_top->S_AXIS_TVALID = 0;
   for (int i = 0; i < 32; i++)
   {
@@ -1101,7 +1120,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
   eval();
   eval();
   eval();
-  // ----------------------------------------------
+  // -------------------------------------
 
   // 演算結果を待つ
   while (!verilator_top->M_AXIS_TVALID)
@@ -1125,8 +1144,6 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       // putb(verilator_top->M_AXIS_TDATA[j]);
       printf("\n");
     }
-    // printf("  %u\n\n", verilator_top->M_AXIS_TDATA[0]);
-    // putb(verilator_top->M_AXIS_TDATA[0]);
     eval();
   }
   eval();
