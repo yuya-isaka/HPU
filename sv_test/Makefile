@@ -42,4 +42,4 @@ clean:
 format :
 	iStyle --style=kr -n $(DESIGN_SRC)
 
-.PHONY:
+.PHONY: clean format

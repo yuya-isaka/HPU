@@ -720,6 +720,8 @@ int main()
     sscanf(attr, "%lx", &src_phys);
     close(fd0);
   }
+  // printf("src_phys: %lx\n", src_phys);
+
   if ((fd0 = open("/sys/class/u-dma-buf/udmabuf1/phys_addr", O_RDONLY)) != -1)
   {
     char attr[1024];
@@ -731,6 +733,7 @@ int main()
     sscanf(attr, "%lx", &dst_phys);
     close(fd0);
   }
+  // printf("dst_phys: %lx\n", dst_phys);
 
   // DMAバッファにユーザ空間から書き込む設定 -----------------------------------------------------
 

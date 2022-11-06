@@ -134,15 +134,24 @@ int main(int argc, char const *argv[])
 	if ((fd0 = open("/sys/class/u-dma-buf/udmabuf0/phys_addr", O_RDONLY)) != -1)
 	{
 		char attr[1024];
-		read(fd0, attr, 1024);
+		ssize_t done = read(fd0, attr, 1024);
+		if (done < 0)
+		{
+			perror("  Failed: read /sys/class/u-dma-buf/udmabuf0/phys_addr");
+		}
 		sscanf(attr, "%lx", &src_phys);
 		close(fd0);
 	}
 	// printf("src_phys: %lx\n", src_phys);
+
 	if ((fd0 = open("/sys/class/u-dma-buf/udmabuf1/phys_addr", O_RDONLY)) != -1)
 	{
 		char attr[1024];
-		read(fd0, attr, 1024);
+		ssize_t done = read(fd0, attr, 1024);
+		if (done < 0)
+		{
+			perror("  Failed: read /sys/class/u-dma-buf/udmabuf1/phys_addr");
+		}
 		sscanf(attr, "%lx", &dst_phys);
 		close(fd0);
 	}
@@ -150,36 +159,36 @@ int main(int argc, char const *argv[])
 
 	if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
 	{
-		perror("Failed: open /dev/udmabuf0");
+		perror("  Failed: open /dev/udmabuf0");
 		return 0;
 	}
 	if ((fd1 = open("/dev/udmabuf1", O_RDWR)) < 0)
 	{
-		perror("Failed: open /dev/udmabuf1");
+		perror("  Failed: open /dev/udmabuf1");
 		return 0;
 	}
 	if ((dmaf = open("/dev/uio0", O_RDWR | O_SYNC)) < 0)
 	{
-		perror("Falied: open /dev/uio0");
+		perror("  Falied: open /dev/uio0");
 		return 0;
 	}
 	if ((topf = open("/dev/uio1", O_RDWR | O_SYNC)) < 0)
 	{
-		perror("Failed: open /dev/uio1");
+		perror("  Failed: open /dev/uio1");
 		return 0;
 	}
 
 	top = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, topf, 0);
 	if (top == MAP_FAILED)
 	{
-		perror("mmap top");
+		perror("  mmap top");
 		close(topf);
 		return 0;
 	}
 	dma = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, dmaf, 0);
 	if (dma == MAP_FAILED)
 	{
-		perror("mmap dma");
+		perror("  mmap dma");
 		close(dmaf);
 		return 0;
 	}
@@ -187,7 +196,7 @@ int main(int argc, char const *argv[])
 	src = (uint16_t *)mmap(NULL, 0x1DCD6500, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
 	if (src == MAP_FAILED)
 	{
-		perror("mmap src");
+		perror("  mmap src");
 		close(fd0);
 		return 0;
 	}
@@ -195,24 +204,25 @@ int main(int argc, char const *argv[])
 	dst = (int *)mmap(NULL, 0x3D0900, PROT_READ | PROT_WRITE, MAP_SHARED, fd1, 0);
 	if (dst == MAP_FAILED)
 	{
-		perror("mmap dst");
+		perror("  mmap dst");
 		close(fd1);
 		return 0;
 	}
 
-	//
-	// ランダムジェネレート生成
+	// ランダム生成
 	top[0x04 / 4] = 26;
 	top[0x00 / 4] = 1;
 	while (top[0x00 / 4] & 0x1)
 		;
 
 	// ---------------------------------------------
+	uint16_t **src_tmp;
+	uint16_t **ascii_array;
 	const int bus_width = 1024;
 	const int instruction_bit = 16;
 	const int train_num = 2;
-	const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
+	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const int ngram = 3;
 	const int core_num = 1;
 	const int instruction_num = 9;
@@ -220,26 +230,25 @@ int main(int argc, char const *argv[])
 	int even = 0;
 	// -------------------------------------------
 
+	// DMAリセット
 	for (int l = 0; l < train_num; l++)
 	{
+
 		dma[0x30 / 4] = 4;
 		dma[0x00 / 4] = 4;
 		while (dma[0x00 / 4] & 0x4)
 			;
-
-		uint16_t **src_tmp;
-		uint16_t **ascii_array;
 
 		const char *path = train_path[l];
 		FILE *file;
 		file = fopen(path, "r");
 		if (file == NULL)
 		{
-			perror("  Failed to open file");
+			perror("  Failed: open file");
 			exit(1);
 		}
 		int ch;
-		int num = 0;
+		size_t num = 0;
 		// while ((ch = fgetc(file)) != EOF) // ubuntu:EOF == -1,  petalinux:EOF == 255
 		while (((ch = fgetc(file)) != EOF) && ((ch = fgetc(file) != 255))) // ubuntu:EOF == -1,  petalinux:EOF == 255
 		{
@@ -247,12 +256,16 @@ int main(int argc, char const *argv[])
 		}
 		fseek(file, 0, SEEK_SET);
 		char *content = (char *)calloc(num, sizeof(char));
-		fread(content, sizeof(char), num, file);
+		size_t done = fread(content, sizeof(char), num, file);
+		if (done < num)
+		{
+			perror("  Failed: fread file");
+		}
 		fclose(file);
 		all_ngram = strlen(content) - ngram + 1;
 		even = all_ngram % 2 == 0;
-		printf("content: %s\n", content); // myname...
-		printf("all_ngram: %d\n", all_ngram);
+		// printf("content: %s\n", content); // myname...
+		// printf("all_ngram: %d\n", all_ngram);
 		// printf("even: %d\n", even);
 
 		int all_instruction = all_ngram / core_num;
@@ -282,7 +295,9 @@ int main(int argc, char const *argv[])
 
 		top[0x08 / 4] = even;
 		top[0x00 / 4] = 2;
-		// コード---------------------------------------------
+
+		// ---------------------------------------------------
+		// ↓ コード---------------------------------------------
 
 		int instruction = 0;
 		int core = 0;
@@ -368,7 +383,9 @@ int main(int argc, char const *argv[])
 			}
 		}
 
-		// ---------------------------------------------
+		// ↑ コード---------------------------------------------
+		// ---------------------------------------------------
+
 		freeArray(&ascii_array, ngram);
 		freeArray(&src_tmp, core_num);
 

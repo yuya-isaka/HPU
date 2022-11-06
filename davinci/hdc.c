@@ -150,20 +150,24 @@ void encoding(HDC *HDCascii, const char *path, uint8_t *values)
 	file = fopen(path, "r");
 	if (file == NULL)
 	{
-		perror("  Failed to open file");
+		perror("  Failed: open file");
 		exit(1);
 	}
 
 	// 何文字?
 	int ch;
-	int num = 0;
+	size_t num = 0;
 	while (((ch = fgetc(file)) != EOF) && ((ch = fgetc(file) != 255))) // ubuntu:EOF == -1,  petalinux:EOF == 255
 	{
 		num++;
 	}
 	fseek(file, 0, SEEK_SET);
 	char *content = (char *)calloc(num, sizeof(char));
-	fread(content, sizeof(char), num, file);
+	size_t done = fread(content, sizeof(char), num, file);
+	if (done < num)
+	{
+		perror("  Failed: fread file");
+	}
 	fclose(file);
 	// debug
 	// printf("%d\n", num);			  		// 27

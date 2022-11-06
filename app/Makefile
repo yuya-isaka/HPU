@@ -9,3 +9,5 @@ check:
 
 clean:
 	rm test_hdc test_hdc-no-reset
+
+.PHONY: default check clean

@@ -50,9 +50,9 @@ clean:
 format :
 	iStyle --style=kr -n $(DESIGN_SRC)
 
-test: test.cpp
+test:
 	g++ test.cpp -o test
 	./test
 	rm test
 
-.PHONY:
+.PHONY: clean format test
