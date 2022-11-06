@@ -160,26 +160,32 @@ unsigned int xor128(int reset)
   }
 }
 
-uint16_t instruction(int addr_flag, unsigned int inst_num, uint16_t addr)
+// 簡易アセンブラ
+// アドレスが必要か、命令コード、アドレス
+uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
 {
   if (addr_flag)
   {
     uint16_t result = 0;
+    // load
     if (inst_num == 1)
     {
       uint16_t inst = 3 << 14;
       result = inst | addr;
     }
+    // l.rshift
     else if (inst_num == 2)
     {
       uint16_t inst = 5 << 13;
       result = inst | addr;
     }
+    // l.lshift
     else if (inst_num == 4)
     {
       uint16_t inst = 9 << 12;
       result = inst | addr;
     }
+    // l.xor
     else if (inst_num == 6)
     {
       uint16_t inst = 17 << 11;
@@ -194,26 +200,32 @@ uint16_t instruction(int addr_flag, unsigned int inst_num, uint16_t addr)
   else
   {
     uint16_t inst = 0;
+    // rshift
     if (inst_num == 3)
     {
       inst = 1 << 14;
     }
+    // lshift
     else if (inst_num == 5)
     {
       inst = 1 << 13;
     }
+    // xor
     else if (inst_num == 7)
     {
       inst = 1 << 12;
     }
+    // store
     else if (inst_num == 8)
     {
       inst = 1 << 11;
     }
+    // lastore
     else if (inst_num == 9)
     {
       inst = 1 << 10;
     }
+    // move
     else if (inst_num == 10)
     {
       inst = 1 << 9;
@@ -291,7 +303,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
         if (i < REMAINDAR)
         {
           uint16_t addr = NGRAM * i + j;
-          uint16_t inst = instruction(1, 1, addr);
+          uint16_t inst = assemble(1, 1, addr);
           src[send_num] = inst;
         }
         else
@@ -307,7 +319,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
       {
         if (i < REMAINDAR)
         {
-          uint16_t inst = instruction(0, 10, 0);
+          uint16_t inst = assemble(0, 10, 0);
           src[send_num] = inst;
         }
         else
@@ -324,7 +336,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
         if (i < REMAINDAR)
         {
           uint16_t addr = NGRAM * i + 1 + j;
-          uint16_t inst = instruction(1, 2, addr);
+          uint16_t inst = assemble(1, 2, addr);
           src[send_num] = inst;
         }
         else
@@ -340,7 +352,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
       {
         if (i < REMAINDAR)
         {
-          uint16_t inst = instruction(0, 7, 0);
+          uint16_t inst = assemble(0, 7, 0);
           src[send_num] = inst;
         }
         else
@@ -356,7 +368,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
       {
         if (i < REMAINDAR)
         {
-          uint16_t inst = instruction(0, 10, 0);
+          uint16_t inst = assemble(0, 10, 0);
           src[send_num] = inst;
         }
         else
@@ -373,7 +385,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
         if (i < REMAINDAR)
         {
           uint16_t addr = NGRAM * i + 2 + j;
-          uint16_t inst = instruction(1, 2, addr);
+          uint16_t inst = assemble(1, 2, addr);
           src[send_num] = inst;
         }
         else
@@ -389,7 +401,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
       {
         if (i < REMAINDAR)
         {
-          uint16_t inst = instruction(0, 3, 0);
+          uint16_t inst = assemble(0, 3, 0);
           src[send_num] = inst;
         }
         else
@@ -405,7 +417,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
       {
         if (i < REMAINDAR)
         {
-          uint16_t inst = instruction(0, 7, 0);
+          uint16_t inst = assemble(0, 7, 0);
           src[send_num] = inst;
         }
         else
@@ -422,7 +434,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
         if (i < REMAINDAR)
         {
           // LASTは確定済みなので９を代入
-          uint16_t inst = instruction(0, 9, 0);
+          uint16_t inst = assemble(0, 9, 0);
           src[send_num] = inst;
         }
         else
@@ -444,7 +456,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
         if (i < CORENUM)
         {
           uint16_t addr = NGRAM * i + j;
-          uint16_t inst = instruction(1, 1, addr);
+          uint16_t inst = assemble(1, 1, addr);
           src[send_num] = inst;
         }
         else
@@ -460,7 +472,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
       {
         if (i < CORENUM)
         {
-          uint16_t inst = instruction(0, 10, 0);
+          uint16_t inst = assemble(0, 10, 0);
           src[send_num] = inst;
         }
         else
@@ -477,7 +489,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
         if (i < CORENUM)
         {
           uint16_t addr = NGRAM * i + 1 + j;
-          uint16_t inst = instruction(1, 2, addr);
+          uint16_t inst = assemble(1, 2, addr);
           src[send_num] = inst;
         }
         else
@@ -493,7 +505,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
       {
         if (i < CORENUM)
         {
-          uint16_t inst = instruction(0, 7, 0);
+          uint16_t inst = assemble(0, 7, 0);
           src[send_num] = inst;
         }
         else
@@ -509,7 +521,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
       {
         if (i < CORENUM)
         {
-          uint16_t inst = instruction(0, 10, 0);
+          uint16_t inst = assemble(0, 10, 0);
           src[send_num] = inst;
         }
         else
@@ -526,7 +538,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
         if (i < CORENUM)
         {
           uint16_t addr = NGRAM * i + 2 + j;
-          uint16_t inst = instruction(1, 2, addr);
+          uint16_t inst = assemble(1, 2, addr);
           src[send_num] = inst;
         }
         else
@@ -542,7 +554,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
       {
         if (i < CORENUM)
         {
-          uint16_t inst = instruction(0, 3, 0);
+          uint16_t inst = assemble(0, 3, 0);
           src[send_num] = inst;
         }
         else
@@ -558,7 +570,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
       {
         if (i < CORENUM)
         {
-          uint16_t inst = instruction(0, 7, 0);
+          uint16_t inst = assemble(0, 7, 0);
           src[send_num] = inst;
         }
         else
@@ -576,12 +588,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
         {
           if (j == LAST)
           {
-            uint16_t inst = instruction(0, 9, 0);
+            uint16_t inst = assemble(0, 9, 0);
             src[send_num] = inst;
           }
           else
           {
-            uint16_t inst = instruction(0, 8, 0);
+            uint16_t inst = assemble(0, 8, 0);
             src[send_num] = inst;
           }
         }

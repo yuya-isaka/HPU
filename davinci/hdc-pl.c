@@ -24,6 +24,7 @@ unsigned long dst_phys;
 
 // ------------------------------------------------------------------------------------------------
 
+// 2次元配列生成
 void makeArray(uint16_t ***a, const int y, const int x)
 {
 	*a = (uint16_t **)calloc(y, sizeof(uint16_t *));
@@ -33,6 +34,7 @@ void makeArray(uint16_t ***a, const int y, const int x)
 	}
 }
 
+// 2次元配列解放
 void freeArray(uint16_t ***a, const int y)
 {
 	for (int i = 0; i < y; i++)
@@ -42,7 +44,9 @@ void freeArray(uint16_t ***a, const int y)
 	free(*a);
 }
 
-uint16_t get_bit(int addr_flag, unsigned int inst_num, uint16_t addr)
+// 簡易アセンブラ
+// アドレスが必要か、命令コード、アドレス
+uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
 {
 	if (addr_flag)
 	{
@@ -117,6 +121,8 @@ uint16_t get_bit(int addr_flag, unsigned int inst_num, uint16_t addr)
 		return inst;
 	}
 }
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------
 
 int main(int argc, char const *argv[])
 {
@@ -284,57 +290,57 @@ int main(int argc, char const *argv[])
 		{
 			// 1
 			uint16_t addr = ascii_array[i][0];
-			uint16_t inst = get_bit(1, 1, addr);
+			uint16_t inst = assemble(1, 1, addr);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
 			// 10
-			inst = get_bit(0, 10, 0);
+			inst = assemble(0, 10, 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
 			// 2
 			addr = ascii_array[i][1];
-			inst = get_bit(1, 2, addr);
+			inst = assemble(1, 2, addr);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
 			// 7
-			inst = get_bit(0, 7, 0);
+			inst = assemble(0, 7, 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
 			// 10
-			inst = get_bit(0, 10, 0);
+			inst = assemble(0, 10, 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
 			// 2
 			addr = ascii_array[i][2];
-			inst = get_bit(1, 2, addr);
+			inst = assemble(1, 2, addr);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
 			// 3
-			inst = get_bit(0, 3, 0);
+			inst = assemble(0, 3, 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
 			// 7
-			inst = get_bit(0, 7, 0);
+			inst = assemble(0, 7, 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
 			// 8 or 9
 			if (i == (all_ngram - 1))
 			{
-				inst = get_bit(0, 9, 0);
+				inst = assemble(0, 9, 0);
 				src_tmp[core][instruction] = inst;
 				instruction++;
 			}
 			else
 			{
-				inst = get_bit(0, 8, 0);
+				inst = assemble(0, 8, 0);
 				src_tmp[core][instruction] = inst;
 				instruction++;
 			}

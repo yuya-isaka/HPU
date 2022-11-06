@@ -75,7 +75,7 @@ void putb(unsigned int v)
 }
 
 // 簡易アセンブラ
-uint16_t instruction(int addr_flag, unsigned int inst_num, uint16_t addr)
+uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
 {
   if (addr_flag)
   {
@@ -297,12 +297,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         uint16_t addr = NGRAM * i + j;
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(1, 1, addr);
+          conv.data_0 = assemble(1, 1, addr);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(1, 1, addr);
+          conv.data_1 = assemble(1, 1, addr);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -341,12 +341,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(0, 10, 0);
+          conv.data_0 = assemble(0, 10, 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(0, 10, 0);
+          conv.data_1 = assemble(0, 10, 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -386,12 +386,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         uint16_t addr = NGRAM * i + 1 + j;
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(1, 2, addr);
+          conv.data_0 = assemble(1, 2, addr);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(1, 2, addr);
+          conv.data_1 = assemble(1, 2, addr);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -430,12 +430,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(0, 7, 0);
+          conv.data_0 = assemble(0, 7, 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(0, 7, 0);
+          conv.data_1 = assemble(0, 7, 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -474,12 +474,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(0, 10, 0);
+          conv.data_0 = assemble(0, 10, 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(0, 10, 0);
+          conv.data_1 = assemble(0, 10, 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -519,12 +519,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         uint16_t addr = NGRAM * i + 2 + j;
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(1, 2, addr);
+          conv.data_0 = assemble(1, 2, addr);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(1, 2, addr);
+          conv.data_1 = assemble(1, 2, addr);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -563,12 +563,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(0, 3, 0);
+          conv.data_0 = assemble(0, 3, 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(0, 3, 0);
+          conv.data_1 = assemble(0, 3, 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -607,12 +607,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(0, 7, 0);
+          conv.data_0 = assemble(0, 7, 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(0, 7, 0);
+          conv.data_1 = assemble(0, 7, 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -651,12 +651,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(0, 9, 0);
+          conv.data_0 = assemble(0, 9, 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(0, 9, 0);
+          conv.data_1 = assemble(0, 9, 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -685,12 +685,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         uint16_t addr = NGRAM * i + j;
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(1, 1, addr);
+          conv.data_0 = assemble(1, 1, addr);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(1, 1, addr);
+          conv.data_1 = assemble(1, 1, addr);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -730,12 +730,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(0, 10, 0);
+          conv.data_0 = assemble(0, 10, 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(0, 10, 0);
+          conv.data_1 = assemble(0, 10, 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -776,12 +776,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         uint16_t addr = NGRAM * i + 1 + j;
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(1, 2, addr);
+          conv.data_0 = assemble(1, 2, addr);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(1, 2, addr);
+          conv.data_1 = assemble(1, 2, addr);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -821,12 +821,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(0, 7, 0);
+          conv.data_0 = assemble(0, 7, 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(0, 7, 0);
+          conv.data_1 = assemble(0, 7, 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -866,12 +866,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(0, 10, 0);
+          conv.data_0 = assemble(0, 10, 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(0, 10, 0);
+          conv.data_1 = assemble(0, 10, 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -912,12 +912,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         uint16_t addr = NGRAM * i + 2 + j;
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(1, 2, addr);
+          conv.data_0 = assemble(1, 2, addr);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(1, 2, addr);
+          conv.data_1 = assemble(1, 2, addr);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -957,12 +957,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(0, 3, 0);
+          conv.data_0 = assemble(0, 3, 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(0, 3, 0);
+          conv.data_1 = assemble(0, 3, 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -1002,12 +1002,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = instruction(0, 7, 0);
+          conv.data_0 = assemble(0, 7, 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = instruction(0, 7, 0);
+          conv.data_1 = assemble(0, 7, 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -1049,12 +1049,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         {
           if (i % 2 == 0)
           {
-            conv.data_0 = instruction(0, 9, 0);
+            conv.data_0 = assemble(0, 9, 0);
             conv.data_1 = 0;
           }
           else
           {
-            conv.data_1 = instruction(0, 9, 0);
+            conv.data_1 = assemble(0, 9, 0);
             verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
             tmp++;
           }
@@ -1080,12 +1080,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         {
           if (i % 2 == 0)
           {
-            conv.data_0 = instruction(0, 8, 0);
+            conv.data_0 = assemble(0, 8, 0);
             conv.data_1 = 0;
           }
           else
           {
-            conv.data_1 = instruction(0, 8, 0);
+            conv.data_1 = assemble(0, 8, 0);
             verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
             tmp++;
           }
