@@ -54,7 +54,7 @@ unsigned int xor128(int reset)
 const int NGRAM = 3;
 
 // 次元数
-const int LENGTH = 1024;
+#define LENGTH 1024
 const int DIM = LENGTH / 32;
 
 // 学習対象の個数（英語、フランス語）
@@ -221,7 +221,11 @@ void encoding(HDC *HDCascii, const char *path, uint8_t *values)
 	}
 	fseek(file, 0, SEEK_SET);
 	char *content = (char *)calloc(num, sizeof(char));
-	fread(content, sizeof(char), num, file);
+	size_t done = fread(content, sizeof(char), num, file);
+	if (done < num)
+	{
+		perror("  Failed: fread file");
+	}
 	fclose(file);
 	// debug
 	// printf("%d\n", num);			  		// 27

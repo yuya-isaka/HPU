@@ -1,12 +1,13 @@
 
 default:
-	gcc -Wall -o hdc hdc.c -lm
-	gcc -Wall -o hdc-xorshift hdc-xorshift.c -lm
-	gcc -Wall -o hdc-pl-2 hdc-pl-2.c -lm
+	gcc -o hdc hdc.c -lm
+	gcc -o hdc-pl-check hdc-pl-check.c -lm
+	gcc -o hdc-new hdc-new.c -lm
 
 check:
 	gcc -Wall -O2 -o hdc hdc.c -lm
-	gcc -Wall -O2 -o hdc-xorshift hdc-xorshift.c -lm
+	gcc -Wall -O2 -o hdc-pl-check hdc-pl-check.c -lm
+	gcc -Wall -O2 -o hdc-new hdc-new.c -lm
 
 
 linux:
@@ -21,6 +22,6 @@ linux-check:
 
 
 clean:
-	rm -f hdc hdc-pl hdc-pl-cpp
+	rm -f hdc hdc-pl hdc-pl-cpp hdc-pl-check hdc-new
 
 .PHONY: default check linux linux-check clean

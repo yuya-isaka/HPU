@@ -18,7 +18,7 @@ __attribute__((destructor)) static void destructor()
 const int NGRAM = 3;
 
 // 次元数
-const int LENGTH = 1024;
+#define LENGTH 1024
 
 // 学習対象の個数（英語、フランス語）
 int train_num = 2;

@@ -89,6 +89,7 @@ uint16_t get_bit(int addr_flag, unsigned int inst_num, uint16_t addr)
 
 int main(int argc, char const *argv[])
 {
+	printf("\n");
 	// ---------------------------------------------
 	uint16_t **src_tmp;
 	uint16_t **ascii_array;
@@ -96,7 +97,7 @@ int main(int argc, char const *argv[])
 	const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
 	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const int ngram = 3;
-	const int core_num = 16;
+	const int core_num = 8;
 	const int instruction_num = 9;
 	int all_ngram = 0;
 	int even = 0;
@@ -104,6 +105,7 @@ int main(int argc, char const *argv[])
 	for (int i = 0; i < train_num; i++)
 	{
 		const char *path = train_path[i];
+		printf("------------- %sの学習 -------------\n\n", path);
 		FILE *file;
 		file = fopen(path, "r");
 		if (file == NULL)
@@ -113,19 +115,24 @@ int main(int argc, char const *argv[])
 		}
 		int ch;
 		int num = 0;
+		// while (((ch = fgetc(file)) != EOF) && ((ch = fgetc(file) != 255))) // ubuntu:EOF == -1,  petalinux:EOF == 255
 		while ((ch = fgetc(file)) != EOF) // ubuntu:EOF == -1,  petalinux:EOF == 255
 		{
 			num++;
 		}
 		fseek(file, 0, SEEK_SET);
 		char *content = (char *)calloc(num, sizeof(char));
-		fread(content, sizeof(char), num, file);
+		size_t done = fread(content, sizeof(char), num, file);
+		if (done < num)
+		{
+			perror("  Failed: fread file");
+		}
 		fclose(file);
 		all_ngram = strlen(content) - ngram + 1;
 		even = all_ngram % 2 == 0;
-		// printf("content: %s\n", content); // myname...
-		// printf("all_ngram: %d\n", all_ngram);
-		// printf("even: %d\n", even);
+		printf("content: %s\n", content); // myname...
+		printf("all_ngram: %d\n", all_ngram);
+		printf("even: %d\n", even);
 
 		int all_instruction = all_ngram / core_num;
 		if (all_ngram % core_num != 0)
@@ -214,7 +221,7 @@ int main(int argc, char const *argv[])
 				instruction++;
 			}
 
-			if (core != 15)
+			if (core != (core_num - 1))
 			{
 				instruction -= instruction_num;
 			}
@@ -222,11 +229,25 @@ int main(int argc, char const *argv[])
 			core = (core + 1) % core_num;
 		}
 
+		printf("\n");
+		int flag = 0;
+		int mass = 1;
 		for (int j = 0; j < all_instruction; j++)
 		{
+			if (flag == 0)
+			{
+				printf("命令の塊%d\n", mass);
+				mass++;
+			}
 			for (int i = 0; i < core_num; i++)
 			{
 				printf("%7d ", src_tmp[i][j]);
+			}
+			flag++;
+			if (flag == instruction_num)
+			{
+				printf("\n");
+				flag = 0;
 			}
 			printf("\n");
 		}
@@ -234,7 +255,7 @@ int main(int argc, char const *argv[])
 		// ---------------------------------------------
 		freeArray(&ascii_array, ngram);
 		freeArray(&src_tmp, core_num);
-		printf("\n");
+		printf("\n\n");
 	}
 
 	return 0;
