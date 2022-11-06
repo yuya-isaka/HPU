@@ -1,19 +1,11 @@
-check:
+default:
 	arm-linux-gnueabihf-gcc test_hdc.c -o test_hdc
-	arm-linux-gnueabihf-gcc test_hdc-no-reset.c -o test_hdc-no-reset
-	arm-linux-gnueabihf-gcc test_hdc_pre.c -o test_hdc_pre
-	arm-linux-gnueabihf-gcc test_hdc_next.c -o test_hdc_next
 
-check-o:
-	arm-linux-gnueabihf-gcc -O2 test_hdc.c -o test_hdc
-	arm-linux-gnueabihf-gcc -O2 test_hdc-no-reset.c -o test_hdc-no-reset
-	arm-linux-gnueabihf-gcc -O2 test_hdc_pre.c -o test_hdc_pre
-	arm-linux-gnueabihf-gcc -O2 test_hdc_next.c -o test_hdc_next
-
-# sudo ./test_hdc
+check:
+	arm-linux-gnueabihf-gcc -Wall -O2 test_hdc.c -o test_hdc
 
 %: %.c
 	arm-linux-gnueabihf-gcc $@.c -o $@
 
 clean:
-	rm test_hdc test_hdc_pre test_hdc_next test_hdc-no-reset
+	rm test_hdc test_hdc-no-reset

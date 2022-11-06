@@ -266,18 +266,6 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
   while (dma[0x00 / 4] & 0x4)
     ;
 
-  //////////////////////////////////////////////////////////////////////////////////////// gen ///////////////////////////////////////////////////////////////////////////////////////////////
-
-  // item_memory_num (乱数の数)
-  top[0x04 / 4] = RANNUM - 1;
-
-  // gen <- 1;
-  top[0x00 / 4] = 1;
-
-  // 乱数生成終了を待つ
-  while (top[0x00 / 4] & 0x1)
-    ;
-
   //////////////////////////////////////////////////////////////////////////////////////// run ///////////////////////////////////////////////////////////////////////////////////////////////
 
   // even
@@ -712,14 +700,22 @@ int main()
   if ((fd0 = open("/sys/class/u-dma-buf/udmabuf0/phys_addr", O_RDONLY)) != -1)
   {
     char attr[1024];
-    read(fd0, attr, 1024);
+    ssize_t done = read(fd0, attr, 1024);
+    if (done < 0)
+    {
+      perror("Failed: read /sys/class/u-dma-buf/udmabuf0/phys_addr");
+    }
     sscanf(attr, "%lx", &src_phys);
     close(fd0);
   }
   if ((fd0 = open("/sys/class/u-dma-buf/udmabuf1/phys_addr", O_RDONLY)) != -1)
   {
     char attr[1024];
-    read(fd0, attr, 1024);
+    ssize_t done = read(fd0, attr, 1024);
+    if (done < 0)
+    {
+      perror("Failed: read /sys/class/u-dma-buf/udmabuf1/phys_addr");
+    }
     sscanf(attr, "%lx", &dst_phys);
     close(fd0);
   }
@@ -790,6 +786,18 @@ int main()
     close(fd1);
     return 0;
   }
+
+  //////////////////////////////////////////////////////////////////////////////////////// gen ///////////////////////////////////////////////////////////////////////////////////////////////
+
+  // item_memory_num (乱数の数)
+  top[0x04 / 4] = RANNUM - 1;
+
+  // gen <- 1;
+  top[0x00 / 4] = 1;
+
+  // 乱数生成終了を待つ
+  while (top[0x00 / 4] & 0x1)
+    ;
 
   ///////////////////////////////////////////////////////////////////////////////// initial, udmabuf, uio 設定 ///////////////////////////////////////////////////////////////////////////////////
 
