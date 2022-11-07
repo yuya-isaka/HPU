@@ -154,8 +154,8 @@ int main(int argc, char const *argv[])
 	printf("\n\n");
 	// ---------------------------------------------
 	const int train_num = 2;
-	const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
+	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const int ngram = 3;
 	const int DIM = 1024 / 32;
 
