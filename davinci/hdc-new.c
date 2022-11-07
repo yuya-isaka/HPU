@@ -99,17 +99,41 @@ unsigned int shifter(unsigned int *v, unsigned int num)
 	return tmp_v;
 }
 
-void shifter_new(unsigned int **new, unsigned int **original, const unsigned int LENGTH, unsigned int num)
+// 多数決関数　&& 加算
+unsigned int grab_bit(unsigned int result_array[], size_t size)
 {
-	unsigned int *result_tmp = (unsigned int *)calloc(LENGTH, sizeof(unsigned int));
-	for (int i = 0; i < LENGTH; i++)
+	unsigned int result = 0;
+
+	// 次元数可変
+	unsigned int mask = (int)1 << (32 - 1);
+	while (mask)
+	{
+		int tmp = 0;
+		for (int i = 0; i < size; i++)
+		{
+			tmp += (mask & result_array[i] ? 1 : 0);
+		}
+		// 多数決で1の数が過半数なら、resultにmaskを加える（→対象のbit番目が1になる）
+		if (tmp > (size / 2))
+		{
+			result += mask;
+		}
+		mask >>= 1;
+	}
+	return result;
+}
+
+void shifter_new(unsigned int **new, unsigned int **original, const unsigned int DIM, unsigned int num)
+{
+	unsigned int *result_tmp = (unsigned int *)calloc(DIM, sizeof(unsigned int));
+	for (int i = 0; i < DIM; i++)
 	{
 		unsigned int tmp = (*original)[i];
 		unsigned int tmp_v = shifter(&tmp, num);
 		result_tmp[i] |= tmp_v;
 		if (i == 0)
 		{
-			result_tmp[LENGTH - 1] |= tmp;
+			result_tmp[DIM - 1] |= tmp;
 		}
 		else
 		{
@@ -117,7 +141,7 @@ void shifter_new(unsigned int **new, unsigned int **original, const unsigned int
 		}
 	}
 
-	for (int i = 0; i < LENGTH; i++)
+	for (int i = 0; i < DIM; i++)
 	{
 		(*new)[i] = result_tmp[i];
 	}
@@ -130,10 +154,10 @@ int main(int argc, char const *argv[])
 	printf("\n\n");
 	// ---------------------------------------------
 	const int train_num = 2;
-	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
+	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const int ngram = 3;
-	const int LENGTH = 1024 / 32;
+	const int DIM = 1024 / 32;
 
 	int all_ngram = 0;
 	int even = 0;
@@ -186,11 +210,11 @@ int main(int argc, char const *argv[])
 		// コード ----------------------------------------
 
 		unsigned int **item_memory_array;
-		makeArrayInt(&item_memory_array, 27, LENGTH);
+		makeArrayInt(&item_memory_array, 27, DIM);
 
 		for (int i = 0; i < 27; i++)
 		{
-			for (int j = 0; j < LENGTH; j++)
+			for (int j = 0; j < DIM; j++)
 			{
 				unsigned int tmp = 0;
 				if (i == 0 && j == 0)
@@ -207,18 +231,27 @@ int main(int argc, char const *argv[])
 		}
 
 		unsigned int **item_memory_array_new;
-		makeArrayInt(&item_memory_array_new, all_ngram, LENGTH);
+		makeArrayInt(&item_memory_array_new, all_ngram, DIM);
 
+		// all_ngramの数だけ、shiftとxorのエンコーディングを計算
 		for (int i = 0; i < all_ngram; i++)
 		{
+			// -----------------------------------------------------
+			// シフトしたものをitem_memory_array_reuslt[ngram][DIM]に格納
 			unsigned int **item_memory_array_result;
-			makeArrayInt(&item_memory_array_result, ngram, LENGTH);
+			makeArrayInt(&item_memory_array_result, ngram, DIM);
 			for (int j = 0; j < ngram; j++)
 			{
-				shifter_new(&item_memory_array_result[j], &item_memory_array[ascii_array[i][j]], LENGTH, j);
+				// shift
+				shifter_new(&item_memory_array_result[j], &item_memory_array[ascii_array[i][j]], DIM, j);
 			}
-			unsigned int tmp[LENGTH] = {0};
-			for (int k = 0; k < LENGTH; k++)
+			// シフト後のデータを各LEGNTHでxorしtmpに格納
+			unsigned int tmp[DIM];
+			for (int j = 0; j < DIM; j++)
+			{
+				tmp[j] = 0;
+			}
+			for (int k = 0; k < DIM; k++)
 			{
 				for (int l = 0; l < ngram; l++)
 				{
@@ -227,24 +260,45 @@ int main(int argc, char const *argv[])
 				}
 			}
 			freeArrayInt(&item_memory_array_result, ngram);
-			for (int k = 0; k < LENGTH; k++)
+			// ------------------------------------------------------
+
+			// tmpに入ったエンコーディング結果でitem_memory_array_new[all_ngram][DIM]を更新
+			for (int k = 0; k < DIM; k++)
 			{
 				item_memory_array_new[i][k] = tmp[k];
 			}
 		}
 
+		// grab_bit使うために転置
+		// item_memory_array_new_t[DIM][all_ngram]
+		unsigned int **item_memory_array_new_t;
+		makeArrayInt(&item_memory_array_new_t, DIM, all_ngram);
+
+		for (int i = 0; i < all_ngram; i++)
+		{
+			for (int j = 0; j < DIM; j++)
+			{
+				item_memory_array_new_t[j][i] = item_memory_array_new[i][j];
+			}
+		}
+
+		unsigned int result[DIM];
+
+		for (int i = 0; i < DIM; i++)
+		{
+			result[i] = grab_bit(item_memory_array_new_t[i], all_ngram);
+		}
+
 		// デバッグ用
-		// for (int i = 0; i < all_ngram; i++)
-		// {
-		// 	for (int j = 0; j < LENGTH; j++)
-		// 	{
-		// 		printf("%u\n", item_memory_array_new[i][j]);
-		// 	}
-		// }
+		for (int j = 0; j < DIM; j++)
+		{
+			printf("%u\n", result[j]);
+		}
 
 		// ---------------------------------------------
 
 		freeArrayInt(&item_memory_array_new, all_ngram);
+		freeArrayInt(&item_memory_array_new_t, DIM);
 		freeArrayInt(&item_memory_array, 27);
 		freeArray(&ascii_array, all_ngram);
 	}
