@@ -186,6 +186,7 @@ int main(int argc, char const *argv[])
 		if (done < num)
 		{
 			perror("  Failed: fread file");
+			exit(1);
 		}
 		fclose(file);
 		all_ngram = strlen(content) - ngram + 1;

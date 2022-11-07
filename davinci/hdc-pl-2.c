@@ -212,10 +212,10 @@ int main(int argc, char const *argv[])
 	}
 
 	// ランダム生成
-	top[0x04 / 4] = 26;
-	top[0x00 / 4] = 1;
-	while (top[0x00 / 4] & 0x1)
-		;
+	// top[0x04 / 4] = 26;
+	// top[0x00 / 4] = 1;
+	// while (top[0x00 / 4] & 0x1)
+	// 	;
 
 	// ---------------------------------------------
 	uint16_t **src_tmp;

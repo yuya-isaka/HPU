@@ -138,6 +138,7 @@ int main(int argc, char const *argv[])
 		if (done < 0)
 		{
 			perror("  Failed: read /sys/class/u-dma-buf/udmabuf0/phys_addr");
+			exit(1);
 		}
 		sscanf(attr, "%lx", &src_phys);
 		close(fd0);
@@ -151,6 +152,7 @@ int main(int argc, char const *argv[])
 		if (done < 0)
 		{
 			perror("  Failed: read /sys/class/u-dma-buf/udmabuf1/phys_addr");
+			exit(1);
 		}
 		sscanf(attr, "%lx", &dst_phys);
 		close(fd0);
@@ -260,6 +262,7 @@ int main(int argc, char const *argv[])
 		if (done < num)
 		{
 			perror("Failed: fread file");
+			exit(1);
 		}
 		fclose(file);
 		all_ngram = strlen(content) - ngram + 1;
