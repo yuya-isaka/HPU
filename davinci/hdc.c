@@ -504,3 +504,37 @@ int main(int argc, char const *argv[])
 
 	return 0;
 }
+
+// 	for (int i = 0; i < 27; i++)
+// 	{
+// 		for (int j = 0; j < LENGTH; j += 32)
+// 		{
+// 			unsigned int tmp = 0;
+// 			if (i == 0 && j == 0)
+// 			{
+// 				tmp = 88675123;
+// 			}
+// 			else
+// 			{
+// 				tmp = xor128(0);
+// 			}
+// 			// putb(tmp);
+// 			unsigned int mask = (int)1 << (sizeof(tmp) * 8 - 1);
+// 			unsigned int l = j;
+// 			do
+// 			{
+// 				uint8_t value = (mask & tmp ? 1 : 0);
+// 				// printf("%u", value);
+// 				HDCascii.data[i].values[l] = value;
+// 				l++;
+// 			} while (mask >>= 1);
+// 			// printf("\n");
+// 			// printf("\n");
+// 		}
+// 		// printf("%d\n", i);
+// 		if (i == 0)
+// 		{
+// 			printb(&HDCascii.data[i]);
+// 		}
+// 		// printb(&HDCascii.data[i]);
+// 	}
