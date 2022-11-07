@@ -6,8 +6,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 次元数可変
-const int DIM = 32 / 32;
-// const int DIM = 1024 / 32;
+// const int DIM = 32 / 32;
+const int DIM = 1024 / 32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -179,32 +179,32 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
 
 	// 0 ~ RANNUM分のハイパーベクトルをランダム生成
 	// 次元数が1024の場合は、その次元は最初の0-32のランダム生成された整数を使う
-	item_memory_array[0][0] = 88675123;
-	for (int j = 0; j < RANNUM; j++)
-	{
-		for (int i = 0; i < DIM; i++)
-		{
-			if (i == 0 && j == 0)
-				continue;
-			item_memory_array[i][j] = xor128(0);
-		}
-	}
-
-	// simple_en, simple_fr ... aaa のテスト　（hdc.c と　 hdc_pl.cのどっちが正しいかわからなくなった時に使用したテスト、一応残す）
-	// 具体的には、aaaの文字をテストするようで、i==0の時にもう一度最初からランダム生成することで、RANNUMの数分のaを用意した。
+	// item_memory_array[0][0] = 88675123;
 	// for (int j = 0; j < RANNUM; j++)
 	// {
 	// 	for (int i = 0; i < DIM; i++)
 	// 	{
-	// 		if (i == 0)
-	// 		{
-	// 			item_memory_array[i][j] = 88675123;
+	// 		if (i == 0 && j == 0)
 	// 			continue;
-	// 		}
 	// 		item_memory_array[i][j] = xor128(0);
 	// 	}
-	// 	xor128(1);
 	// }
+
+	// simple_en, simple_fr ... aaa のテスト　（hdc.c と　 hdc_pl.cのどっちが正しいかわからなくなった時に使用したテスト、一応残す）
+	// 具体的には、aaaの文字をテストするようで、i==0の時にもう一度最初からランダム生成することで、RANNUMの数分のaを用意した。
+	for (int j = 0; j < RANNUM; j++)
+	{
+		for (int i = 0; i < DIM; i++)
+		{
+			if (i == 0)
+			{
+				item_memory_array[i][j] = 88675123;
+				continue;
+			}
+			item_memory_array[i][j] = xor128(0);
+		}
+		xor128(1);
+	}
 
 	// あらかじめPermutation
 	// item_memoryに格納されている順番に、行ごとにPermutationを実行する
@@ -270,20 +270,20 @@ int main(int argc, char **argv)
 	const int CORENUM = 1;
 	int ADDRNUM = 0;
 
-	for (int i = 3; i < RANNUM; i += 3)
-	{
-		ADDRNUM = i;
+	// for (int i = 3; i < RANNUM; i += 3)
+	// {
+	// 	ADDRNUM = i;
 
-		check(NGRAM, CORENUM, ADDRNUM);
-		xor128(1);
+	// 	check(NGRAM, CORENUM, ADDRNUM);
+	// 	xor128(1);
 
-		printf(" -------------------\n\n");
-	}
+	// 	printf(" -------------------\n\n");
+	// }
 
-	// ADDRNUM = 3;
-	// check(NGRAM, CORENUM, ADDRNUM);
-	// xor128(1);
-	// printf(" --------\n\n");
+	ADDRNUM = 3;
+	check(NGRAM, CORENUM, ADDRNUM);
+	xor128(1);
+	printf(" --------\n\n");
 	// ADDRNUM = 54;
 	// check(NGRAM, CORENUM, ADDRNUM);
 	// xor128(1);

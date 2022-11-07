@@ -110,7 +110,7 @@ int main(int argc, char const *argv[])
 		file = fopen(path, "r");
 		if (file == NULL)
 		{
-			perror("  Failed to open file");
+			perror("  Failed: open file");
 			exit(1);
 		}
 		int ch;
