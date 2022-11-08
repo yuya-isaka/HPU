@@ -226,7 +226,7 @@ int main(int argc, char const *argv[])
 	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
 	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const int ngram = 3;
-	const int core_num = 16;
+	const int core_num = 1;
 	const int instruction_num = 9;
 	int all_ngram = 0;
 	int even = 0;
@@ -251,8 +251,8 @@ int main(int argc, char const *argv[])
 		}
 		int ch;
 		size_t num = 0;
-		// while ((ch = fgetc(file)) != EOF) // ubuntu:EOF == -1,  petalinux:EOF == 255
-		while (((ch = fgetc(file)) != EOF) && ((ch = fgetc(file) != 255))) // ubuntu:EOF == -1,  petalinux:EOF == 255
+		// while (((ch = fgetc(file)) != EOF) && ((ch = fgetc(file) != 255))) // ubuntu:EOF == -1,  petalinux:EOF == 255
+		while ((ch = fgetc(file)) != EOF) // ubuntu:EOF == -1,  petalinux:EOF == 255
 		{
 			num++;
 		}
@@ -268,8 +268,8 @@ int main(int argc, char const *argv[])
 		all_ngram = strlen(content) - ngram + 1;
 		even = all_ngram % 2 == 0;
 		// printf("content: %s\n", content); // myname...
-		// printf("all_ngram: %d\n", all_ngram);
-		// printf("even: %d\n", even);
+		printf("all_ngram: %d\n", all_ngram);
+		printf("even: %d\n", even);
 
 		int all_instruction = all_ngram / core_num;
 		if (all_ngram % core_num != 0)
@@ -277,7 +277,7 @@ int main(int argc, char const *argv[])
 			all_instruction++;
 		}
 		all_instruction *= instruction_num;
-		// printf("all_instruction: %d\n", all_instruction);
+		printf("all_instruction: %d\n", all_instruction);
 
 		makeArray(&src_tmp, core_num, all_instruction);
 		makeArray(&ascii_array, all_ngram, ngram);
@@ -384,6 +384,8 @@ int main(int argc, char const *argv[])
 				src[send_num] = 0;
 				send_num++;
 			}
+			// 2億5000万が限界
+			// printf("%d\n", send_num);
 		}
 
 		// ↑ コード---------------------------------------------

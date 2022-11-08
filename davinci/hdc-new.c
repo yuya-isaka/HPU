@@ -180,6 +180,7 @@ int main(int argc, char const *argv[])
 		{
 			num++;
 		}
+		printf("EOF: %d\n", EOF);
 		fseek(file, 0, SEEK_SET);
 		char *content = (char *)calloc(num, sizeof(char));
 		size_t done = fread(content, sizeof(char), num, file);
