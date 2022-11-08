@@ -10,17 +10,17 @@ module counter
      )
      (
          // in
-         input wire			                clk,
-         input wire                         rst,
+         input wire			                    clk,
+         input wire                             rst,
          // 1コア
-         input wire [CORENUM-1:0]           store,
+         input wire [ CORENUM-1:0 ]             store,
          //  input wire                         store,
          // 1コア
-         input wire [CORENUM-1:0]           core_result,
+         input wire [ CORENUM-1:0 ]             core_result,
          //  input wire                         core_result,
 
          // out
-         output logic 		                sign_bit
+         output logic 		                    sign_bit
      );
 
 
@@ -54,21 +54,21 @@ module counter
 
     // 分散RAM (符号付き)
     // (* ram_style = "block" *)
-    reg signed [ W-1:0]      box;
+    reg signed [ W-1:0 ]      box;
 
     // コア数可変
-    // reg signed [W-1:0]      box_11;
-    // reg signed [W-1:0]      box_22;
+    // reg signed [W-1:0 ]      box_11;
+    // reg signed [W-1:0 ]      box_22;
 
     // コア数可変
-    reg signed [ W-1:0]      box_1;
-    // reg signed [W-1:0]      box_2;
-    // reg signed [W-1:0]      box_3;
-    // reg signed [W-1:0]      box_4;
-    // reg signed [W-1:0]      box_5;
-    // reg signed [W-1:0]      box_6;
-    // reg signed [W-1:0]      box_7;
-    // reg signed [W-1:0]      box_8;
+    reg signed [ W-1:0 ]      box_1;
+    // reg signed [W-1:0 ]      box_2;
+    // reg signed [W-1:0 ]      box_3;
+    // reg signed [W-1:0 ]      box_4;
+    // reg signed [W-1:0 ]      box_5;
+    // reg signed [W-1:0 ]      box_6;
+    // reg signed [W-1:0 ]      box_7;
+    // reg signed [W-1:0 ]      box_8;
 
     // run == 1 にする前に設定する必要性あり
     // $signed(1'b1)にするとバグる
@@ -91,24 +91,24 @@ module counter
                       // 1コア
                       //   box_1 <= select;
                       // 2コア
-                      box_1 <= select[0] + select[1];
-                      //   box_1 <= select[0]
-                      //         + select[1]
-                      //         + select[2]
-                      //         + select[3];
-                      //   box_2 <= select[4]
-                      //         + select[5]
-                      //         + select[6]
-                      //         + select[7];
-                      //   box_3 <= select[8]
-                      //         + select[9]
-                      //         + select[10]
-                      //         + select[11];
+                      box_1 <= select[ 0 ] + select[ 1 ];
+                      //   box_1 <= select[0 ]
+                      //         + select[1 ]
+                      //         + select[2 ]
+                      //         + select[3 ];
+                      //   box_2 <= select[4 ]
+                      //         + select[5 ]
+                      //         + select[6 ]
+                      //         + select[7 ];
+                      //   box_3 <= select[8 ]
+                      //         + select[9 ]
+                      //         + select[10 ]
+                      //         + select[11 ];
                       //   box_4 <=
-                      //         select[12]
-                      //         + select[13]
-                      //         + select[14]
-                      //         + select[15];
+                      //         select[12 ]
+                      //         + select[13 ]
+                      //         + select[14 ]
+                      //         + select[15 ];
                   end
 
                   else if ( store_nn ) begin
@@ -125,8 +125,8 @@ module counter
 
 
     // 1コア
-    wire signed [1:0]      select [0:CORENUM-1];
-    // wire signed [ 1:0]      select;
+    wire signed [ 1:0 ]      select [ 0:CORENUM-1 ];
+    // wire signed [ 1:0 ]      select;
 
     generate
         genvar      k;
@@ -136,15 +136,15 @@ module counter
                          // in
                          .clk( clk ),
                          // 1コア
-                         .store_bit(store[k]),
+                         .store_bit( store[ k ] ),
                          //  .store_bit( store ),
                          // 1コア
-                         .core_result_bit(core_result[k]),
+                         .core_result_bit( core_result[ k ] ),
                          //  .core_result_bit( core_result ),
 
                          // out
                          // 1コア
-                         .sel_bit(select[k])
+                         .sel_bit( select[ k ] )
                          //  .sel_bit( select)
                      );
         end

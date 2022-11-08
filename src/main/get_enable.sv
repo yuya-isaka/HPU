@@ -5,15 +5,15 @@
 module get_enable
     (
         // in
-        input wire              clk,
-        input wire              gen,
-        input wire              run,
-        input wire              get_valid,
+        input wire                  clk,
+        input wire                  gen,
+        input wire                  run,
+        input wire                  get_valid,
 
         // out
-        output wire             get_ready,
-        output logic            get_v,
-        output logic            exec
+        output wire                 get_ready,
+        output logic                get_v,
+        output logic                exec
     );
 
 

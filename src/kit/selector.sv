@@ -5,9 +5,9 @@
 module selector
     (
         // in
-        input wire                          clk,
-        input wire 				            store_bit,
-        input wire 						    core_result_bit,
+        input wire                              clk,
+        input wire 				                store_bit,
+        input wire 						        core_result_bit,
 
         // out
         // 1bitにするとbox+bit_1+bit_2で勝手に1bitとして符号拡張されて必ず-1される (教訓も込めて2bitで実装、暗黙の符号拡張に任せる)

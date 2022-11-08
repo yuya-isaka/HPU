@@ -7,23 +7,23 @@ module core
          parameter DIM = 1023
      )
      (
-         input wire                     clk,
-         input wire                     run,
-         input wire                     gen,
-         input wire                     update_item,
-         input wire [ 9:0]               item_a,
-         input wire [ DIM:0]             rand_num,
-         input wire                     get_v,
+         input wire                         clk,
+         input wire                         run,
+         input wire                         gen,
+         input wire                         update_item,
+         input wire [ 9:0 ]                 item_a,
+         input wire [ DIM:0 ]               rand_num,
+         input wire                         get_v,
          // アドレス幅可変
-         //  input wire [31:0]              get_d,
-         input wire [ 15:0]              get_d,
-         input wire                     exec,
-         input wire                     wb_en,
-         input wire [ DIM:0]             wb_data,
+         //   input wire [31:0]                  get_d,
+         input wire [ 15:0 ]                get_d,
+         input wire                         exec,
+         input wire                         wb_en,
+         input wire [ DIM:0 ]               wb_data,
 
-         output reg                     store,
-         output logic [ DIM:0]           core_result,
-         output reg                     last
+         output reg                         store,
+         output logic [ DIM:0 ]             core_result,
+         output reg                         last
      );
 
 
@@ -31,34 +31,34 @@ module core
 
 
     (* ram_style = "block" *)
-    reg [ DIM:0]      item_memory [ 0:1023 ];
+    reg [ DIM:0 ]      item_memory [ 0:1023 ];
 
 
     reg             wb_ok;
 
-    always_ff @(posedge clk) begin
-                  if (wb) begin
+    always_ff @( posedge clk) begin
+                  if ( wb ) begin
                       wb_ok <= 1;
                   end
-                  else if (wb_en) begin
+                  else if ( wb_en ) begin
                       wb_ok <= 0;
                   end
               end
 
               reg [ 9:0]       addr;
-    reg [ DIM:0]     reg_0;
+    reg [ DIM:0 ]     reg_0;
     // 16bit保持
-    reg [ 15:0]      inst;
+    reg [ 15:0 ]      inst;
 
     always_ff @( posedge clk ) begin
                   if ( gen & update_item ) begin
-                      item_memory[ item_a] <= rand_num;
+                      item_memory[ item_a ] <= rand_num;
                       addr <= 0;
                       reg_0 <= 0;
                       inst <= 0;
                   end
                   else if ( wb_ok & wb_en) begin
-                      item_memory[ wb_addr] <= wb_data;
+                      item_memory[ wb_addr ] <= wb_data;
                   end
                   else if ( get_v ) begin
                       // アドレスが必要か否か
@@ -111,11 +111,11 @@ module core
 
 
 
-    reg [ DIM:0] reg_1;
-    reg [ DIM:0] reg_2;
+    reg [ DIM:0 ] reg_1;
+    reg [ DIM:0 ] reg_2;
 
-    reg [ DIM:0] buff;
-    reg [ 9:0]   wb_addr;
+    reg [ DIM:0 ] buff;
+    reg [ 9:0 ]   wb_addr;
     reg            wb;
 
     // reg_1, reg_2は値を保持しておく必要がある（reg_0はその度にロードされるから保持しなくていい）

@@ -12,7 +12,7 @@ module stream_ctrl
          input wire                         rst,
          input wire                         get_v,
          // 1コア
-         input wire [CORENUM-1:0]           last,
+         input wire [ CORENUM-1:0 ]         last,
          //  input wire                         last,
          input wire                         dst_ready,
 
@@ -131,7 +131,7 @@ module stream_ctrl
               end;
 
 
-    wire [ 1:0]      i;
+    wire [ 1:0 ]      i;
     wire            last_stream;
 
     // 各コアで違う結果を返したい時に使うかも？

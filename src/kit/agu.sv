@@ -12,16 +12,16 @@ module agu
      )
      (
          // in
-         input wire                 clk,
-         input wire                 rst,
-         input wire [ W-1:0]         ini,
-         input wire [ W-1:0]         fin,
-         input wire                 start,
-         input wire                 en,
+         input wire                     clk,
+         input wire                     rst,
+         input wire [ W-1:0 ]           ini,
+         input wire [ W-1:0 ]           fin,
+         input wire                     start,
+         input wire                     en,
 
          // out
-         output reg [ W-1:0]         data,
-         output logic               last
+         output reg [ W-1:0 ]           data,
+         output logic                   last
      );
 
 
@@ -74,7 +74,7 @@ module agu
     always_comb begin
                     last = 1'b0;
 
-                    if ( ( data==fin) & ( run|start) & en ) begin
+                    if ( ( data == fin ) & ( run | start ) & en ) begin
                         last = 1'b1;
                     end
                 end;
