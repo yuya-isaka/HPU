@@ -37,7 +37,7 @@ void putb(unsigned int v)
 // 2個の値を返す
 // 1. 右にnum回シフトしたやつを返す
 // 2. 第一引数にm右にシフトしたやつを取り出して、左に(32-num)回論理左シフトしたやつを格納し更新
-unsigned int shifter_2(unsigned int *v, unsigned int num)
+unsigned int shifter_32(unsigned int *v, unsigned int num)
 {
 	// num回 論理右シフト
 	unsigned int tmp_v = *v >> num;
@@ -50,7 +50,7 @@ unsigned int shifter_2(unsigned int *v, unsigned int num)
 }
 
 // N-gram用のシフト関数
-void shifter_new(const int NGRAM)
+void shifter_ngram(const int NGRAM)
 {
 	int num = 0;
 	for (int i = 0; i < RANNUM; i++)
@@ -61,7 +61,7 @@ void shifter_new(const int NGRAM)
 			unsigned int tmp = item_memory_array[j][i];
 			// はみ出たやつを論理左シフトしたやつ (tmp)
 			// 右論理シフトしたやつ (tmp_v)
-			unsigned int tmp_v = shifter_2(&tmp, num);
+			unsigned int tmp_v = shifter_32(&tmp, num);
 			// 右にシフトしたやつを0, 1, 2 ... と順番に格納
 			// つまり、右から昇順の配列があったら、右から左に向かって順番に更新していく
 			result_tmp[j] |= tmp_v;
@@ -179,38 +179,38 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
 
 	// 0 ~ RANNUM分のハイパーベクトルをランダム生成
 	// 次元数が1024の場合は、その次元は最初の0-32のランダム生成された整数を使う
-	// item_memory_array[0][0] = 88675123;
-	// for (int j = 0; j < RANNUM; j++)
-	// {
-	// 	for (int i = 0; i < DIM; i++)
-	// 	{
-	// 		if (i == 0 && j == 0)
-	// 			continue;
-	// 		item_memory_array[i][j] = xor128(0);
-	// 	}
-	// }
-
-	// simple_en, simple_fr ... aaa のテスト　（hdc.c と　 hdc_pl.cのどっちが正しいかわからなくなった時に使用したテスト、一応残す）
-	// 具体的には、aaaの文字をテストするようで、i==0の時にもう一度最初からランダム生成することで、RANNUMの数分のaを用意した。
+	item_memory_array[0][0] = 88675123;
 	for (int j = 0; j < RANNUM; j++)
 	{
 		for (int i = 0; i < DIM; i++)
 		{
-			if (i == 0)
-			{
-				item_memory_array[i][j] = 88675123;
+			if (i == 0 && j == 0)
 				continue;
-			}
 			item_memory_array[i][j] = xor128(0);
 		}
-		xor128(1);
 	}
+
+	// simple_en, simple_fr ... aaa のテスト　（hdc.c と　 hdc_pl.cのどっちが正しいかわからなくなった時に使用したテスト、一応残す）
+	// 具体的には、aaaの文字をテストするようで、i==0の時にもう一度最初からランダム生成することで、RANNUMの数分のaを用意した。
+	// for (int j = 0; j < RANNUM; j++)
+	// {
+	// 	for (int i = 0; i < DIM; i++)
+	// 	{
+	// 		if (i == 0)
+	// 		{
+	// 			item_memory_array[i][j] = 88675123;
+	// 			continue;
+	// 		}
+	// 		item_memory_array[i][j] = xor128(0);
+	// 	}
+	// 	xor128(1);
+	// }
 
 	// あらかじめPermutation
 	// item_memoryに格納されている順番に、行ごとにPermutationを実行する
 	// item_memoryは[32][1024]で格納されており、縦の32の右シフトの演算を実現してくれている
 	// ただ、Nーgramに特化しており、NGRAMで指定された数分を順番にシフトする形式にしてある。なので、どこを何ビットシフトするかちゃんと指定する形にするには別の関数が必要。
-	shifter_new(NGRAM);
+	shifter_ngram(NGRAM);
 
 	// 1024 / 32bit なら 32回実行
 	// 縦は同じハイパーベクトル. 横同士を計算させる

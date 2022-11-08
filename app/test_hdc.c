@@ -39,20 +39,7 @@ void putb(unsigned int v)
   putchar('0'), putchar('b'), printb(v), putchar('\n');
 }
 
-unsigned int shifter(unsigned int v, unsigned int num)
-{
-  // num回 論理右シフト
-  unsigned int tmp = v >> num;
-
-  // 右にシフトしたやつを取り出して、左に(32-num)回 論理左シフト
-  unsigned int tmp_num = (1 << num) - 1;
-  unsigned int tmp_v = (v & tmp_num) << ((sizeof(v) * 8) - num);
-
-  tmp_v = tmp_v | tmp;
-  return tmp_v;
-}
-
-unsigned int shifter_2(unsigned int *v, unsigned int num)
+unsigned int shifter_32(unsigned int *v, unsigned int num)
 {
   // num回 論理右シフト
   unsigned int tmp_v = *v >> num;
@@ -64,7 +51,7 @@ unsigned int shifter_2(unsigned int *v, unsigned int num)
   return tmp_v;
 }
 
-void shifter_new(const int NGRAM)
+void shifter_ngram(const int NGRAM)
 {
   int num = 0;
   for (int i = 0; i < RANNUM; i++)
@@ -78,7 +65,7 @@ void shifter_new(const int NGRAM)
     for (int j = 0; j < DIM; j++)
     {
       unsigned int tmp = item_memory_array[j][i];
-      unsigned int tmp_v = shifter_2(&tmp, num);
+      unsigned int tmp_v = shifter_32(&tmp, num);
       result_tmp[j] |= tmp_v;
       if (j == 0)
       {
@@ -640,7 +627,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
     }
   }
 
-  shifter_new(NGRAM);
+  shifter_ngram(NGRAM);
 
   for (int j = 0; j < DIM; j++)
   {

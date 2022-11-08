@@ -87,7 +87,7 @@ unsigned int xor128(int reset)
 	}
 }
 
-unsigned int shifter(unsigned int *v, unsigned int num)
+unsigned int shifter_32(unsigned int *v, unsigned int num)
 {
 	// num回 論理右シフト
 	unsigned int tmp_v = *v >> num;
@@ -123,13 +123,13 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 	return result;
 }
 
-void shifter_new(unsigned int **new, unsigned int **original, const unsigned int DIM, unsigned int num)
+void shifter_1024(unsigned int **new, unsigned int **original, const unsigned int DIM, unsigned int num)
 {
 	unsigned int *result_tmp = (unsigned int *)calloc(DIM, sizeof(unsigned int));
 	for (int i = 0; i < DIM; i++)
 	{
 		unsigned int tmp = (*original)[i];
-		unsigned int tmp_v = shifter(&tmp, num);
+		unsigned int tmp_v = shifter_32(&tmp, num);
 		result_tmp[i] |= tmp_v;
 		if (i == 0)
 		{
@@ -244,7 +244,7 @@ int main(int argc, char const *argv[])
 			for (int j = 0; j < ngram; j++)
 			{
 				// shift
-				shifter_new(&item_memory_array_result[j], &item_memory_array[ascii_array[i][j]], DIM, j);
+				shifter_1024(&item_memory_array_result[j], &item_memory_array[ascii_array[i][j]], DIM, j);
 			}
 			// シフト後のデータを各LEGNTHでxorしtmpに格納
 			unsigned int tmp[DIM];
