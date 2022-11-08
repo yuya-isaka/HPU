@@ -162,7 +162,7 @@ uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
 //    argc    ... Verilatorに必要
 //    **argv  ... Verilatorに必要
 //    DEBUG   = DMA中断するか否か
-void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM, int argc, char **argv, const int DEBUG)
+void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM, const int MAJORITY_ADDR, int argc, char **argv, const int DEBUG)
 {
 
   // CORENUMの数すべてを使わないケースがあるか調べる
@@ -250,21 +250,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
   }
   verilator_top->S_AXI_ARVALID = 0;
   eval();
-  // ---- matwはここで０になっている ----
-
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  // Parameter セットアップ
-
-  // even
-  verilator_top->S_AXI_AWADDR = 8;
-  verilator_top->S_AXI_WDATA = EVEN;
-  verilator_top->S_AXI_AWVALID = 1;
-  verilator_top->S_AXI_WVALID = 1;
-  eval();
-  verilator_top->S_AXI_AWVALID = 0;
-  verilator_top->S_AXI_WVALID = 0;
-  eval();
+  // ---- genはここで０になっている ----
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -281,9 +267,36 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
   // 送信
   verilator_top->S_AXIS_TVALID = 1;
 
+  int tmp = 0;
+
+  // EVEN ===========================================================================
+
+  // load
+  uint16_t addr = MAJORITY_ADDR;
+  conv.data_0 = assemble(1, 1, addr);
+  conv.data_1 = 0;
+  verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+  tmp++;
+  for (int i = tmp; i < 32; i++)
+  {
+    verilator_top->S_AXIS_TDATA[i] = 0;
+  }
+  eval();
+
+  // store
+  tmp = 0;
+  conv.data_0 = assemble(0, 8, 0);
+  conv.data_1 = 0;
+  verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+  tmp++;
+  for (int i = tmp; i < 32; i++)
+  {
+    verilator_top->S_AXIS_TDATA[i] = 0;
+  }
+  eval();
+
   // ↓ここを書き換える==================================================================
 
-  int tmp = 0;
   for (int j = 0; j < ADDRNUM; j++)
   {
 
@@ -1185,6 +1198,7 @@ int main(int argc, char **argv)
   // 次元数可変 (結果を何個出力するかに使う)
   // const int DIM = 1024 / 32;
   const int DIM = 32 / 32;
+  const int MAJORITY_ADDR = 1023;
 
   // const int SIMULATION_COUNT = 100;
   // for (int i = 3; i < SIMULATION_COUNT; i += 3)
@@ -1192,18 +1206,18 @@ int main(int argc, char **argv)
   //   ADDRNUM = i;
 
   //   DEBUG = 1;
-  //   check(NGRAM, CORENUM, ADDRNUM, DIM, argc, argv, DEBUG);
+  //   check(NGRAM, CORENUM, ADDRNUM, DIM,MAJORITY_ADDR, argc, argv, DEBUG);
 
   //   printf(" -------------------\n\n");
   // }
 
-  ADDRNUM = 9;
+  ADDRNUM = 12;
   DEBUG = 0;
-  check(NGRAM, CORENUM, ADDRNUM, DIM, argc, argv, DEBUG);
+  check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
   // ADDRNUM = 54;
   // DEBUG = 1;
-  // check(NGRAM, CORENUM, ADDRNUM, DIM, argc, argv, DEBUG);
+  // check(NGRAM, CORENUM, ADDRNUM, DIM,MAJORITY_ADDR, argc, argv, DEBUG);
 
   printf("\n ======================================= 終了 ========================================= \n\n");
 

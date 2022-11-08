@@ -92,7 +92,7 @@ void shifter_ngram(const int NGRAM)
 }
 
 // 多数決関数　&& 加算
-unsigned int grab_bit(unsigned int result_array[], size_t size)
+unsigned int addition(unsigned int result_array[], size_t size)
 {
 	unsigned int result = 0;
 
@@ -160,7 +160,7 @@ unsigned int xor128(int reset)
 //    NGRAM   = 1 ~
 //    CORENUM = 1 - 16
 //    ADDRNUM = NGRAMの倍数 (shifter_newを使ったテストをしているから。また、LASTが０のままになりtb.cppでは止まる。test.cppでは動くけどNGRAMの倍数以外は同じ値が出る)
-void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
+void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJORITY_ADDR)
 {
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -245,11 +245,11 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
 		if (EVEN)
 		{
 			// RANNUM-1を追加するランダム値に使う
-			result_array[num] = item_memory_array[j][RANNUM - 1];
+			result_array[num] = item_memory_array[j][MAJORITY_ADDR];
 			// printf("ランダム：%u\n", result_array[num]);
 			// putb(result_array[num]);
 		}
-		unsigned int result_real = grab_bit(result_array, ARNUM);
+		unsigned int result_real = addition(result_array, ARNUM);
 		printf("  %u\n", result_real);
 		// putb(result_real);
 
@@ -267,6 +267,7 @@ int main(int argc, char **argv)
 
 	const int NGRAM = 3;
 	const int CORENUM = 1;
+	const int MAJORITY_ADDR = 1023;
 	int ADDRNUM = 0;
 
 	// const int SIMULATION_COUNT = 100;
@@ -274,18 +275,18 @@ int main(int argc, char **argv)
 	// {
 	// 	ADDRNUM = i;
 
-	// 	check(NGRAM, CORENUM, ADDRNUM);
+	// 	check(NGRAM, CORENUM, ADDRNUM, MAJORITY_ADDR);
 	// 	xor128(1);
 
 	// 	printf(" -------------------\n\n");
 	// }
 
-	ADDRNUM = 9;
-	check(NGRAM, CORENUM, ADDRNUM);
+	ADDRNUM = 12;
+	check(NGRAM, CORENUM, ADDRNUM, MAJORITY_ADDR);
 	xor128(1);
 	// printf(" --------\n\n");
 	// ADDRNUM = 54;
-	// check(NGRAM, CORENUM, ADDRNUM);
+	// check(NGRAM, CORENUM, ADDRNUM, MAJORITY_ADDR);
 	// xor128(1);
 
 	printf("\n ------------------------------- 終了 ------------------------------- \n");

@@ -12,8 +12,6 @@ module counter
          // in
          input wire			                clk,
          input wire                         rst,
-         input wire                         tmp_even,
-         input wire                         tmp_rand_bit,
          // 1コア
          //  input wire [CORENUM-1:0]           store,
          input wire                         store,
@@ -76,20 +74,7 @@ module counter
     // $signed(1'b1)にするとバグる
     always_ff @(posedge clk) begin
                   if (rst) begin
-                      // 偶数なら一個たす
-                      if (tmp_even) begin
-                          if (tmp_rand_bit == 1'b0) begin
-                              // 1
-                              box <= $signed(1);
-                          end
-                          else begin
-                              // -1
-                              box <= $signed(1'b1);
-                          end
-                      end
-                      else begin
-                          box <= 0;
-                      end
+                      box <= 0;
                       // コア数可変
                       box_1 <= 0;
                       //   box_2 <= 0;

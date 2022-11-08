@@ -11,8 +11,6 @@ module buffer_ctrl
          // in
          input wire                         clk,
          input wire                         rst,
-         input wire                         tmp_even,
-         input wire [DIM:0]                 tmp_rand,
          // コア数可変
          input wire [DIM:0]                 core_result_1,
          //  input wire [DIM:0]                 core_result_2,
@@ -72,8 +70,6 @@ module buffer_ctrl
                         // in
                         .clk(clk),
                         .rst(rst),
-                        .tmp_even(tmp_even),
-                        .tmp_rand_bit(tmp_rand[i]),
                         // 1コア
                         .store(store),
                         // .store(store[CORENUM-1:0]),

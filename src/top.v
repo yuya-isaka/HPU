@@ -121,8 +121,6 @@ module top
                     // in
                     .clk(AXIS_ACLK),
                     .rst(~run),
-                    .tmp_even(even),
-                    .tmp_rand(tmp_rand[DIM:0]),
                     // 1コア
                     .core_result_1(core_result),
                     // コア数可変
@@ -357,18 +355,6 @@ module top
     end
 
 
-    reg [DIM:0]      tmp_rand;
-
-    always @(posedge AXIS_ACLK) begin
-        if (~AXIS_ARESETN) begin
-            tmp_rand <= 0;
-        end
-        else if (gen & (item_a == item_memory_num) & update_item) begin
-            tmp_rand <= rand_num;
-        end
-    end
-
-
     //================================================================
 
     // 1コア
@@ -396,7 +382,6 @@ module top
                      .gen(gen),
                      .update_item(update_item),
                      .item_a(item_a[9:0]),
-                     .item_memory_num(item_memory_num[9:0]),
                      .rand_num(rand_num[DIM:0]),
                      .get_v(get_v),
                      // アドレス数可変
@@ -534,9 +519,6 @@ module top
     // item_memory数 (現状1023最大値, 16bitアドレスで指定)
     reg [9:0]       item_memory_num;
 
-    // 処理する数が偶数か否か
-    reg             even;
-
 
     //================================================================
 
@@ -546,7 +528,6 @@ module top
         if (~S_AXI_ARESETN) begin
             {run, gen} <= 2'b00;
             item_memory_num <= 10'd0;
-            even <= 1'd0;
         end
         else if (register_w) begin
             case ({write_addr[9:2],2'b00})
@@ -554,8 +535,6 @@ module top
                     {run, gen} <= write_data[1:0];
                 10'd04:
                     item_memory_num[9:0] <= write_data[9:0]; // 最大1023
-                10'd08:
-                    even <= write_data[0];
                 default:
                     ;
             endcase
@@ -578,8 +557,6 @@ module top
                     S_AXI_RDATA[1:0] <= {run, gen};
                 10'd04:
                     S_AXI_RDATA[9:0] <= item_memory_num[9:0];
-                10'd08:
-                    S_AXI_RDATA <= even;
                 default:
                     ;
             endcase

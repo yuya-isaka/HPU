@@ -12,7 +12,6 @@ module core
          input wire                     gen,
          input wire                     update_item,
          input wire [9:0]               item_a,
-         input wire [9:0]               item_memory_num,
          input wire [DIM:0]             rand_num,
          input wire                     get_v,
          // アドレス幅可変
@@ -38,7 +37,7 @@ module core
     reg [15:0]      inst;
 
     always_ff @(posedge clk) begin
-                  if (gen & (item_a != item_memory_num) & update_item) begin
+                  if (gen & update_item) begin
                       item_memory[item_a] <= rand_num;
                       reg_0 <= 0;
                       inst <= 0;
@@ -73,45 +72,21 @@ module core
     // 7. reg2の値を吐き出す
     // exec
 
-    //  inst[31:15]の16ビットで指定
-    //      a. 2進数
-    //      b. 10進数
+    // 1. ロードデータをreg2に格納 (reg0 → reg2) load
 
-    // ロード
-    //  0. ロードデータをreg2に格納 (reg0 → reg2)
-    //      a. 0000000000000001
-    //      b. 1
+    // 2. ロードデータをPermしたものをreg2に格納 (reg0 → Perm → reg2) l.rshift
+    // 3. reg2をPermしたものをreg2に格納 (reg2 → Perm → reg2) rshift
 
-    // Permutation
-    //  1. ロードデータを1Permしたものをreg2に格納 (reg0 → Perm → reg2)
-    //      a. 0000000000000010
-    //      b. 2
-    //  2. reg2をPermしたものをreg2に格納 (reg2 → Perm → reg2)
-    //      a. 0000000000000100
-    //      b. 4
+    // 4. ロードデータをPermしたものをreg2に格納 (reg0 → Perm → reg2) l.lshift
+    // 5. reg2をPermしたものをreg2に格納 (reg2 → Perm → reg2) lshift
 
-    // Xor
-    //  3. ロードデータとreg2をXorしたものをreg2に格納（reg0 Xor reg2 → reg2）
-    //      a. 0000000000001000
-    //      b. 8
-    //  4. reg1とreg2をXorしたものをreg2に格納（reg1 Xor reg2 → reg2）
-    //      a. 0000000000010000
-    //      b. 16
+    // 6. ロードデータとreg2をXorしたものをreg2に格納（reg0 Xor reg2 → reg2）l.xor
+    // 7. reg1とreg2をXorしたものをreg2に格納（reg1 Xor reg2 → reg2) xor
 
-    // ストア
-    //  5. reg2の値を吐き出す
-    //      a. 0000000000100000
-    //      b. 32
+    // 8. reg2の値を吐き出す store
+    // 9. ラストストア lastore
 
-    // Copy
-    //  6. reg2 → reg1
-    //      a. 0000000001000000
-    //      b. 64
-
-    // ラストストア
-    //  7. reg2の値を最後に吐き出す
-    //      a. 0000000010000000
-    //      b. 128
+    // 10. reg2 → reg1 move
 
 
 
