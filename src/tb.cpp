@@ -1184,8 +1184,8 @@ int main(int argc, char **argv)
   int DEBUG = 0;
   int ADDRNUM = 0;
   // 次元数可変 (結果を何個出力するかに使う)
-  // const int DIM = 1024 / 32;
-  const int DIM = 32 / 32;
+  const int DIM = 1024 / 32;
+  // const int DIM = 32 / 32;
 
   for (int i = 3; i < RANNUM; i += 3)
   {
