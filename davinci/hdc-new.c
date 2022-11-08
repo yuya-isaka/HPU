@@ -154,10 +154,11 @@ int main(int argc, char const *argv[])
 	printf("\n\n");
 	// ---------------------------------------------
 	const int train_num = 2;
-	const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
+	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const int ngram = 3;
 	const int DIM = 1024 / 32;
+	const int rand_num = 27;
 	// 偶数のときにユーザが適当に追加する値のアドレス
 	const int majority_tmp = 26;
 
@@ -215,10 +216,11 @@ int main(int argc, char const *argv[])
 
 		// コード ----------------------------------------
 
+		// ランダムなハイパーベクトルを生成
 		unsigned int **item_memory_array;
-		makeArrayInt(&item_memory_array, 27, DIM);
+		makeArrayInt(&item_memory_array, rand_num, DIM);
 
-		for (int i = 0; i < 27; i++)
+		for (int i = 0; i < rand_num; i++)
 		{
 			for (int j = 0; j < DIM; j++)
 			{
@@ -318,7 +320,7 @@ int main(int argc, char const *argv[])
 
 		freeArrayInt(&item_memory_array_new, all_ngram);
 		freeArrayInt(&item_memory_array_new_t, DIM);
-		freeArrayInt(&item_memory_array, 27);
+		freeArrayInt(&item_memory_array, rand_num);
 		freeArray(&ascii_array, all_ngram);
 	}
 	printf("\n");
