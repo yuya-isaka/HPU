@@ -161,9 +161,9 @@ module core
                               // wb
                               wb <= 1;
                               wb_addr <= addr;
+                              buff <= 0;
+                              store <= 0;
                               // last
-                              buff <= reg_2;
-                              store <= 1;
                               last <= 1;
                           end
                       end

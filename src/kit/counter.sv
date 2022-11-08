@@ -13,11 +13,11 @@ module counter
          input wire			                clk,
          input wire                         rst,
          // 1コア
-         //  input wire [CORENUM-1:0]           store,
-         input wire                         store,
+         input wire [CORENUM-1:0]           store,
+         //  input wire                         store,
          // 1コア
-         //  input wire [CORENUM-1:0]           core_result,
-         input wire                         core_result,
+         input wire [CORENUM-1:0]           core_result,
+         //  input wire                         core_result,
 
          // out
          output logic 		                sign_bit
@@ -89,9 +89,9 @@ module counter
                   else if ( store_n ) begin
                       // コア数可変
                       // 1コア
-                      box_1 <= select;
+                      //   box_1 <= select;
                       // 2コア
-                      //   box_1 <= select[0] + select[1];
+                      box_1 <= select[0] + select[1];
                       //   box_1 <= select[0]
                       //         + select[1]
                       //         + select[2]
@@ -125,8 +125,8 @@ module counter
 
 
     // 1コア
-    // wire signed [1:0]      select [0:CORENUM-1];
-    wire signed [ 1:0]      select;
+    wire signed [1:0]      select [0:CORENUM-1];
+    // wire signed [ 1:0]      select;
 
     generate
         genvar      k;
@@ -136,16 +136,16 @@ module counter
                          // in
                          .clk( clk ),
                          // 1コア
-                         //  .store_bit(store[k]),
-                         .store_bit( store ),
+                         .store_bit(store[k]),
+                         //  .store_bit( store ),
                          // 1コア
-                         //  .core_result_bit(core_result[k]),
-                         .core_result_bit( core_result ),
+                         .core_result_bit(core_result[k]),
+                         //  .core_result_bit( core_result ),
 
                          // out
                          // 1コア
-                         //  .sel_bit(select[k])
-                         .sel_bit( select)
+                         .sel_bit(select[k])
+                         //  .sel_bit( select)
                      );
         end
     endgenerate

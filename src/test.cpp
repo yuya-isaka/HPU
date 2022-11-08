@@ -6,8 +6,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 次元数可変
-// const int DIM = 32 / 32;
-const int DIM = 1024 / 32;
+const int DIM = 32 / 32;
+// const int DIM = 1024 / 32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -158,9 +158,8 @@ unsigned int xor128(int reset)
 // N-gram専用check関数
 // 簡易アセンブラを使って、直接アセンブラを記述 (関数使ったやつに書き直す)
 //    NGRAM   = 1 ~
-//    CORENUM = 1 - 16
 //    ADDRNUM = NGRAMの倍数 (shifter_newを使ったテストをしているから。また、LASTが０のままになりtb.cppでは止まる。test.cppでは動くけどNGRAMの倍数以外は同じ値が出る)
-void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJORITY_ADDR)
+void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR)
 {
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -266,7 +265,6 @@ int main(int argc, char **argv)
 	printf("\n ------------------------------- 開始 ------------------------------- \n\n\n");
 
 	const int NGRAM = 3;
-	const int CORENUM = 1;
 	const int MAJORITY_ADDR = 1023;
 	int ADDRNUM = 0;
 
@@ -275,18 +273,18 @@ int main(int argc, char **argv)
 	{
 		ADDRNUM = i;
 
-		check(NGRAM, CORENUM, ADDRNUM, MAJORITY_ADDR);
+		check(NGRAM, ADDRNUM, MAJORITY_ADDR);
 		xor128(1);
 
 		printf(" -------------------\n\n");
 	}
 
 	// ADDRNUM = 12;
-	// check(NGRAM, CORENUM, ADDRNUM, MAJORITY_ADDR);
+	// check(NGRAM, ADDRNUM, MAJORITY_ADDR);
 	// xor128(1);
 	// printf(" --------\n\n");
 	// ADDRNUM = 54;
-	// check(NGRAM, CORENUM, ADDRNUM, MAJORITY_ADDR);
+	// check(NGRAM, ADDRNUM, MAJORITY_ADDR);
 	// xor128(1);
 
 	printf("\n ------------------------------- 終了 ------------------------------- \n");
