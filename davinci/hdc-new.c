@@ -154,10 +154,12 @@ int main(int argc, char const *argv[])
 	printf("\n\n");
 	// ---------------------------------------------
 	const int train_num = 2;
-	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
+	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const int ngram = 3;
 	const int DIM = 1024 / 32;
+	// 偶数のときにユーザが適当に追加する値のアドレス
+	const int majority_tmp = 26;
 
 	int all_ngram = 0;
 	int even = 0;
@@ -175,12 +177,14 @@ int main(int argc, char const *argv[])
 		}
 		int ch;
 		int num = 0;
-		// while (((ch = fgetc(file)) != EOF) && ((ch = fgetc(file) != 255))) // ubuntu:EOF == -1,  petalinux:EOF == 255
+		// 与えられたファイルがひと続きの文字列と仮定 (2行になると｛10, 0x0a, LF(改行)｝ が入ってしまいズレる)
 		while ((ch = fgetc(file)) != EOF) // ubuntu:EOF == -1,  petalinux:EOF == 255
 		{
+			// printf("%d\n", ch);
 			num++;
 		}
-		printf("EOF: %d\n", EOF);
+		// printf("%d\n", num);
+		printf("EOF: %d\n", EOF); // EOFは全て-1 (Mac, Linux, Petalinux)
 		fseek(file, 0, SEEK_SET);
 		char *content = (char *)calloc(num, sizeof(char));
 		size_t done = fread(content, sizeof(char), num, file);
@@ -271,6 +275,11 @@ int main(int argc, char const *argv[])
 			}
 		}
 
+		if (even)
+		{
+			all_ngram++;
+		}
+
 		// grab_bit使うために転置
 		// item_memory_array_new_t[DIM][all_ngram]
 		unsigned int **item_memory_array_new_t;
@@ -280,7 +289,15 @@ int main(int argc, char const *argv[])
 		{
 			for (int j = 0; j < DIM; j++)
 			{
-				item_memory_array_new_t[j][i] = item_memory_array_new[i][j];
+				if (even && (i == (all_ngram - 1)))
+				{
+					// 適当な値を追加
+					item_memory_array_new_t[j][i] = item_memory_array[majority_tmp][j];
+				}
+				else
+				{
+					item_memory_array_new_t[j][i] = item_memory_array_new[i][j];
+				}
 			}
 		}
 

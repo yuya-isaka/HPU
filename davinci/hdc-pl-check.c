@@ -115,8 +115,7 @@ int main(int argc, char const *argv[])
 		}
 		int ch;
 		int num = 0;
-		// while (((ch = fgetc(file)) != EOF) && ((ch = fgetc(file) != 255))) // ubuntu:EOF == -1,  petalinux:EOF == 255
-		while ((ch = fgetc(file)) != EOF) // ubuntu:EOF == -1,  petalinux:EOF == 255
+		while ((ch = fgetc(file)) != EOF) // EOF == -1
 		{
 			num++;
 		}

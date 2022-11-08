@@ -251,11 +251,12 @@ int main(int argc, char const *argv[])
 		}
 		int ch;
 		size_t num = 0;
-		// while (((ch = fgetc(file)) != EOF) && ((ch = fgetc(file) != 255))) // ubuntu:EOF == -1,  petalinux:EOF == 255
-		while ((ch = fgetc(file)) != EOF) // ubuntu:EOF == -1,  petalinux:EOF == 255
+		// 1行を前提
+		while ((ch = fgetc(file)) != EOF)
 		{
 			num++;
 		}
+		printf("EOF: %d\n", EOF); // EOFは全て-1
 		fseek(file, 0, SEEK_SET);
 		char *content = (char *)calloc(num, sizeof(char));
 		size_t done = fread(content, sizeof(char), num, file);
