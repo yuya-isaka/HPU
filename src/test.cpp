@@ -252,7 +252,6 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
 		unsigned int result_real = grab_bit(result_array, ARNUM);
 		printf("  %u\n", result_real);
 		// putb(result_real);
-		printf("\n");
 
 		free(result_array);
 	}
@@ -270,20 +269,21 @@ int main(int argc, char **argv)
 	const int CORENUM = 1;
 	int ADDRNUM = 0;
 
-	// for (int i = 3; i < RANNUM; i += 3)
-	// {
-	// 	ADDRNUM = i;
+	const int SIMULATION_COUNT = 100;
+	for (int i = 3; i < SIMULATION_COUNT; i += 3)
+	{
+		ADDRNUM = i;
 
-	// 	check(NGRAM, CORENUM, ADDRNUM);
-	// 	xor128(1);
+		check(NGRAM, CORENUM, ADDRNUM);
+		xor128(1);
 
-	// 	printf(" -------------------\n\n");
-	// }
+		printf(" -------------------\n\n");
+	}
 
-	ADDRNUM = 3;
-	check(NGRAM, CORENUM, ADDRNUM);
-	xor128(1);
-	printf(" --------\n\n");
+	// ADDRNUM = 3;
+	// check(NGRAM, CORENUM, ADDRNUM);
+	// xor128(1);
+	// printf(" --------\n\n");
 	// ADDRNUM = 54;
 	// check(NGRAM, CORENUM, ADDRNUM);
 	// xor128(1);

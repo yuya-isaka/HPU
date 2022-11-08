@@ -1142,7 +1142,6 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
     {
       printf("  %u\n", verilator_top->M_AXIS_TDATA[j]);
       // putb(verilator_top->M_AXIS_TDATA[j]);
-      printf("\n");
     }
     eval();
   }
@@ -1187,7 +1186,8 @@ int main(int argc, char **argv)
   const int DIM = 1024 / 32;
   // const int DIM = 32 / 32;
 
-  for (int i = 3; i < RANNUM; i += 3)
+  const int SIMULATION_COUNT = 100;
+  for (int i = 3; i < SIMULATION_COUNT; i += 3)
   {
     ADDRNUM = i;
 
