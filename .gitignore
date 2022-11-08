@@ -363,4 +363,10 @@ sim
 *.vcd
 boot
 
+# バイナリたち
 hdc
+test_hdc
+hdc-new
+hdc-pl
+hdc-pl-check
+hdc-pl-cpp
