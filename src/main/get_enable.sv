@@ -20,26 +20,29 @@ module get_enable
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    assign get_ready = 1'b1;
-
-
-    always_comb begin
-                    get_v = 1'b0;
-
-                    if (get_valid & get_ready & run & ~gen) begin
-                        get_v = 1'b1;
-                    end
-                end;
-
-
-    always_ff @(posedge clk) begin
-                  if (~run) begin
+    always_ff @( posedge clk ) begin
+                  if ( ~run ) begin
                       exec <= 1'b0;
                   end
                   else begin
                       exec <= get_v;
                   end
               end;
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    assign get_ready = 1'b1;
+
+
+    always_comb begin
+                    get_v = 1'b0;
+
+                    if ( get_valid & get_ready & run & ~gen ) begin
+                        get_v = 1'b1;
+                    end
+                end;
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

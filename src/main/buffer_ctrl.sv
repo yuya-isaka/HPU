@@ -12,7 +12,7 @@ module buffer_ctrl
          input wire                         clk,
          input wire                         rst,
          // コア数可変
-         input wire [DIM:0]                 core_result_1,
+         input wire [ DIM:0]                 core_result_1,
          //  input wire [DIM:0]                 core_result_2,
          //  input wire [DIM:0]                 core_result_3,
          //  input wire [DIM:0]                 core_result_4,
@@ -50,28 +50,28 @@ module buffer_ctrl
          input wire                         stream_v,
 
          // out
-         output logic [1023:0]              stream_d
+         output logic [ 1023:0]              stream_d
      );
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    wire [DIM:0]      sign_bit;
+    wire [ DIM:0]      sign_bit;
 
     generate
         genvar i;
-        for (i = 0; i < DIM+1; i = i + 1) begin
+        for ( i = 0; i < DIM+1; i = i + 1 ) begin
 
             // コア数可変
             // 計算数可変 (現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分)
-            counter #(.W(30), .CORENUM(1)) counter
+            counter #( .W( 30 ), .CORENUM( 1 ) ) counter
                     (
                         // in
-                        .clk(clk),
-                        .rst(rst),
+                        .clk( clk ),
+                        .rst( rst ),
                         // 1コア
-                        .store(store),
+                        .store( store ),
                         // .store(store[CORENUM-1:0]),
                         // コア数可変
                         // この順番で渡す必要がある
@@ -108,12 +108,12 @@ module buffer_ctrl
                                 // core_result_4[i],
                                 // core_result_3[i],
                                 // core_result_2[i],
-                                core_result_1[i]
+                                core_result_1[ i]
                             }
                         ),
 
                         // out
-                        .sign_bit(sign_bit[i])
+                        .sign_bit( sign_bit[ i ] )
                     );
 
         end
@@ -143,8 +143,8 @@ module buffer_ctrl
 
 
     // stream_d
-    always_ff @(posedge clk) begin
-                  if (stream_v) begin
+    always_ff @( posedge clk ) begin
+                  if ( stream_v ) begin
                       stream_d <= sign_bit;
                   end
               end;

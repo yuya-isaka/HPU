@@ -104,6 +104,12 @@ uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
       uint16_t inst = 17 << 11;
       result = inst | addr;
     }
+    // lastback
+    else if (inst_num == 11)
+    {
+      uint16_t inst = 33 << 10;
+      result = inst | addr;
+    }
     else
     {
       printf("error");
@@ -1065,12 +1071,14 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         {
           if (i % 2 == 0)
           {
-            conv.data_0 = assemble(0, 9, 0);
+            // conv.data_0 = assemble(0, 9, 0);
+            conv.data_0 = assemble(1, 11, 1000);
             conv.data_1 = 0;
           }
           else
           {
-            conv.data_1 = assemble(0, 9, 0);
+            // conv.data_1 = assemble(0, 9, 0);
+            conv.data_0 = assemble(1, 11, 1000);
             verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
             tmp++;
           }
@@ -1127,8 +1135,9 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 
   // ↑ここを書き換える==================================================================
 
-  // 最後の送信途中で止まる対策 --------------
   verilator_top->S_AXIS_TVALID = 0;
+
+  // 最後の送信途中で止まる対策 --------------
   for (int i = 0; i < 32; i++)
   {
     verilator_top->S_AXIS_TDATA[i] = 0;
@@ -1203,20 +1212,20 @@ int main(int argc, char **argv)
   // const int DIM = 1024 / 32;
   const int MAJORITY_ADDR = 1023;
 
-  const int SIMULATION_COUNT = 100;
-  for (int i = 3; i < SIMULATION_COUNT; i += 3)
-  {
-    ADDRNUM = i;
+  // const int SIMULATION_COUNT = 100;
+  // for (int i = 3; i < SIMULATION_COUNT; i += 3)
+  // {
+  //   ADDRNUM = i;
 
-    DEBUG = 1;
-    check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  //   DEBUG = 1;
+  //   check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
 
-    printf(" -------------------\n\n");
-  }
+  //   printf(" -------------------\n\n");
+  // }
 
-  // ADDRNUM = 12;
-  // DEBUG = 0;
-  // check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  ADDRNUM = 12;
+  DEBUG = 0;
+  check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
   // ADDRNUM = 54;
   // DEBUG = 1;

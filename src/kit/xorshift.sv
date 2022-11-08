@@ -8,20 +8,20 @@ module xorshift
         input wire                      gen,
 
         // out
-        output logic [31:0]             rand_num
+        output logic [ 31:0]             rand_num
     );
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    reg [31:0]      x;
-    reg [31:0]      y;
-    reg [31:0]      z;
-    reg [31:0]      w;
+    reg [ 31:0]      x;
+    reg [ 31:0]      y;
+    reg [ 31:0]      z;
+    reg [ 31:0]      w;
 
-    always_ff @(posedge clk) begin
-                  if (~gen) begin
+    always_ff @( posedge clk ) begin
+                  if ( ~gen ) begin
                       // パターン１
                       // x <= 2380889285;
                       // y <= 1631889387;
@@ -38,7 +38,7 @@ module xorshift
                       x <= y;
                       y <= z;
                       z <= w;
-                      w <= (w ^ (w >> 19)) ^ ((x ^ (x << 11)) ^ ((x ^ (x << 11)) >> 8));
+                      w <= ( w ^ ( w >> 19 ) ) ^ ( ( x ^ ( x << 11 ) ) ^ ( ( x ^ ( x << 11 ) ) >> 8 ) );
                   end
               end;
 

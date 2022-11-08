@@ -13,7 +13,7 @@ module stream_ctrl
          input wire                         get_v,
          // 1コア
          //  input wire [CORENUM-1:0]           last,
-         input wire                        last,
+         input wire                         last,
          input wire                         dst_ready,
 
          // out
@@ -36,13 +36,13 @@ module stream_ctrl
     //           end;
 
     reg         last_n, last_nn;
-    always_ff @(posedge clk) begin
-                  if (rst) begin
+    always_ff @( posedge clk ) begin
+                  if ( rst ) begin
                       last_n <= 1'b0;
                       last_nn <= 1'b0;
                   end
                   else begin
-                      if (last != 0) begin
+                      if ( last != 0 ) begin
                           last_n <= 1'b1;
                       end
                       else begin
@@ -54,11 +54,11 @@ module stream_ctrl
 
 
     reg         last_keep;
-    always_ff @(posedge clk) begin
-                  if (rst) begin
+    always_ff @( posedge clk ) begin
+                  if ( rst ) begin
                       last_keep <= 1'b0;
                   end
-                  else if (stream_ok) begin
+                  else if ( stream_ok ) begin
                       last_keep <= 1'b0;
                   end
                   // タイミング可変
@@ -67,18 +67,18 @@ module stream_ctrl
                   // 4コア
                   //   else if (last) begin
                   // 16コア
-                  else if (last_nn) begin
+                  else if ( last_nn ) begin
                       last_keep <= 1'b1;
                   end
               end;
 
 
     reg         stream_ok_keep;
-    always_ff @(posedge clk)begin
-                  if (rst) begin
+    always_ff @( posedge clk ) begin
+                  if ( rst ) begin
                       stream_ok_keep <= 1'b0;
                   end
-                  else if (dst_ready) begin
+                  else if ( dst_ready ) begin
                       stream_ok_keep <= stream_ok;
                   end
               end;
@@ -97,7 +97,7 @@ module stream_ctrl
                     // 4コア
                     // if ((last | last_keep) & dst_ready) begin
                     // 16コア
-                    if ((last_nn | last_keep) & dst_ready) begin
+                    if ( ( last_nn | last_keep) & dst_ready ) begin
                         stream_ok = 1'b1;
                     end
                 end;
@@ -107,47 +107,47 @@ module stream_ctrl
 
 
     // dst_valid
-    always_ff @(posedge clk)begin
-                  if (rst) begin
+    always_ff @( posedge clk ) begin
+                  if ( rst ) begin
                       dst_valid <= 1'b0;
                   end
-                  else if (dst_ready) begin
+                  else if ( dst_ready ) begin
                       dst_valid <= stream_active;
                   end
               end;
 
 
     reg         stream_active;
-    always_ff @(posedge clk)begin
-                  if (rst) begin
+    always_ff @( posedge clk ) begin
+                  if ( rst ) begin
                       stream_active <= 1'b0;
                   end
-                  else if (last_stream) begin
+                  else if ( last_stream ) begin
                       stream_active <= 1'b0;
                   end
-                  else if (dst_ready & stream_ok) begin
+                  else if ( dst_ready & stream_ok ) begin
                       stream_active <= 1'b1;
                   end
               end;
 
 
-    wire [1:0]      i;
+    wire [ 1:0]      i;
     wire            last_stream;
 
     // 各コアで違う結果を返したい時に使うかも？
-    agu #(.W(2)) agu_stream_i
+    agu #( .W( 2 ) ) agu_stream_i
         (
             // in
-            .ini(2'd0),
-            .fin(2'd0),
-            .start(start),
-            .clk(clk),
-            .rst(rst),
-            .en(dst_ready),
+            .ini( 2'd0 ),
+            .fin( 2'd0 ),
+            .start( start ),
+            .clk( clk ),
+            .rst( rst ),
+            .en( dst_ready ),
 
             // out
-            .data(i),
-            .last(last_stream)
+            .data( i ),
+            .last( last_stream)
         );
 
 
@@ -159,7 +159,7 @@ module stream_ctrl
     always_comb begin
                     start = 1'b0;
 
-                    if (dst_ready & stream_ok_keep) begin
+                    if ( dst_ready & stream_ok_keep ) begin
                         start = 1'b1;
                     end
                 end;
@@ -172,11 +172,11 @@ module stream_ctrl
 
 
     // dst_last
-    always_ff @(posedge clk)begin
-                  if (rst) begin
+    always_ff @( posedge clk ) begin
+                  if ( rst ) begin
                       dst_last <= 1'b0;
                   end
-                  else if (dst_ready) begin
+                  else if ( dst_ready ) begin
                       dst_last <= stream_active & last_stream;
                   end
               end;

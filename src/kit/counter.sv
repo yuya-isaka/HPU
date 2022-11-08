@@ -39,7 +39,7 @@ module counter
     // タイミング可変
     // 16コア
     reg         store_n, store_nn;
-    always_ff @(posedge clk) begin
+    always_ff @( posedge clk ) begin
                   store_n <= store;
                   store_nn <= store_n;
               end;
@@ -54,14 +54,14 @@ module counter
 
     // 分散RAM (符号付き)
     // (* ram_style = "block" *)
-    reg signed [W-1:0]      box;
+    reg signed [ W-1:0]      box;
 
     // コア数可変
     // reg signed [W-1:0]      box_11;
     // reg signed [W-1:0]      box_22;
 
     // コア数可変
-    reg signed [W-1:0]      box_1;
+    reg signed [ W-1:0]      box_1;
     // reg signed [W-1:0]      box_2;
     // reg signed [W-1:0]      box_3;
     // reg signed [W-1:0]      box_4;
@@ -72,8 +72,8 @@ module counter
 
     // run == 1 にする前に設定する必要性あり
     // $signed(1'b1)にするとバグる
-    always_ff @(posedge clk) begin
-                  if (rst) begin
+    always_ff @( posedge clk ) begin
+                  if ( rst ) begin
                       box <= 0;
                       // コア数可変
                       box_1 <= 0;
@@ -86,7 +86,7 @@ module counter
                       //   box_8 <= 0;
                   end
 
-                  else if (store_n) begin
+                  else if ( store_n ) begin
                       // コア数可変
                       // 1コア
                       box_1 <= select;
@@ -111,7 +111,7 @@ module counter
                       //         + select[15];
                   end
 
-                  else if (store_nn) begin
+                  else if ( store_nn ) begin
                       // コア数可変
                       // 16コア
                       //   box <= box + box_1 + box_2 + box_3 + box_4;
@@ -126,26 +126,26 @@ module counter
 
     // 1コア
     // wire signed [1:0]      select [0:CORENUM-1];
-    wire signed [1:0]      select;
+    wire signed [ 1:0]      select;
 
     generate
         genvar      k;
-        for (k = 0; k < CORENUM; k = k + 1) begin
+        for ( k = 0; k < CORENUM; k = k + 1 ) begin
             selector selector
                      (
                          // in
-                         .clk(clk),
+                         .clk( clk ),
                          // 1コア
                          //  .store_bit(store[k]),
-                         .store_bit(store),
+                         .store_bit( store ),
                          // 1コア
                          //  .core_result_bit(core_result[k]),
-                         .core_result_bit(core_result),
+                         .core_result_bit( core_result ),
 
                          // out
                          // 1コア
                          //  .sel_bit(select[k])
-                         .sel_bit(select)
+                         .sel_bit( select)
                      );
         end
     endgenerate
@@ -153,7 +153,7 @@ module counter
 
 
     // 符号ビット
-    assign sign_bit = box[W-1];
+    assign sign_bit = box[ W-1 ];
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

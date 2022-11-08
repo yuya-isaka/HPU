@@ -48,7 +48,7 @@ clean:
 	rm -rf sim/ tmp.vcd
 
 format :
-	iStyle --style=kr -n $(DESIGN_SRC)
+	iStyle --style=kr -n -s4 $(DESIGN_SRC)
 
 test:
 	g++ test.cpp -o test

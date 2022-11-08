@@ -18,26 +18,26 @@ module top
         input wire                  S_AXI_ACLK,
         input wire                  S_AXI_ARESETN,
 
-        input wire [31:0]           S_AXI_AWADDR,
+        input wire [ 31:0]           S_AXI_AWADDR,
         input wire                  S_AXI_AWVALID,
         output wire                 S_AXI_AWREADY,
 
-        input wire [31:0]           S_AXI_WDATA,
-        input wire [3:0]            S_AXI_WSTRB,
+        input wire [ 31:0]           S_AXI_WDATA,
+        input wire [ 3:0]            S_AXI_WSTRB,
         input wire                  S_AXI_WVALID,
         output wire                 S_AXI_WREADY,
 
         input wire                  S_AXI_BREADY,
-        output wire [1:0]           S_AXI_BRESP,
+        output wire [ 1:0]           S_AXI_BRESP,
         output wire                 S_AXI_BVALID,
 
-        input wire [31:0]           S_AXI_ARADDR,
+        input wire [ 31:0]           S_AXI_ARADDR,
         input wire                  S_AXI_ARVALID,
         output wire                 S_AXI_ARREADY,
 
         input wire                  S_AXI_RREADY,
-        output reg [31:0]           S_AXI_RDATA,
-        output wire [1:0]           S_AXI_RRESP,
+        output reg [ 31:0]           S_AXI_RDATA,
+        output wire [ 1:0]           S_AXI_RRESP,
         output wire                 S_AXI_RVALID,
         // -----------------------------------------------
 
@@ -47,15 +47,15 @@ module top
 
         // AXI Stream Master Interface -------------------
         input wire                  M_AXIS_TREADY,
-        output wire [1023:0]        M_AXIS_TDATA,
+        output wire [ 1023:0]        M_AXIS_TDATA,
         output wire                 M_AXIS_TVALID,
-        output wire [7:0]           M_AXIS_TSTRB,
+        output wire [ 7:0]           M_AXIS_TSTRB,
         output wire                 M_AXIS_TLAST,
         // -----------------------------------------------
 
         // AXI Stream Slave Interface --------------------
-        input wire [1023:0]         S_AXIS_TDATA,
-        input wire [7:0]            S_AXIS_TSTRB,
+        input wire [ 1023:0]         S_AXIS_TDATA,
+        input wire [ 7:0]            S_AXIS_TSTRB,
         input wire                  S_AXIS_TLAST,
         input wire                  S_AXIS_TVALID,
         output wire                 S_AXIS_TREADY
@@ -100,29 +100,28 @@ module top
     get_enable get_enable
                (
                    // in
-                   .clk(AXIS_ACLK),
-                   .gen(gen),
-                   .run(run),
-                   .get_valid(S_AXIS_TVALID),
+                   .clk( AXIS_ACLK ),
+                   .gen( gen ),
+                   .run( run ),
+                   .get_valid( S_AXIS_TVALID ),
 
                    // out
-                   .get_ready(S_AXIS_TREADY),
-                   .get_v(get_v),
-                   .exec(exec)
+                   .get_ready( S_AXIS_TREADY ),
+                   .get_v( get_v ),
+                   .exec( exec)
                );
-
 
 
     // コア数可変
     // 次元数可変
     // buffer_ctrl #(.DIM(1023), .CORENUM(1)) buffer_ctrl
-    buffer_ctrl #(.DIM(31), .CORENUM(1)) buffer_ctrl
+    buffer_ctrl #( .DIM( 31 ), .CORENUM( 1 ) ) buffer_ctrl
                 (
                     // in
-                    .clk(AXIS_ACLK),
-                    .rst(~run),
+                    .clk( AXIS_ACLK ),
+                    .rst( ~run ),
                     // 1コア
-                    .core_result_1(core_result),
+                    .core_result_1( core_result ),
                     // コア数可変
                     // .core_result_1(core_result[0]),
                     // .core_result_2(core_result[1]),
@@ -158,47 +157,47 @@ module top
                     // .core_result_32(core_result[31]),
                     // 1コア
                     // .store(store[CORENUM-1:0]),
-                    .store(store),
-                    .stream_v(stream_v),
+                    .store( store ),
+                    .stream_v( stream_v ),
 
                     // out
                     // バス幅可変
-                    .stream_d(M_AXIS_TDATA[1023:0])
+                    .stream_d( M_AXIS_TDATA[ 1023:0 ] )
                 );
 
 
 
     wire              stream_v;
 
-    stream_ctrl #(.CORENUM(2)) stream_ctrl
+    stream_ctrl #( .CORENUM( 2 ) ) stream_ctrl
                 (
                     // in
-                    .clk(AXIS_ACLK),
-                    .rst(~run),
+                    .clk( AXIS_ACLK ),
+                    .rst( ~run ),
                     // 1コア
                     // .last(last[CORENUM-1:0]),
-                    .last(last),
-                    .get_v(get_v),
-                    .dst_ready(M_AXIS_TREADY),
+                    .last( last ),
+                    .get_v( get_v ),
+                    .dst_ready( M_AXIS_TREADY ),
 
                     // out
-                    .dst_valid(M_AXIS_TVALID),
-                    .dst_last(M_AXIS_TLAST),
-                    .stream_v(stream_v)
+                    .dst_valid( M_AXIS_TVALID ),
+                    .dst_last( M_AXIS_TLAST ),
+                    .stream_v( stream_v)
                 );
 
 
     // =============================== ランダム関連 ===================================
 
 
-    reg [4:0]       item_a_tmp;
+    reg [ 4:0]       item_a_tmp;
 
-    always @(posedge AXIS_ACLK) begin
-        if (~gen) begin
+    always @( posedge AXIS_ACLK ) begin
+        if ( ~gen ) begin
             item_a_tmp <= 0;
         end
         else begin
-            if (item_a_tmp == WI) begin
+            if ( item_a_tmp == WI ) begin
                 item_a_tmp <= 5'd0;
             end
             else begin
@@ -210,11 +209,11 @@ module top
 
     reg             update_item;
 
-    always @(posedge AXIS_ACLK) begin
-        if (~gen) begin
+    always @( posedge AXIS_ACLK ) begin
+        if ( ~gen ) begin
             update_item <= 0;
         end
-        else if (item_a_tmp == WI) begin
+        else if ( item_a_tmp == WI ) begin
             update_item <= 1'd1;
         end
         else begin
@@ -224,40 +223,40 @@ module top
 
 
     // 1024個のアドレスを生成 （各コアのitem_memoryに格納）
-    reg [9:0]      item_a;
+    reg [ 9:0]      item_a;
 
-    always @(posedge AXIS_ACLK) begin
-        if (~gen) begin
+    always @( posedge AXIS_ACLK ) begin
+        if ( ~gen ) begin
             item_a <= 0;
         end
-        else if (update_item) begin
+        else if ( update_item ) begin
             item_a <= item_a + 10'd1;
         end
     end
 
 
-    wire [31:0]         rand_num_tmp;
+    wire [ 31:0]         rand_num_tmp;
 
     xorshift prng
              (
                  // in
-                 .clk(AXIS_ACLK),
-                 .gen(gen),
+                 .clk( AXIS_ACLK ),
+                 .gen( gen ),
 
                  // out
-                 .rand_num(rand_num_tmp[31:0])
+                 .rand_num( rand_num_tmp[ 31:0 ] )
              );
 
 
-    reg [DIM:0]       rand_num;
+    reg [ DIM:0]       rand_num;
 
-    always @(posedge AXIS_ACLK) begin
-        if (~gen) begin
+    always @( posedge AXIS_ACLK ) begin
+        if ( ~gen ) begin
             rand_num <= 0;
         end
         // 次元数可変
-        else if (item_a_tmp == 0) begin
-            rand_num[31:0] <= rand_num_tmp;
+        else if ( item_a_tmp == 0 ) begin
+            rand_num[ 31:0] <= rand_num_tmp;
         end
         // else if (item_a_tmp == 1) begin
         //     rand_num[63:32] <= rand_num_tmp;
@@ -355,6 +354,7 @@ module top
     end
 
 
+
     //================================================================
 
     // 1コア
@@ -363,7 +363,8 @@ module top
 
     // 1コア
     // wire [DIM:0]                    core_result [0:CORENUM-1];
-    wire [DIM:0]                    core_result;
+    wire [ DIM:
+           0]                    core_result;
 
     // 1コア
     // wire [CORENUM-1:0]              last;
@@ -371,34 +372,39 @@ module top
 
     generate
         genvar      i;
-        for (i = 0; i < CORENUM; i = i + 1) begin
+        for ( i = 0;
+                i < CORENUM;
+                i = i + 1 ) begin
             // 次元数可変
             // core #(.DIM(1023)) core
-            core #(.DIM(31)) core
+            core #( .DIM( 31 ) )
+                 core
                  (
                      // in
-                     .clk(AXIS_ACLK),
-                     .run(run),
-                     .gen(gen),
-                     .update_item(update_item),
-                     .item_a(item_a[9:0]),
-                     .rand_num(rand_num[DIM:0]),
-                     .get_v(get_v),
+                     .clk( AXIS_ACLK ),
+                     .run( run ),
+                     .gen( gen ),
+                     .update_item( update_item ),
+                     .item_a( item_a[ 9:0 ] ),
+                     .rand_num( rand_num[ DIM:0 ] ),
+                     .get_v( get_v ),
                      // アドレス数可変
                      //  .get_d(S_AXIS_TDATA[31+32*i:32*i]),
-                     .get_d(S_AXIS_TDATA[15+16*i:16*i]),
-                     .exec(exec),
+                     .get_d( S_AXIS_TDATA[ 15+16*i:16*i ] ),
+                     .exec( exec ),
+                     .wb_en( M_AXIS_TVALID ),
+                     .wb_data( M_AXIS_TDATA[ DIM:0] ),
 
                      // out
                      // 1コア
                      //  .store(store[i]),
-                     .store(store),
+                     .store( store ),
                      // 1コア
                      //  .core_result(core_result[i]),
-                     .core_result(core_result),
+                     .core_result( core_result ),
                      // 1コア
                      //  .last(last[i])
-                     .last(last)
+                     .last( last)
                  );
         end
     endgenerate
@@ -414,20 +420,24 @@ module top
 
 
     // AXI Lite Slave State --------------
-    reg [3:0]           state;
+    reg [ 3:
+          0]           state;
 
-    wire INI = (state == 4'b0000);
-    wire AW  = (state == 4'b0001);
-    wire W   = (state == 4'b0010);
-    wire AWW = (state == 4'b0011);
-    wire AR1 = (state == 4'b0100);
-    wire AR2 = (state == 4'b1000);
+    wire INI = ( state == 4'b0000 );
+    wire AW  = ( state == 4'b0001 );
+    wire W   = ( state == 4'b0010 );
+    wire AWW = ( state == 4'b0011 );
+    wire AR1 = ( state == 4'b0100 );
+    wire AR2 = ( state == 4'b1000 );
     // -----------------------------------
 
 
-    reg [11:2]          write_addr;
-    reg [11:2]          read_addr;
-    reg [31:0]          write_data;
+    reg [ 11:
+          2]          write_addr;
+    reg [ 11:
+          2]          read_addr;
+    reg [ 31:
+          0]          write_data;
 
 
     //================================================================
@@ -441,59 +451,59 @@ module top
     assign S_AXI_BVALID  = AWW;
     assign S_AXI_RVALID  = AR2;
 
-    always @(posedge S_AXI_ACLK) begin
-        if (~S_AXI_ARESETN) begin
+    always @( posedge S_AXI_ACLK ) begin
+        if ( ~S_AXI_ARESETN ) begin
             state <= 4'b0000;
             write_addr <= 0;
             write_data <= 0;
         end
         // INI
-        else if (INI) begin
-            if (S_AXI_AWVALID & S_AXI_WVALID) begin // go AWW
+        else if ( INI ) begin
+            if ( S_AXI_AWVALID & S_AXI_WVALID ) begin // go AWW
                 state <= 4'b0011;
-                write_addr[11:2] <= S_AXI_AWADDR[11:2];
+                write_addr[ 11:2] <= S_AXI_AWADDR[ 11:2 ];
                 write_data <= S_AXI_WDATA;
             end
-            else if (S_AXI_AWVALID) begin // go AW
+            else if ( S_AXI_AWVALID ) begin // go AW
                 state <= 4'b0001;
-                write_addr[11:2] <= S_AXI_AWADDR[11:2];
+                write_addr[ 11:2] <= S_AXI_AWADDR[ 11:2 ];
             end
-            else if (S_AXI_WVALID) begin // go W
+            else if ( S_AXI_WVALID ) begin // go W
                 state <= 4'b0010;
                 write_data <= S_AXI_WDATA;
             end
-            else if (S_AXI_ARVALID) begin // go AR1
+            else if ( S_AXI_ARVALID ) begin // go AR1
                 state <= 4'b0100;
-                read_addr[11:2] <= S_AXI_ARADDR[11:2];
+                read_addr[ 11:2] <= S_AXI_ARADDR[ 11:2 ];
             end
         end
         // AW
-        else if (AW) begin
-            if (S_AXI_WVALID) begin // go AWW
+        else if ( AW ) begin
+            if ( S_AXI_WVALID ) begin // go AWW
                 state <= 4'b0011;
                 write_data <= S_AXI_WDATA;
             end
         end
         // W
-        else if (W) begin
-            if (S_AXI_AWVALID) begin // go AWW
+        else if ( W ) begin
+            if ( S_AXI_AWVALID ) begin // go AWW
                 state <= 4'b0011;
-                write_addr[11:2] <= S_AXI_AWADDR[11:2];
+                write_addr[ 11:2] <= S_AXI_AWADDR[ 11:2 ];
             end
         end
         // AWW
-        else if (AWW) begin
-            if (S_AXI_BREADY) begin // go INI
+        else if ( AWW ) begin
+            if ( S_AXI_BREADY ) begin // go INI
                 state <= 4'b0000;
             end
         end
         // AR1
-        else if (AR1) begin
+        else if ( AR1 ) begin
             state <= 4'b1000;
         end
         // AR2
-        else if (AR2) begin
-            if (S_AXI_RREADY) begin // go INI
+        else if ( AR2 ) begin
+            if ( S_AXI_RREADY ) begin // go INI
                 state <= 4'b0000;
             end
         end
@@ -506,8 +516,8 @@ module top
     wire            register_w;
     wire            register_r;
 
-    assign register_w = AWW & (write_addr[11:10] == 2'b00);
-    assign register_r = AR1 & (read_addr[11:10] == 2'b00);
+    assign register_w = AWW & ( write_addr[ 11:10] == 2'b00 );
+    assign register_r = AR1 & ( read_addr[ 11:10] == 2'b00 );
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -517,29 +527,30 @@ module top
     reg             run, gen;
 
     // item_memory数 (現状1023最大値, 16bitアドレスで指定)
-    reg [9:0]       item_memory_num;
+    reg [ 9:
+          0]       item_memory_num;
 
 
     //================================================================
 
 
     // Register Write
-    always @(posedge S_AXI_ACLK) begin
-        if (~S_AXI_ARESETN) begin
-            {run, gen} <= 2'b00;
+    always @( posedge S_AXI_ACLK ) begin
+        if ( ~S_AXI_ARESETN ) begin
+            { run, gen} <= 2'b00;
             item_memory_num <= 10'd0;
         end
-        else if (register_w) begin
-            case ({write_addr[9:2],2'b00})
+        else if ( register_w ) begin
+            case ( { write_addr[ 9:2 ],2'b00 } )
                 10'd00:
-                    {run, gen} <= write_data[1:0];
+                    { run, gen} <= write_data[ 1:0 ];
                 10'd04:
-                    item_memory_num[9:0] <= write_data[9:0]; // 最大1023
+                    item_memory_num[ 9:0] <= write_data[ 9:0 ]; // 最大1023
                 default:
                     ;
             endcase
         end
-        else if (gen & item_a == item_memory_num & update_item) begin
+        else if ( gen & item_a == item_memory_num & update_item ) begin
             gen <= 1'b0;
         end
     end
@@ -549,14 +560,14 @@ module top
 
 
     // Register Read
-    always @(posedge S_AXI_ACLK) begin
-        if (register_r) begin
+    always @( posedge S_AXI_ACLK ) begin
+        if ( register_r ) begin
             S_AXI_RDATA <= 0;
-            case ({read_addr[9:2],2'b00})
+            case ( { read_addr[ 9:2 ],2'b00 } )
                 10'h00:
-                    S_AXI_RDATA[1:0] <= {run, gen};
+                    S_AXI_RDATA[ 1:0] <= { run, gen };
                 10'd04:
-                    S_AXI_RDATA[9:0] <= item_memory_num[9:0];
+                    S_AXI_RDATA[ 9:0] <= item_memory_num[ 9:0 ];
                 default:
                     ;
             endcase
