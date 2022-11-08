@@ -236,7 +236,7 @@ unsigned long dst_phys;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
+void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJORITY_ADDR)
 {
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -267,17 +267,48 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
 
   //////////////////////////////////////////////////////////////////////////////////////// run ///////////////////////////////////////////////////////////////////////////////////////////////
 
-  // even
-  top[0x08 / 4] = EVEN;
-
-  //////////////////////////////////////////////////////////////////////////////////////// run ///////////////////////////////////////////////////////////////////////////////////////////////
-
   // run <- 1;
   top[0x00 / 4] = 2;
 
-  // printf("\n ------------------------- Sample Input --------------------------- \n\n");
-
   int send_num = 0;
+
+  //////////////////////////////////////////////// Even //////////////////////////////////////////////
+
+  if (EVEN)
+  {
+    // load
+    for (int i = 0; i < (BUSWIDTH / 16); i++)
+    {
+      if (i == 0)
+      {
+        uint16_t addr = MAJORITY_ADDR;
+        uint16_t inst = assemble(1, 1, addr);
+        src[send_num] = inst;
+      }
+      else
+      {
+        src[send_num] = 0;
+      }
+      send_num++;
+    }
+
+    // store
+    for (int i = 0; i < (BUSWIDTH / 16); i++)
+    {
+      if (i == 0)
+      {
+        uint16_t inst = assemble(0, 8, 0);
+        src[send_num] = inst;
+      }
+      else
+      {
+        src[send_num] = 0;
+      }
+      send_num++;
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
 
   for (int j = 0; j < ADDRNUM; j++)
   {
@@ -658,7 +689,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM)
     if (EVEN)
     {
       // RANNUM-1を追加するランダム値に使う
-      result_array[num] = item_memory_array[j][RANNUM - 1];
+      result_array[num] = item_memory_array[j][MAJORITY_ADDR];
       // printf("ランダム：%u\n", result_array[num]);
       // putb(result_array[num]);
     }
@@ -805,13 +836,14 @@ int main()
 
   const int NGRAM = 3;
   const int CORENUM = 1;
+  const int MAJORITY_ADDR = 1023;
   int ADDRNUM = 0;
 
   for (int i = 3; i <= RANNUM; i += 3)
   {
     ADDRNUM = i;
 
-    check(NGRAM, CORENUM, ADDRNUM);
+    check(NGRAM, CORENUM, ADDRNUM, MAJORITY_ADDR);
     xor128(1);
   }
 
