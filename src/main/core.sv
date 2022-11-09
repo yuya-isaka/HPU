@@ -49,7 +49,8 @@ module core
                           wb <= 0;
                       end
                   end
-                  else if ( get_v ) begin
+
+                  if ( get_v ) begin
                       // アドレスが必要か否か
                       if ( get_d[ 15 ] ) begin
                           // wb.item (特殊)
@@ -177,7 +178,7 @@ module core
                               buff <= reg_2;
                               store <= 1;
                           end
-                          // lastore
+                          // last
                           else if ( inst[ 10 ] ) begin
                               last <= 1;
                               buff <= 0;

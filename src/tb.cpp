@@ -104,8 +104,8 @@ uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
       uint16_t inst = 17 << 11;
       result = inst | addr;
     }
-    // lastback
-    else if (inst_num == 11)
+    // wb.item
+    else if (inst_num == 12)
     {
       uint16_t inst = 33 << 10;
       result = inst | addr;
@@ -148,6 +148,11 @@ uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
     else if (inst_num == 10)
     {
       inst = 1 << 9;
+    }
+    // wb
+    else if (inst_num == 11)
+    {
+      inst = 1 << 8;
     }
     else
     {
@@ -988,6 +993,33 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
+      // last
+      tmp = 0;
+      for (int i = 0; i < 1; i++)
+      {
+        conv.data_0 = assemble(0, 9, 0);
+        conv.data_1 = 0;
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      // 残り埋める
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      verilator_top->S_AXIS_TVALID = 0;
+
+      // 演算結果を待つ
+      while (!verilator_top->M_AXIS_TVALID)
+      {
+        eval();
+      }
+
+      // 送信
+      verilator_top->S_AXIS_TVALID = 1;
+
       // 3 -------------------------------------------------------------------
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
@@ -1111,6 +1143,55 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         }
         eval();
 
+        // // wb
+        // tmp = 0;
+        // for (int i = 0; i < 1; i++)
+        // {
+        //   conv.data_0 = assemble(0, 11, 0);
+        //   conv.data_1 = 0;
+        //   verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        //   tmp++;
+        // }
+        // // 残り埋める
+        // for (int i = tmp; i < 32; i++)
+        // {
+        //   verilator_top->S_AXIS_TDATA[i] = 0;
+        // }
+        // eval();
+
+        // wb.item
+        tmp = 0;
+        for (int i = 0; i < 1; i++)
+        {
+          conv.data_0 = assemble(1, 12, 1023);
+          conv.data_1 = 0;
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+        // 残り埋める
+        for (int i = tmp; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+
+        // load
+        tmp = 0;
+        for (int i = 0; i < 1; i++)
+        {
+          conv.data_0 = assemble(1, 1, 1023);
+          conv.data_1 = 0;
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+        // 残り埋める
+        for (int i = tmp; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+
+        // last
         tmp = 0;
         for (int i = 0; i < 1; i++)
         {
