@@ -380,39 +380,39 @@ int main(int argc, char const *argv[])
 
 		int send_num = 0;
 
-		// if (even)
-		// {
-		// 	// load
-		// 	for (int i = 0; i < (bus_width / instruction_bit); i++)
-		// 	{
-		// 		if (i == 0)
-		// 		{
-		// 			uint16_t addr = majority_addr;
-		// 			uint16_t inst = assemble(1, 1, addr);
-		// 			src[send_num] = inst;
-		// 		}
-		// 		else
-		// 		{
-		// 			src[send_num] = 0;
-		// 		}
-		// 		send_num++;
-		// 	}
+		if (even)
+		{
+			// load
+			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			{
+				if (i == 0)
+				{
+					uint16_t addr = majority_addr;
+					uint16_t inst = assemble(1, 1, addr);
+					src[send_num] = inst;
+				}
+				else
+				{
+					src[send_num] = 0;
+				}
+				send_num++;
+			}
 
-		// 	// store
-		// 	for (int i = 0; i < (bus_width / instruction_bit); i++)
-		// 	{
-		// 		if (i == 0)
-		// 		{
-		// 			uint16_t inst = assemble(0, 8, 0);
-		// 			src[send_num] = inst;
-		// 		}
-		// 		else
-		// 		{
-		// 			src[send_num] = 0;
-		// 		}
-		// 		send_num++;
-		// 	}
-		// }
+			// store
+			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			{
+				if (i == 0)
+				{
+					uint16_t inst = assemble(0, 8, 0);
+					src[send_num] = inst;
+				}
+				else
+				{
+					src[send_num] = 0;
+				}
+				send_num++;
+			}
+		}
 
 		int flag = 0;
 		int mass = 1;

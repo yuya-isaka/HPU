@@ -45,7 +45,7 @@ module core
                   end
               end;
 
-              reg [ 9:0 ]       addr;
+    reg [ 9:0 ]       addr;
     reg [ DIM:0 ]     reg_0;
     // 16bit保持
     reg [ 15:0 ]      inst;
@@ -217,6 +217,11 @@ module core
                       buff <= 0;
                       store <= 0;
                       last <= 0;
+                  end
+                  // execもたってない、lastもたってないとき発動
+                  else if ( store ) begin
+                      buff <= 0;
+                      store <= 0;
                   end
               end;
 
