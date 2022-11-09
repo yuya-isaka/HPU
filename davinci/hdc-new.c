@@ -154,8 +154,8 @@ int main(int argc, char const *argv[])
 	printf("\n\n");
 	// ---------------------------------------------
 	const int train_num = 2;
-	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
+	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const int ngram = 3;
 	const int DIM = 1024 / 32;
 	const int rand_num = 27;
@@ -295,6 +295,7 @@ int main(int argc, char const *argv[])
 				{
 					// 適当な値を追加
 					item_memory_array_new_t[j][i] = item_memory_array[majority_tmp][j];
+					// printf("ら：%u\n", item_memory_array_new_t[j][i]);
 				}
 				else
 				{
@@ -323,7 +324,6 @@ int main(int argc, char const *argv[])
 		freeArrayInt(&item_memory_array, rand_num);
 		freeArray(&ascii_array, all_ngram);
 	}
-	printf("\n");
 	printf("---------------------------------------------------------\n\n");
 	clock_t end = clock();
 	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;

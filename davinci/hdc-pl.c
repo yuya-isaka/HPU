@@ -75,6 +75,12 @@ uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
 			uint16_t inst = 17 << 11;
 			result = inst | addr;
 		}
+		// lastback
+		else if (inst_num == 11)
+		{
+			uint16_t inst = 33 << 10;
+			result = inst | addr;
+		}
 		else
 		{
 			printf("error");
@@ -223,11 +229,12 @@ int main(int argc, char const *argv[])
 	const int bus_width = 1024;
 	const int instruction_bit = 16;
 	const int train_num = 2;
-	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
+	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const int ngram = 3;
-	const int core_num = 1;
+	const int core_num = 2;
 	const int instruction_num = 9;
+	const int majority_addr = 26;
 	int all_ngram = 0;
 	int even = 0;
 	// -------------------------------------------
@@ -297,7 +304,6 @@ int main(int argc, char const *argv[])
 			}
 		}
 
-		top[0x08 / 4] = even;
 		top[0x00 / 4] = 2;
 
 		// ---------------------------------------------------
@@ -373,21 +379,79 @@ int main(int argc, char const *argv[])
 		}
 
 		int send_num = 0;
+
+		// if (even)
+		// {
+		// 	// load
+		// 	for (int i = 0; i < (bus_width / instruction_bit); i++)
+		// 	{
+		// 		if (i == 0)
+		// 		{
+		// 			uint16_t addr = majority_addr;
+		// 			uint16_t inst = assemble(1, 1, addr);
+		// 			src[send_num] = inst;
+		// 		}
+		// 		else
+		// 		{
+		// 			src[send_num] = 0;
+		// 		}
+		// 		send_num++;
+		// 	}
+
+		// 	// store
+		// 	for (int i = 0; i < (bus_width / instruction_bit); i++)
+		// 	{
+		// 		if (i == 0)
+		// 		{
+		// 			uint16_t inst = assemble(0, 8, 0);
+		// 			src[send_num] = inst;
+		// 		}
+		// 		else
+		// 		{
+		// 			src[send_num] = 0;
+		// 		}
+		// 		send_num++;
+		// 	}
+		// }
+
+		int flag = 0;
+		int mass = 1;
+		for (int j = 0; j < all_instruction; j++)
+		{
+			if (flag == 0)
+			{
+				printf("命令の塊%d\n", mass);
+				mass++;
+			}
+			for (int i = 0; i < core_num; i++)
+			{
+				printf("%7d ", src_tmp[i][j]);
+			}
+			flag++;
+			if (flag == instruction_num)
+			{
+				printf("\n");
+				flag = 0;
+			}
+			printf("\n");
+		}
+
 		for (int j = 0; j < all_instruction; j++)
 		{
 			for (int i = 0; i < core_num; i++)
 			{
 				src[send_num] = src_tmp[i][j];
+				// printf("%u\n", src[send_num]);
 				send_num++;
 			}
 			for (int i = core_num; i < (bus_width / instruction_bit); i++)
 			{
 				src[send_num] = 0;
+				// printf("%u\n", src[send_num]);
 				send_num++;
 			}
-			// 2億5000万が限界
-			// printf("%d\n", send_num);
 		}
+		// printf("%d\n", send_num / 64);
 
 		// ↑ コード---------------------------------------------
 		// ---------------------------------------------------

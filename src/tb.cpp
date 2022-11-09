@@ -1195,24 +1195,24 @@ void check2(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM
   eval();
   eval();
 
-  verilator_top->S_AXI_AWADDR = 0;
-  verilator_top->S_AXI_WDATA = 0;
-  verilator_top->S_AXI_AWVALID = 1;
-  verilator_top->S_AXI_WVALID = 1;
-  eval();
-  verilator_top->S_AXI_AWVALID = 0;
-  verilator_top->S_AXI_WVALID = 0;
-  eval();
+  // verilator_top->S_AXI_AWADDR = 0;
+  // verilator_top->S_AXI_WDATA = 0;
+  // verilator_top->S_AXI_AWVALID = 1;
+  // verilator_top->S_AXI_WVALID = 1;
+  // eval();
+  // verilator_top->S_AXI_AWVALID = 0;
+  // verilator_top->S_AXI_WVALID = 0;
+  // eval();
 
-  // run <- 1;
-  verilator_top->S_AXI_AWADDR = 0;
-  verilator_top->S_AXI_WDATA = 2;
-  verilator_top->S_AXI_AWVALID = 1;
-  verilator_top->S_AXI_WVALID = 1;
-  eval();
-  verilator_top->S_AXI_AWVALID = 0;
-  verilator_top->S_AXI_WVALID = 0;
-  eval();
+  // // run <- 1;
+  // verilator_top->S_AXI_AWADDR = 0;
+  // verilator_top->S_AXI_WDATA = 2;
+  // verilator_top->S_AXI_AWVALID = 1;
+  // verilator_top->S_AXI_WVALID = 1;
+  // eval();
+  // verilator_top->S_AXI_AWVALID = 0;
+  // verilator_top->S_AXI_WVALID = 0;
+  // eval();
 
   // 送信
   verilator_top->S_AXIS_TVALID = 1;

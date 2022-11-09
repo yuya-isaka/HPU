@@ -43,22 +43,21 @@ module core
                   else if ( wb_en ) begin
                       wb_ok <= 0;
                   end
-              end
+              end;
 
-              reg [ 9:0]       addr;
+              reg [ 9:0 ]       addr;
     reg [ DIM:0 ]     reg_0;
     // 16bit保持
     reg [ 15:0 ]      inst;
 
     always_ff @( posedge clk ) begin
-                  if ( gen & update_item ) begin
-                      item_memory[ item_a ] <= rand_num;
-                      addr <= 0;
-                      reg_0 <= 0;
-                      inst <= 0;
-                  end
-                  else if ( wb_ok & wb_en) begin
-                      item_memory[ wb_addr ] <= wb_data;
+                  if ( ( gen & update_item) | ( wb_ok & wb_en ) ) begin
+                      if ( gen & update_item) begin
+                          item_memory[ item_a ] <= rand_num;
+                      end
+                      else begin
+                          item_memory[ wb_addr ] <= wb_data;
+                      end
                   end
                   else if ( get_v ) begin
                       // アドレスが必要か否か
