@@ -50,14 +50,12 @@ module buffer_ctrl
          input wire                             stream_v,
 
          // out
-         output logic [ 1023:0 ]                stream_d
+         output logic [ 1023:0 ]                stream_d,
+         output wire  [ DIM:0 ]                 sign_bit
      );
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    wire [ DIM:0 ]      sign_bit;
 
     generate
         genvar i;

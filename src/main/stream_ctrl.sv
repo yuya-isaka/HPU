@@ -35,11 +35,10 @@ module stream_ctrl
     //               last_nnn <= get_fin_nn;
     //           end;
 
-    reg         last_n, last_nn;
+    reg         last_n;
     always_ff @( posedge clk ) begin
                   if ( rst ) begin
                       last_n <= 1'b0;
-                      last_nn <= 1'b0;
                   end
                   else begin
                       if ( last != 0 ) begin
@@ -48,7 +47,6 @@ module stream_ctrl
                       else begin
                           last_n <= 1'b0;
                       end
-                      last_nn <= last_n;
                   end
               end;
 
@@ -67,7 +65,7 @@ module stream_ctrl
                   // 4コア
                   //   else if (last) begin
                   // 16コア
-                  else if ( last_nn ) begin
+                  else if ( last_n ) begin
                       last_keep <= 1'b1;
                   end
               end;
@@ -97,7 +95,7 @@ module stream_ctrl
                     // 4コア
                     // if ((last | last_keep) & dst_ready) begin
                     // 16コア
-                    if ( ( last_nn | last_keep) & dst_ready ) begin
+                    if ( ( last_n | last_keep) & dst_ready ) begin
                         stream_ok = 1'b1;
                     end
                 end;
