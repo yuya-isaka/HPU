@@ -436,22 +436,90 @@ int main(int argc, char const *argv[])
 			printf("\n");
 		}
 
+		printf("%d\n", all_instruction);
 		for (int j = 0; j < all_instruction; j++)
 		{
 			for (int i = 0; i < core_num; i++)
 			{
 				src[send_num] = src_tmp[i][j];
-				// printf("%u\n", src[send_num]);
+				printf("%d\n", src[send_num]);
 				send_num++;
 			}
 			for (int i = core_num; i < (bus_width / instruction_bit); i++)
 			{
 				src[send_num] = 0;
-				// printf("%u\n", src[send_num]);
 				send_num++;
 			}
+			if (j != (all_instruction - 1) && send_num >= 256)
+			{
+				printf("-----------------------\n");
+				for (int i = 0; i < core_num; i++)
+				{
+					uint16_t inst = assemble(1, 11, 1023);
+					src[send_num] = inst;
+					send_num++;
+				}
+				for (int i = core_num; i < (bus_width / instruction_bit); i++)
+				{
+					src[send_num] = 0;
+					send_num++;
+				}
+
+				dma[0x00 / 4] = 1;
+				dma[0x18 / 4] = src_phys;
+				dma[0x28 / 4] = send_num * 2; // 16ビットがsend_num個
+
+				dma[0x30 / 4] = 1;
+				dma[0x48 / 4] = dst_phys;
+				dma[0x58 / 4] = (bus_width / 32) * 4; // 32個 * 4バイト = 128バイト = 1024ビット
+
+				while ((dma[0x34 / 4] & 0x1000) != 0x1000)
+					;
+
+				top[0x00 / 4] = 0;
+
+				top[0x00 / 4] = 2;
+
+				dma[0x30 / 4] = 4;
+				dma[0x00 / 4] = 4;
+				while (dma[0x00 / 4] & 0x4)
+					;
+
+				send_num = 0;
+
+				// load
+				for (int i = 0; i < (bus_width / instruction_bit); i++)
+				{
+					if (i == 0)
+					{
+						uint16_t addr = 1023;
+						uint16_t inst = assemble(1, 1, addr);
+						src[send_num] = inst;
+					}
+					else
+					{
+						src[send_num] = 0;
+					}
+					send_num++;
+				}
+
+				// store
+				for (int i = 0; i < (bus_width / instruction_bit); i++)
+				{
+					if (i == 0)
+					{
+						uint16_t inst = assemble(0, 8, 0);
+						src[send_num] = inst;
+					}
+					else
+					{
+						src[send_num] = 0;
+					}
+					send_num++;
+				}
+			}
+			// 2億5000万が限界 printf("%d\n", send_num);
 		}
-		// printf("%d\n", send_num / 64);
 
 		// ↑ コード---------------------------------------------
 		// ---------------------------------------------------
