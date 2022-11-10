@@ -463,6 +463,23 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
         if (i < REMAINDAR)
         {
           // LASTは確定済みなので９を代入
+          uint16_t inst = assemble(0, 8, 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // LAST命令
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i == 0)
+        {
           uint16_t inst = assemble(0, 9, 0);
           src[send_num] = inst;
         }
@@ -617,7 +634,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
         {
           if (j == LAST)
           {
-            uint16_t inst = assemble(0, 9, 0);
+            uint16_t inst = assemble(0, 8, 0);
             src[send_num] = inst;
           }
           else
@@ -637,6 +654,24 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       j += NGRAM * CORENUM - 1;
     }
   }
+
+  // LAST命令
+  // 1024bit ---------------------------------------------
+  for (int i = 0; i < (BUSWIDTH / 16); i++)
+  {
+    if (i == 0)
+    {
+      uint16_t inst = assemble(0, 9, 0);
+      src[send_num] = inst;
+    }
+    else
+    {
+
+      src[send_num] = 0;
+    }
+    send_num++;
+  }
+  // ------------------------------------------------------
 
   // AXI DMA 送信の設定（UIO経由）
   dma[0x00 / 4] = 1;

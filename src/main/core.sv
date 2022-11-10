@@ -53,18 +53,18 @@ module core
     always_ff @( posedge clk ) begin
                   // ランダム生成 | 書き戻し（命令12)
                   if ( ( gen & update_item) |  wb_flag  ) begin
-                      // ランダム生成(gen)
-                      if ( gen & update_item) begin
-                          item_memory[ item_a ] <= rand_num;
-                      end
                       // 書き戻し(命令12)
-                      else begin
+                      if ( wb_flag ) begin
                           item_memory[ wb_addr ] <= reg_2;
                           // 書き戻し完了後にフラグを落とす
                           // ただし, wb→wbと命令が並んでいた場合を考慮
                           if ( ~( get_v & get_d[ 15 ] & get_d[ 10 ] ) ) begin
                               wb_flag <= 0;
                           end
+                      end
+                      // ランダム生成(gen)
+                      else begin
+                          item_memory[ item_a ] <= rand_num;
                       end
                   end
 
