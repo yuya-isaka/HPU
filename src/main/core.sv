@@ -61,7 +61,12 @@ module core
                               inst <= 0;
                           end
                           else begin
-                              reg_0 <= item_memory[ get_d[ 9:0 ] ];
+                              if ( wb ) begin
+                                  reg_0 <= reg_2;
+                              end
+                              else begin
+                                  reg_0 <= item_memory[ get_d[ 9:0 ] ];
+                              end
                               inst <= get_d[ 15:0 ];
                           end
                       end

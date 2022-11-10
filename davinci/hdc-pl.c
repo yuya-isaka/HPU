@@ -234,8 +234,8 @@ int main(int argc, char const *argv[])
 	const int bus_width = 1024;
 	const int instruction_bit = 16;
 	const int train_num = 2;
-	const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
+	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const int ngram = 3;
 	const int core_num = 2;
 	const int instruction_num = 9;
@@ -411,27 +411,27 @@ int main(int argc, char const *argv[])
 		}
 
 		// デバッグ
-		int debug_flag = 0;
-		int debug_mass = 1;
-		for (int j = 0; j < all_instruction; j++)
-		{
-			if (debug_flag == 0)
-			{
-				printf("命令の塊%d\n", debug_mass);
-				debug_mass++;
-			}
-			for (int i = 0; i < core_num; i++)
-			{
-				printf("%7d ", src_tmp[i][j]);
-			}
-			debug_flag++;
-			if (debug_flag == instruction_num)
-			{
-				printf("\n");
-				debug_flag = 0;
-			}
-			printf("\n");
-		}
+		// int debug_flag = 0;
+		// int debug_mass = 1;
+		// for (int j = 0; j < all_instruction; j++)
+		// {
+		// 	if (debug_flag == 0)
+		// 	{
+		// 		printf("命令の塊%d\n", debug_mass);
+		// 		debug_mass++;
+		// 	}
+		// 	for (int i = 0; i < core_num; i++)
+		// 	{
+		// 		printf("%7d ", src_tmp[i][j]);
+		// 	}
+		// 	debug_flag++;
+		// 	if (debug_flag == instruction_num)
+		// 	{
+		// 		printf("\n");
+		// 		debug_flag = 0;
+		// 	}
+		// 	printf("\n");
+		// }
 
 		for (int j = 0; j < all_instruction; j++)
 		{
@@ -446,13 +446,14 @@ int main(int argc, char const *argv[])
 				src[send_num] = 0;
 				send_num++;
 			}
+			// printf("%d\n", send_num);
 
 			// 最後じゃないかつ値を超えてたら
 			// 2億5000万が限界
-			if (j != (all_instruction - 1) && send_num >= 256)
+			if (j != (all_instruction - 1) && send_num >= 40000000)
 			{
 
-				printf("-----------------------\n");
+				printf("------------DMA再発行-----------\n");
 
 				// last命令
 				for (int i = 0; i < 1; i++)

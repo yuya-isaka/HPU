@@ -1323,21 +1323,21 @@ int main(int argc, char **argv)
   const int DIM = 1024 / 32;
   const int MAJORITY_ADDR = 1023;
 
-  const int SIMULATION_COUNT = 100;
-  for (int i = 3; i < SIMULATION_COUNT; i += 3)
-  {
-    ADDRNUM = i;
+  // const int SIMULATION_COUNT = 100;
+  // for (int i = 3; i < SIMULATION_COUNT; i += 3)
+  // {
+  //   ADDRNUM = i;
 
-    DEBUG = 1;
-    check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
-    // check2(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  //   DEBUG = 1;
+  //   check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  //   // check2(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
 
-    printf(" -------------------\n\n");
-  }
+  //   printf(" -------------------\n\n");
+  // }
 
-  // ADDRNUM = 6;
-  // DEBUG = 0;
-  // check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  ADDRNUM = 12;
+  DEBUG = 0;
+  check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
   // ADDRNUM = 54;
   // DEBUG = 1;
