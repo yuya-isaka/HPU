@@ -33,10 +33,13 @@ module core
 
     // ハイパーベクトルを保持するメモリ
     (* ram_style = "block" *)
-    reg [ DIM:0 ]      item_memory [ 0:1023 ];
+    reg [ DIM:0 ]           item_memory [ 0:1023 ];
 
-    // ロードデータ
-    reg [ DIM:0 ]       reg_0;
+    // フォワーディング処理フラグ
+    reg                     forward_flag;
+
+    // アイテムメモリーからロードしたデータの格納場所
+    reg [ DIM:0 ]           reg_tmp;
 
     always_ff @( posedge clk ) begin
 
@@ -56,9 +59,27 @@ module core
                   // 読み出し
                   // 常に垂れ流しで読み出しでOK
                   // (必要ない場合は使わない)
-                  reg_0 <= item_memory[ get_d[ 9:0 ] ];
+                  reg_tmp <= item_memory[ get_d[ 9:0 ] ];
+                  forward_flag <= ( wb_flag & ( wb_addr == get_d[ 9:0 ] ) );
 
               end;
+
+
+    // 命令で使われるロードデータ
+    logic [ DIM:0 ]         reg_0;
+
+    // reg_tmpを使うかreg_2の値を使うか
+    // reg2の保持しておきつつ続けてreg2を使って更新したいとき、write_back命令を直前に発行
+    // (たぶん意外に便利に使える。write_backしたあとreg0にロードしてそのままreg2の値と計算するとかもできる)
+    always_comb begin
+                    // 通常はアイテムメモリーからロードした値を格納
+                    reg_0 = reg_tmp;
+
+                    // フォワーディングフラグが立っている場合、reg_2の値をフォワーディング
+                    if ( forward_flag ) begin
+                        reg_0 = reg_2;
+                    end
+                end;
 
 
     // 書き戻し命令が発行されたか否かのフラグ
