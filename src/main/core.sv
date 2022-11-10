@@ -35,85 +35,92 @@ module core
     (* ram_style = "block" *)
     reg [ DIM:0 ]      item_memory [ 0:1023 ];
 
-    // 書き戻し命令が発行されたか否かのフラグ
-    reg                 wb_flag;
-    // 書き戻し先のアドレス
-    reg [ 9:0 ]         wb_addr;
     // ロードデータ
     reg [ DIM:0 ]       reg_0;
-    // 命令
-    reg [ 15:0 ]        inst;
 
-    // 更新対象
-    //  - item_memory
-    //  - wb_flag
-    //  - wb_addr
-    //  - reg_0
-    //  - inst
     always_ff @( posedge clk ) begin
-                  // ランダム生成 | 書き戻し（命令12)
-                  if ( ( gen & update_item) |  wb_flag  ) begin
-                      // 書き戻し(命令12)
+
+                  // 書き込み
+                  // 書き戻し（命令12) | ランダム生成
+                  if ( wb_flag | ( gen & update_item ) ) begin
+                      // 書き戻し（命令12）
                       if ( wb_flag ) begin
                           item_memory[ wb_addr ] <= reg_2;
-                          // 書き戻し完了後にフラグを落とす
-                          // ただし, wb→wbと命令が並んでいた場合を考慮
-                          if ( ~( get_v & get_d[ 15 ] & get_d[ 10 ] ) ) begin
-                              wb_flag <= 0;
-                          end
                       end
-                      // ランダム生成(gen)
+                      // ランダム生成
                       else begin
                           item_memory[ item_a ] <= rand_num;
                       end
                   end
 
-                  // データを受信している時実行
+                  // 読み出し
+                  // 常に垂れ流しで読み出しでOK
+                  // (必要ない場合は使わない)
+                  reg_0 <= item_memory[ get_d[ 9:0 ] ];
+
+              end;
+
+
+    // 書き戻し命令が発行されたか否かのフラグ
+    reg                 wb_flag;
+
+    // 書き戻し先のアドレス
+    reg [ 9:0 ]         wb_addr;
+
+    // 命令
+    reg [ 15:0 ]        inst;
+
+
+    // 更新対象
+    //  - inst
+    //  - wb_flag
+    //  - wb_addr
+    always_ff @( posedge clk ) begin
+
+                  // データ受信時実行
                   if ( get_v ) begin
-                      // アドレス必要
-                      if ( get_d[ 15 ] ) begin
-                          // 12. wb.item (特殊命令)
-                          if ( get_d[ 10 ] ) begin
-                              // 書き込みフラグを立てる
-                              wb_flag <= 1'b1;
-                              // 書き込み先アドレス格納
-                              wb_addr <= get_d[ 9:0 ];
-                              // データはロードされない, 命令は発行しない
-                              reg_0 <= 0;
-                              inst <= 0;
-                          end
-                          else begin
-                              // フォワーディング処理 (wb直後のload関連の命令に対応)
-                              if ( wb_flag ) begin
-                                  reg_0 <= reg_2;
-                              end
-                              // ロード関連の命令に必要なロード
-                              else begin
-                                  reg_0 <= item_memory[ get_d[ 9:0 ] ];
-                              end
-                              inst <= get_d[ 15:0 ];
-                          end
+
+                      // 12. wb.item命令 (特殊)
+                      if ( get_d[ 15 ] & get_d[ 10 ] ) begin
+                          // 書き込みフラグを立てる
+                          wb_flag <= 1'b1;
+                          // 書き込み先アドレス格納
+                          wb_addr <= get_d[ 9:0 ];
+
+                          // 命令は発行しない (nop)
+                          inst <= 0;
                       end
-                      // アドレスいらん場合は、命令だけを更新
+
+                      // wb.item命令以外はinstを更新
                       else begin
-                          reg_0 <= 0;
                           inst <= get_d[ 15:0 ];
+                          wb_flag <= 0;
+                          wb_addr <= 0;
                       end
+
                   end
+
                   // データを受信していないとき実行
+                  // (リセットも兼ねる)
                   else begin
-                      // reg_0とinstは保持しなくていい (たとえ、reg_0を更新した後にget_vが落ちても、execはまだ続いているので、次サイクルで使われる)
-                      // wb_flagはwb_flagがたった次に必ず落ちる
-                      // wb_addrは更新せず放置で良い
-                      reg_0 <= 0;
+                      // instは保持しなくていい
+                      // (たとえ、instを更新した後にget_vが落ちても、execはまだ続いているので、次サイクルで使われる)
                       inst <= 0;
+                      wb_flag <= 0;
+                      wb_addr <= 0;
                   end
+
               end;
 
 
     // reg_1, reg_2は値を保持しておく必要がある （reg_0はその度にロードされるから保持しなくていい）
+
+    // レジスタ1
     reg [ DIM:0 ]       reg_1;
+    // レジスタ2
     reg [ DIM:0 ]       reg_2;
+
+    // storeする値を蓄える変数
     reg [ DIM:0 ]       buff;
 
     // 更新対象

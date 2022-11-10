@@ -702,6 +702,63 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       }
       eval();
 
+      // write back 実験
+      tmp = 0;
+      for (int i = 0; i < 1; i++)
+      {
+        conv.data_0 = assemble(0, 11, 0);
+        conv.data_1 = 0;
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      // 残り埋める
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      // write back 実験
+      tmp = 0;
+      for (int i = 0; i < 1; i++)
+      {
+        conv.data_0 = assemble(1, 12, 1022);
+        conv.data_1 = 0;
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      // 残り埋める
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      // write back 実験
+      tmp = 0;
+      // 残り埋める
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      // write back 実験
+      tmp = 0;
+      for (int i = 0; i < 1; i++)
+      {
+        conv.data_0 = assemble(1, 1, 1022);
+        conv.data_1 = 0;
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      // 残り埋める
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
       // 2連続でstoreすることも可能
       // tmp = 0;
       // for (int i = 0; i < REMAINDAR; i++)
@@ -1345,12 +1402,12 @@ int main(int argc, char **argv)
   printf("\n ====================================== 開始 ========================================= \n\n");
 
   const int NGRAM = 3;
-  const int CORENUM = 2;
+  const int CORENUM = 16;
   int DEBUG = 0;
   int ADDRNUM = 0;
   // 次元数可変 (結果を何個出力するかに使う)
-  // const int DIM = 32 / 32;
-  const int DIM = 1024 / 32;
+  const int DIM = 32 / 32;
+  // const int DIM = 1024 / 32;
   const int MAJORITY_ADDR = 1023;
 
   // const int SIMULATION_COUNT = 100;

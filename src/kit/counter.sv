@@ -49,62 +49,62 @@ module counter
                   else if ( store_nn ) begin
                       // コア数可変
                       // 16コア
-                      //   box <= box + box_1 + box_2 + box_3 + box_4;
+                      box <= box + box_1 + box_2 + box_3 + box_4;
                       // 1-4コア
-                      box <= box + box_1;
+                      //   box <= box + box_1;
                   end
               end;
 
 
     // コア数可変
-    // reg signed [W-1:0 ]      box_11;
-    // reg signed [W-1:0 ]      box_22;
+    reg signed [ W-1:0 ]      box_11;
+    reg signed [ W-1:0 ]      box_22;
 
     // コア数可変
     reg signed [ W-1:0 ]      box_1;
-    // reg signed [W-1:0 ]      box_2;
-    // reg signed [W-1:0 ]      box_3;
-    // reg signed [W-1:0 ]      box_4;
-    // reg signed [W-1:0 ]      box_5;
-    // reg signed [W-1:0 ]      box_6;
-    // reg signed [W-1:0 ]      box_7;
-    // reg signed [W-1:0 ]      box_8;
+    reg signed [ W-1:0 ]      box_2;
+    reg signed [ W-1:0 ]      box_3;
+    reg signed [ W-1:0 ]      box_4;
+    reg signed [ W-1:0 ]      box_5;
+    reg signed [ W-1:0 ]      box_6;
+    reg signed [ W-1:0 ]      box_7;
+    reg signed [ W-1:0 ]      box_8;
 
     always_ff @( posedge clk ) begin
                   if ( rst ) begin
                       // コア数可変
                       box_1 <= 0;
-                      //   box_2 <= 0;
-                      //   box_3 <= 0;
-                      //   box_4 <= 0;
-                      //   box_5 <= 0;
-                      //   box_6 <= 0;
-                      //   box_7 <= 0;
-                      //   box_8 <= 0;
+                      box_2 <= 0;
+                      box_3 <= 0;
+                      box_4 <= 0;
+                      box_5 <= 0;
+                      box_6 <= 0;
+                      box_7 <= 0;
+                      box_8 <= 0;
                   end
                   else if ( store_n ) begin
                       // コア数可変
                       // 1コア
                       //   box_1 <= select;
                       // 2コア
-                      box_1 <= select[ 0 ] + select[ 1 ];
-                      //   box_1 <= select[0 ]
-                      //         + select[1 ]
-                      //         + select[2 ]
-                      //         + select[3 ];
-                      //   box_2 <= select[4 ]
-                      //         + select[5 ]
-                      //         + select[6 ]
-                      //         + select[7 ];
-                      //   box_3 <= select[8 ]
-                      //         + select[9 ]
-                      //         + select[10 ]
-                      //         + select[11 ];
-                      //   box_4 <=
-                      //         select[12 ]
-                      //         + select[13 ]
-                      //         + select[14 ]
-                      //         + select[15 ];
+                      //   box_1 <= select[ 0 ] + select[ 1 ];
+                      box_1 <= select[ 0 ]
+                            + select[ 1 ]
+                            + select[ 2 ]
+                            + select[ 3 ];
+                      box_2 <= select[ 4 ]
+                            + select[ 5 ]
+                            + select[ 6 ]
+                            + select[ 7 ];
+                      box_3 <= select[ 8 ]
+                            + select[ 9 ]
+                            + select[ 10 ]
+                            + select[ 11 ];
+                      box_4 <=
+                            select[ 12 ]
+                            + select[ 13 ]
+                            + select[ 14 ]
+                            + select[ 15 ];
                   end
               end;
 
