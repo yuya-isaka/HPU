@@ -19,16 +19,22 @@ module selector
 
 
     always_ff @( posedge clk ) begin
+                  // ストアする場合
                   if ( store_bit ) begin
-                      // -1
-                      sel_bit <= $signed( 1'b1 );
-
+                      // 0の時は +1 (MSBを0に近づける)
                       if ( core_result_bit == 1'b0 ) begin
                           // 1
                           sel_bit <= $signed( 1 );
                       end
+                      // 1の時は -1 (MSBを1に近づける)
+                      else begin
+                          // -1
+                          sel_bit <= $signed( 1'b1 );
+                      end
                   end
+                  // ストアせん場合
                   else begin
+                      // +0 で何もしないのと同じ
                       sel_bit <= 0;
                   end
               end;

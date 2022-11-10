@@ -680,6 +680,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         {
           conv.data_0 = assemble(0, 8, 0);
           conv.data_1 = 0;
+          // conv.data_1 = assemble(0, 9, 0); // storeとlastを同時実行して問題ないかテスト
         }
         else
         {
@@ -700,6 +701,36 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         verilator_top->S_AXIS_TDATA[i] = 0;
       }
       eval();
+
+      // 2連続でstoreすることも可能
+      // tmp = 0;
+      // for (int i = 0; i < REMAINDAR; i++)
+      // {
+      //   if (i % 2 == 0)
+      //   {
+      //     conv.data_0 = assemble(0, 8, 0);
+      //     conv.data_1 = 0;
+      //     // conv.data_1 = assemble(0, 9, 0); // storeとlastを同時実行して問題ないかテスト
+      //   }
+      //   else
+      //   {
+      //     conv.data_1 = assemble(0, 8, 0);
+      //     verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      //     tmp++;
+      //   }
+      // }
+      // // 奇数のとき最後の代入ができていない
+      // if (REMAINDAR % 2 != 0)
+      // {
+      //   verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      //   tmp++;
+      // }
+      // // 残り埋める
+      // for (int i = tmp; i < 32; i++)
+      // {
+      //   verilator_top->S_AXIS_TDATA[i] = 0;
+      // }
+      // eval();
 
       tmp = 0;
       for (int i = 0; i < 1; i++)
@@ -993,32 +1024,32 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // last
-      tmp = 0;
-      for (int i = 0; i < 1; i++)
-      {
-        conv.data_0 = assemble(0, 9, 0);
-        conv.data_1 = 0;
-        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-        tmp++;
-      }
-      // 残り埋める
-      for (int i = tmp; i < 32; i++)
-      {
-        verilator_top->S_AXIS_TDATA[i] = 0;
-      }
-      eval();
+      // // last
+      // tmp = 0;
+      // for (int i = 0; i < 1; i++)
+      // {
+      //   conv.data_0 = assemble(0, 9, 0);
+      //   conv.data_1 = 0;
+      //   verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      //   tmp++;
+      // }
+      // // 残り埋める
+      // for (int i = tmp; i < 32; i++)
+      // {
+      //   verilator_top->S_AXIS_TDATA[i] = 0;
+      // }
+      // eval();
 
-      verilator_top->S_AXIS_TVALID = 0;
+      // verilator_top->S_AXIS_TVALID = 0;
 
-      // 演算結果を待つ
-      while (!verilator_top->M_AXIS_TVALID)
-      {
-        eval();
-      }
+      // // 演算結果を待つ
+      // while (!verilator_top->M_AXIS_TVALID)
+      // {
+      //   eval();
+      // }
 
-      // 送信
-      verilator_top->S_AXIS_TVALID = 1;
+      // // 送信
+      // verilator_top->S_AXIS_TVALID = 1;
 
       // 3 -------------------------------------------------------------------
       tmp = 0;
@@ -1125,7 +1156,6 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
           else
           {
             conv.data_1 = assemble(0, 8, 0);
-            // conv.data_1 = assemble(0, 8, 0);
             verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
             tmp++;
           }
@@ -1159,37 +1189,37 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // }
         // eval();
 
-        // wb.item
-        tmp = 0;
-        for (int i = 0; i < 1; i++)
-        {
-          conv.data_0 = assemble(1, 12, 1023);
-          conv.data_1 = 0;
-          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-          tmp++;
-        }
-        // 残り埋める
-        for (int i = tmp; i < 32; i++)
-        {
-          verilator_top->S_AXIS_TDATA[i] = 0;
-        }
-        eval();
+        // // wb.item
+        // tmp = 0;
+        // for (int i = 0; i < 1; i++)
+        // {
+        //   conv.data_0 = assemble(1, 12, 1023);
+        //   conv.data_1 = 0;
+        //   verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        //   tmp++;
+        // }
+        // // 残り埋める
+        // for (int i = tmp; i < 32; i++)
+        // {
+        //   verilator_top->S_AXIS_TDATA[i] = 0;
+        // }
+        // eval();
 
-        // load
-        tmp = 0;
-        for (int i = 0; i < 1; i++)
-        {
-          conv.data_0 = assemble(1, 1, 1023);
-          conv.data_1 = 0;
-          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-          tmp++;
-        }
-        // 残り埋める
-        for (int i = tmp; i < 32; i++)
-        {
-          verilator_top->S_AXIS_TDATA[i] = 0;
-        }
-        eval();
+        // // load
+        // tmp = 0;
+        // for (int i = 0; i < 1; i++)
+        // {
+        //   conv.data_0 = assemble(1, 1, 1023);
+        //   conv.data_1 = 0;
+        //   verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        //   tmp++;
+        // }
+        // // 残り埋める
+        // for (int i = tmp; i < 32; i++)
+        // {
+        //   verilator_top->S_AXIS_TDATA[i] = 0;
+        // }
+        // eval();
 
         // last
         tmp = 0;
@@ -1319,8 +1349,8 @@ int main(int argc, char **argv)
   int DEBUG = 0;
   int ADDRNUM = 0;
   // 次元数可変 (結果を何個出力するかに使う)
-  // const int DIM = 32 / 32;
-  const int DIM = 1024 / 32;
+  const int DIM = 32 / 32;
+  // const int DIM = 1024 / 32;
   const int MAJORITY_ADDR = 1023;
 
   // const int SIMULATION_COUNT = 100;
@@ -1335,7 +1365,7 @@ int main(int argc, char **argv)
   //   printf(" -------------------\n\n");
   // }
 
-  ADDRNUM = 12;
+  ADDRNUM = 15;
   DEBUG = 0;
   check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");

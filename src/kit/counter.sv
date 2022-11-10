@@ -4,8 +4,10 @@
 
 module counter
     #(
-         // 現状1GBが限界なため30bitでOK
+         // 現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分
+         // counterで数える上限
          parameter W = 30,
+         // コア数 (デバッグ用)
          parameter CORENUM = 16
      )
      (
@@ -27,16 +29,6 @@ module counter
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // タイミング可変
-    // 32コア
-    // reg         store_n, store_nn, store_nnn;
-    // always_ff @(posedge clk) begin
-    //               store_n <= store;
-    //               store_nn <= store_n;
-    //               store_nnn <= store_nn;
-    //           end;
-
-    // タイミング可変
     // 16コア
     reg         store_n, store_nn;
     always_ff @( posedge clk ) begin
@@ -44,17 +36,25 @@ module counter
                   store_nn <= store_n;
               end;
 
-    // タイミング可変
-    // 4コア
-    // reg         store_n;
-    // always_ff @(posedge clk) begin
-    //               store_n <= store;
-    //           end;
-
 
     // 分散RAM (符号付き)
-    // (* ram_style = "block" *)
     reg signed [ W-1:0 ]      box;
+
+    always_ff @( posedge clk ) begin
+                  // 現状アクセラレータの動作を止めることで、counterの値をフラッシュ（将来命令セットにフラッシュを加えるかも）
+                  if ( rst) begin
+                      box <= 0;
+                  end
+                  // store_nと分離することで、storeが連続で実行されても対応可能にした
+                  else if ( store_nn ) begin
+                      // コア数可変
+                      // 16コア
+                      //   box <= box + box_1 + box_2 + box_3 + box_4;
+                      // 1-4コア
+                      box <= box + box_1;
+                  end
+              end;
+
 
     // コア数可変
     // reg signed [W-1:0 ]      box_11;
@@ -70,11 +70,8 @@ module counter
     // reg signed [W-1:0 ]      box_7;
     // reg signed [W-1:0 ]      box_8;
 
-    // run == 1 にする前に設定する必要性あり
-    // $signed(1'b1)にするとバグる
     always_ff @( posedge clk ) begin
                   if ( rst ) begin
-                      box <= 0;
                       // コア数可変
                       box_1 <= 0;
                       //   box_2 <= 0;
@@ -85,7 +82,6 @@ module counter
                       //   box_7 <= 0;
                       //   box_8 <= 0;
                   end
-
                   else if ( store_n ) begin
                       // コア数可変
                       // 1コア
@@ -110,24 +106,18 @@ module counter
                       //         + select[14 ]
                       //         + select[15 ];
                   end
-
-                  else if ( store_nn ) begin
-                      // コア数可変
-                      // 16コア
-                      //   box <= box + box_1 + box_2 + box_3 + box_4;
-                      // 1-4コア
-                      box <= box + box_1;
-                  end
               end;
 
 
     //================================================================
 
 
+    // 0, 1, -1を格納
     // 1コア
     wire signed [ 1:0 ]      select [ 0:CORENUM-1 ];
     // wire signed [ 1:0 ]      select;
 
+    // 各コアの結果をselectに格納　（0, 1, -1）
     generate
         genvar      k;
         for ( k = 0; k < CORENUM; k = k + 1 ) begin
@@ -151,8 +141,8 @@ module counter
     endgenerate
 
 
-
     // 符号ビット
+    // boxは分散RAMなので、非同期に読み出し (後々変えるかも)
     assign sign_bit = box[ W-1 ];
 
 

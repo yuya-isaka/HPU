@@ -4,7 +4,9 @@
 
 module buffer_ctrl
     #(
+         // ハイパーベクトルの次元数
          parameter DIM = 1023,
+         // コア数 (デバッグ用)
          parameter CORENUM = 16
      )
      (
@@ -57,6 +59,8 @@ module buffer_ctrl
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+    // 次元数分のカウンターを用意
     generate
         genvar i;
         for ( i = 0; i < DIM + 1; i = i + 1 ) begin
@@ -121,27 +125,16 @@ module buffer_ctrl
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // 4コア
-    // 『stream_vが立つタイミングのencoded_hvが求めてた値』
-    //         ->   get_fin         ->   stream_v
-    //                              ->   sign_bit(最新値)
-    //         ->   select          ->   box ↑(sign_bit), update前にselectが組み合わせ回路で求まっている前提
-
     // 16コア
     // 『stream_vが立つタイミングのsign_bitが求めてた値』
-    // last     ->   last_n      ->  last_nn  ->  stream_v
-    //         ->   select       ->  box_1 ...  ->  box ↑ sign_bitも最新値
-
-
-    // 32コア
-    // 『stream_vが立つタイミングのsign_bitが求めてた値』
-    // update  ->   get_fin      ->  get_fin_n  ->  get_fin_nn   ->  stream_v
-    //         ->   update_n     ->  update_nn  ->  update_nnn   ->  sign_bit(最新値)
-    //         ->   select       ->  box_1 ...  ->  box_11       ->  box ↑ sign_bitも最新値
+    // last     ->   last_n      ->  last_nn    ->  stream_v
+    //          ->   select      ->  box_1 ...  ->  box, sign_bit 最新値
 
 
     // stream_d
     always_ff @( posedge clk ) begin
+                  // stream_vがたった次のタイミングに値を更新
+                  // stram_vの次にdst_validが立つ設計
                   if ( stream_v ) begin
                       stream_d <= sign_bit;
                   end

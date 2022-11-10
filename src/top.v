@@ -2,15 +2,16 @@
 `default_nettype none
 
 
-// 可変
-// --------------------
+// 可変 (デバッグ用)
+
+// ------------------------------------------
 // アドレス数可変
 // 計算数可変
 // バス幅可変
-// --------------------
-// コア数可変 (1コア専用の部分は、『1コア』とコメント。storeするタイミングをずらすやつは『タイミング可変』とコメント)
+
+// コア数可変 (1コア専用の部分は、『1コア』とコメント。)
 // 次元数可変 (topだけ)
-// --------------------
+// ------------------------------------------
 
 module top
     (
@@ -65,21 +66,21 @@ module top
 
     // 次元数可変
     // 32次元 -----------------
-    // parameter DIM = 31;
+    parameter DIM = 31;
     // -----------------------
 
     // 1024次元 ---------------
-    parameter DIM = 1023;
+    // parameter DIM = 1023;
     // -----------------------
 
 
     // 次元数可変
     // 32次元 -----------------
-    // parameter WI = 0;
+    parameter WI = 0;
     // -----------------------
 
     // 1024次元 ---------------
-    parameter WI = 31;
+    // parameter WI = 31;
     // -----------------------
 
 
@@ -110,12 +111,13 @@ module top
                );
 
 
+    // 現時点のcounterの値
     wire [ DIM:0 ]      sign_bit;
 
     // コア数可変
     // 次元数可変
-    // buffer_ctrl #( .DIM( 31 ), .CORENUM( 2 ) ) buffer_ctrl
-    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 2 ) ) buffer_ctrl
+    // buffer_ctrl #( .DIM( 1023 ), .CORENUM( 2 ) ) buffer_ctrl
+    buffer_ctrl #( .DIM( 31 ), .CORENUM( 2 ) ) buffer_ctrl
                 (
                     // in
                     .clk( AXIS_ACLK ),
@@ -168,6 +170,8 @@ module top
 
 
 
+    // 計算結果を送るタイミングの１クロック前に立つ
+    // counterの値(sign_bit)をM_AXIS_TDATAに格納するタイミングを知らせる役割
     wire              stream_v;
 
     stream_ctrl #( .CORENUM( 2 ) ) stream_ctrl
@@ -188,9 +192,14 @@ module top
                 );
 
 
-    // =============================== ランダム関連 ===================================
+    // ================================================== ランダム関連 ==============================================================
+    // ランダム関連はgen信号によって駆動
+    // ============================================================================================================================
 
 
+    // 32bitのランダム値の生成数
+    // (1024bitのハイパーベクトルが生成される場合、32個生成）
+    // (現状最大で32個なので、5bit幅)
     reg [ 4:0 ]       item_a_tmp;
 
     always @( posedge AXIS_ACLK ) begin
@@ -208,6 +217,8 @@ module top
     end
 
 
+    // 各コアのitem_memoryにランダム値を格納するタイミング
+    // item_a_tmpの値から、更新タイミングを決定
     reg             update_item;
 
     always @( posedge AXIS_ACLK ) begin
@@ -223,7 +234,8 @@ module top
     end
 
 
-    // 1024個のアドレスを生成 （各コアのitem_memoryに格納）
+    // 各コアのitem_memoryのアドレス
+    // (現状最大で1024個なので、10bit指定)
     reg [ 9:0 ]      item_a;
 
     always @( posedge AXIS_ACLK ) begin
@@ -236,6 +248,7 @@ module top
     end
 
 
+    // xorshiftモジュールから生成される32bitのランダム値
     wire [ 31:0 ]         rand_num_tmp;
 
     xorshift prng
@@ -249,6 +262,8 @@ module top
              );
 
 
+    // xorshiftから生成されたランダム値(rand_num_tmp)の格納先
+    // (ハイパーベクトル次元数が1024なら、31回別々に格納する)
     reg [ DIM:0 ]       rand_num;
 
     always @( posedge AXIS_ACLK ) begin
@@ -259,123 +274,128 @@ module top
         else if ( item_a_tmp == 0 ) begin
             rand_num[ 31:0 ] <= rand_num_tmp;
         end
-        else if ( item_a_tmp == 1 ) begin
-            rand_num[ 63:32 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 2 ) begin
-            rand_num[ 95:64 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 3 ) begin
-            rand_num[ 127:96 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 4 ) begin
-            rand_num[ 159:128 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 5 ) begin
-            rand_num[ 191:160 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 6 ) begin
-            rand_num[ 223:192 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 7 ) begin
-            rand_num[ 255:224 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 8 ) begin
-            rand_num[ 287:256 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 9 ) begin
-            rand_num[ 319:288 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 10 ) begin
-            rand_num[ 351:320 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 11 ) begin
-            rand_num[ 383:352 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 12 ) begin
-            rand_num[ 415:384 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 13 ) begin
-            rand_num[ 447:416 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 14 ) begin
-            rand_num[ 479:448 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 15 ) begin
-            rand_num[ 511:480 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 16 ) begin
-            rand_num[ 543:512 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 17 ) begin
-            rand_num[ 575:544 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 18 ) begin
-            rand_num[ 607:576 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 19 ) begin
-            rand_num[ 639:608 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 20 ) begin
-            rand_num[ 671:640 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 21 ) begin
-            rand_num[ 703:672 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 22 ) begin
-            rand_num[ 735:704 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 23 ) begin
-            rand_num[ 767:736 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 24 ) begin
-            rand_num[ 799:768 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 25 ) begin
-            rand_num[ 831:800 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 26 ) begin
-            rand_num[ 863:832 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 27 ) begin
-            rand_num[ 895:864 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 28 ) begin
-            rand_num[ 927:896 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 29 ) begin
-            rand_num[ 959:928 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 30 ) begin
-            rand_num[ 991:960 ] <= rand_num_tmp;
-        end
-        else if ( item_a_tmp == 31 ) begin
-            rand_num[ 1023:992 ] <= rand_num_tmp;
-        end
+        // else if ( item_a_tmp == 1 ) begin
+        //     rand_num[ 63:32 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 2 ) begin
+        //     rand_num[ 95:64 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 3 ) begin
+        //     rand_num[ 127:96 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 4 ) begin
+        //     rand_num[ 159:128 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 5 ) begin
+        //     rand_num[ 191:160 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 6 ) begin
+        //     rand_num[ 223:192 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 7 ) begin
+        //     rand_num[ 255:224 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 8 ) begin
+        //     rand_num[ 287:256 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 9 ) begin
+        //     rand_num[ 319:288 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 10 ) begin
+        //     rand_num[ 351:320 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 11 ) begin
+        //     rand_num[ 383:352 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 12 ) begin
+        //     rand_num[ 415:384 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 13 ) begin
+        //     rand_num[ 447:416 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 14 ) begin
+        //     rand_num[ 479:448 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 15 ) begin
+        //     rand_num[ 511:480 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 16 ) begin
+        //     rand_num[ 543:512 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 17 ) begin
+        //     rand_num[ 575:544 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 18 ) begin
+        //     rand_num[ 607:576 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 19 ) begin
+        //     rand_num[ 639:608 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 20 ) begin
+        //     rand_num[ 671:640 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 21 ) begin
+        //     rand_num[ 703:672 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 22 ) begin
+        //     rand_num[ 735:704 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 23 ) begin
+        //     rand_num[ 767:736 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 24 ) begin
+        //     rand_num[ 799:768 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 25 ) begin
+        //     rand_num[ 831:800 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 26 ) begin
+        //     rand_num[ 863:832 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 27 ) begin
+        //     rand_num[ 895:864 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 28 ) begin
+        //     rand_num[ 927:896 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 29 ) begin
+        //     rand_num[ 959:928 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 30 ) begin
+        //     rand_num[ 991:960 ] <= rand_num_tmp;
+        // end
+        // else if ( item_a_tmp == 31 ) begin
+        //     rand_num[ 1023:992 ] <= rand_num_tmp;
+        // end
     end
 
 
+    // ============================================================================================================================
+    // ============================================================================================================================
 
-    //================================================================
 
+    // 各コアのストア信号
     // 1コア
     wire [ CORENUM-1:0 ]              store;
     // wire                            store;
 
+    // 各コアの演算結果
     // 1コア
     wire [ DIM:0 ]                    core_result [ 0:CORENUM-1 ];
     // wire [DIM:0]                    core_result;
 
+    // 各コアのラスト信号
     // 1コア
     wire [ CORENUM-1:0 ]              last;
     // wire                            last;
 
+    // 各コアでエンコーディング
     generate
         genvar      i;
         for ( i = 0; i < CORENUM; i = i + 1 ) begin
             // 次元数可変
-            // core #( .DIM( 31 ) ) core
-            core #( .DIM( 1023 ) ) core
+            // core #( .DIM( 1023 ) ) core
+            core #( .DIM( 31 ) ) core
                  (
                      // in
                      .clk( AXIS_ACLK ),
@@ -385,8 +405,7 @@ module top
                      .item_a( item_a[ 9:0 ] ),
                      .rand_num( rand_num[ DIM:0 ] ),
                      .get_v( get_v ),
-                     // アドレス数可変
-                     //  .get_d(S_AXIS_TDATA[31+32*i:32*i]),
+                     // 16bit命令
                      .get_d( S_AXIS_TDATA[ 15+16*i:16*i ] ),
                      .exec( exec ),
                      .sign_bit( sign_bit[ DIM:0] ),
@@ -416,6 +435,7 @@ module top
 
 
     // AXI Lite Slave State --------------
+
     reg [ 3:0 ]           state;
 
     wire INI = ( state == 4'b0000 );
@@ -424,12 +444,19 @@ module top
     wire AWW = ( state == 4'b0011 );
     wire AR1 = ( state == 4'b0100 );
     wire AR2 = ( state == 4'b1000 );
+
     // -----------------------------------
 
 
+    // アドレスは4の倍数で指定
+
+    // UIOの書き込み先アドレス
     reg [ 11:2 ]          write_addr;
-    reg [ 11:2 ]          read_addr;
+    // UIOの書き込みデータ
     reg [ 31:0 ]          write_data;
+
+    // UIOの読み込み先アドレス
+    reg [ 11:2 ]          read_addr;
 
 
     //================================================================
@@ -443,59 +470,71 @@ module top
     assign S_AXI_BVALID  = AWW;
     assign S_AXI_RVALID  = AR2;
 
+
     always @( posedge S_AXI_ACLK ) begin
+        // リセット
         if ( ~S_AXI_ARESETN ) begin
             state <= 4'b0000;
             write_addr <= 0;
             write_data <= 0;
+            read_addr <= 0;
         end
         // INI
         else if ( INI ) begin
-            if ( S_AXI_AWVALID & S_AXI_WVALID ) begin // go AWW
+            if ( S_AXI_AWVALID & S_AXI_WVALID ) begin
+                // go AWW
                 state <= 4'b0011;
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
                 write_data <= S_AXI_WDATA;
             end
-            else if ( S_AXI_AWVALID ) begin // go AW
+            else if ( S_AXI_AWVALID ) begin
+                // go AW
                 state <= 4'b0001;
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
             end
-            else if ( S_AXI_WVALID ) begin // go W
+            else if ( S_AXI_WVALID ) begin
+                // go W
                 state <= 4'b0010;
                 write_data <= S_AXI_WDATA;
             end
-            else if ( S_AXI_ARVALID ) begin // go AR1
+            else if ( S_AXI_ARVALID ) begin
+                // go AR1
                 state <= 4'b0100;
                 read_addr[ 11:2 ] <= S_AXI_ARADDR[ 11:2 ];
             end
         end
         // AW
         else if ( AW ) begin
-            if ( S_AXI_WVALID ) begin // go AWW
+            if ( S_AXI_WVALID ) begin
+                // go AWW
                 state <= 4'b0011;
                 write_data <= S_AXI_WDATA;
             end
         end
         // W
         else if ( W ) begin
-            if ( S_AXI_AWVALID ) begin // go AWW
+            if ( S_AXI_AWVALID ) begin
+                // go AWW
                 state <= 4'b0011;
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
             end
         end
         // AWW
         else if ( AWW ) begin
-            if ( S_AXI_BREADY ) begin // go INI
+            if ( S_AXI_BREADY ) begin
+                // go INI
                 state <= 4'b0000;
             end
         end
         // AR1
         else if ( AR1 ) begin
+            // go AR2
             state <= 4'b1000;
         end
         // AR2
         else if ( AR2 ) begin
-            if ( S_AXI_RREADY ) begin // go INI
+            if ( S_AXI_RREADY ) begin
+                // go INI
                 state <= 4'b0000;
             end
         end
@@ -505,63 +544,97 @@ module top
     //================================================================
 
 
-    wire            register_w;
-    wire            register_r;
+    // 書き込み可能フラグ
+    wire            register_wflag;
 
-    assign register_w = AWW & ( write_addr[ 11:10] == 2'b00 );
-    assign register_r = AR1 & ( read_addr[ 11:10] == 2'b00 );
+    assign register_wflag = AWW & ( write_addr[ 11:10 ] == 2'b00 );
+
+
+    // 読み込み可能フラグ
+    wire            register_rflag;
+
+    assign register_rflag = AR1 & ( read_addr[ 11:10 ] == 2'b00 );
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // 状態
-    reg             run, gen;
+    // アクセラレータのモード
+    // gen ... アクセラレータ準備モード　（ランダムなハイパーベクトルをitem_memoryに格納）
+    // run ... アクセラレータ実行モード
 
-    // item_memory数 (現状1023最大値, 16bitアドレスで指定)
+    // gen ... 書き込みモードで１を代入
+    // run ... 書き込みモードで2を代入
+    reg             gen, run;
+
+    // item_memoryに格納するハイパーベクトルの数
+    // (現状の最大値は1023)
     reg [ 9:0 ]       item_memory_num;
 
 
     //================================================================
 
 
-    // Register Write
+    // UIO Register Write (書き込みモード)
     always @( posedge S_AXI_ACLK ) begin
+
+        // 初期化
         if ( ~S_AXI_ARESETN ) begin
             { run, gen } <= 2'b00;
             item_memory_num <= 10'd0;
         end
-        else if ( register_w ) begin
-            case ( { write_addr[ 9:2 ],2'b00 } )
+
+        // 書き込み
+        else if ( register_wflag ) begin
+
+            // 4の倍数に揃えるため、下位2bitは強制的に０
+            case ( { write_addr[ 9:2 ], 2'b00 } )
+                // アドレス０
                 10'd00:
-                    { run, gen} <= write_data[ 1:0 ];
+                    { run, gen } <= write_data[ 1:0 ];
+                // アドレス４
                 10'd04:
-                    item_memory_num[ 9:0] <= write_data[ 9:0 ]; // 最大1023
+                    // 最大1023
+                    item_memory_num[ 9:0 ] <= write_data[ 9:0 ];
+                // 上記アドレス以外は何もしない
                 default:
                     ;
             endcase
+
         end
+
+        // アクセラレータ準備モード終了
+        // (item_memory_num数のハイパーベクトルを生成して終了)
+        // (現状S_AXI_ACLK, S_AXIS_ACLKが同じ周波数を用いているため問題ない)
         else if ( gen & item_a == item_memory_num & update_item ) begin
             gen <= 1'b0;
         end
+
     end
 
 
     //================================================================
 
 
-    // Register Read
+    // UIO Register Read (読み込みモード)
     always @( posedge S_AXI_ACLK ) begin
-        if ( register_r ) begin
-            S_AXI_RDATA <= 0;
+
+        // 読み込み
+        if ( register_rflag ) begin
+
+            // 4の倍数に揃えるため、下位2bitは強制的に０
             case ( { read_addr[ 9:2 ], 2'b00 } )
+                // アドレス０
                 10'h00:
                     S_AXI_RDATA[ 1:0 ] <= { run, gen };
+                // アドレス４
                 10'd04:
                     S_AXI_RDATA[ 9:0 ] <= item_memory_num[ 9:0 ];
+                // 上記アドレス以外は何もしない
                 default:
-                    ;
+                    S_AXI_RDATA <= 0;
             endcase
+
         end
     end
 

@@ -4,6 +4,7 @@
 
 module stream_ctrl
     #(
+         // コア数 (デバッグ用)
          parameter CORENUM = 16
      )
      (
@@ -13,7 +14,7 @@ module stream_ctrl
          input wire                         get_v,
          // 1コア
          input wire [ CORENUM-1:0 ]         last,
-         //  input wire                         last,
+         //   input wire                         last,
          input wire                         dst_ready,
 
          // out
@@ -26,19 +27,22 @@ module stream_ctrl
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // タイミング可変
-    // 32コア
-    // reg         last_n, last_nn, last_nnn;
-    // always_ff @(posedge clk) begin
-    //               get_fin_n <= get_fin;
-    //               get_fin_nn <= get_fin_n;
-    //               last_nnn <= get_fin_nn;
-    //           end;
+    // 現状の流れ
+    // last -> last_n -> last_nn                  -> stream_ok_keep (stream_ok保持) -> dst_valid (stream_active引き金)
+    //                   stream_ok (last_nn引き金)    start (stream_ok_keep引き金)       dst_last (stream_active & last_stream引き金)
+    //                                               stream_active (sream_ok引き金)
+    //                                               stream_v (stream_active引き金)
+    //                                               last_stream (start引き金)
 
-    reg         last_n;
+
+    // ラスト命令 (9命令) が実行された時、同時に他のコアでstore命令が実行されていることを考慮
+    // sign_bitが更新されるまで2サイクル待つ
+    reg         last_n, last_nn;
+
     always_ff @( posedge clk ) begin
                   if ( rst ) begin
-                      last_n <= 1'b0;
+                      last_n <= 0;
+                      last_nn <= 0;
                   end
                   else begin
                       if ( last != 0 ) begin
@@ -47,31 +51,33 @@ module stream_ctrl
                       else begin
                           last_n <= 1'b0;
                       end
+                      last_nn <= last_n;
                   end
               end;
 
 
+    // ラスト命令が発行された後に、dst_readyが落ちている場合を考慮
+    // ラスト命令が発行された事実を保持
     reg         last_keep;
+
     always_ff @( posedge clk ) begin
                   if ( rst ) begin
                       last_keep <= 1'b0;
                   end
+                  // 問題なく発行できそうなら、keepはしない
+                  // stream_okを先に評価する
                   else if ( stream_ok ) begin
                       last_keep <= 1'b0;
                   end
-                  // タイミング可変
-                  // 32コア
-                  //   else if (lst_nnn) begin
-                  // 4コア
-                  //   else if (last) begin
-                  // 16コア
-                  else if ( last_n ) begin
+                  else if ( last_nn ) begin
                       last_keep <= 1'b1;
                   end
               end;
 
 
+    // stream_okが立った事実を保持
     reg         stream_ok_keep;
+
     always_ff @( posedge clk ) begin
                   if ( rst ) begin
                       stream_ok_keep <= 1'b0;
@@ -85,17 +91,13 @@ module stream_ctrl
     //================================================================
 
 
+    // 引き金: last_nn か last_keep
     logic       stream_ok;
+
     always_comb begin
                     stream_ok = 1'b0;
 
-                    // タイミング可変
-                    // 32コア
-                    // if ((last_nnn | last_keep) & dst_ready) begin
-                    // 4コア
-                    // if ((last | last_keep) & dst_ready) begin
-                    // 16コア
-                    if ( ( last_n | last_keep) & dst_ready ) begin
+                    if ( ( last_nn | last_keep) & dst_ready ) begin
                         stream_ok = 1'b1;
                     end
                 end;
@@ -104,7 +106,9 @@ module stream_ctrl
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // dst_valid
+    // 引き金: stream_active
+    // streamが続く限り1のまま
+    // dst_valid(M_AXIS_TVALIDが立ったタイミングのstream_d(M_AXIS_TDATA)のデータが送信される
     always_ff @( posedge clk ) begin
                   if ( rst ) begin
                       dst_valid <= 1'b0;
@@ -115,22 +119,30 @@ module stream_ctrl
               end;
 
 
+    // 引き金: stream_ok
+    // streamが続く限り1のまま
     reg         stream_active;
+
     always_ff @( posedge clk ) begin
                   if ( rst ) begin
                       stream_active <= 1'b0;
                   end
+                  // 最後のストリームの時に落とす
+                  // 最後のストリームが立っている時、再びstream_okが経つのは未定義動作（こっちが先に評価されるため）
                   else if ( last_stream ) begin
                       stream_active <= 1'b0;
                   end
+                  // stream_active <= stream_okはだめ
+                  // 一度stream_okが立ったら、stream_activeの値は保持する （last_streamが立った時に落とす）
                   else if ( dst_ready & stream_ok ) begin
                       stream_active <= 1'b1;
                   end
               end;
 
 
-    wire [ 1:0 ]      i;
-    wire            last_stream;
+    // 引き金: start
+    wire [ 1:0 ]        i;
+    wire                last_stream;
 
     // 各コアで違う結果を返したい時に使うかも？
     agu #( .W( 2 ) ) agu_stream_i
@@ -145,13 +157,14 @@ module stream_ctrl
 
             // out
             .data( i ),
-            .last( last_stream)
+            .last( last_stream )
         );
 
 
     //================================================================
 
 
+    // 引き金： stream_ok_keep
     logic       start;
 
     always_comb begin
@@ -163,13 +176,15 @@ module stream_ctrl
                 end;
 
 
-    assign stream_v = stream_active & dst_ready;
+    // 引き金: stream_active
+    assign stream_v = dst_ready & stream_active;
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // dst_last
+    // 引き金: stream_activeとlast_stream
+    // dst_validが立つ & 最後のストリームの時立たせる
     always_ff @( posedge clk ) begin
                   if ( rst ) begin
                       dst_last <= 1'b0;
