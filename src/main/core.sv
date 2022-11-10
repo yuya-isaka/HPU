@@ -61,6 +61,7 @@ module core
                               inst <= 0;
                           end
                           else begin
+                            // フォワーディング処理
                               if ( wb ) begin
                                   reg_0 <= reg_2;
                               end
