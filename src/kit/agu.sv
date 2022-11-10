@@ -8,10 +8,13 @@
 //      enが１の時＋１する
 module agu
     #(
+
          // アドレス生成の数の制限
          parameter W = 32
+
      )
      (
+
          // in
          input wire                     clk,
          input wire                     rst,
@@ -20,9 +23,11 @@ module agu
          input wire                     start,
          input wire                     en,
 
+
          // out
          output reg [ W-1:0 ]           data,
          output logic                   last
+
      );
 
 
@@ -33,14 +38,19 @@ module agu
     //      最後に０にする
     //      それまでは１
     reg              run;
+
     always_ff @( posedge clk ) begin
+
                   if ( rst ) begin
                       run <= 1'b0;
                   end
+
                   else if ( start | run ) begin
+
                       if ( last & en ) begin
                           run <= 1'b0;
                       end
+
                       else begin
                           run <= 1'b1;
                       end
@@ -52,13 +62,17 @@ module agu
     //      最後に初期化
     //      それまでは +1
     always_ff @( posedge clk ) begin
+
                   if ( rst ) begin
                       data <= ini;
                   end
+
                   else if ( start | run ) begin
+
                       if ( last & en ) begin
                           data <= ini;
                       end
+
                       else if ( en ) begin
                           data <= data + 1'b1;
                       end

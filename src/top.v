@@ -15,6 +15,7 @@
 
 module top
     (
+
         // AXI Lite Slave Interface ----------------------
         input wire                      S_AXI_ACLK,
         input wire                      S_AXI_ARESETN,
@@ -61,6 +62,7 @@ module top
         input wire                      S_AXIS_TVALID,
         output wire                     S_AXIS_TREADY
         // -----------------------------------------------
+
     );
 
 
@@ -98,16 +100,19 @@ module top
 
     get_enable get_enable
                (
+
                    // in
                    .clk( AXIS_ACLK ),
                    .gen( gen ),
                    .run( run ),
                    .get_valid( S_AXIS_TVALID ),
 
+
                    // out
                    .get_ready( S_AXIS_TREADY ),
                    .get_v( get_v ),
                    .exec( exec )
+
                );
 
 
@@ -119,6 +124,7 @@ module top
     // buffer_ctrl #( .DIM( 31 ), .CORENUM( 16 ) ) buffer_ctrl
     buffer_ctrl #( .DIM( 1023 ), .CORENUM( 16 ) ) buffer_ctrl
                 (
+
                     // in
                     .clk( AXIS_ACLK ),
                     .rst( ~run ),
@@ -146,10 +152,12 @@ module top
                     // .store( store ),
                     .stream_v( stream_v ),
 
+
                     // out
                     // バス幅可変
                     .stream_d( M_AXIS_TDATA[ 1023:0 ] ),
                     .sign_bit( sign_bit[ DIM:0 ] )
+
                 );
 
 
@@ -160,6 +168,7 @@ module top
 
     stream_ctrl #( .CORENUM( 2 ) ) stream_ctrl
                 (
+
                     // in
                     .clk( AXIS_ACLK ),
                     .rst( ~run ),
@@ -169,10 +178,12 @@ module top
                     .get_v( get_v ),
                     .dst_ready( M_AXIS_TREADY ),
 
+
                     // out
                     .dst_valid( M_AXIS_TVALID ),
                     .dst_last( M_AXIS_TLAST ),
                     .stream_v( stream_v)
+
                 );
 
 
@@ -187,13 +198,17 @@ module top
     reg [ 4:0 ]       item_a_tmp;
 
     always @( posedge AXIS_ACLK ) begin
+
         if ( ~gen ) begin
             item_a_tmp <= 0;
         end
+
         else begin
+
             if ( item_a_tmp == WI ) begin
                 item_a_tmp <= 5'd0;
             end
+
             else begin
                 item_a_tmp <= item_a_tmp + 5'd1;
             end
@@ -206,12 +221,15 @@ module top
     reg             update_item;
 
     always @( posedge AXIS_ACLK ) begin
+
         if ( ~gen ) begin
             update_item <= 0;
         end
+
         else if ( item_a_tmp == WI ) begin
             update_item <= 1'd1;
         end
+
         else begin
             update_item <= 0;
         end
@@ -223,9 +241,11 @@ module top
     reg [ 9:0 ]      item_a;
 
     always @( posedge AXIS_ACLK ) begin
+
         if ( ~gen ) begin
             item_a <= 0;
         end
+
         else if ( update_item ) begin
             item_a <= item_a + 10'd1;
         end
@@ -237,12 +257,15 @@ module top
 
     xorshift prng
              (
+
                  // in
                  .clk( AXIS_ACLK ),
                  .gen( gen ),
 
+
                  // out
                  .rand_num( rand_num_tmp[ 31:0 ] )
+
              );
 
 
@@ -251,103 +274,136 @@ module top
     reg [ DIM:0 ]       rand_num;
 
     always @( posedge AXIS_ACLK ) begin
+
         if ( ~gen ) begin
             rand_num <= 0;
         end
+
         // 次元数可変
         else if ( item_a_tmp == 0 ) begin
             rand_num[ 31:0 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 1 ) begin
             rand_num[ 63:32 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 2 ) begin
             rand_num[ 95:64 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 3 ) begin
             rand_num[ 127:96 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 4 ) begin
             rand_num[ 159:128 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 5 ) begin
             rand_num[ 191:160 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 6 ) begin
             rand_num[ 223:192 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 7 ) begin
             rand_num[ 255:224 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 8 ) begin
             rand_num[ 287:256 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 9 ) begin
             rand_num[ 319:288 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 10 ) begin
             rand_num[ 351:320 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 11 ) begin
             rand_num[ 383:352 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 12 ) begin
             rand_num[ 415:384 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 13 ) begin
             rand_num[ 447:416 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 14 ) begin
             rand_num[ 479:448 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 15 ) begin
             rand_num[ 511:480 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 16 ) begin
             rand_num[ 543:512 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 17 ) begin
             rand_num[ 575:544 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 18 ) begin
             rand_num[ 607:576 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 19 ) begin
             rand_num[ 639:608 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 20 ) begin
             rand_num[ 671:640 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 21 ) begin
             rand_num[ 703:672 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 22 ) begin
             rand_num[ 735:704 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 23 ) begin
             rand_num[ 767:736 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 24 ) begin
             rand_num[ 799:768 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 25 ) begin
             rand_num[ 831:800 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 26 ) begin
             rand_num[ 863:832 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 27 ) begin
             rand_num[ 895:864 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 28 ) begin
             rand_num[ 927:896 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 29 ) begin
             rand_num[ 959:928 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 30 ) begin
             rand_num[ 991:960 ] <= rand_num_tmp;
         end
+
         else if ( item_a_tmp == 31 ) begin
             rand_num[ 1023:992 ] <= rand_num_tmp;
         end
@@ -375,12 +431,16 @@ module top
 
     // 各コアでエンコーディング
     generate
+
         genvar      i;
+
         for ( i = 0; i < CORENUM; i = i + 1 ) begin
+
             // 次元数可変
             // core #( .DIM( 31 ) ) core
             core #( .DIM( 1023 ) ) core
                  (
+
                      // in
                      .clk( AXIS_ACLK ),
                      .run( run ),
@@ -394,6 +454,7 @@ module top
                      .exec( exec ),
                      .sign_bit( sign_bit[ DIM:0] ),
 
+
                      // out
                      // 1コア
                      .store( store[ i ] ),
@@ -404,6 +465,7 @@ module top
                      // 1コア
                      .last( last[ i ] )
                      //  .last( last)
+
                  );
         end
     endgenerate
@@ -423,10 +485,15 @@ module top
     reg [ 3:0 ]           state;
 
     wire INI = ( state == 4'b0000 );
+
     wire AW  = ( state == 4'b0001 );
+
     wire W   = ( state == 4'b0010 );
+
     wire AWW = ( state == 4'b0011 );
+
     wire AR1 = ( state == 4'b0100 );
+
     wire AR2 = ( state == 4'b1000 );
 
     // -----------------------------------
@@ -436,6 +503,7 @@ module top
 
     // UIOの書き込み先アドレス
     reg [ 11:2 ]          write_addr;
+
     // UIOの書き込みデータ
     reg [ 31:0 ]          write_data;
 
@@ -447,15 +515,22 @@ module top
 
 
     assign S_AXI_BRESP   = 2'b00;
+
     assign S_AXI_RRESP   = 2'b00;
+
     assign S_AXI_AWREADY = INI | W;
+
     assign S_AXI_WREADY  = INI | AW;
+
     assign S_AXI_ARREADY = INI;
+
     assign S_AXI_BVALID  = AWW;
+
     assign S_AXI_RVALID  = AR2;
 
 
     always @( posedge S_AXI_ACLK ) begin
+
         // リセット
         if ( ~S_AXI_ARESETN ) begin
             state <= 4'b0000;
@@ -463,60 +538,74 @@ module top
             write_data <= 0;
             read_addr <= 0;
         end
+
         // INI
         else if ( INI ) begin
+
             if ( S_AXI_AWVALID & S_AXI_WVALID ) begin
                 // go AWW
                 state <= 4'b0011;
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
                 write_data <= S_AXI_WDATA;
             end
+
             else if ( S_AXI_AWVALID ) begin
                 // go AW
                 state <= 4'b0001;
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
             end
+
             else if ( S_AXI_WVALID ) begin
                 // go W
                 state <= 4'b0010;
                 write_data <= S_AXI_WDATA;
             end
+
             else if ( S_AXI_ARVALID ) begin
                 // go AR1
                 state <= 4'b0100;
                 read_addr[ 11:2 ] <= S_AXI_ARADDR[ 11:2 ];
             end
         end
+
         // AW
         else if ( AW ) begin
+
             if ( S_AXI_WVALID ) begin
                 // go AWW
                 state <= 4'b0011;
                 write_data <= S_AXI_WDATA;
             end
         end
+
         // W
         else if ( W ) begin
+
             if ( S_AXI_AWVALID ) begin
                 // go AWW
                 state <= 4'b0011;
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
             end
         end
+
         // AWW
         else if ( AWW ) begin
+
             if ( S_AXI_BREADY ) begin
                 // go INI
                 state <= 4'b0000;
             end
         end
+
         // AR1
         else if ( AR1 ) begin
             // go AR2
             state <= 4'b1000;
         end
+
         // AR2
         else if ( AR2 ) begin
+
             if ( S_AXI_RREADY ) begin
                 // go INI
                 state <= 4'b0000;
@@ -573,13 +662,16 @@ module top
 
             // 4の倍数に揃えるため、下位2bitは強制的に０
             case ( { write_addr[ 9:2 ], 2'b00 } )
+
                 // アドレス０
                 10'd00:
                     { run, gen } <= write_data[ 1:0 ];
+
                 // アドレス４
                 10'd04:
                     // 最大1023
                     item_memory_num[ 9:0 ] <= write_data[ 9:0 ];
+
                 // 上記アドレス以外は何もしない
                 default:
                     ;
@@ -593,7 +685,6 @@ module top
         else if ( gen & item_a == item_memory_num & update_item ) begin
             gen <= 1'b0;
         end
-
     end
 
 
@@ -608,12 +699,15 @@ module top
 
             // 4の倍数に揃えるため、下位2bitは強制的に０
             case ( { read_addr[ 9:2 ], 2'b00 } )
+
                 // アドレス０
                 10'h00:
                     S_AXI_RDATA[ 1:0 ] <= { run, gen };
+
                 // アドレス４
                 10'd04:
                     S_AXI_RDATA[ 9:0 ] <= item_memory_num[ 9:0 ];
+
                 // 上記アドレス以外は何もしない
                 default:
                     S_AXI_RDATA <= 0;

@@ -4,10 +4,13 @@
 
 module stream_ctrl
     #(
+
          // コア数 (デバッグ用)
          parameter CORENUM = 16
+
      )
      (
+
          // in
          input wire                         clk,
          input wire                         rst,
@@ -17,10 +20,12 @@ module stream_ctrl
          //   input wire                         last,
          input wire                         dst_ready,
 
+
          // out
          output reg                         dst_valid,
          output reg                         dst_last,
          output logic                       stream_v
+
      );
 
 
@@ -40,17 +45,22 @@ module stream_ctrl
     reg         last_n, last_nn;
 
     always_ff @( posedge clk ) begin
+
                   if ( rst ) begin
                       last_n <= 0;
                       last_nn <= 0;
                   end
+
                   else begin
+
                       if ( last != 0 ) begin
                           last_n <= 1'b1;
                       end
+
                       else begin
                           last_n <= 1'b0;
                       end
+
                       last_nn <= last_n;
                   end
               end;
@@ -61,14 +71,17 @@ module stream_ctrl
     reg         last_keep;
 
     always_ff @( posedge clk ) begin
+
                   if ( rst ) begin
                       last_keep <= 1'b0;
                   end
+
                   // 問題なく発行できそうなら、keepはしない
                   // stream_okを先に評価する
                   else if ( stream_ok ) begin
                       last_keep <= 1'b0;
                   end
+
                   else if ( last_nn ) begin
                       last_keep <= 1'b1;
                   end
@@ -79,9 +92,11 @@ module stream_ctrl
     reg         stream_ok_keep;
 
     always_ff @( posedge clk ) begin
+
                   if ( rst ) begin
                       stream_ok_keep <= 1'b0;
                   end
+
                   else if ( dst_ready ) begin
                       stream_ok_keep <= stream_ok;
                   end
@@ -110,9 +125,11 @@ module stream_ctrl
     // streamが続く限り1のまま
     // dst_valid(M_AXIS_TVALIDが立ったタイミングのstream_d(M_AXIS_TDATA)のデータが送信される
     always_ff @( posedge clk ) begin
+
                   if ( rst ) begin
                       dst_valid <= 1'b0;
                   end
+
                   else if ( dst_ready ) begin
                       dst_valid <= stream_active;
                   end
@@ -124,14 +141,17 @@ module stream_ctrl
     reg         stream_active;
 
     always_ff @( posedge clk ) begin
+
                   if ( rst ) begin
                       stream_active <= 1'b0;
                   end
+
                   // 最後のストリームの時に落とす
                   // 最後のストリームが立っている時、再びstream_okが経つのは未定義動作（こっちが先に評価されるため）
                   else if ( last_stream ) begin
                       stream_active <= 1'b0;
                   end
+
                   // stream_active <= stream_okはだめ
                   // 一度stream_okが立ったら、stream_activeの値は保持する （last_streamが立った時に落とす）
                   else if ( dst_ready & stream_ok ) begin
@@ -147,6 +167,7 @@ module stream_ctrl
     // 各コアで違う結果を返したい時に使うかも？
     agu #( .W( 2 ) ) agu_stream_i
         (
+
             // in
             .ini( 2'd0 ),
             .fin( 2'd0 ),
@@ -155,9 +176,11 @@ module stream_ctrl
             .rst( rst ),
             .en( dst_ready ),
 
+
             // out
             .data( i ),
             .last( last_stream )
+
         );
 
 
@@ -186,9 +209,11 @@ module stream_ctrl
     // 引き金: stream_activeとlast_stream
     // dst_validが立つ & 最後のストリームの時立たせる
     always_ff @( posedge clk ) begin
+
                   if ( rst ) begin
                       dst_last <= 1'b0;
                   end
+
                   else if ( dst_ready ) begin
                       dst_last <= stream_active & last_stream;
                   end

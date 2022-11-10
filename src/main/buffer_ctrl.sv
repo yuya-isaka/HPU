@@ -4,12 +4,15 @@
 
 module buffer_ctrl
     #(
+
          // ハイパーベクトルの次元数
          parameter DIM = 1023,
          // コア数 (デバッグ用)
          parameter CORENUM = 16
+
      )
      (
+
          // in
          input wire                             clk,
          input wire                             rst,
@@ -35,9 +38,11 @@ module buffer_ctrl
          //  input wire                         store,
          input wire                             stream_v,
 
+
          // out
          output logic [ 1023:0 ]                stream_d,
          output wire  [ DIM:0 ]                 sign_bit
+
      );
 
 
@@ -46,13 +51,16 @@ module buffer_ctrl
 
     // 次元数分のカウンターを用意
     generate
+
         genvar i;
+
         for ( i = 0; i < DIM + 1; i = i + 1 ) begin
 
             // コア数可変
             // 計算数可変 (現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分)
             counter #( .W( 30 ), .CORENUM( 16 ) ) counter
                     (
+
                         // in
                         .clk( clk ),
                         .rst( rst ),
@@ -82,8 +90,10 @@ module buffer_ctrl
                             }
                         ),
 
+
                         // out
                         .sign_bit( sign_bit[ i ] )
+
                     );
 
         end
@@ -101,6 +111,7 @@ module buffer_ctrl
 
     // stream_d
     always_ff @( posedge clk ) begin
+
                   // stream_vがたった次のタイミングに値を更新
                   // stram_vの次にdst_validが立つ設計
                   if ( stream_v ) begin

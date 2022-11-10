@@ -4,16 +4,19 @@
 
 module get_enable
     (
+
         // in
         input wire                  clk,
         input wire                  gen,
         input wire                  run,
         input wire                  get_valid,
 
+
         // out
         output wire                 get_ready,
         output logic                get_v,
         output logic                exec
+
     );
 
 
@@ -22,9 +25,11 @@ module get_enable
 
     // データ受信の次から演算を開始
     always_ff @( posedge clk ) begin
+
                   if ( ~run ) begin
                       exec <= 1'b0;
                   end
+
                   else begin
                       exec <= get_v;
                   end

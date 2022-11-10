@@ -3,12 +3,15 @@
 
 module xorshift
     (
+
         // in
         input wire                          clk,
         input wire                          gen,
 
+
         // out
         output logic [ 31:0 ]               rand_num
+
     );
 
 
@@ -22,6 +25,7 @@ module xorshift
     reg [ 31:0 ]      w;
 
     always_ff @( posedge clk ) begin
+
                   // ランダム生成のフラグが立ったら、再び初期値を設定
                   if ( ~gen ) begin
                       // ランダム生成する際の初期値
@@ -38,6 +42,7 @@ module xorshift
                       z <= 521288629;
                       w <= 88675123;
                   end
+
                   else begin
                       x <= y;
                       y <= z;

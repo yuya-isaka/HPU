@@ -4,13 +4,16 @@
 
 module counter
     #(
+
          // 現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分
          // counterで数える上限
          parameter W = 30,
          // コア数 (デバッグ用)
          parameter CORENUM = 16
+
      )
      (
+
          // in
          input wire			                    clk,
          input wire                             rst,
@@ -21,8 +24,10 @@ module counter
          input wire [ CORENUM-1:0 ]             core_result,
          //  input wire                         core_result,
 
+
          // out
          output logic 		                    sign_bit
+
      );
 
 
@@ -32,8 +37,10 @@ module counter
     reg         store_n, store_nn;
 
     always_ff @( posedge clk ) begin
+
                   store_n <= store;
                   store_nn <= store_n;
+
               end;
 
 
@@ -49,6 +56,7 @@ module counter
     reg signed [ W-1:0 ]      box_4;
 
     always_ff @( posedge clk ) begin
+
                   if ( rst ) begin
                       // コア数可変
                       box_1 <= 0;
@@ -56,6 +64,7 @@ module counter
                       box_3 <= 0;
                       box_4 <= 0;
                   end
+
                   else if ( store_n ) begin
                       // コア数可変
                       // 1コア
@@ -91,10 +100,12 @@ module counter
     reg signed [ W-1:0 ]      box;
 
     always_ff @( posedge clk ) begin
+
                   // 現状アクセラレータの動作を止めることで、counterの値をフラッシュ（将来命令セットにフラッシュを加えるかも）
                   if ( rst) begin
                       box <= 0;
                   end
+
                   // store_nと分離することで、storeが連続で実行されても対応可能にした
                   else if ( store_nn ) begin
                       // コア数可変
@@ -121,8 +132,11 @@ module counter
 
     // 各コアの結果をselectに格納　（0, 1, -1）
     generate
+
         genvar      k;
+
         for ( k = 0; k < CORENUM; k = k + 1 ) begin
+
             selector selector
                      (
                          // in
@@ -139,6 +153,7 @@ module counter
                          .sel_bit( select[ k ] )
                          //  .sel_bit( select)
                      );
+
         end
     endgenerate
 

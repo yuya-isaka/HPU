@@ -4,10 +4,13 @@
 
 module core
     #(
+
          // ハイパーベクトルの次元数
          parameter DIM = 1023
+
      )
      (
+
          // in
          input wire                         clk,
          input wire                         run,
@@ -21,10 +24,12 @@ module core
          input wire                         exec,
          input wire [ DIM:0 ]               sign_bit,
 
+
          // out
          output reg                         store,
          output logic [ DIM:0 ]             core_result,
          output reg                         last
+
      );
 
 
@@ -35,21 +40,29 @@ module core
     (* ram_style = "block" *)
     reg [ DIM:0 ]           item_memory [ 0:1023 ];
 
+    // アイテムメモリーからロードしたデータの格納場所
+    reg [ DIM:0 ]           reg_tmp;
+
     // フォワーディング処理フラグ
     reg                     forward_flag;
 
-    // アイテムメモリーからロードしたデータの格納場所
-    reg [ DIM:0 ]           reg_tmp;
+
+    // 更新対象
+    //  - item_memory
+    //  - reg_tmp
+    //  - forward_flag
 
     always_ff @( posedge clk ) begin
 
                   // 書き込み
                   // 書き戻し（命令12) | ランダム生成
                   if ( wb_flag | ( gen & update_item ) ) begin
+
                       // 書き戻し（命令12）
                       if ( wb_flag ) begin
                           item_memory[ wb_addr ] <= reg_2;
                       end
+
                       // ランダム生成
                       else begin
                           item_memory[ item_a ] <= rand_num;
@@ -60,9 +73,12 @@ module core
                   // 常に垂れ流しで読み出しでOK
                   // (必要ない場合は使わない)
                   reg_tmp <= item_memory[ get_d[ 9:0 ] ];
+
+                  // フォワーディングフラグ
                   forward_flag <= ( wb_flag & ( wb_addr == get_d[ 9:0 ] ) );
 
               end;
+
 
 
     // 命令で使われるロードデータ
@@ -80,6 +96,7 @@ module core
                         reg_0 = reg_2;
                     end
                 end;
+
 
 
     // 書き戻し命令が発行されたか否かのフラグ
@@ -118,7 +135,6 @@ module core
                           wb_flag <= 0;
                           wb_addr <= 0;
                       end
-
                   end
 
                   // データを受信していないとき実行
@@ -130,14 +146,15 @@ module core
                       wb_flag <= 0;
                       wb_addr <= 0;
                   end
-
               end;
+
 
 
     // reg_1, reg_2は値を保持しておく必要がある （reg_0はその度にロードされるから保持しなくていい）
 
     // レジスタ1
     reg [ DIM:0 ]       reg_1;
+
     // レジスタ2
     reg [ DIM:0 ]       reg_2;
 
@@ -151,6 +168,7 @@ module core
     //  - store (port)
     //  - last  (port)
     always_ff @( posedge clk ) begin
+
                   // アクセラレータの動作終了と同時にリセット
                   // reg_1　reg_2 は保持したいため、リセット時にしか0に戻さない
                   if ( ~run ) begin
@@ -160,28 +178,34 @@ module core
                       store <= 0;
                       last <= 0;
                   end
+
                   // アクセラレータ動作中実行
                   else if ( exec ) begin
+
                       // アドレス必要
                       if ( inst[ 15 ] ) begin
+
                           // 1. load
                           if ( inst[ 14 ] ) begin
                               reg_2 <= reg_0;
                               buff <= 0;
                               store <= 0;
                           end
+
                           // 2. l.rshift
                           else if ( inst[ 13 ] ) begin
                               reg_2 <= { reg_0[ 0 ], reg_0[ DIM:1 ] };
                               buff <= 0;
                               store <= 0;
                           end
+
                           // 4. l.lshift
                           else if ( inst[ 12 ] ) begin
                               reg_2 <= { reg_0[ DIM-1:0 ], reg_0[ DIM ] };
                               buff <= 0;
                               store <= 0;
                           end
+
                           // 6. l.xor
                           else if ( inst[ 11 ] ) begin
                               reg_2 <= reg_0 ^ reg_2;
@@ -189,49 +213,58 @@ module core
                               store <= 0;
                           end
                       end
+
                       // アドレスいらん
                       else begin
+
                           // 3. rshift
                           if ( inst[ 14 ] ) begin
                               reg_2 <= { reg_2[ 0 ], reg_2[ DIM:1 ] };
                               buff <= 0;
                               store <= 0;
                           end
+
                           // 5. lshift
                           else if ( inst[ 13 ] ) begin
                               reg_2 <= { reg_2[ DIM-1:0 ], reg_2[ DIM ] };
                               buff <= 0;
                               store <= 0;
                           end
+
                           // 7. xor
                           else if ( inst[ 12 ] ) begin
                               reg_2 <= reg_1 ^ reg_2;
                               buff <= 0;
                               store <= 0;
                           end
+
                           // 8. store
                           else if ( inst[ 11 ] ) begin
                               buff <= reg_2;
                               store <= 1;
                           end
+
                           // 9. last
                           else if ( inst[ 10 ] ) begin
                               last <= 1;
                               buff <= 0;
                               store <= 0;
                           end
+
                           // 10. move
                           else if ( inst[ 9 ] ) begin
                               reg_1 <= reg_2;
                               buff <= 0;
                               store <= 0;
                           end
+
                           // 11. wb
                           else if ( inst[ 8 ] ) begin
                               reg_2 <= sign_bit;
                               buff <= 0;
                               store <= 0;
                           end
+
                           // nop (すべて0のはず)
                           else begin
                               buff <= 0;
@@ -239,6 +272,7 @@ module core
                           end
                       end
                   end
+
                   // execが落ちてる場合、その前にstore,last命令は実行されているので、リセットしてOK
                   // last命令が立つ時、execは落ちている設計 (last命令は必ず最後に実行する制限)
                   //   - もしlast命令をいつでも使えるようにするなら、if (exec)内のlast命令以外でlast <= 0 をしておかないとlastが落ちないでバグりそう
