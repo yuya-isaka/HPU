@@ -75,8 +75,8 @@ uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
 			uint16_t inst = 17 << 11;
 			result = inst | addr;
 		}
-		// lastback
-		else if (inst_num == 11)
+		// wb.item
+		else if (inst_num == 12)
 		{
 			uint16_t inst = 33 << 10;
 			result = inst | addr;
@@ -110,7 +110,7 @@ uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
 		{
 			inst = 1 << 11;
 		}
-		// lastore
+		// last
 		else if (inst_num == 9)
 		{
 			inst = 1 << 10;
@@ -119,6 +119,11 @@ uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
 		else if (inst_num == 10)
 		{
 			inst = 1 << 9;
+		}
+		// wb
+		else if (inst_num == 11)
+		{
+			inst = 1 << 8;
 		}
 		else
 		{
@@ -313,62 +318,53 @@ int main(int argc, char const *argv[])
 		int core = 0;
 		for (int i = 0; i < all_ngram; i++)
 		{
-			// 1
+			// 1 load
 			uint16_t addr = ascii_array[i][0];
 			uint16_t inst = assemble(1, 1, addr);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 10
+			// 10 move
 			inst = assemble(0, 10, 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 2
+			// 2 l.rshift
 			addr = ascii_array[i][1];
 			inst = assemble(1, 2, addr);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 7
+			// 7 xor
 			inst = assemble(0, 7, 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 10
+			// 10 move
 			inst = assemble(0, 10, 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 2
+			// 2 l.rshift
 			addr = ascii_array[i][2];
 			inst = assemble(1, 2, addr);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 3
+			// 3 rshift
 			inst = assemble(0, 3, 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 7
+			// 7 xor
 			inst = assemble(0, 7, 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 8 or 9
-			if (i == (all_ngram - 1))
-			{
-				inst = assemble(0, 9, 0);
-				src_tmp[core][instruction] = inst;
-				instruction++;
-			}
-			else
-			{
-				inst = assemble(0, 8, 0);
-				src_tmp[core][instruction] = inst;
-				instruction++;
-			}
+			// 8 store
+			inst = assemble(0, 8, 0);
+			src_tmp[core][instruction] = inst;
+			instruction++;
 
 			if (core != (core_num - 1))
 			{
@@ -414,35 +410,35 @@ int main(int argc, char const *argv[])
 			}
 		}
 
-		int flag = 0;
-		int mass = 1;
+		// デバッグ
+		int debug_flag = 0;
+		int debug_mass = 1;
 		for (int j = 0; j < all_instruction; j++)
 		{
-			if (flag == 0)
+			if (debug_flag == 0)
 			{
-				printf("命令の塊%d\n", mass);
-				mass++;
+				printf("命令の塊%d\n", debug_mass);
+				debug_mass++;
 			}
 			for (int i = 0; i < core_num; i++)
 			{
 				printf("%7d ", src_tmp[i][j]);
 			}
-			flag++;
-			if (flag == instruction_num)
+			debug_flag++;
+			if (debug_flag == instruction_num)
 			{
 				printf("\n");
-				flag = 0;
+				debug_flag = 0;
 			}
 			printf("\n");
 		}
 
-		printf("%d\n", all_instruction);
 		for (int j = 0; j < all_instruction; j++)
 		{
+
 			for (int i = 0; i < core_num; i++)
 			{
 				src[send_num] = src_tmp[i][j];
-				printf("%d\n", src[send_num]);
 				send_num++;
 			}
 			for (int i = core_num; i < (bus_width / instruction_bit); i++)
@@ -450,16 +446,22 @@ int main(int argc, char const *argv[])
 				src[send_num] = 0;
 				send_num++;
 			}
+
+			// 最後じゃないかつ値を超えてたら
+			// 2億5000万が限界
 			if (j != (all_instruction - 1) && send_num >= 256)
 			{
+
 				printf("-----------------------\n");
-				for (int i = 0; i < core_num; i++)
+
+				// last命令
+				for (int i = 0; i < 1; i++)
 				{
-					uint16_t inst = assemble(1, 11, 1023);
+					uint16_t inst = assemble(0, 9, 0);
 					src[send_num] = inst;
 					send_num++;
 				}
-				for (int i = core_num; i < (bus_width / instruction_bit); i++)
+				for (int i = 1; i < (bus_width / instruction_bit); i++)
 				{
 					src[send_num] = 0;
 					send_num++;
@@ -476,56 +478,30 @@ int main(int argc, char const *argv[])
 				while ((dma[0x34 / 4] & 0x1000) != 0x1000)
 					;
 
-				top[0x00 / 4] = 0;
-
-				top[0x00 / 4] = 2;
-
 				dma[0x30 / 4] = 4;
 				dma[0x00 / 4] = 4;
 				while (dma[0x00 / 4] & 0x4)
 					;
 
 				send_num = 0;
-
-				// load
-				for (int i = 0; i < (bus_width / instruction_bit); i++)
-				{
-					if (i == 0)
-					{
-						uint16_t addr = 1023;
-						uint16_t inst = assemble(1, 1, addr);
-						src[send_num] = inst;
-					}
-					else
-					{
-						src[send_num] = 0;
-					}
-					send_num++;
-				}
-
-				// store
-				for (int i = 0; i < (bus_width / instruction_bit); i++)
-				{
-					if (i == 0)
-					{
-						uint16_t inst = assemble(0, 8, 0);
-						src[send_num] = inst;
-					}
-					else
-					{
-						src[send_num] = 0;
-					}
-					send_num++;
-				}
 			}
-			// 2億5000万が限界 printf("%d\n", send_num);
+		}
+
+		// last命令
+		for (int i = 0; i < 1; i++)
+		{
+			uint16_t inst = assemble(0, 9, 0);
+			src[send_num] = inst;
+			send_num++;
+		}
+		for (int i = 1; i < (bus_width / instruction_bit); i++)
+		{
+			src[send_num] = 0;
+			send_num++;
 		}
 
 		// ↑ コード---------------------------------------------
 		// ---------------------------------------------------
-
-		freeArray(&ascii_array, ngram);
-		freeArray(&src_tmp, core_num);
 
 		dma[0x00 / 4] = 1;
 		dma[0x18 / 4] = src_phys;
@@ -544,6 +520,9 @@ int main(int argc, char const *argv[])
 		}
 
 		top[0x00 / 4] = 0;
+
+		freeArray(&ascii_array, ngram);
+		freeArray(&src_tmp, core_num);
 
 		printf("\n");
 	}

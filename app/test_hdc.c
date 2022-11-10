@@ -178,6 +178,12 @@ uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
       uint16_t inst = 17 << 11;
       result = inst | addr;
     }
+    // wb.item
+    else if (inst_num == 12)
+    {
+      uint16_t inst = 33 << 10;
+      result = inst | addr;
+    }
     else
     {
       printf("error");
@@ -216,6 +222,11 @@ uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
     else if (inst_num == 10)
     {
       inst = 1 << 9;
+    }
+    // wb
+    else if (inst_num == 11)
+    {
+      inst = 1 << 8;
     }
     else
     {

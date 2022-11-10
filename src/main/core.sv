@@ -45,7 +45,7 @@ module core
                           item_memory[ item_a ] <= rand_num;
                       end
                       else begin
-                          item_memory[ wb_addr ] <= sign_bit;
+                          item_memory[ wb_addr ] <= reg_2;
                           wb <= 0;
                       end
                   end

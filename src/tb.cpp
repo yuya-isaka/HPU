@@ -139,7 +139,7 @@ uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
     {
       inst = 1 << 11;
     }
-    // lastore
+    // last
     else if (inst_num == 9)
     {
       inst = 1 << 10;
