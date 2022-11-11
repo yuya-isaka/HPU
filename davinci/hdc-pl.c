@@ -450,7 +450,7 @@ int main(int argc, char const *argv[])
 
 			// 最後じゃないかつ値を超えてたら
 			// 2億5000万が限界
-			if (j != (all_instruction - 1) && send_num >= 30000000)
+			if (j != (all_instruction - 1) && send_num >= 35000000)
 			{
 
 				printf("------------DMA再発行-----------\n");
