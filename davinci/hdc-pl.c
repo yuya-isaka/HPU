@@ -201,6 +201,7 @@ int main(int argc, char const *argv[])
 		return 0;
 	}
 	// 500MB
+	// もしかしたら8MBでいいのか。。。
 	src = (uint16_t *)mmap(NULL, 0x1DCD6500, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
 	if (src == MAP_FAILED)
 	{
@@ -230,7 +231,8 @@ int main(int argc, char const *argv[])
 	const int instruction_bit = 16;
 	const int train_num = 2;
 	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
 	const int ngram = 3;
 	const int core_num = 16;
 	const int instruction_num = 9;
@@ -276,8 +278,8 @@ int main(int argc, char const *argv[])
 		all_ngram = strlen(content) - ngram + 1;
 		even = all_ngram % 2 == 0;
 		// printf("content: %s\n", content); // myname...
-		// printf("all_ngram: %d\n", all_ngram);
-		// printf("even: %d\n", even);
+		printf("all_ngram: %d\n", all_ngram);
+		printf("even: %d\n", even);
 
 		int all_instruction = all_ngram / core_num;
 		if (all_ngram % core_num != 0)
@@ -285,7 +287,7 @@ int main(int argc, char const *argv[])
 			all_instruction++;
 		}
 		all_instruction *= instruction_num;
-		// printf("all_instruction: %d\n", all_instruction);
+		printf("all_instruction: %d\n\n", all_instruction);
 
 		makeArray(&src_tmp, core_num, all_instruction);
 		makeArray(&ascii_array, all_ngram, ngram);
@@ -443,11 +445,11 @@ int main(int argc, char const *argv[])
 			}
 
 			// 最後じゃないかつ値を超えてたら
-			// 2億5000万が限界
+			// (2^26-8) / 2 が限界
 			if (j != (all_instruction - 1) && send_num >= 33000000)
 			{
 
-				// printf("------------DMA再発行-----------\n");
+				printf("------------DMA再発行-----------\n");
 
 				// last命令
 				for (int i = 0; i < 1; i++)
@@ -494,10 +496,14 @@ int main(int argc, char const *argv[])
 			src[send_num] = 0;
 			send_num++;
 		}
-		// printf("send_num: %d\n", send_num);
+
+		printf("send_num: %d\n\n", send_num);
 
 		// ↑ コード---------------------------------------------
 		// ---------------------------------------------------
+
+		freeArray(&ascii_array, ngram);
+		freeArray(&src_tmp, core_num);
 
 		dma[0x00 / 4] = 1;
 		dma[0x18 / 4] = src_phys;
@@ -516,9 +522,6 @@ int main(int argc, char const *argv[])
 		}
 
 		top[0x00 / 4] = 0;
-
-		freeArray(&ascii_array, ngram);
-		freeArray(&src_tmp, core_num);
 
 		printf("\n");
 	}

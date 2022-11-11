@@ -223,12 +223,14 @@ int main(int argc, char const *argv[])
 	uint16_t **ascii_array;
 	const int bus_width = 1024;
 	const int instruction_bit = 16;
-	const int train_num = 2;
+	const int train_num = 1;
 	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	const char *train_path[] = {"data/decorate/en"};
 	const int ngram = 3;
-	const int core_num = 1;
+	const int core_num = 16;
 	const int instruction_num = 9;
+	const int majority_addr = 26;
 	int all_ngram = 0;
 	int even = 0;
 	// -------------------------------------------
@@ -251,8 +253,8 @@ int main(int argc, char const *argv[])
 		}
 		int ch;
 		size_t num = 0;
-		// while ((ch = fgetc(file)) != EOF) // ubuntu:EOF == -1,  petalinux:EOF == 255
-		while (((ch = fgetc(file)) != EOF) && ((ch = fgetc(file) != 255))) // ubuntu:EOF == -1,  petalinux:EOF == 255
+		// while (((ch = fgetc(file)) != EOF) && ((ch = fgetc(file) != 255))) // ubuntu:EOF == -1,  petalinux:EOF == 255
+		while ((ch = fgetc(file)) != EOF) // ubuntu:EOF == -1,  petalinux:EOF == 255
 		{
 			num++;
 		}
@@ -296,7 +298,6 @@ int main(int argc, char const *argv[])
 			}
 		}
 
-		top[0x08 / 4] = even;
 		top[0x00 / 4] = 2;
 
 		// ---------------------------------------------------
@@ -371,7 +372,44 @@ int main(int argc, char const *argv[])
 			core = (core + 1) % core_num;
 		}
 
+		printf("%d\n", core);
+
 		int send_num = 0;
+
+		if (even)
+		{
+			// load
+			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			{
+				if (i == 0)
+				{
+					uint16_t addr = majority_addr;
+					uint16_t inst = assemble(1, 1, addr);
+					src[send_num] = inst;
+				}
+				else
+				{
+					src[send_num] = 0;
+				}
+				send_num++;
+			}
+
+			// store
+			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			{
+				if (i == 0)
+				{
+					uint16_t inst = assemble(0, 8, 0);
+					src[send_num] = inst;
+				}
+				else
+				{
+					src[send_num] = 0;
+				}
+				send_num++;
+			}
+		}
+
 		for (int j = 0; j < all_instruction; j++)
 		{
 			for (int i = 0; i < core_num; i++)
