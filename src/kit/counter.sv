@@ -44,16 +44,15 @@ module counter
               end;
 
 
+    // 分散RAM (符号付き)
+    reg signed [ W-1:0 ]      box;
 
     // コア数可変
-    reg signed [ W-1:0 ]      box_11;
-    reg signed [ W-1:0 ]      box_22;
-
-    // コア数可変
-    reg signed [ W-1:0 ]      box_1;
-    reg signed [ W-1:0 ]      box_2;
-    reg signed [ W-1:0 ]      box_3;
-    reg signed [ W-1:0 ]      box_4;
+    // 4bitあれば十分
+    reg signed [ 3:0 ]      box_1;
+    reg signed [ 3:0 ]      box_2;
+    reg signed [ 3:0 ]      box_3;
+    reg signed [ 3:0 ]      box_4;
 
     always_ff @( posedge clk ) begin
 
@@ -92,14 +91,7 @@ module counter
                             + select[ 14 ]
                             + select[ 15 ];
                   end
-              end;
 
-
-
-    // 分散RAM (符号付き)
-    reg signed [ W-1:0 ]      box;
-
-    always_ff @( posedge clk ) begin
 
                   // 現状アクセラレータの動作を止めることで、counterの値をフラッシュ（将来命令セットにフラッシュを加えるかも）
                   if ( rst) begin
@@ -120,6 +112,7 @@ module counter
                       //   box <= box + box_1;
                   end
               end;
+
 
 
     //================================================================

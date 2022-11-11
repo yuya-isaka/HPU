@@ -166,7 +166,8 @@ module top
     // counterの値(sign_bit)をM_AXIS_TDATAに格納するタイミングを知らせる役割
     wire              stream_v;
 
-    stream_ctrl #( .CORENUM( 2 ) ) stream_ctrl
+    // コア数可変
+    stream_ctrl #( .CORENUM( 16 ) ) stream_ctrl
                 (
 
                     // in

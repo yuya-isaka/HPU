@@ -8,19 +8,14 @@
 #include <sys/mman.h> // mmap
 #include <time.h>
 
+// ------------------------------------------------------------------------------------------------
+
 volatile int *top;
 volatile int *dma;
 volatile uint16_t *src;
 volatile int *dst;
 unsigned long src_phys;
 unsigned long dst_phys;
-
-// --------------------------------------- メモリリークチェック、デストラクター -------------------------
-
-// __attribute__((destructor)) static void destructor()
-// {
-// 	system("leaks -q a.out");
-// }
 
 // ------------------------------------------------------------------------------------------------
 
@@ -244,10 +239,10 @@ int main(int argc, char const *argv[])
 	int even = 0;
 	// -------------------------------------------
 
-	// DMAリセット
 	for (int l = 0; l < train_num; l++)
 	{
 
+		// DMAリセット
 		dma[0x30 / 4] = 4;
 		dma[0x00 / 4] = 4;
 		while (dma[0x00 / 4] & 0x4)
@@ -268,7 +263,7 @@ int main(int argc, char const *argv[])
 		{
 			num++;
 		}
-		printf("EOF: %d\n", EOF); // EOFは全て-1
+		// printf("EOF: %d\n", EOF); // EOFは全て-1
 		fseek(file, 0, SEEK_SET);
 		char *content = (char *)calloc(num, sizeof(char));
 		size_t done = fread(content, sizeof(char), num, file);
@@ -281,8 +276,8 @@ int main(int argc, char const *argv[])
 		all_ngram = strlen(content) - ngram + 1;
 		even = all_ngram % 2 == 0;
 		// printf("content: %s\n", content); // myname...
-		printf("all_ngram: %d\n", all_ngram);
-		printf("even: %d\n", even);
+		// printf("all_ngram: %d\n", all_ngram);
+		// printf("even: %d\n", even);
 
 		int all_instruction = all_ngram / core_num;
 		if (all_ngram % core_num != 0)
@@ -290,7 +285,7 @@ int main(int argc, char const *argv[])
 			all_instruction++;
 		}
 		all_instruction *= instruction_num;
-		printf("all_instruction: %d\n", all_instruction);
+		// printf("all_instruction: %d\n", all_instruction);
 
 		makeArray(&src_tmp, core_num, all_instruction);
 		makeArray(&ascii_array, all_ngram, ngram);
@@ -446,14 +441,13 @@ int main(int argc, char const *argv[])
 				src[send_num] = 0;
 				send_num++;
 			}
-			// printf("%d\n", send_num);
 
 			// 最後じゃないかつ値を超えてたら
 			// 2億5000万が限界
-			if (j != (all_instruction - 1) && send_num >= 30000000)
+			if (j != (all_instruction - 1) && send_num >= 33000000)
 			{
 
-				printf("------------DMA再発行-----------\n");
+				// printf("------------DMA再発行-----------\n");
 
 				// last命令
 				for (int i = 0; i < 1; i++)
@@ -500,6 +494,7 @@ int main(int argc, char const *argv[])
 			src[send_num] = 0;
 			send_num++;
 		}
+		// printf("send_num: %d\n", send_num);
 
 		// ↑ コード---------------------------------------------
 		// ---------------------------------------------------

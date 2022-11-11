@@ -370,3 +370,5 @@ hdc-new
 hdc-pl
 hdc-pl-check
 hdc-pl-cpp
+
+.svlint.toml
