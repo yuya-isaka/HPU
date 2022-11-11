@@ -191,6 +191,17 @@ int main(int argc, char const *argv[])
 		shifter_1024(&result_tmp[i], &item_memory_array[rand() % 1024], DIM, 2);
 	}
 
+	unsigned int result[DIM];
+	for (int i = 0; i < DIM; i++)
+	{
+		result[i] = grab_bit(result_tmp[i], trial_num);
+	}
+
+	for (int i = 0; i < DIM; i++)
+	{
+		printf("%u\n", result[i]);
+	}
+
 	clock_t end = clock();
 	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
 	printf("\n\n  time %lf[ms]\n", time);

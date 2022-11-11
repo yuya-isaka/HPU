@@ -242,6 +242,15 @@ int main(int argc, char const *argv[])
 			src[send_num++] = 0;
 		}
 
+		for (int j = 0; j < 16; j++)
+		{
+			src[send_num++] = assemble(0, 8, 0);
+		}
+		for (int j = 16; j < 64; j++)
+		{
+			src[send_num++] = 0;
+		}
+
 		// if (num > 512)
 		// {
 		// 	uint16_t inst = assemble(1, 4, addr);
