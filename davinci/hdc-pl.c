@@ -291,6 +291,7 @@ int main(int argc, char const *argv[])
 
 		makeArray(&src_tmp, core_num, all_instruction);
 		makeArray(&ascii_array, all_ngram, ngram);
+
 		for (int i = 0; i < core_num; i++)
 		{
 			for (int j = 0; j < all_instruction; j++)
@@ -497,7 +498,7 @@ int main(int argc, char const *argv[])
 			send_num++;
 		}
 
-		printf("send_num: %d\n\n", send_num);
+		// printf("send_num: %d\n\n", send_num);
 
 		// ↑ コード---------------------------------------------
 		// ---------------------------------------------------
@@ -515,6 +516,8 @@ int main(int argc, char const *argv[])
 
 		while ((dma[0x34 / 4] & 0x1000) != 0x1000)
 			;
+
+		printf("\n");
 
 		for (int j = 0; j < (1024 / 32); j++)
 		{
