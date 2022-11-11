@@ -234,7 +234,7 @@ int main(int argc, char const *argv[])
 	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
 	const int ngram = 3;
-	const int core_num = 16;
+	const int core_num = 1;
 	const int instruction_num = 9;
 	const int majority_addr = 26;
 	int all_ngram = 0;

@@ -744,12 +744,13 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
     // putb(result_real);
     if (result_real != dst[j])
     {
-      printf("  Error %u %u\n", result_real, dst[j]);
+      printf("\n  Error %u %u\n", result_real, dst[j]);
+      printf("  CORENUM=%d  ADDRNUM=%d\n\n", CORENUM, ADDRNUM);
     }
-    else
-    {
-      printf("  Success\n");
-    }
+    // else
+    // {
+    //   printf("  Success\n");
+    // }
 
     free(result_array);
   }
@@ -881,17 +882,24 @@ int main()
   ///////////////////////////////////////////////////////////////////////////////// initial, udmabuf, uio 設定 ///////////////////////////////////////////////////////////////////////////////////
 
   const int NGRAM = 3;
-  const int CORENUM = 2;
   const int MAJORITY_ADDR = 1023;
+
+  int CORENUM = 16;
   int ADDRNUM = 0;
 
-  for (int i = 3; i <= RANNUM; i += 3)
+  for (int j = 1; j <= 16; j++)
   {
-    ADDRNUM = i;
+    CORENUM = j;
+    for (int i = 3; i <= RANNUM; i += 3)
+    {
+      ADDRNUM = i;
 
-    check(NGRAM, CORENUM, ADDRNUM, MAJORITY_ADDR);
-    xor128(1);
+      check(NGRAM, CORENUM, ADDRNUM, MAJORITY_ADDR);
+      xor128(1);
+    }
   }
+
+  printf("\nOK!\n");
 
   printf("\n ------------------------------ 終了 -------------------------------- \n\n");
 
