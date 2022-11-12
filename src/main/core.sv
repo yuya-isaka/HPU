@@ -194,16 +194,30 @@ module core
 
                           // 2. l.rshift
                           else if ( inst[ 13 ] ) begin
-                              reg_2 <= { reg_0[ 0 ], reg_0[ DIM:1 ] };
-                              buff <= 0;
-                              store <= 0;
+                              if ( inst[ 14 ] ) begin
+                                  reg_2 <= { reg_0[ 31:0 ], reg_0[ DIM:32 ] };
+                                  buff <= 0;
+                                  store <= 0;
+                              end
+                              else begin
+                                  reg_2 <= { reg_0[ 0 ], reg_0[ DIM:1 ] };
+                                  buff <= 0;
+                                  store <= 0;
+                              end
                           end
 
                           // 4. l.lshift
                           else if ( inst[ 12 ] ) begin
-                              reg_2 <= { reg_0[ DIM-1:0 ], reg_0[ DIM ] };
-                              buff <= 0;
-                              store <= 0;
+                              if ( inst [ 14 ] ) begin
+                                  reg_2 <= { reg_0[ DIM-32:0 ], reg_0[ DIM:DIM-31 ] };
+                                  buff <= 0;
+                                  store <= 0;
+                              end
+                              else begin
+                                  reg_2 <= { reg_0[ DIM-1:0 ], reg_0[ DIM ] };
+                                  buff <= 0;
+                                  store <= 0;
+                              end
                           end
 
                           // 6. l.xor
@@ -261,6 +275,20 @@ module core
                           // 11. wb
                           else if ( inst[ 8 ] ) begin
                               reg_2 <= sign_bit;
+                              buff <= 0;
+                              store <= 0;
+                          end
+
+                          // rshift.32
+                          else if ( inst[ 7 ] ) begin
+                              reg_2 <= { reg_2[ 31:0 ], reg_2[ DIM:32 ] };
+                              buff <= 0;
+                              store <= 0;
+                          end
+
+                          // lshift.32
+                          else if ( inst[ 6 ] ) begin
+                              reg_2 <= { reg_2[ DIM-32:0 ], reg_2[ DIM:DIM-31 ] };
                               buff <= 0;
                               store <= 0;
                           end
