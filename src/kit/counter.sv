@@ -52,7 +52,7 @@ module counter
     reg signed [ 3:0 ]      box_1;
     reg signed [ 3:0 ]      box_2;
     reg signed [ 3:0 ]      box_3;
-    reg signed [ 3:0 ]      box_4;
+    // reg signed [ 3:0 ]      box_4;
 
     always_ff @( posedge clk ) begin
 
@@ -61,7 +61,7 @@ module counter
                       box_1 <= 0;
                       box_2 <= 0;
                       box_3 <= 0;
-                      box_4 <= 0;
+                      //   box_4 <= 0;
                   end
 
                   else if ( store_n ) begin
@@ -85,11 +85,11 @@ module counter
                             + select[ 9 ]
                             + select[ 10 ]
                             + select[ 11 ];
-                      box_4 <=
-                            select[ 12 ]
-                            + select[ 13 ]
-                            + select[ 14 ]
-                            + select[ 15 ];
+                      //   box_4 <=
+                      //         select[ 12 ]
+                      //         + select[ 13 ]
+                      //         + select[ 14 ]
+                      //         + select[ 15 ];
                   end
 
 
@@ -106,8 +106,8 @@ module counter
                           box
                           + box_1
                           + box_2
-                          + box_3
-                          + box_4;
+                          + box_3;
+                      //   + box_4;
                       // 1-4コア
                       //   box <= box + box_1;
                   end
