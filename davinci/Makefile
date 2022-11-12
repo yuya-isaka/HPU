@@ -16,6 +16,11 @@ check:
 	gcc -Wall -O2 -o binding2 binding2.c -lm
 	gcc -Wall -O2 -o addition addition.c -lm
 
+asm:
+	gcc -S -o addition.s addition.c -lm
+	gcc -Wall -O2 -S -o addition-O2.s addition.c -lm
+
+
 
 linux:
 	arm-linux-gnueabihf-gcc -o hdc hdc.c -lm
