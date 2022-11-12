@@ -235,13 +235,14 @@ int main(int argc, char const *argv[])
 
 		for (int j = 0; j < 16; j++)
 		{
-			src[send_num++] = assemble(1, 6, rand() % 1024);
+			src[send_num++] = assemble(0, 3, 0);
 		}
 		for (int j = 16; j < 64; j++)
 		{
 			src[send_num++] = 0;
 		}
 
+		// store
 		// for (int j = 0; j < 16; j++)
 		// {
 		// 	src[send_num++] = assemble(0, 8, 0);

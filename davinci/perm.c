@@ -184,21 +184,11 @@ int main(int argc, char const *argv[])
 	int trial_num = 50000000;
 
 	unsigned int **result_tmp;
-	makeArrayInt(&result_tmp, DIM, trial_num);
+	makeArrayInt(&result_tmp, trial_num, DIM);
 
 	for (int i = 0; i < trial_num; i++)
 	{
-		int addr1 = rand() % 1024;
-		int addr2 = rand() % 1024;
-		for (int j = 0; j < DIM; j++)
-		{
-			result_tmp[j][i] = item_memory_array[addr1][j] ^ item_memory_array[addr2][j];
-		}
-	}
-
-	for (int i = 0; i < DIM; i++)
-	{
-		printf("%u\n", *result_tmp[i]);
+		shifter_1024(&result_tmp[i], &item_memory_array[rand() % 1024], DIM, 2);
 	}
 
 	// unsigned int result[DIM];

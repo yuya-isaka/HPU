@@ -153,13 +153,17 @@ int main(int argc, char const *argv[])
 {
 	clock_t start = clock();
 
-	const int DIM = 32;
+	//--
+
+	const int DIM = 1024 / 32;
 	const int rand_num = 1024;
+	const int trial_num = 50000000;
 
 	srand(10);
 	xor128(1);
 
-	// ランダムなハイパーベクトルを生成
+	//--
+
 	unsigned int **item_memory_array;
 	makeArrayInt(&item_memory_array, rand_num, DIM);
 
@@ -177,40 +181,38 @@ int main(int argc, char const *argv[])
 				tmp = xor128(0);
 			}
 			item_memory_array[i][j] = tmp;
-			// printf("%u\n", tmp);
 		}
 	}
 
-	int trial_num = 50000000;
+	//--
 
-	unsigned int **result_tmp;
-	makeArrayInt(&result_tmp, DIM, trial_num);
+	unsigned int **data;
+	makeArrayInt(&data, DIM, trial_num);
 
 	for (int i = 0; i < trial_num; i++)
 	{
-		int addr1 = rand() % 1024;
-		int addr2 = rand() % 1024;
+		int addr = rand() % 1024;
 		for (int j = 0; j < DIM; j++)
 		{
-			result_tmp[j][i] = item_memory_array[addr1][j] ^ item_memory_array[addr2][j];
+			data[j][i] = item_memory_array[addr][j];
 		}
+	}
+
+	unsigned int result[DIM];
+	for (int i = 0; i < DIM; i++)
+	{
+		result[i] = grab_bit(data[i], trial_num);
 	}
 
 	for (int i = 0; i < DIM; i++)
 	{
-		printf("%u\n", *result_tmp[i]);
+		printf("%u\n", result[i]);
 	}
 
-	// unsigned int result[DIM];
-	// for (int i = 0; i < DIM; i++)
-	// {
-	// 	result[i] = grab_bit(result_tmp[i], trial_num);
-	// }
+	//--
 
-	// for (int i = 0; i < DIM; i++)
-	// {
-	// 	printf("%u\n", result[i]);
-	// }
+	freeArrayInt(&data, DIM);
+	freeArrayInt(&item_memory_array, rand_num);
 
 	clock_t end = clock();
 	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;

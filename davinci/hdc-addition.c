@@ -198,13 +198,13 @@ int main(int argc, char const *argv[])
 		return 0;
 	}
 
-	// // ランダム生成
-	// top[0x04 / 4] = 1023;
-	// top[0x00 / 4] = 1;
-	// while (top[0x00 / 4] & 0x1)
-	// 	;
+	// ランダム生成
+	top[0x04 / 4] = 1023;
+	top[0x00 / 4] = 1;
+	while (top[0x00 / 4] & 0x1)
+		;
 
-	// const int core_num = 16;
+	// --
 
 	// DMAリセット
 	dma[0x30 / 4] = 4;
@@ -216,92 +216,100 @@ int main(int argc, char const *argv[])
 
 	srand(10);
 
-	int send_num = 0;
+	const int core_num = 16;
+	const int instruction_num = 2;
 	const int trial_num = 50000000;
+	const int instruction_size = instruction_num * 64;
+	int repeat = 33000000 / instruction_size;
+	repeat++;
+	int trial = trial_num / (repeat * core_num);
+	trial++;
+	const int repeat_remainder = (trial_num - (repeat * core_num * trial)) / core_num;
 
-	// 一度流れる命令を決めて、それがひたすら実行される
+	//--
 
-	for (int i = 0; i < trial_num; i += 16)
+	int send_num = 0;
+
+	printf("trial: %d\n", trial);
+	printf("repeat: %d\n", repeat);
+	for (int i = 0; i < trial; i++)
 	{
-
-		for (int j = 0; j < 16; j++)
+		for (int j = 0; j < repeat; j++)
 		{
-			src[send_num++] = assemble(1, 2, rand() % 1024);
-		}
-		for (int j = 16; j < 64; j++)
-		{
-			src[send_num++] = 0;
-		}
-
-		for (int j = 0; j < 16; j++)
-		{
-			src[send_num++] = assemble(1, 6, rand() % 1024);
-		}
-		for (int j = 16; j < 64; j++)
-		{
-			src[send_num++] = 0;
-		}
-
-		// for (int j = 0; j < 16; j++)
-		// {
-		// 	src[send_num++] = assemble(0, 8, 0);
-		// }
-		// for (int j = 16; j < 64; j++)
-		// {
-		// 	src[send_num++] = 0;
-		// }
-
-		// if (num > 512)
-		// {
-		// 	uint16_t inst = assemble(1, 4, addr);
-		// 	src[send_num++] = inst;
-		// 	for (int j = 0; j < (1024 - num - 1); j++)
-		// 	{
-		// 		inst = assemble(0, 5, 0);
-		// 		src[send_num++] = inst;
-		// 	}
-		// }
-		// else
-		// {
-		// 	uint16_t inst = assemble(1, 2, addr);
-		// 	src[send_num++] = inst;
-		// 	for (int j = 0; j < (num - 1); j++)
-		// 	{
-		// 		inst = assemble(0, 3, 0);
-		// 		src[send_num++] = inst;
-		// 	}
-		// }
-
-		if (send_num >= 33000000)
-		{
-			// last命令
-			for (int j = 0; j < 1; j++)
+			// load
+			for (int k = 0; k < core_num; k++)
 			{
-				uint16_t inst = assemble(0, 9, 0);
-				src[send_num++] = inst;
+				src[send_num++] = assemble(1, 1, rand() % 1024);
 			}
-			for (int i = 1; i < 64; i++)
+			for (int k = core_num; k < 64; k++)
 			{
 				src[send_num++] = 0;
 			}
 
-			dma[0x00 / 4] = 1;
-			dma[0x18 / 4] = src_phys;
-			dma[0x28 / 4] = send_num * 2; // 16ビットがsend_num個
+			// store
+			for (int k = 0; k < core_num; k++)
+			{
+				src[send_num++] = assemble(0, 8, 0);
+			}
+			for (int k = core_num; k < 64; k++)
+			{
+				src[send_num++] = 0;
+			}
+		}
 
-			dma[0x30 / 4] = 1;
-			dma[0x48 / 4] = dst_phys;
-			dma[0x58 / 4] = 128; // 32個 * 4バイト = 128バイト = 1024ビット
+		// last命令
+		for (int j = 0; j < 1; j++)
+		{
+			uint16_t inst = assemble(0, 9, 0);
+			src[send_num++] = inst;
+		}
+		for (int j = 1; j < 64; j++)
+		{
+			src[send_num++] = 0;
+		}
 
-			while ((dma[0x34 / 4] & 0x1000) != 0x1000)
-				;
+		dma[0x00 / 4] = 1;
+		dma[0x18 / 4] = src_phys;
+		dma[0x28 / 4] = send_num * 2; // 16ビットがsend_num個
 
-			dma[0x30 / 4] = 4;
-			dma[0x00 / 4] = 4;
-			while (dma[0x00 / 4] & 0x4)
-				;
+		dma[0x30 / 4] = 1;
+		dma[0x48 / 4] = dst_phys;
+		dma[0x58 / 4] = 128; // 32個 * 4バイト = 128バイト = 1024ビット
 
-			send_num = 0;
+		while ((dma[0x34 / 4] & 0x1000) != 0x1000)
+			;
+
+		dma[0x30 / 4] = 4;
+		dma[0x00 / 4] = 4;
+		while (dma[0x00 / 4] & 0x4)
+			;
+
+		send_num = 0;
+	}
+
+	send_num = 0;
+
+	printf("repeat_remainder: %d\n", repeat_remainder);
+	for (int j = 0; j < repeat_remainder; j++)
+	{
+		// load
+		for (int k = 0; k < core_num; k++)
+		{
+			src[send_num++] = assemble(1, 1, rand() % 1024);
+		}
+		for (int k = core_num; k < 64; j++)
+		{
+			src[send_num++] = 0;
+		}
+
+		// store
+		for (int k = 0; k < core_num; k++)
+		{
+			src[send_num++] = assemble(0, 8, 0);
+		}
+		for (int k = core_num; k < 64; k++)
+		{
+			src[send_num++] = 0;
 		}
 	}
 
@@ -311,7 +319,38 @@ int main(int argc, char const *argv[])
 		uint16_t inst = assemble(0, 9, 0);
 		src[send_num++] = inst;
 	}
-	for (int i = 1; i < 64; i++)
+	for (int j = 1; j < 64; j++)
+	{
+		src[send_num++] = 0;
+	}
+
+	dma[0x00 / 4] = 1;
+	dma[0x18 / 4] = src_phys;
+	dma[0x28 / 4] = send_num * 2; // 16ビットがsend_num個
+
+	dma[0x30 / 4] = 1;
+	dma[0x48 / 4] = dst_phys;
+	dma[0x58 / 4] = 128; // 32個 * 4バイト = 128バイト = 1024ビット
+
+	while ((dma[0x34 / 4] & 0x1000) != 0x1000)
+		;
+
+	dma[0x30 / 4] = 4;
+	dma[0x00 / 4] = 4;
+	while (dma[0x00 / 4] & 0x4)
+		;
+
+	send_num = 0;
+
+	// --
+
+	// last命令
+	for (int j = 0; j < 1; j++)
+	{
+		uint16_t inst = assemble(0, 9, 0);
+		src[send_num++] = inst;
+	}
+	for (int j = 1; j < 64; j++)
 	{
 		src[send_num++] = 0;
 	}

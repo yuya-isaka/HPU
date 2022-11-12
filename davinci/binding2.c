@@ -183,34 +183,51 @@ int main(int argc, char const *argv[])
 
 	int trial_num = 50000000;
 
-	unsigned int **result_tmp;
-	makeArrayInt(&result_tmp, DIM, trial_num);
+	int result_tmp[1024];
+	for (int i = 0; i < 1024; i++)
+	{
+		result_tmp[i] = 0;
+	}
 
 	for (int i = 0; i < trial_num; i++)
 	{
 		int addr1 = rand() % 1024;
 		int addr2 = rand() % 1024;
+		int tmp;
+		unsigned int k = 0;
 		for (int j = 0; j < DIM; j++)
 		{
-			result_tmp[j][i] = item_memory_array[addr1][j] ^ item_memory_array[addr2][j];
+			tmp = item_memory_array[addr1][j] ^ item_memory_array[addr2][j];
+			unsigned int mask = (int)1 << (32 - 1);
+			while (mask)
+			{
+				result_tmp[k] += (mask & tmp ? -1 : 1);
+				k++;
+				mask >>= 1;
+			}
+		}
+	}
+
+	unsigned int result[DIM];
+
+	unsigned int main_mask = (int)1 << (32 - 1);
+	int j = 0;
+	for (int i = 0; i < DIM; i++)
+	{
+		unsigned int mask = (int)1 << (32 - 1);
+		while (mask)
+		{
+			unsigned int aaa = (result_tmp[j] & main_mask ? 1 : 0);
+			j++;
+			mask >>= 1;
+			result[i] += aaa << mask;
 		}
 	}
 
 	for (int i = 0; i < DIM; i++)
 	{
-		printf("%u\n", *result_tmp[i]);
+		printf("%u\n", result[i]);
 	}
-
-	// unsigned int result[DIM];
-	// for (int i = 0; i < DIM; i++)
-	// {
-	// 	result[i] = grab_bit(result_tmp[i], trial_num);
-	// }
-
-	// for (int i = 0; i < DIM; i++)
-	// {
-	// 	printf("%u\n", result[i]);
-	// }
 
 	clock_t end = clock();
 	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
