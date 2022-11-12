@@ -55,10 +55,10 @@ module core
     always_ff @( posedge clk ) begin
 
                   // 書き込み
-                  // 書き戻し（命令12) | ランダム生成
+                  // 書き戻し | ランダム生成
                   if ( wb_flag | ( gen & update_item ) ) begin
 
-                      // 書き戻し（命令12）
+                      // 書き戻し
                       if ( wb_flag ) begin
                           item_memory[ wb_addr ] <= reg_2;
                       end
@@ -118,8 +118,8 @@ module core
                   // データ受信時実行
                   if ( get_v ) begin
 
-                      // 12. wb.item命令 (特殊)
-                      if ( get_d[ 15 ] & get_d[ 10 ] ) begin
+                      // wb.item命令 (特殊)
+                      if ( get_d[ 15 ] & get_d[ 12 ] ) begin
                           // 書き込みフラグを立てる
                           wb_flag <= 1'b1;
                           // 書き込み先アドレス格納
@@ -185,43 +185,15 @@ module core
                       // アドレス必要
                       if ( inst[ 15 ] ) begin
 
-                          // 1. load
+                          // load
                           if ( inst[ 14 ] ) begin
                               reg_2 <= reg_0;
                               buff <= 0;
                               store <= 0;
                           end
 
-                          //   // 2. l.rshift
-                          //   else if ( inst[ 13 ] ) begin
-                          //       if ( inst[ 14 ] ) begin
-                          //           reg_2 <= { reg_0[ 31:0 ], reg_0[ DIM:32 ] };
-                          //           buff <= 0;
-                          //           store <= 0;
-                          //       end
-                          //       else begin
-                          //           reg_2 <= { reg_0[ 0 ], reg_0[ DIM:1 ] };
-                          //           buff <= 0;
-                          //           store <= 0;
-                          //       end
-                          //   end
-
-                          //   // 4. l.lshift
-                          //   else if ( inst[ 12 ] ) begin
-                          //       if ( inst [ 14 ] ) begin
-                          //           reg_2 <= { reg_0[ DIM-32:0 ], reg_0[ DIM:DIM-31 ] };
-                          //           buff <= 0;
-                          //           store <= 0;
-                          //       end
-                          //       else begin
-                          //           reg_2 <= { reg_0[ DIM-1:0 ], reg_0[ DIM ] };
-                          //           buff <= 0;
-                          //           store <= 0;
-                          //       end
-                          //   end
-
-                          // 6. l.xor
-                          else if ( inst[ 11 ] ) begin
+                          // l.xor
+                          else if ( inst[ 13 ] ) begin
                               reg_2 <= reg_0 ^ reg_2;
                               buff <= 0;
                               store <= 0;
@@ -229,167 +201,159 @@ module core
                       end
 
                       // アドレスいらん
-                      else begin
 
-                          // 3. rshift
-                          if ( inst[ 14 ] ) begin
+                      // rshift
+                      else if ( inst[ 14 ] ) begin
+
+                          // 1
+                          if ( inst[ 12 ] ) begin
                               reg_2 <= { reg_2[ 0 ], reg_2[ DIM:1 ] };
-                              buff <= 0;
-                              store <= 0;
                           end
 
-                          // 5. lshift
-                          else if ( inst[ 13 ] ) begin
-                              reg_2 <= { reg_2[ DIM-1:0 ], reg_2[ DIM ] };
-                              buff <= 0;
-                              store <= 0;
-                          end
-
-                          // 7. xor
-                          else if ( inst[ 12 ] ) begin
-                              reg_2 <= reg_1 ^ reg_2;
-                              buff <= 0;
-                              store <= 0;
-                          end
-
-                          // 8. store
+                          // 2
                           else if ( inst[ 11 ] ) begin
-                              buff <= reg_2;
-                              store <= 1;
+                              reg_2 <= { reg_2[ 1:0 ], reg_2[ DIM:2 ] };
                           end
 
-                          // 9. last
+                          // 4
                           else if ( inst[ 10 ] ) begin
-                              last <= 1;
-                              buff <= 0;
-                              store <= 0;
+                              reg_2 <= { reg_2[ 3:0 ], reg_2[ DIM:4 ] };
                           end
 
-                          // 10. move
+                          // 8
                           else if ( inst[ 9 ] ) begin
-                              reg_1 <= reg_2;
-                              buff <= 0;
-                              store <= 0;
+                              reg_2 <= { reg_2[ 7:0 ], reg_2[ DIM:8 ] };
                           end
 
-                          // 11. wb
+                          // 16
                           else if ( inst[ 8 ] ) begin
-                              reg_2 <= sign_bit;
-                              buff <= 0;
-                              store <= 0;
+                              reg_2 <= { reg_2[ 15:0 ], reg_2[ DIM:16 ] };
                           end
 
-                          // rshift.32
-                          // lshift.32
+                          // 32
                           else if ( inst[ 7 ] ) begin
-                              if ( inst[ 6 ] ) begin
-                                  reg_2 <= { reg_2[ 31:0 ], reg_2[ DIM:32 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
-                              else begin
-                                  reg_2 <= { reg_2[ DIM-32:0 ], reg_2[ DIM:DIM-31 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
+                              reg_2 <= { reg_2[ 31:0 ], reg_2[ DIM:32 ] };
                           end
 
+                          // 64
                           else if ( inst[ 6 ] ) begin
-                              if ( inst[ 5 ] ) begin
-                                  reg_2 <= { reg_2[ 15:0 ], reg_2[ DIM:16 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
-                              else begin
-                                  reg_2 <= { reg_2[ DIM-16:0 ], reg_2[ DIM:DIM-15 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
+                              reg_2 <= { reg_2[ 63:0 ], reg_2[ DIM:64 ] };
                           end
 
+                          // 128
                           else if ( inst[ 5 ] ) begin
-                              if ( inst[ 4 ] ) begin
-                                  reg_2 <= { reg_2[ 7:0 ], reg_2[ DIM:8 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
-                              else begin
-                                  reg_2 <= { reg_2[ DIM-8:0 ], reg_2[ DIM:DIM-7 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
+                              reg_2 <= { reg_2[ 127:0 ], reg_2[ DIM:128 ] };
                           end
 
+                          // 256
                           else if ( inst[ 4 ] ) begin
-                              if ( inst[ 3 ] ) begin
-                                  reg_2 <= { reg_2[ 3:0 ], reg_2[ DIM:4 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
-                              else begin
-                                  reg_2 <= { reg_2[ DIM-4:0 ], reg_2[ DIM:DIM-3 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
+                              reg_2 <= { reg_2[ 255:0 ], reg_2[ DIM:256 ] };
                           end
 
+                          // 512
                           else if ( inst[ 3 ] ) begin
-                              if ( inst[ 2 ] ) begin
-                                  reg_2 <= { reg_2[ 63:0 ], reg_2[ DIM:64 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
-                              else begin
-                                  reg_2 <= { reg_2[ DIM-64:0 ], reg_2[ DIM:DIM-63 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
+                              reg_2 <= { reg_2[ 511:0 ], reg_2[ DIM:512 ] };
                           end
 
-                          else if ( inst[ 2 ] ) begin
-                              if ( inst[ 1 ] ) begin
-                                  reg_2 <= { reg_2[ 127:0 ], reg_2[ DIM:128 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
-                              else begin
-                                  reg_2 <= { reg_2[ DIM-128:0 ], reg_2[ DIM:DIM-127 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
+                          buff <= 0;
+                          store <= 0;
+                      end
+
+                      // lshift
+                      else if ( inst [ 13 ] ) begin
+
+                          // 1
+                          if ( inst[ 12 ] ) begin
+                              reg_2 <= { reg_2[ DIM-1:0 ], reg_2[ DIM ] };
                           end
 
-                          else if ( inst[ 1 ] ) begin
-                              if ( inst[ 0 ] ) begin
-                                  reg_2 <= { reg_2[ 255:0 ], reg_2[ DIM:256 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
-                              else begin
-                                  reg_2 <= { reg_2[ DIM-256:0 ], reg_2[ DIM:DIM-255 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
+                          // 2
+                          else if ( inst[ 11 ] ) begin
+                              reg_2 <= { reg_2[ DIM-2:0 ], reg_2[ DIM:DIM-1 ] };
                           end
 
-                          else if ( inst[ 2 ] ) begin
-                              if ( inst[ 0 ] ) begin
-                                  reg_2 <= { reg_2[ 511:0 ], reg_2[ DIM:512 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
-                              else begin
-                                  reg_2 <= { reg_2[ DIM-512:0 ], reg_2[ DIM:DIM-511 ] };
-                                  buff <= 0;
-                                  store <= 0;
-                              end
+                          // 4
+                          else if ( inst[ 10 ] ) begin
+                              reg_2 <= { reg_2[ DIM-4:0 ], reg_2[ DIM:DIM-3 ] };
                           end
 
-                          // nop (すべて0のはず)
-                          else begin
-                              buff <= 0;
-                              store <= 0;
+                          // 8
+                          else if ( inst[ 9 ] ) begin
+                              reg_2 <= { reg_2[ DIM-8:0 ], reg_2[ DIM:DIM-7 ] };
                           end
+
+                          // 16
+                          else if ( inst[ 8 ] ) begin
+                              reg_2 <= { reg_2[ DIM-16:0 ], reg_2[ DIM:DIM-15 ] };
+                          end
+
+                          // 32
+                          else if ( inst[ 7 ] ) begin
+                              reg_2 <= { reg_2[ DIM-32:0 ], reg_2[ DIM:DIM-31 ] };
+                          end
+
+                          // 64
+                          else if ( inst[ 6 ] ) begin
+                              reg_2 <= { reg_2[ DIM-64:0 ], reg_2[ DIM:DIM-63 ] };
+                          end
+
+                          // 128
+                          else if ( inst[ 5 ] ) begin
+                              reg_2 <= { reg_2[ DIM-128:0 ], reg_2[ DIM:DIM-127 ] };
+                          end
+
+                          // 256
+                          else if ( inst[ 4 ] ) begin
+                              reg_2 <= { reg_2[ DIM-256:0 ], reg_2[ DIM:DIM-255 ] };
+                          end
+
+                          // 512
+                          else if ( inst[ 3 ] ) begin
+                              reg_2 <= { reg_2[ DIM-512:0 ], reg_2[ DIM:DIM-511 ] };
+                          end
+
+                          buff <= 0;
+                          store <= 0;
+                      end
+
+                      // xor
+                      else if ( inst[ 12 ] ) begin
+                          reg_2 <= reg_1 ^ reg_2;
+                          buff <= 0;
+                          store <= 0;
+                      end
+
+                      // store
+                      else if ( inst[ 11 ] ) begin
+                          buff <= reg_2;
+                          store <= 1;
+                      end
+
+                      // last
+                      else if ( inst[ 10 ] ) begin
+                          last <= 1;
+                          buff <= 0;
+                          store <= 0;
+                      end
+
+                      // move
+                      else if ( inst[ 9 ] ) begin
+                          reg_1 <= reg_2;
+                          buff <= 0;
+                          store <= 0;
+                      end
+
+                      // wb
+                      else if ( inst[ 8 ] ) begin
+                          reg_2 <= sign_bit;
+                          buff <= 0;
+                          store <= 0;
+                      end
+
+                      // nop (すべて0のはず)
+                      else begin
+                          buff <= 0;
+                          store <= 0;
                       end
                   end
 

@@ -75,89 +75,166 @@ void putb(unsigned int v)
 }
 
 // 簡易アセンブラ
-uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
+uint16_t assemble(int addr_flag, const char inst_str[], uint16_t addr)
 {
   if (addr_flag)
   {
     uint16_t result = 0;
+
     // load
-    if (inst_num == 1)
+    if (strcmp(inst_str, "load") == 0)
     {
-      uint16_t inst = 3 << 14;
+      uint16_t inst = 49152;
       result = inst | addr;
     }
-    // l.rshift
-    else if (inst_num == 2)
-    {
-      uint16_t inst = 5 << 13;
-      result = inst | addr;
-    }
-    // l.lshift
-    else if (inst_num == 4)
-    {
-      uint16_t inst = 9 << 12;
-      result = inst | addr;
-    }
+
     // l.xor
-    else if (inst_num == 6)
+    else if (strcmp(inst_str, "lxor") == 0)
     {
-      uint16_t inst = 17 << 11;
+      uint16_t inst = 40960;
       result = inst | addr;
     }
+
     // wb.item
-    else if (inst_num == 12)
+    else if (strcmp(inst_str, "wbitem") == 0)
     {
-      uint16_t inst = 33 << 10;
+      uint16_t inst = 36864;
       result = inst | addr;
     }
+
     else
     {
       printf("error");
     }
+
     return result;
   }
+
   else
   {
     uint16_t inst = 0;
-    // rshift
-    if (inst_num == 3)
-    {
-      inst = 1 << 14;
-    }
-    // lshift
-    else if (inst_num == 5)
-    {
-      inst = 1 << 13;
-    }
+
     // xor
-    else if (inst_num == 7)
+    if (strcmp(inst_str, "xor") == 0)
     {
-      inst = 1 << 12;
+      inst = 4096;
     }
+
     // store
-    else if (inst_num == 8)
+    else if (strcmp(inst_str, "store") == 0)
     {
-      inst = 1 << 11;
+      inst = 2048;
     }
+
     // last
-    else if (inst_num == 9)
+    else if (strcmp(inst_str, "last") == 0)
     {
-      inst = 1 << 10;
+      inst = 1024;
     }
+
     // move
-    else if (inst_num == 10)
+    else if (strcmp(inst_str, "move") == 0)
     {
-      inst = 1 << 9;
+      inst = 512;
     }
+
     // wb
-    else if (inst_num == 11)
+    else if (strcmp(inst_str, "wb") == 0)
     {
-      inst = 1 << 8;
+      inst = 256;
     }
+
+    // rshift
+    else if (strcmp(inst_str, "rshift1") == 0)
+    {
+      inst = 20480;
+    }
+
+    else if (strcmp(inst_str, "rshift2") == 0)
+    {
+      inst = 18432;
+    }
+
+    else if (strcmp(inst_str, "rshift4") == 0)
+    {
+      inst = 17408;
+    }
+    else if (strcmp(inst_str, "rshift8") == 0)
+    {
+      inst = 16896;
+    }
+    else if (strcmp(inst_str, "rshift16") == 0)
+    {
+      inst = 16640;
+    }
+    else if (strcmp(inst_str, "rshift32") == 0)
+    {
+      inst = 16512;
+    }
+    else if (strcmp(inst_str, "rshift64") == 0)
+    {
+      inst = 16448;
+    }
+    else if (strcmp(inst_str, "rshift128") == 0)
+    {
+      inst = 16416;
+    }
+    else if (strcmp(inst_str, "rshift256") == 0)
+    {
+      inst = 16400;
+    }
+    else if (strcmp(inst_str, "rshift512") == 0)
+    {
+      inst = 16392;
+    }
+
+    // lshift
+    else if (strcmp(inst_str, "lshift1") == 0)
+    {
+      inst = 12288;
+    }
+    else if (strcmp(inst_str, "lshift2") == 0)
+    {
+      inst = 10240;
+    }
+    else if (strcmp(inst_str, "lshift4") == 0)
+    {
+      inst = 9216;
+    }
+    else if (strcmp(inst_str, "lshift8") == 0)
+    {
+      inst = 8704;
+    }
+    else if (strcmp(inst_str, "lshift16") == 0)
+    {
+      inst = 8448;
+    }
+    else if (strcmp(inst_str, "lshift32") == 0)
+    {
+      inst = 8320;
+    }
+    else if (strcmp(inst_str, "lshift64") == 0)
+    {
+      inst = 8256;
+    }
+    else if (strcmp(inst_str, "lshift128") == 0)
+    {
+      inst = 8224;
+    }
+    else if (strcmp(inst_str, "lshift256") == 0)
+    {
+      inst = 8208;
+    }
+    else if (strcmp(inst_str, "lshift512") == 0)
+    {
+      inst = 8200;
+    }
+
     else
     {
       printf("error");
     }
+
     return inst;
   }
 }
@@ -286,7 +363,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
   {
     // load
     uint16_t addr = MAJORITY_ADDR;
-    conv.data_0 = assemble(1, 1, addr);
+    conv.data_0 = assemble(1, "load", addr);
     conv.data_1 = 0;
     verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
     tmp++;
@@ -298,7 +375,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 
     // store
     tmp = 0;
-    conv.data_0 = assemble(0, 8, 0);
+    conv.data_0 = assemble(0, "store", 0);
     conv.data_1 = 0;
     verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
     tmp++;
@@ -317,19 +394,19 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
     if (REMAINDAR != 0 && j == LAST)
     {
 
-      // 1 -------------------------------------------------------------------
+      // load
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
         uint16_t addr = NGRAM * i + j;
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(1, 1, addr);
+          conv.data_0 = assemble(1, "load", addr);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(1, 1, addr);
+          conv.data_1 = assemble(1, "load", addr);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -362,18 +439,18 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 10 -------------------------------------------------------------------
+      // move
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(0, 10, 0);
+          conv.data_0 = assemble(0, "move", 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(0, 10, 0);
+          conv.data_1 = assemble(0, "move", 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -406,19 +483,19 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 2 -------------------------------------------------------------------
+      // load
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
         uint16_t addr = NGRAM * i + 1 + j;
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(1, 2, addr);
+          conv.data_0 = assemble(1, "load", addr);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(1, 2, addr);
+          conv.data_1 = assemble(1, "load", addr);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -451,18 +528,18 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 7 -------------------------------------------------------------------
+      // rshift1
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(0, 7, 0);
+          conv.data_0 = assemble(0, "rshift1", 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(0, 7, 0);
+          conv.data_1 = assemble(0, "rshift1", 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -495,18 +572,18 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 10 -------------------------------------------------------------------
+      // xor
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(0, 10, 0);
+          conv.data_0 = assemble(0, "xor", 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(0, 10, 0);
+          conv.data_1 = assemble(0, "xor", 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -539,19 +616,63 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 2 -------------------------------------------------------------------
+      // move
+      tmp = 0;
+      for (int i = 0; i < REMAINDAR; i++)
+      {
+        if (i % 2 == 0)
+        {
+          conv.data_0 = assemble(0, "move", 0);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = assemble(0, "move", 0);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (REMAINDAR % 2 != 0)
+      {
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // load
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
         uint16_t addr = NGRAM * i + 2 + j;
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(1, 2, addr);
+          conv.data_0 = assemble(1, "load", addr);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(1, 2, addr);
+          conv.data_1 = assemble(1, "load", addr);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -584,18 +705,18 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 3 -------------------------------------------------------------------
+      // rshift2
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(0, 3, 0);
+          conv.data_0 = assemble(0, "rshift2", 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(0, 3, 0);
+          conv.data_1 = assemble(0, "rshift2", 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -628,18 +749,18 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 7 -------------------------------------------------------------------
+      // xor
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(0, 7, 0);
+          conv.data_0 = assemble(0, "xor", 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(0, 7, 0);
+          conv.data_1 = assemble(0, "xor", 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -672,19 +793,19 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 9 (ここは必ずラストの命令) -------------------------------------------------------------------
+      // store
       tmp = 0;
       for (int i = 0; i < REMAINDAR; i++)
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(0, 8, 0);
+          conv.data_0 = assemble(0, "store", 0);
           conv.data_1 = 0;
           // conv.data_1 = assemble(0, 9, 0); // storeとlastを同時実行して問題ないかテスト
         }
         else
         {
-          conv.data_1 = assemble(0, 8, 0);
+          conv.data_1 = assemble(0, "store", 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -702,11 +823,13 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       }
       eval();
 
-      // write back 実験
+      //------------------------------------------------- 実験 -------------------------------------------------------
+
+      // wb.item
       tmp = 0;
       for (int i = 0; i < 1; i++)
       {
-        conv.data_0 = assemble(1, 12, 1022);
+        conv.data_0 = assemble(1, "wbitem", 1022);
         conv.data_1 = 0;
         verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
         tmp++;
@@ -718,11 +841,11 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       }
       eval();
 
-      // write back 実験
+      // load
       tmp = 0;
       for (int i = 0; i < 1; i++)
       {
-        conv.data_0 = assemble(1, 1, 1022);
+        conv.data_0 = assemble(1, "load", 1022);
         conv.data_1 = 0;
         verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
         tmp++;
@@ -764,10 +887,13 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       // }
       // eval();
 
+      // -------------------------------------------------------じっけんしゅうりょう -----------------------------------------------------------
+
+      // last
       tmp = 0;
       for (int i = 0; i < 1; i++)
       {
-        conv.data_0 = assemble(0, 9, 0);
+        conv.data_0 = assemble(0, "last", 0);
         conv.data_1 = 0;
         verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
         tmp++;
@@ -783,19 +909,19 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
     } //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     else
     {
-      // 1 -------------------------------------------------------------------
+      // load
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
         uint16_t addr = NGRAM * i + j;
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(1, 1, addr);
+          conv.data_0 = assemble(1, "load", addr);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(1, 1, addr);
+          conv.data_1 = assemble(1, "load", addr);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -829,18 +955,18 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 10 -------------------------------------------------------------------
+      // move
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(0, 10, 0);
+          conv.data_0 = assemble(0, "move", 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(0, 10, 0);
+          conv.data_1 = assemble(0, "move", 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -874,19 +1000,19 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 2 -------------------------------------------------------------------
+      // load
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
         uint16_t addr = NGRAM * i + 1 + j;
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(1, 2, addr);
+          conv.data_0 = assemble(1, "load", addr);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(1, 2, addr);
+          conv.data_1 = assemble(1, "load", addr);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -920,18 +1046,18 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 7 -------------------------------------------------------------------
+      // rshift1
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(0, 7, 0);
+          conv.data_0 = assemble(0, "rshift1", 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(0, 7, 0);
+          conv.data_1 = assemble(0, "rshift1", 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -965,18 +1091,18 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 10 -------------------------------------------------------------------
+      // xor
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(0, 10, 0);
+          conv.data_0 = assemble(0, "xor", 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(0, 10, 0);
+          conv.data_1 = assemble(0, "xor", 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -1010,19 +1136,64 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 2 -------------------------------------------------------------------
+      // move
+      tmp = 0;
+      for (int i = 0; i < CORENUM; i++)
+      {
+        if (i % 2 == 0)
+        {
+          conv.data_0 = assemble(0, "move", 0);
+          conv.data_1 = 0;
+        }
+        else
+        {
+          conv.data_1 = assemble(0, "move", 0);
+          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+          tmp++;
+        }
+      }
+      // 奇数のとき最後の代入ができていない
+      if (CORENUM % 2 != 0)
+      {
+        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+        tmp++;
+      }
+      // 残り埋める
+      for (int i = tmp; i < 32; i++)
+      {
+        verilator_top->S_AXIS_TDATA[i] = 0;
+      }
+      eval();
+
+      if (DEBUG)
+      {
+        // 送信途中で止まる対策 -----------------------------
+        verilator_top->S_AXIS_TVALID = 0;
+        for (int i = 0; i < 32; i++)
+        {
+          verilator_top->S_AXIS_TDATA[i] = 0;
+        }
+        eval();
+        eval();
+        eval();
+        verilator_top->S_AXIS_TVALID = 1;
+        eval();
+        // ----------------------------------------------
+      }
+
+      // load
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
         uint16_t addr = NGRAM * i + 2 + j;
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(1, 2, addr);
+          conv.data_0 = assemble(1, "load", addr);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(1, 2, addr);
+          conv.data_1 = assemble(1, "load", addr);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -1055,6 +1226,8 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         eval();
         // ----------------------------------------------
       }
+
+      // ------------------------------------------------------　実験　途中でとめてもcounterの値は残っているか -----------------------------------
 
       // // last
       // tmp = 0;
@@ -1083,18 +1256,20 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       // // 送信
       // verilator_top->S_AXIS_TVALID = 1;
 
-      // 3 -------------------------------------------------------------------
+      // -------------------------------------------------- じっけんおわり ------------------------------------------------------------
+
+      // rshift2
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(0, 3, 0);
+          conv.data_0 = assemble(0, "rshift2", 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(0, 3, 0);
+          conv.data_1 = assemble(0, "rshift2", 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -1128,18 +1303,18 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         // ----------------------------------------------
       }
 
-      // 7 -------------------------------------------------------------------
+      // xor
       tmp = 0;
       for (int i = 0; i < CORENUM; i++)
       {
         if (i % 2 == 0)
         {
-          conv.data_0 = assemble(0, 7, 0);
+          conv.data_0 = assemble(0, "xor", 0);
           conv.data_1 = 0;
         }
         else
         {
-          conv.data_1 = assemble(0, 7, 0);
+          conv.data_1 = assemble(0, "xor", 0);
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
         }
@@ -1175,19 +1350,18 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 
       if (j == LAST)
       {
-        // 8 -------------------------------------------------------------------
+        // store
         tmp = 0;
         for (int i = 0; i < CORENUM; i++)
         {
           if (i % 2 == 0)
           {
-            conv.data_0 = assemble(0, 8, 0);
-            // conv.data_0 = assemble(0, 8, 0);
+            conv.data_0 = assemble(0, "store", 0);
             conv.data_1 = 0;
           }
           else
           {
-            conv.data_1 = assemble(0, 8, 0);
+            conv.data_1 = assemble(0, "store", 0);
             verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
             tmp++;
           }
@@ -1205,59 +1379,11 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
         }
         eval();
 
-        // // wb
-        // tmp = 0;
-        // for (int i = 0; i < 1; i++)
-        // {
-        //   conv.data_0 = assemble(0, 11, 0);
-        //   conv.data_1 = 0;
-        //   verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-        //   tmp++;
-        // }
-        // // 残り埋める
-        // for (int i = tmp; i < 32; i++)
-        // {
-        //   verilator_top->S_AXIS_TDATA[i] = 0;
-        // }
-        // eval();
-
-        // // wb.item
-        // tmp = 0;
-        // for (int i = 0; i < 1; i++)
-        // {
-        //   conv.data_0 = assemble(1, 12, 1023);
-        //   conv.data_1 = 0;
-        //   verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-        //   tmp++;
-        // }
-        // // 残り埋める
-        // for (int i = tmp; i < 32; i++)
-        // {
-        //   verilator_top->S_AXIS_TDATA[i] = 0;
-        // }
-        // eval();
-
-        // // load
-        // tmp = 0;
-        // for (int i = 0; i < 1; i++)
-        // {
-        //   conv.data_0 = assemble(1, 1, 1023);
-        //   conv.data_1 = 0;
-        //   verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-        //   tmp++;
-        // }
-        // // 残り埋める
-        // for (int i = tmp; i < 32; i++)
-        // {
-        //   verilator_top->S_AXIS_TDATA[i] = 0;
-        // }
-        // eval();
-
         // last
         tmp = 0;
         for (int i = 0; i < 1; i++)
         {
-          conv.data_0 = assemble(0, 9, 0);
+          conv.data_0 = assemble(0, "last", 0);
           conv.data_1 = 0;
           verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
           tmp++;
@@ -1271,18 +1397,18 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
       }
       else
       {
-        // 8 -------------------------------------------------------------------
+        // store
         tmp = 0;
         for (int i = 0; i < CORENUM; i++)
         {
           if (i % 2 == 0)
           {
-            conv.data_0 = assemble(0, 8, 0);
+            conv.data_0 = assemble(0, "store", 0);
             conv.data_1 = 0;
           }
           else
           {
-            conv.data_1 = assemble(0, 8, 0);
+            conv.data_1 = assemble(0, "store", 0);
             verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
             tmp++;
           }
@@ -1377,7 +1503,7 @@ int main(int argc, char **argv)
   printf("\n ====================================== 開始 ========================================= \n\n");
 
   const int NGRAM = 3;
-  const int CORENUM = 16;
+  const int CORENUM = 12;
   int DEBUG = 0;
   int ADDRNUM = 0;
   // 次元数可変 (結果を何個出力するかに使う)
@@ -1397,7 +1523,7 @@ int main(int argc, char **argv)
   //   printf(" -------------------\n\n");
   // }
 
-  ADDRNUM = 15;
+  ADDRNUM = 40;
   DEBUG = 0;
   check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
