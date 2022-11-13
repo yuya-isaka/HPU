@@ -7,6 +7,8 @@ default:
 	gcc -O2 -o bound bound.c -lm
 	gcc -O2 -o bound2 bound2.c -lm
 	gcc -O2 -o perm perm.c -lm
+	gcc -O2 -o perm_bound perm_bound.c -lm
+	gcc -O2 -o perm_and_bound perm_and_bound.c -lm
 
 check:
 	gcc -Wall -o bind bind.c -lm

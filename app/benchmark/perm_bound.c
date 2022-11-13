@@ -94,7 +94,7 @@ unsigned int shifter_32(unsigned int *v, unsigned int num)
 
 // unsigned int 1024bitのシフト
 // 32bitのシフトを繰り返すことでエミュレート（現状31シフトが限界）
-void shifter_1024(unsigned int **new, unsigned int **original, const unsigned int require_int_num, unsigned int num)
+void shifter_1024(unsigned int new[], unsigned int **original, const unsigned int require_int_num, unsigned int num)
 {
 	// original[require_int_num] 	... unsigned int のデータが32個格納（1024次元をエミュレート）
 	// new[require_int_num] 		... unsigned int のデータが32個格納（1024次元をエミュレート）
@@ -128,10 +128,47 @@ void shifter_1024(unsigned int **new, unsigned int **original, const unsigned in
 	// 結果を移す
 	for (int i = 0; i < require_int_num; i++)
 	{
-		(*new)[i] = result_bind[i];
+		new[i] = result_bind[i];
 	}
 
 	free(result_bind);
+}
+
+// -----------------------------------------------------------------------
+
+// 多数決関数　&& 加算
+// 32bitの各ビットの立っている数を数えて多数決関数を実行し結果ベクトルを生成
+// result_array[train_size] ... すべてのデータの 結果（unsigned int) が入っている。1024次元ならこのbounding関数を32回使う
+unsigned int bounding(unsigned int result_array[], size_t train_size)
+{
+	// Populationカウントをして、その後多数決関数を実行
+
+	unsigned int result_bind_bound = 0;
+
+	// マスクをずらしながら各次元の1が立っている数を調べる
+	unsigned int mask = (int)1 << (32 - 1);
+
+	while (mask)
+	{
+		int buff = 0;
+
+		// 訓練データの数だけ足し算
+		for (int i = 0; i < train_size; i++)
+		{
+			buff += (mask & result_array[i] ? 1 : 0);
+		}
+
+		// 多数決で1の数が過半数なら、resultにmaskを加える（→対象のbit番目が1になる）
+		if (buff > (train_size / 2))
+		{
+			// 多数決で1が優位だったら、該当ビットを立たせる
+			result_bind_bound += mask;
+		}
+
+		mask >>= 1;
+	}
+
+	return result_bind_bound;
 }
 
 // -----------------------------------------------------------------------
@@ -184,25 +221,66 @@ int main(int argc, char const *argv[])
 
 	int trial_num = 50000000;
 
-	// Permutation結果を格納
-	unsigned int **result;
-	makeArrayInt(&result, trial_num, require_int_num);
+	// 結果を格納
+	int result_perm_bound[1024];
+	// 初期化しないとバグる
+	for (int i = 0; i < 1024; i++)
+	{
+		result_perm_bound[i] = 0;
+	}
 
 	// 試行
-	for (int i = 0; i < trial_num; i++)
+	for (int i = 0; i < trial_num; i++) // 5000万
 	{
 		// アドレス生成
-		int addr = rand() % 1024;
+		int addr1 = rand() % 1024;
 
 		// Permutation回数
 		int num = rand() % 32;
 
 		// Perm
-		shifter_1024(&result[i], &item_memory_array[addr], require_int_num, num);
+		unsigned int result_tmp[require_int_num];
+		shifter_1024(result_tmp, &item_memory_array[addr1], require_int_num, num);
+
+		for (int j = 0; j < require_int_num; j++) // 32
+		{
+			// bound
+			unsigned int mask = 1;
+			for (int k = 0; k < 32; k++) // 32
+			{
+				result_perm_bound[j * 32 + k] += (mask & result_tmp[j] ? -1 : 1);
+				mask <<= 1;
+			}
+		}
+	}
+
+	// 多数決格納先
+	unsigned int result_majority[require_int_num];
+	// 初期化しないとバグる
+	for (int i = 0; i < require_int_num; i++)
+	{
+		result_majority[i] = 0;
+	}
+
+	// 多数決
+	unsigned int main_mask = 1 << (32 - 1);
+	for (int i = 0; i < require_int_num; i++) // 32
+	{
+		for (int j = 0; j < 32; j++) // 32
+		{
+			// 符号ビットが立ってたら、1 たってなかったら０
+			unsigned int result_tmp = (result_perm_bound[i * 32 + j] & main_mask ? 1 : 0);
+			result_majority[i] += result_tmp << j;
+		}
+	}
+
+	// 結果出力
+	for (int i = 0; i < require_int_num; i++)
+	{
+		printf("%u\n", result_majority[i]);
 	}
 
 	// 解放
-	freeArrayInt(&result, trial_num);
 	freeArrayInt(&item_memory_array, item_memory_num);
 
 	// -----------------------------------------------------------------------

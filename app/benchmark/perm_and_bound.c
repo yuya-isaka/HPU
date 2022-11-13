@@ -136,6 +136,43 @@ void shifter_1024(unsigned int **new, unsigned int **original, const unsigned in
 
 // -----------------------------------------------------------------------
 
+// 多数決関数　&& 加算
+// 32bitの各ビットの立っている数を数えて多数決関数を実行し結果ベクトルを生成
+// result_array[train_size] ... すべてのデータの 結果（unsigned int) が入っている。1024次元ならこのbounding関数を32回使う
+unsigned int bounding(unsigned int result_array[], size_t train_size)
+{
+	// Populationカウントをして、その後多数決関数を実行
+
+	unsigned int result_bind_bound = 0;
+
+	// マスクをずらしながら各次元の1が立っている数を調べる
+	unsigned int mask = (int)1 << (32 - 1);
+
+	while (mask)
+	{
+		int buff = 0;
+
+		// 訓練データの数だけ足し算
+		for (int i = 0; i < train_size; i++)
+		{
+			buff += (mask & result_array[i] ? 1 : 0);
+		}
+
+		// 多数決で1の数が過半数なら、resultにmaskを加える（→対象のbit番目が1になる）
+		if (buff > (train_size / 2))
+		{
+			// 多数決で1が優位だったら、該当ビットを立たせる
+			result_bind_bound += mask;
+		}
+
+		mask >>= 1;
+	}
+
+	return result_bind_bound;
+}
+
+// -----------------------------------------------------------------------
+
 int main(int argc, char const *argv[])
 {
 	// -----------------------------------------------------------------------
@@ -185,8 +222,8 @@ int main(int argc, char const *argv[])
 	int trial_num = 50000000;
 
 	// Permutation結果を格納
-	unsigned int **result;
-	makeArrayInt(&result, trial_num, require_int_num);
+	unsigned int **result_perm;
+	makeArrayInt(&result_perm, trial_num, require_int_num);
 
 	// 試行
 	for (int i = 0; i < trial_num; i++)
@@ -198,11 +235,36 @@ int main(int argc, char const *argv[])
 		int num = rand() % 32;
 
 		// Perm
-		shifter_1024(&result[i], &item_memory_array[addr], require_int_num, num);
+		shifter_1024(&result_perm[i], &item_memory_array[addr], require_int_num, num);
+	}
+
+	// Permutation結果を転置
+	unsigned int **result_perm_t;
+	makeArrayInt(&result_perm_t, require_int_num, trial_num);
+	for (int i = 0; i < require_int_num; i++)
+	{
+		for (int j = 0; j < trial_num; j++)
+		{
+			result_perm_t[i][j] = result_perm[j][i];
+		}
+	}
+
+	// bound
+	unsigned int result_bound[require_int_num];
+	for (int i = 0; i < require_int_num; i++)
+	{
+		result_bound[i] = bounding(result_perm_t[i], trial_num);
+	}
+
+	// 結果出力
+	for (int i = 0; i < require_int_num; i++)
+	{
+		printf("%u\n", result_bound[i]);
 	}
 
 	// 解放
-	freeArrayInt(&result, trial_num);
+	freeArrayInt(&result_perm_t, require_int_num);
+	freeArrayInt(&result_perm, trial_num);
 	freeArrayInt(&item_memory_array, item_memory_num);
 
 	// -----------------------------------------------------------------------
