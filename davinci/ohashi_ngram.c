@@ -626,7 +626,7 @@ int main(int argc, char const *argv[])
 	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
 	clock_t end = clock();
 	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\n  time %lf[ms]\n", time);
+	printf("\n\nOhashi_ngram time %lf[ms]\n", time);
 
 	return 0;
 }

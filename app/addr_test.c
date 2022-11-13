@@ -90,7 +90,7 @@ void shifter_ngram(const int NGRAM)
   }
 }
 
-unsigned int addition(unsigned int result_array[], size_t size)
+unsigned int bounding(unsigned int result_array[], size_t size)
 {
   unsigned int result = 0;
 
@@ -739,7 +739,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       // printf("ランダム：%u\n", result_array[num]);
       // putb(result_array[num]);
     }
-    unsigned int result_real = addition(result_array, ARNUM);
+    unsigned int result_real = bounding(result_array, ARNUM);
     // printf("  %u\n", result_real);
     // putb(result_real);
     if (result_real != dst[j])
