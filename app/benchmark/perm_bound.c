@@ -264,8 +264,8 @@ int main(int argc, char const *argv[])
 	// -----------------------------------------------------------------------
 	// 実験
 
+	// int trial_num = 50000000;
 	int trial_num = 50000000;
-	// int trial_num = 50;
 
 	// 結果を格納
 	int result_perm_bound[1024];

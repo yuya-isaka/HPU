@@ -49,6 +49,7 @@ module counter
     // 4bitあれば十分
     reg signed [ 3:0 ]      box_1;
     reg signed [ 3:0 ]      box_2;
+    // reg signed [ 3:0 ]      box_3;
 
 
     always_ff @( posedge clk ) begin
@@ -84,21 +85,21 @@ module counter
                         + select[ 2 ]
                         + select[ 3 ]
                         + select[ 4 ]
-                        + select[ 5 ];
+                        + select[ 5 ]
+                        + select[ 6 ]
+                        + select[ 7 ];
                   box_2 <=
-                        select[ 6 ]
-                        + select[ 7 ]
-                        + select[ 8 ]
+                        select[ 8 ]
                         + select[ 9 ]
                         + select[ 10 ]
-                        + select[ 11 ];
+                        + select[ 11 ]
+                        +select[ 12 ]
+                        + select[ 13 ]
+                        + select[ 14 ]
+                        + select[ 15 ];
                   //   box_3 <=
                   //   box_4 <=
                   // box_4 <=
-                  //       select[ 12 ]
-                  //       + select[ 13 ]
-                  //       + select[ 14 ]
-                  //       + select[ 15 ];
               end;
 
 
