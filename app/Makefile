@@ -14,6 +14,6 @@ asm:
 
 
 clean:
-	rm test_hdc
+	rm addr_test
 
-.PHONY: default check clean
+.PHONY: default check asm clean
