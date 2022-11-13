@@ -302,11 +302,6 @@ module core
                                   reg_2 <= { reg_2[ DIM-256:0 ], reg_2[ DIM:DIM-255 ] };
                               end
 
-                              // 512
-                              else if ( inst[ 3 ] ) begin
-                                  reg_2 <= { reg_2[ DIM-512:0 ], reg_2[ DIM:DIM-511 ] };
-                              end
-
                               buff <= 0;
                               store <= 0;
                           end

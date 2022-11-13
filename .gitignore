@@ -364,11 +364,6 @@ sim
 boot
 
 # バイナリたち
-hdc
-test_hdc
-hdc-new
-hdc-pl
-hdc-pl-check
-hdc-pl-cpp
+davinci_ngram
 
 .svlint.toml

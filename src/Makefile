@@ -29,10 +29,10 @@ DESIGN_SRC = \
 ./main/stream_ctrl.sv \
 ./main/buffer_ctrl.sv \
 ./main/core.sv \
-./kit/agu.sv \
 ./kit/counter.sv \
 ./kit/xorshift.sv \
 ./kit/selector.sv \
+# ./kit/agu.sv \
 
 VERILATOR_TB = tb.cpp
 

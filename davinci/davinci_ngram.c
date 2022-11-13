@@ -96,6 +96,8 @@ unsigned int xor128(int reset)
 	}
 }
 
+// -----------------------------------------------------------------------
+
 // unsigned int 32bitのシフト
 // num回右論理シフトしたやつを返す
 // 引数のvには、右論理シフトではみだしたやつを（32-num)回論理左シフトして取り出す
@@ -153,44 +155,56 @@ void shifter_1024(unsigned int **new, unsigned int **original, const unsigned in
 	free(result_tmp);
 }
 
+// -----------------------------------------------------------------------
+
 // 多数決関数　&& 加算
 // 32bitの各ビットの立っている数を数えて多数決関数を実行し結果ベクトルを生成
-// result_array[size] ... すべてのデータの 結果（unsigned int) が入っている。1024次元ならこのbounding関数を32回使う
-unsigned int bounding(unsigned int result_array[], size_t size)
+// result_array[train_size] ... すべてのデータの 結果（unsigned int) が入っている。1024次元ならこのbounding関数を32回使う
+unsigned int bounding(unsigned int result_array[], size_t train_size)
 {
+	// Populationカウントをして、その後多数決関数を実行
+
 	unsigned int result = 0;
 
-	//
+	// マスクをずらしながら各次元の1が立っている数を調べる
 	unsigned int mask = (int)1 << (32 - 1);
 
 	while (mask)
 	{
-		int tmp = 0;
-		for (int i = 0; i < size; i++)
+		int buff = 0;
+
+		// 訓練データの数だけ足し算
+		for (int i = 0; i < train_size; i++)
 		{
-			tmp += (mask & result_array[i] ? 1 : 0);
+			buff += (mask & result_array[i] ? 1 : 0);
 		}
 
 		// 多数決で1の数が過半数なら、resultにmaskを加える（→対象のbit番目が1になる）
-		if (tmp > (size / 2))
+		if (buff > (train_size / 2))
 		{
+			// 多数決で1が優位だったら、該当ビットを立たせる
 			result += mask;
 		}
 
 		mask >>= 1;
 	}
+
 	return result;
 }
+// -----------------------------------------------------------------------
 
 int main(int argc, char const *argv[])
 {
+
 	clock_t start = clock();
 	printf("\n\n");
+
 	// ---------------------------------------------
+
 	const int train_num = 2;
 	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
-	const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
+	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	// const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
 	const int ngram = 3;
 	const int DIM = 1024 / 32;
 	const int rand_num = 27;
@@ -199,9 +213,17 @@ int main(int argc, char const *argv[])
 
 	int all_ngram = 0;
 	int even = 0;
+
+	// ランダム生成の初期化
+	xor128(1);
+
 	// ---------------------------------------------
+
+	// 英語とフランス語の数だけ繰り返す
 	for (int i = 0; i < train_num; i++)
 	{
+
+		// ファイル読み込み
 		const char *path = train_path[i];
 		printf("\n------------- %sの学習 -------------\n\n", path);
 		FILE *file;
@@ -211,15 +233,17 @@ int main(int argc, char const *argv[])
 			perror("  Failed: open file");
 			exit(1);
 		}
+
+		// ---------------------------------------------
+
+		// ファイルから文字列を取得
 		int ch;
 		int num = 0;
 		// 与えられたファイルがひと続きの文字列と仮定 (2行になると｛10, 0x0a, LF(改行)｝ が入ってしまいズレる)
-		while ((ch = fgetc(file)) != EOF) // ubuntu:EOF == -1,  petalinux:EOF == 255
+		while ((ch = fgetc(file)) != EOF)
 		{
-			// printf("%d\n", ch);
 			num++;
 		}
-		// printf("%d\n", num);
 		printf("EOF: %d\n", EOF); // EOFは全て-1 (Mac, Linux, Petalinux)
 		fseek(file, 0, SEEK_SET);
 		char *content = (char *)calloc(num, sizeof(char));
@@ -230,12 +254,23 @@ int main(int argc, char const *argv[])
 			exit(1);
 		}
 		fclose(file);
+
 		all_ngram = strlen(content) - ngram + 1;
+		// 偶数なら１こ生やす
+		if (even)
+		{
+			all_ngram++;
+		}
 		even = all_ngram % 2 == 0;
+
+		// 確認
 		// printf("content: %s\n", content); // myname...
 		printf("all_ngram: %d\n", all_ngram);
 		printf("even: %d\n", even);
 
+		// ---------------------------------------------
+
+		// 得られた文字列からアドレスを取得
 		uint16_t **ascii_array;
 		makeArray(&ascii_array, all_ngram, ngram);
 		for (int i = 0; i < all_ngram; i++)
@@ -247,9 +282,8 @@ int main(int argc, char const *argv[])
 			}
 		}
 
-		xor128(1);
-
 		// コード ----------------------------------------
+		// ---------------------------------------------
 
 		// ランダムなハイパーベクトルを生成
 		unsigned int **item_memory_array;
@@ -269,15 +303,22 @@ int main(int argc, char const *argv[])
 					tmp = xor128(0);
 				}
 				item_memory_array[i][j] = tmp;
-				// printf("%u\n", tmp);
 			}
 		}
 
+		// ---------------------------------------------
+
 		unsigned int **item_memory_array_new;
-		makeArrayInt(&item_memory_array_new, all_ngram, DIM);
+		makeArrayInt(&item_memory_array_new, DIM, all_ngram);
+
+		int repeat_num = all_ngram;
+		if (even)
+		{
+			repeat_num--;
+		}
 
 		// all_ngramの数だけ、shiftとxorのエンコーディングを計算
-		for (int i = 0; i < all_ngram; i++)
+		for (int i = 0; i < repeat_num; i++)
 		{
 			// -----------------------------------------------------
 			// シフトしたものをitem_memory_array_reuslt[ngram][DIM]に格納
@@ -308,42 +349,29 @@ int main(int argc, char const *argv[])
 			// tmpに入ったエンコーディング結果でitem_memory_array_new[all_ngram][DIM]を更新
 			for (int k = 0; k < DIM; k++)
 			{
-				item_memory_array_new[i][k] = tmp[k];
+				item_memory_array_new[k][i] = tmp[k];
 			}
 		}
+
+		// ---------------------------------------------
 
 		if (even)
 		{
-			all_ngram++;
-		}
-
-		// grab_bit使うために転置
-		// item_memory_array_new_t[DIM][all_ngram]
-		unsigned int **item_memory_array_new_t;
-		makeArrayInt(&item_memory_array_new_t, DIM, all_ngram);
-
-		for (int i = 0; i < all_ngram; i++)
-		{
-			for (int j = 0; j < DIM; j++)
+			for (int i = 0; i < DIM; i++)
 			{
-				if (even && (i == (all_ngram - 1)))
-				{
-					// 適当な値を追加
-					item_memory_array_new_t[j][i] = item_memory_array[majority_tmp][j];
-					// printf("ら：%u\n", item_memory_array_new_t[j][i]);
-				}
-				else
-				{
-					item_memory_array_new_t[j][i] = item_memory_array_new[i][j];
-				}
+
+				item_memory_array_new[i][all_ngram - 1] = item_memory_array[majority_tmp][i];
 			}
 		}
 
-		unsigned int result[DIM];
+		// ---------------------------------------------
 
+		// 結果を格納
+		// Bounding
+		unsigned int result[DIM];
 		for (int i = 0; i < DIM; i++)
 		{
-			result[i] = bounding(item_memory_array_new_t[i], all_ngram);
+			result[i] = bounding(item_memory_array_new[i], all_ngram);
 		}
 
 		// デバッグ用
@@ -354,8 +382,7 @@ int main(int argc, char const *argv[])
 
 		// ---------------------------------------------
 
-		freeArrayInt(&item_memory_array_new, all_ngram);
-		freeArrayInt(&item_memory_array_new_t, DIM);
+		freeArrayInt(&item_memory_array_new, DIM);
 		freeArrayInt(&item_memory_array, rand_num);
 		freeArray(&ascii_array, all_ngram);
 	}

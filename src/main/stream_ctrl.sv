@@ -12,19 +12,19 @@ module stream_ctrl
      (
 
          // in
-         input wire                         clk,
-         input wire                         rst,
-         input wire                         get_v,
+         input wire                             clk,
+         input wire                             rst,
+         input wire                             get_v,
          // 1コア
-         input wire [ CORENUM-1:0 ]         last,
-         //   input wire                         last,
-         input wire                         dst_ready,
+         input wire [ CORENUM-1:0 ]             last,
+         //   input wire                             last,
+         input wire                             dst_ready,
 
 
          // out
-         output reg                         dst_valid,
-         output reg                         dst_last,
-         output logic                       stream_v
+         output reg                             dst_valid,
+         output reg                             dst_last,
+         output logic                           stream_v
 
      );
 
@@ -33,22 +33,25 @@ module stream_ctrl
 
 
     // 現状の流れ
-    // last -> last_n -> last_nn                  -> stream_ok_keep (stream_ok保持) -> dst_valid (stream_active引き金)
-    //                   stream_ok (last_nn引き金)    start (stream_ok_keep引き金)       dst_last (stream_active & last_stream引き金)
-    //                                               stream_active (sream_ok引き金)
-    //                                               stream_v (stream_active引き金)
-    //                                               last_stream (start引き金)
+    // last -> last_n -> last_nn ->  stream_ok_keep (stream_ok保持) -> dst_valid (stream_active引き金)
+    //                               start (stream_ok_keep引き金)       dst_last (stream_active & last_stream引き金)
+    //                               stream_active (sream_ok引き金)
+    //                               stream_v (stream_active引き金)
+    //                               last_stream (start引き金)
 
 
     // ラスト命令 (9命令) が実行された時、同時に他のコアでstore命令が実行されていることを考慮
-    // sign_bitが更新されるまで2サイクル待つ
-    reg         last_n, last_nn;
+    // sign_bitが更新されるまで3サイクル待つ
+    reg         last_n;
+    reg         last_nn;
+    reg         last_stream;
 
     always_ff @( posedge clk ) begin
 
                   if ( rst ) begin
                       last_n <= 0;
                       last_nn <= 0;
+                      last_stream <= 0;
                   end
 
                   else begin
@@ -62,6 +65,7 @@ module stream_ctrl
                       end
 
                       last_nn <= last_n;
+                      last_stream <= last_nn;
                   end
               end;
 
@@ -161,42 +165,42 @@ module stream_ctrl
 
 
     // 引き金: start
-    wire [ 1:0 ]        i;
-    wire                last_stream;
+    // wire [ 1:0 ]        i;
+    // wire                last_stream;
 
     // 各コアで違う結果を返したい時に使うかも？
-    agu #( .W( 2 ) ) agu_stream_i
-        (
+    // agu #( .W( 2 ) ) agu_stream_i
+    //     (
 
-            // in
-            .ini( 2'd0 ),
-            .fin( 2'd0 ),
-            .start( start ),
-            .clk( clk ),
-            .rst( rst ),
-            .en( dst_ready ),
+    //         // in
+    //         .ini( 2'd0 ),
+    //         .fin( 2'd0 ),
+    //         .start( start ),
+    //         .clk( clk ),
+    //         .rst( rst ),
+    //         .en( dst_ready ),
 
 
-            // out
-            .data( i ),
-            .last( last_stream )
+    //         // out
+    //         .data( i ),
+    //         .last( last_stream )
 
-        );
+    //     );
 
 
     //================================================================
 
 
     // 引き金： stream_ok_keep
-    logic       start;
+    // logic       start;
 
-    always_comb begin
-                    start = 1'b0;
+    // always_comb begin
+    //                 start = 1'b0;
 
-                    if ( dst_ready & stream_ok_keep ) begin
-                        start = 1'b1;
-                    end
-                end;
+    //                 if ( dst_ready & stream_ok_keep ) begin
+    //                     start = 1'b1;
+    //                 end
+    //             end;
 
 
     // 引き金: stream_active

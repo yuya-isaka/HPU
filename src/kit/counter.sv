@@ -34,17 +34,18 @@ module counter
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    reg         store_n, store_nn;
+    reg         store_n;
+    reg         store_nn;
 
-    // 分散RAM (符号付き)
     reg signed [ W-1:0 ]      box;
 
     // コア数可変
-    // 4bitあれば十分
-    reg signed [ 3:0 ]      box_1;
-    reg signed [ 3:0 ]      box_2;
-    reg signed [ 3:0 ]      box_3;
-    reg signed [ 3:0 ]      box_4;
+    // 3bitあれば十分
+    reg signed [ 2:0 ]      box_1;
+    reg signed [ 2:0 ]      box_2;
+    reg signed [ 2:0 ]      box_3;
+    reg signed [ 2:0 ]      box_4;
+
 
     always_ff @( posedge clk ) begin
 
@@ -148,7 +149,7 @@ module counter
 
 
     // 符号ビット
-    // boxは分散RAMなので、非同期に読み出し (後々変えるかも)
+    // 非同期読み出し
     assign sign_bit = box[ W-1 ];
 
 
