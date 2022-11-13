@@ -1,9 +1,9 @@
 
 default:
-	gcc -Wall -O2 -o davinci_ngram davinci_ngram.c -lm
+	gcc -O2 -o davinci_ngram davinci_ngram.c -lm
 
 check:
-	gcc -o davinci_ngram davinci_ngram.c -lm
+	gcc -Wall -o davinci_ngram davinci_ngram.c -lm
 
 asm:
 	gcc -Wall -O2 -S -o davinci_ngram.s davinci_ngram.c -lm
@@ -11,10 +11,10 @@ asm:
 
 
 linux:
-	arm-linux-gnueabihf-gcc -Wall -O2 -o ohashi_ngram ohashi_ngram.c -lm
+	arm-linux-gnueabihf-gcc -O2 -o ohashi_ngram ohashi_ngram.c -lm
 
 linux-check:
-	arm-linux-gnueabihf-gcc -o ohashi_ngram ohashi_ngram.c -lm
+	arm-linux-gnueabihf-gcc -Wall -o ohashi_ngram ohashi_ngram.c -lm
 
 linux-asm:
 	arm-linux-gnueabihf-gcc -Wall -O2 -S -o ohashi_ngram.s ohashi_ngram.c -lm

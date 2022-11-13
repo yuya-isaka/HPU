@@ -119,7 +119,7 @@ module core
                   if ( get_v ) begin
 
                       // wb.item命令 (特殊)
-                      if ( get_d[ 15 ] & get_d[ 12 ] ) begin
+                      if ( get_d[ 15 ] & get_d[ 13 ] ) begin
                           // 書き込みフラグを立てる
                           wb_flag <= 1'b1;
                           // 書き込み先アドレス格納
@@ -188,13 +188,6 @@ module core
                           // load
                           if ( inst[ 14 ] ) begin
                               reg_2 <= reg_0;
-                              buff <= 0;
-                              store <= 0;
-                          end
-
-                          // l.xor
-                          else if ( inst[ 13 ] ) begin
-                              reg_2 <= reg_0 ^ reg_2;
                               buff <= 0;
                               store <= 0;
                           end
