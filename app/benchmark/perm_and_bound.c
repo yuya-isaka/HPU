@@ -104,24 +104,41 @@ void shifter_1024(unsigned int **new, unsigned int **original, const unsigned in
 	// シフトしたデータを一時的に格納
 	unsigned int *result_bind = (unsigned int *)calloc(require_int_num, sizeof(unsigned int));
 
-	// 32回繰り返す
-	for (int i = 0; i < require_int_num; i++)
+	unsigned int perm = 0;
+	while (num)
 	{
 
-		// tmp		... num回右論理シフトした際にはみ出した部分を（32-num)回左論理シフトしたやつ
-		// tmp_v 	... num回右論理シフトしたやつ
-		unsigned int tmp = (*original)[i];
-		unsigned int tmp_v = shifter_32(&tmp, num);
-
-		// シフト
-		result_bind[i] |= tmp_v;
-		if (i == 0)
+		// あと何回かチェック
+		if (num > 31)
 		{
-			result_bind[require_int_num - 1] |= tmp;
+			perm = 31;
+			num -= 31;
 		}
 		else
 		{
-			result_bind[i - 1] |= tmp;
+			perm = num;
+			num = 0;
+		}
+
+		// 32回繰り返す
+		for (int i = 0; i < require_int_num; i++)
+		{
+
+			// tmp		... num回右論理シフトした際にはみ出した部分を（32-num)回左論理シフトしたやつ
+			// tmp_v 	... num回右論理シフトしたやつ
+			unsigned int tmp = (*original)[i];
+			unsigned int tmp_v = shifter_32(&tmp, perm);
+
+			// シフト
+			result_bind[i] |= tmp_v;
+			if (i == 0)
+			{
+				result_bind[require_int_num - 1] |= tmp;
+			}
+			else
+			{
+				result_bind[i - 1] |= tmp;
+			}
 		}
 	}
 
@@ -232,7 +249,7 @@ int main(int argc, char const *argv[])
 		int addr = rand() % 1024;
 
 		// Permutation回数
-		int num = rand() % 32;
+		int num = rand() % 1024;
 
 		// Perm
 		shifter_1024(&result_perm[i], &item_memory_array[addr], require_int_num, num);
