@@ -88,18 +88,6 @@ unsigned int xor128(int reset)
 	}
 }
 
-unsigned int shifter_32(unsigned int *v, unsigned int num)
-{
-	// num回 論理右シフト
-	unsigned int tmp_v = *v >> num;
-
-	// 右にシフトしたやつを取り出して、左に(32-num)回 論理左シフト
-	unsigned int tmp_num = (1 << num) - 1;
-	*v = (*v & tmp_num) << (32 - num);
-
-	return tmp_v;
-}
-
 // 多数決関数　&& 加算
 unsigned int grab_bit(unsigned int result_array[], size_t size)
 {
@@ -124,29 +112,61 @@ unsigned int grab_bit(unsigned int result_array[], size_t size)
 	return result;
 }
 
-void shifter_1024(unsigned int **new, unsigned int **original, const unsigned int DIM, unsigned int num)
+// unsigned int 32bitのシフト
+// num回右論理シフトしたやつを返す
+// 引数のvには、右論理シフトではみだしたやつを（32-num)回論理左シフトして取り出す
+unsigned int shifter_32(unsigned int *v, unsigned int num)
 {
-	unsigned int *result_tmp = (unsigned int *)calloc(DIM, sizeof(unsigned int));
-	for (int i = 0; i < DIM; i++)
+	// num回 論理右シフト
+	unsigned int tmp_v = *v >> num;
+
+	// 右にシフトしたやつを取り出して、左に(32-num)回 論理左シフト
+	unsigned int tmp_num = (1 << num) - 1;
+	*v = (*v & tmp_num) << (32 - num);
+
+	return tmp_v;
+}
+
+// unsigned int 1024bitのシフト
+// 32bitのシフトを繰り返すことでエミュレート（現状31シフトが限界）
+void shifter_1024(unsigned int **new, unsigned int **original, const unsigned int require_int_num, unsigned int num)
+{
+	// original[require_int_num] 	... unsigned int のデータが32個格納（1024次元をエミュレート）
+	// new[require_int_num] 		... unsigned int のデータが32個格納（1024次元をエミュレート）
+
+	// original配列に格納されているデータをシフトしたデータをnew配列に格納
+
+	// シフトしたデータを一時的に格納
+	unsigned int *result_bind = (unsigned int *)calloc(require_int_num, sizeof(unsigned int));
+
+	// 32回繰り返す
+	for (int i = 0; i < require_int_num; i++)
 	{
+
+		// tmp		... num回右論理シフトした際にはみ出した部分を（32-num)回左論理シフトしたやつ
+		// tmp_v 	... num回右論理シフトしたやつ
 		unsigned int tmp = (*original)[i];
 		unsigned int tmp_v = shifter_32(&tmp, num);
-		result_tmp[i] |= tmp_v;
+
+		// シフト
+		result_bind[i] |= tmp_v;
 		if (i == 0)
 		{
-			result_tmp[DIM - 1] |= tmp;
+			result_bind[require_int_num - 1] |= tmp;
 		}
 		else
 		{
-			result_tmp[i - 1] |= tmp;
+			result_bind[i - 1] |= tmp;
 		}
 	}
 
-	for (int i = 0; i < DIM; i++)
+	// 結果を移す
+	for (int i = 0; i < require_int_num; i++)
 	{
-		(*new)[i] = result_tmp[i];
+		(*new)[i] = result_bind[i];
 	}
-	free(result_tmp);
+
+	free(result_bind);
 }
 
 int main(int argc, char const *argv[])

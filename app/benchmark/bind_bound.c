@@ -128,32 +128,70 @@ int main(int argc, char const *argv[])
 	int trial_num = 50000000;
 
 	// 結果を格納
-	unsigned int **result_bind;
-	makeArrayInt(&result_bind, trial_num, require_int_num);
+	int result_bind_bound[1024];
+	// 初期化しないとバグる
+	for (int i = 0; i < 1024; i++)
+	{
+		result_bind_bound[i] = 0;
+	}
 
 	// 試行
 	for (int i = 0; i < trial_num; i++) // 5000万
 	{
+		// アドレス生成
 		int addr1 = rand() % 1024;
 		int addr2 = rand() % 1024;
+		// printf("%d : %d\n", addr1, addr2);
+
 		for (int j = 0; j < require_int_num; j++) // 32
 		{
-			result_bind[i][j] = item_memory_array[addr1][j] ^ item_memory_array[addr2][j];
+			// bind
+			unsigned int result_tmp;
+			result_tmp = item_memory_array[addr1][j] ^ item_memory_array[addr2][j];
+
+			// bound
+			unsigned int mask = 1;
+			for (int k = 0; k < 32; k++) // 32
+			{
+				result_bind_bound[j * 32 + k] += (mask & result_tmp ? -1 : 1);
+				mask <<= 1;
+			}
 		}
 	}
 
+	// 多数決格納先
+	unsigned int result_majority[require_int_num];
+	// 初期化しないとバグる
+	for (int i = 0; i < require_int_num; i++)
+	{
+		result_majority[i] = 0;
+	}
+
+	unsigned int main_mask = 1 << (32 - 1);
+	for (int i = 0; i < require_int_num; i++) // 32
+	{
+		for (int j = 0; j < 32; j++) // 32
+		{
+			// 符号ビットが立ってたら、1 たってなかったら０
+			unsigned int result_tmp = (result_bind_bound[i * 32 + j] & main_mask ? 1 : 0);
+			result_majority[i] += result_tmp << j;
+		}
+	}
+
+	// 結果出力
+	for (int i = 0; i < require_int_num; i++)
+	{
+		printf("%u\n", result_majority[i]);
+	}
+
 	// 解放
-	freeArrayInt(&result_bind, trial_num);
 	freeArrayInt(&item_memory_array, item_memory_num);
 
 	// -----------------------------------------------------------------------
 
-	// タイム確認
 	clock_t end = clock();
 	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\nBind time %lf[ms]\n", time);
-
-	// -----------------------------------------------------------------------
+	printf("\n\n  time %lf[ms]\n", time);
 
 	return 0;
 }

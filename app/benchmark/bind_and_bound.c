@@ -1,5 +1,4 @@
 
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,28 +12,6 @@
 __attribute__((destructor)) static void destructor()
 {
 	system("leaks -q a.out");
-}
-
-// -----------------------------------------------------------------------
-
-// y列x行のuint16_t２次元配列を確保
-void makeArray(uint16_t ***a, const int y, const int x)
-{
-	*a = (uint16_t **)calloc(y, sizeof(uint16_t *));
-	for (int i = 0; i < y; i++)
-	{
-		(*a)[i] = (uint16_t *)calloc(x, sizeof(uint16_t));
-	}
-}
-
-// y列x行のuint16_t２次元配列を解放
-void freeArray(uint16_t ***a, const int y)
-{
-	for (int i = 0; i < y; i++)
-	{
-		free((*a)[i]);
-	}
-	free(*a);
 }
 
 // -----------------------------------------------------------------------
@@ -100,65 +77,6 @@ unsigned int xor128(int reset)
 
 // -----------------------------------------------------------------------
 
-// unsigned int 32bitのシフト
-// num回右論理シフトしたやつを返す
-// 引数のvには、右論理シフトではみだしたやつを（32-num)回論理左シフトして取り出す
-unsigned int shifter_32(unsigned int *v, unsigned int num)
-{
-	// num回 論理右シフト
-	unsigned int tmp_v = *v >> num;
-
-	// 右にシフトしたやつを取り出して、左に(32-num)回 論理左シフト
-	unsigned int tmp_num = (1 << num) - 1;
-	*v = (*v & tmp_num) << (32 - num);
-
-	return tmp_v;
-}
-
-// unsigned int 1024bitのシフト
-// 32bitのシフトを繰り返すことでエミュレート（現状31シフトが限界）
-void shifter_1024(unsigned int **new, unsigned int **original, const unsigned int require_int_num, unsigned int num)
-{
-	// original[require_int_num] 	... unsigned int のデータが32個格納（1024次元をエミュレート）
-	// new[require_int_num] 		... unsigned int のデータが32個格納（1024次元をエミュレート）
-
-	// original配列に格納されているデータをシフトしたデータをnew配列に格納
-
-	// シフトしたデータを一時的に格納
-	unsigned int *result_bind = (unsigned int *)calloc(require_int_num, sizeof(unsigned int));
-
-	// 32回繰り返す
-	for (int i = 0; i < require_int_num; i++)
-	{
-
-		// tmp		... num回右論理シフトした際にはみ出した部分を（32-num)回左論理シフトしたやつ
-		// tmp_v 	... num回右論理シフトしたやつ
-		unsigned int tmp = (*original)[i];
-		unsigned int tmp_v = shifter_32(&tmp, num);
-
-		// シフト
-		result_bind[i] |= tmp_v;
-		if (i == 0)
-		{
-			result_bind[require_int_num - 1] |= tmp;
-		}
-		else
-		{
-			result_bind[i - 1] |= tmp;
-		}
-	}
-
-	// 結果を移す
-	for (int i = 0; i < require_int_num; i++)
-	{
-		(*new)[i] = result_bind[i];
-	}
-
-	free(result_bind);
-}
-
-// -----------------------------------------------------------------------
-
 // 多数決関数　&& 加算
 // 32bitの各ビットの立っている数を数えて多数決関数を実行し結果ベクトルを生成
 // result_array[train_size] ... すべてのデータの 結果（unsigned int) が入っている。1024次元ならこのbounding関数を32回使う
@@ -193,6 +111,7 @@ unsigned int bounding(unsigned int result_array[], size_t train_size)
 
 	return result_bind_bound;
 }
+
 // -----------------------------------------------------------------------
 
 int main(int argc, char const *argv[])
@@ -247,31 +166,46 @@ int main(int argc, char const *argv[])
 
 	// 結果を格納
 	unsigned int **result_bind;
-	makeArrayInt(&result_bind, trial_num, require_int_num);
+	makeArrayInt(&result_bind, require_int_num, trial_num);
 
 	// 試行
 	for (int i = 0; i < trial_num; i++) // 5000万
 	{
+		// アドレス生成
 		int addr1 = rand() % 1024;
 		int addr2 = rand() % 1024;
+		// printf("%d : %d\n", addr1, addr2);
+
+		// bind
 		for (int j = 0; j < require_int_num; j++) // 32
 		{
-			result_bind[i][j] = item_memory_array[addr1][j] ^ item_memory_array[addr2][j];
+			result_bind[j][i] = item_memory_array[addr1][j] ^ item_memory_array[addr2][j];
 		}
 	}
 
+	// Bound & 多数決
+	unsigned int result_bind_bound[require_int_num];
+	for (int i = 0; i < require_int_num; i++) // 32
+	{
+		// bound
+		result_bind_bound[i] = bounding(result_bind[i], trial_num);
+	}
+
+	// 結果出力
+	for (int i = 0; i < require_int_num; i++) // 32
+	{
+		printf("%u\n", result_bind_bound[i]);
+	}
+
 	// 解放
-	freeArrayInt(&result_bind, trial_num);
-	freeArrayInt(&item_memory_num, item_memory_num);
+	freeArrayInt(&result_bind, require_int_num);
+	freeArrayInt(&item_memory_array, item_memory_num);
 
 	// -----------------------------------------------------------------------
 
-	// タイム確認
 	clock_t end = clock();
 	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\nBind time %lf[ms]\n\n", time);
-
-	// -----------------------------------------------------------------------
+	printf("\n\nBind-Bound time %lf[ms]\n", time);
 
 	return 0;
 }
