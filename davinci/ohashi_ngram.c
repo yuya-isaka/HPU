@@ -19,7 +19,7 @@ unsigned long dst_phys;
 
 // ------------------------------------------------------------------------------------------------
 
-// 2次元配列生成
+// y列x行のuint16_t２次元配列を確保
 void makeArray(uint16_t ***a, const int y, const int x)
 {
 	*a = (uint16_t **)calloc(y, sizeof(uint16_t *));
@@ -29,7 +29,7 @@ void makeArray(uint16_t ***a, const int y, const int x)
 	}
 }
 
-// 2次元配列解放
+// y列x行のuint16_t２次元配列を解放
 void freeArray(uint16_t ***a, const int y)
 {
 	for (int i = 0; i < y; i++)
@@ -39,91 +39,153 @@ void freeArray(uint16_t ***a, const int y)
 	free(*a);
 }
 
+// -----------------------------------------------------------------------
+
 // 簡易アセンブラ
-// アドレスが必要か、命令コード、アドレス
-uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
+uint16_t assemble(const char inst_str[], uint16_t addr)
 {
-	if (addr_flag)
+	if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0)
 	{
 		uint16_t result = 0;
+
 		// load
-		if (inst_num == 1)
+		if (strcmp(inst_str, "load") == 0)
 		{
-			uint16_t inst = 3 << 14;
+			uint16_t inst = 49152;
 			result = inst | addr;
 		}
-		// l.rshift
-		else if (inst_num == 2)
-		{
-			uint16_t inst = 5 << 13;
-			result = inst | addr;
-		}
-		// l.lshift
-		else if (inst_num == 4)
-		{
-			uint16_t inst = 9 << 12;
-			result = inst | addr;
-		}
-		// l.xor
-		else if (inst_num == 6)
-		{
-			uint16_t inst = 17 << 11;
-			result = inst | addr;
-		}
+
 		// wb.item
-		else if (inst_num == 12)
+		else if (strcmp(inst_str, "wbitem") == 0)
 		{
-			uint16_t inst = 33 << 10;
+			uint16_t inst = 40960;
 			result = inst | addr;
 		}
-		else
-		{
-			printf("error");
-		}
+
 		return result;
 	}
+
 	else
 	{
 		uint16_t inst = 0;
-		// rshift
-		if (inst_num == 3)
-		{
-			inst = 1 << 14;
-		}
-		// lshift
-		else if (inst_num == 5)
-		{
-			inst = 1 << 13;
-		}
+
 		// xor
-		else if (inst_num == 7)
+		if (strcmp(inst_str, "xor") == 0)
 		{
-			inst = 1 << 12;
+			inst = 4096;
 		}
+
 		// store
-		else if (inst_num == 8)
+		else if (strcmp(inst_str, "store") == 0)
 		{
-			inst = 1 << 11;
+			inst = 2048;
 		}
+
 		// last
-		else if (inst_num == 9)
+		else if (strcmp(inst_str, "last") == 0)
 		{
-			inst = 1 << 10;
+			inst = 1024;
 		}
+
 		// move
-		else if (inst_num == 10)
+		else if (strcmp(inst_str, "move") == 0)
 		{
-			inst = 1 << 9;
+			inst = 512;
 		}
+
 		// wb
-		else if (inst_num == 11)
+		else if (strcmp(inst_str, "wb") == 0)
 		{
-			inst = 1 << 8;
+			inst = 256;
 		}
+
+		// rshift
+		else if (strcmp(inst_str, "rshift1") == 0)
+		{
+			inst = 20480;
+		}
+
+		else if (strcmp(inst_str, "rshift2") == 0)
+		{
+			inst = 18432;
+		}
+
+		else if (strcmp(inst_str, "rshift4") == 0)
+		{
+			inst = 17408;
+		}
+		else if (strcmp(inst_str, "rshift8") == 0)
+		{
+			inst = 16896;
+		}
+		else if (strcmp(inst_str, "rshift16") == 0)
+		{
+			inst = 16640;
+		}
+		else if (strcmp(inst_str, "rshift32") == 0)
+		{
+			inst = 16512;
+		}
+		else if (strcmp(inst_str, "rshift64") == 0)
+		{
+			inst = 16448;
+		}
+		else if (strcmp(inst_str, "rshift128") == 0)
+		{
+			inst = 16416;
+		}
+		else if (strcmp(inst_str, "rshift256") == 0)
+		{
+			inst = 16400;
+		}
+		else if (strcmp(inst_str, "rshift512") == 0)
+		{
+			inst = 16392;
+		}
+
+		// lshift
+		else if (strcmp(inst_str, "lshift1") == 0)
+		{
+			inst = 12288;
+		}
+		else if (strcmp(inst_str, "lshift2") == 0)
+		{
+			inst = 10240;
+		}
+		else if (strcmp(inst_str, "lshift4") == 0)
+		{
+			inst = 9216;
+		}
+		else if (strcmp(inst_str, "lshift8") == 0)
+		{
+			inst = 8704;
+		}
+		else if (strcmp(inst_str, "lshift16") == 0)
+		{
+			inst = 8448;
+		}
+		else if (strcmp(inst_str, "lshift32") == 0)
+		{
+			inst = 8320;
+		}
+		else if (strcmp(inst_str, "lshift64") == 0)
+		{
+			inst = 8256;
+		}
+		else if (strcmp(inst_str, "lshift128") == 0)
+		{
+			inst = 8224;
+		}
+		else if (strcmp(inst_str, "lshift256") == 0)
+		{
+			inst = 8208;
+		}
+
 		else
 		{
 			printf("error");
 		}
+
 		return inst;
 	}
 }
@@ -231,16 +293,17 @@ int main(int argc, char const *argv[])
 	const int instruction_bit = 16;
 	const int train_num = 2;
 	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
-	const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
+	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	// const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
 	const int ngram = 3;
-	const int core_num = 1;
-	const int instruction_num = 9;
+	const int core_num = 12;
+	const int instruction_num = 10;
 	const int majority_addr = 26;
 	int all_ngram = 0;
 	int even = 0;
 	// -------------------------------------------
 
+	// 英語とフランス語の数だけ繰り返す
 	for (int l = 0; l < train_num; l++)
 	{
 
@@ -250,7 +313,9 @@ int main(int argc, char const *argv[])
 		while (dma[0x00 / 4] & 0x4)
 			;
 
+		// ファイル読み込み
 		const char *path = train_path[l];
+		printf("\n------------- %sの学習 -------------\n\n", path);
 		FILE *file;
 		file = fopen(path, "r");
 		if (file == NULL)
@@ -258,6 +323,10 @@ int main(int argc, char const *argv[])
 			perror("  Failed: open file");
 			exit(1);
 		}
+
+		// ---------------------------------------------
+
+		// ファイルから文字列を取得
 		int ch;
 		size_t num = 0;
 		// 1行を前提
@@ -277,21 +346,31 @@ int main(int argc, char const *argv[])
 		fclose(file);
 		all_ngram = strlen(content) - ngram + 1;
 		even = all_ngram % 2 == 0;
+
+		// 確認
 		// printf("content: %s\n", content); // myname...
 		printf("all_ngram: %d\n", all_ngram);
 		printf("even: %d\n", even);
 
+		// ---------------------------------------------
+
+		// 何個の命令が必要か算出
 		int all_instruction = all_ngram / core_num;
 		if (all_ngram % core_num != 0)
 		{
 			all_instruction++;
 		}
 		all_instruction *= instruction_num;
+
+		// 確認
 		printf("all_instruction: %d\n\n", all_instruction);
+
+		// ---------------------------------------------
 
 		makeArray(&src_tmp, core_num, all_instruction);
 		makeArray(&ascii_array, all_ngram, ngram);
 
+		// 一時的な命令格納場所
 		for (int i = 0; i < core_num; i++)
 		{
 			for (int j = 0; j < all_instruction; j++)
@@ -299,6 +378,8 @@ int main(int argc, char const *argv[])
 				src_tmp[i][j] = 0;
 			}
 		}
+
+		// 得られた文字列からアドレスを取得
 		for (int i = 0; i < all_ngram; i++)
 		{
 			for (int j = 0; j < ngram; j++)
@@ -307,6 +388,7 @@ int main(int argc, char const *argv[])
 			}
 		}
 
+		// アクセラレータ起動
 		top[0x00 / 4] = 2;
 
 		// ---------------------------------------------------
@@ -316,51 +398,56 @@ int main(int argc, char const *argv[])
 		int core = 0;
 		for (int i = 0; i < all_ngram; i++)
 		{
-			// 1 load
+			// load
 			uint16_t addr = ascii_array[i][0];
-			uint16_t inst = assemble(1, 1, addr);
+			uint16_t inst = assemble("load", addr);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 10 move
-			inst = assemble(0, 10, 0);
+			// move
+			inst = assemble("move", 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 2 l.rshift
-			addr = ascii_array[i][1];
-			inst = assemble(1, 2, addr);
+			// load
+			addr = ascii_array[i][0];
+			inst = assemble("load", addr);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 7 xor
-			inst = assemble(0, 7, 0);
+			// rshift1
+			inst = assemble("rshift1", 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 10 move
-			inst = assemble(0, 10, 0);
+			// xor
+			inst = assemble("xor", 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 2 l.rshift
+			// move
+			inst = assemble("move", 0);
+			src_tmp[core][instruction] = inst;
+			instruction++;
+
+			// load
 			addr = ascii_array[i][2];
-			inst = assemble(1, 2, addr);
+			inst = assemble("load", addr);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 3 rshift
-			inst = assemble(0, 3, 0);
+			// rshift2
+			inst = assemble("rshift2", 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 7 xor
-			inst = assemble(0, 7, 0);
+			// xor
+			inst = assemble("xor", 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// 8 store
-			inst = assemble(0, 8, 0);
+			// store
+			inst = assemble("store", 0);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
@@ -372,8 +459,11 @@ int main(int argc, char const *argv[])
 			core = (core + 1) % core_num;
 		}
 
+		// ---------------------------------------------
+
 		int send_num = 0;
 
+		// 偶数のとき指定した値をsrc配列に入れておく
 		if (even)
 		{
 			// load
@@ -382,7 +472,7 @@ int main(int argc, char const *argv[])
 				if (i == 0)
 				{
 					uint16_t addr = majority_addr;
-					uint16_t inst = assemble(1, 1, addr);
+					uint16_t inst = assemble("load", addr);
 					src[send_num] = inst;
 				}
 				else
@@ -397,7 +487,7 @@ int main(int argc, char const *argv[])
 			{
 				if (i == 0)
 				{
-					uint16_t inst = assemble(0, 8, 0);
+					uint16_t inst = assemble("store", 0);
 					src[send_num] = inst;
 				}
 				else
@@ -407,6 +497,8 @@ int main(int argc, char const *argv[])
 				send_num++;
 			}
 		}
+
+		// ---------------------------------------------
 
 		// デバッグ
 		// int debug_flag = 0;
@@ -431,6 +523,9 @@ int main(int argc, char const *argv[])
 		// 	printf("\n");
 		// }
 
+		// ---------------------------------------------
+
+		// 命令をsrc配列に埋める
 		for (int j = 0; j < all_instruction; j++)
 		{
 
@@ -455,7 +550,7 @@ int main(int argc, char const *argv[])
 				// last命令
 				for (int i = 0; i < 1; i++)
 				{
-					uint16_t inst = assemble(0, 9, 0);
+					uint16_t inst = assemble("last", 0);
 					src[send_num] = inst;
 					send_num++;
 				}
@@ -488,7 +583,7 @@ int main(int argc, char const *argv[])
 		// last命令
 		for (int i = 0; i < 1; i++)
 		{
-			uint16_t inst = assemble(0, 9, 0);
+			uint16_t inst = assemble("last", 0);
 			src[send_num] = inst;
 			send_num++;
 		}
@@ -498,14 +593,13 @@ int main(int argc, char const *argv[])
 			send_num++;
 		}
 
-		// printf("send_num: %d\n\n", send_num);
-
 		// ↑ コード---------------------------------------------
 		// ---------------------------------------------------
 
 		freeArray(&ascii_array, ngram);
 		freeArray(&src_tmp, core_num);
 
+		// 最後の送信
 		dma[0x00 / 4] = 1;
 		dma[0x18 / 4] = src_phys;
 		dma[0x28 / 4] = send_num * 2; // 16ビットがsend_num個
@@ -517,16 +611,16 @@ int main(int argc, char const *argv[])
 		while ((dma[0x34 / 4] & 0x1000) != 0x1000)
 			;
 
+		// 結果確認
 		printf("\n");
-
 		for (int j = 0; j < (1024 / 32); j++)
 		{
 			printf("%u\n", dst[j]);
 		}
-
-		top[0x00 / 4] = 0;
-
 		printf("\n");
+
+		// アクセラレータ終了
+		top[0x00 / 4] = 0;
 	}
 
 	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");

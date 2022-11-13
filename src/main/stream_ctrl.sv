@@ -34,10 +34,15 @@ module stream_ctrl
 
     // 現状の流れ
     // last -> last_n -> last_nn ->  stream_ok_keep (stream_ok保持) -> dst_valid (stream_active引き金)
-    //                               start (stream_ok_keep引き金)       dst_last (stream_active & last_stream引き金)
+    //                   stream_ok   last_stream (last_nn引き金)       dst_last (stream_active & last_stream引き金)
     //                               stream_active (sream_ok引き金)
     //                               stream_v (stream_active引き金)
-    //                               last_stream (start引き金)
+
+    //// last -> last_n -> last_nn ->  stream_ok_keep (stream_ok保持) -> dst_valid (stream_active引き金)
+    ////                               start (stream_ok_keep引き金)       dst_last (stream_active & last_stream引き金)
+    ////                               stream_active (sream_ok引き金)
+    ////                               stream_v (stream_active引き金)
+    ////                               last_stream (start引き金)
 
 
     // ラスト命令 (9命令) が実行された時、同時に他のコアでstore命令が実行されていることを考慮

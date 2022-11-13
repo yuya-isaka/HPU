@@ -37,62 +37,27 @@ module counter
     reg         store_n;
     reg         store_nn;
 
+    always_ff @( posedge clk ) begin
+                  store_n <= store;
+                  store_nn <= store_n;
+              end;
+
+
     reg signed [ W-1:0 ]      box;
 
     // コア数可変
-    // 3bitあれば十分
-    reg signed [ 2:0 ]      box_1;
-    reg signed [ 2:0 ]      box_2;
-    reg signed [ 2:0 ]      box_3;
-    reg signed [ 2:0 ]      box_4;
+    // 4bitあれば十分
+    reg signed [ 3:0 ]      box_1;
+    reg signed [ 3:0 ]      box_2;
 
 
     always_ff @( posedge clk ) begin
 
-                  store_n <= store;
-                  store_nn <= store_n;
-
                   if ( rst ) begin
                       // コア数可変
+                      box <= 0;
                       box_1 <= 0;
                       box_2 <= 0;
-                      box_3 <= 0;
-                      box_4 <= 0;
-                  end
-
-                  else if ( store_n ) begin
-                      // コア数可変
-                      // 1コア
-                      //   box_1 <= select;
-                      // 2コア
-                      //   box_1 <= select[ 0 ] + select[ 1 ];
-                      box_1 <=
-                            select[ 0 ]
-                            + select[ 1 ]
-                            + select[ 2 ];
-                      box_2 <=
-                            select[ 3 ]
-                            + select[ 4 ]
-                            + select[ 5 ];
-                      box_3 <=
-                            select[ 6 ]
-                            + select[ 7 ]
-                            + select[ 8 ];
-                      box_4 <=
-                            select[ 9 ]
-                            + select[ 10 ]
-                            + select[ 11 ];
-                      // box_4 <=
-                      //       select[ 12 ]
-                      //       + select[ 13 ]
-                      //       + select[ 14 ]
-                      //       + select[ 15 ];
-                  end
-
-
-                  // 現状アクセラレータの動作を止めることで、counterの値をフラッシュ（将来命令セットにフラッシュを加えるかも）
-                  if ( rst) begin
-                      box <= 0;
                   end
 
                   // store_nと分離することで、storeが連続で実行されても対応可能にした
@@ -102,12 +67,37 @@ module counter
                       box <=
                           box
                           + box_1
-                          + box_2
-                          + box_3
-                          + box_4;
+                          + box_2;
                       // 1-4コア
                       //   box <= box + box_1;
                   end
+
+                  // コア数可変
+                  // 1コア
+                  //   box_1 <= select;
+                  // 2コア
+                  //   box_1 <= select[ 0 ] + select[ 1 ];
+                  box_1 <=
+                        select[ 0 ]
+                        + select[ 1 ]
+                        + select[ 2 ]
+                        + select[ 3 ]
+                        + select[ 4 ]
+                        + select[ 5 ];
+                  box_2 <=
+                        select[ 6 ]
+                        + select[ 7 ]
+                        + select[ 8 ]
+                        + select[ 9 ]
+                        + select[ 10 ]
+                        + select[ 11 ];
+                  //   box_3 <=
+                  //   box_4 <=
+                  // box_4 <=
+                  //       select[ 12 ]
+                  //       + select[ 13 ]
+                  //       + select[ 14 ]
+                  //       + select[ 15 ];
               end;
 
 

@@ -365,5 +365,6 @@ boot
 
 # バイナリたち
 davinci_ngram
+ohashi_ngram
 
 .svlint.toml
