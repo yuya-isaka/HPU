@@ -7,33 +7,16 @@
 #include <math.h>
 #include <time.h>
 
-// --------------------- メモリリークチェック、デストラクター -----------------------
+// // --------------------- メモリリークチェック、デストラクター -----------------------
 
-__attribute__((destructor)) static void destructor()
-{
-	system("leaks -q a.out");
-}
+// __attribute__((destructor)) static void destructor()
+// {
+// 	system("leaks -q a.out");
+// }
 
 // -----------------------------------------------------------------------
 
-void makeArray(uint16_t ***a, const int y, const int x)
-{
-	*a = (uint16_t **)calloc(y, sizeof(uint16_t *));
-	for (int i = 0; i < y; i++)
-	{
-		(*a)[i] = (uint16_t *)calloc(x, sizeof(uint16_t));
-	}
-}
-
-void freeArray(uint16_t ***a, const int y)
-{
-	for (int i = 0; i < y; i++)
-	{
-		free((*a)[i]);
-	}
-	free(*a);
-}
-
+// y列x行のunsigned int２次元配列を確保
 void makeArrayInt(unsigned int ***a, const int y, const int x)
 {
 	*a = (unsigned int **)calloc(y, sizeof(unsigned int *));
@@ -43,6 +26,7 @@ void makeArrayInt(unsigned int ***a, const int y, const int x)
 	}
 }
 
+// y列x行のunsigned int２次元配列を解放
 void freeArrayInt(unsigned int ***a, const int y)
 {
 	for (int i = 0; i < y; i++)
@@ -52,6 +36,9 @@ void freeArrayInt(unsigned int ***a, const int y)
 	free(*a);
 }
 
+// -----------------------------------------------------------------------
+
+// ランダム生成（xorshift）
 unsigned int xor128(int reset)
 {
 	// 内部で値を保持（seed） パターン１
@@ -88,88 +75,75 @@ unsigned int xor128(int reset)
 	}
 }
 
-unsigned int shifter_32(unsigned int *v, unsigned int num)
-{
-	// num回 論理右シフト
-	unsigned int tmp_v = *v >> num;
-
-	// 右にシフトしたやつを取り出して、左に(32-num)回 論理左シフト
-	unsigned int tmp_num = (1 << num) - 1;
-	*v = (*v & tmp_num) << (32 - num);
-
-	return tmp_v;
-}
+// -----------------------------------------------------------------------
 
 // 多数決関数　&& 加算
-unsigned int grab_bit(unsigned int result_array[], size_t size)
+// 32bitの各ビットの立っている数を数えて多数決関数を実行し結果ベクトルを生成
+// result_array[train_size] ... すべてのデータの 結果（unsigned int) が入っている。1024次元ならこのbounding関数を32回使う
+unsigned int bounding(unsigned int result_array[], size_t train_size)
 {
-	unsigned int result = 0;
+	// Populationカウントをして、その後多数決関数を実行
 
-	// 次元数可変
+	unsigned int result_bind_bound = 0;
+
+	// マスクをずらしながら各次元の1が立っている数を調べる
 	unsigned int mask = (int)1 << (32 - 1);
+
 	while (mask)
 	{
-		int tmp = 0;
-		for (int i = 0; i < size; i++)
+		int buff = 0;
+
+		// 訓練データの数だけ足し算
+		for (int i = 0; i < train_size; i++)
 		{
-			tmp += (mask & result_array[i] ? 1 : 0);
+			buff += (mask & result_array[i] ? 1 : 0);
 		}
+
 		// 多数決で1の数が過半数なら、resultにmaskを加える（→対象のbit番目が1になる）
-		if (tmp > (size / 2))
+		if (buff > (train_size / 2))
 		{
-			result += mask;
+			// 多数決で1が優位だったら、該当ビットを立たせる
+			result_bind_bound += mask;
 		}
+
 		mask >>= 1;
 	}
-	return result;
+
+	return result_bind_bound;
 }
 
-void shifter_1024(unsigned int **new, unsigned int **original, const unsigned int DIM, unsigned int num)
-{
-	unsigned int *result_tmp = (unsigned int *)calloc(DIM, sizeof(unsigned int));
-	for (int i = 0; i < DIM; i++)
-	{
-		unsigned int tmp = (*original)[i];
-		unsigned int tmp_v = shifter_32(&tmp, num);
-		result_tmp[i] |= tmp_v;
-		if (i == 0)
-		{
-			result_tmp[DIM - 1] |= tmp;
-		}
-		else
-		{
-			result_tmp[i - 1] |= tmp;
-		}
-	}
-
-	for (int i = 0; i < DIM; i++)
-	{
-		(*new)[i] = result_tmp[i];
-	}
-	free(result_tmp);
-}
+// -----------------------------------------------------------------------
 
 int main(int argc, char const *argv[])
 {
+
+	// -----------------------------------------------------------------------
+
+	// 時間測る
 	clock_t start = clock();
 
-	//--
+	// 1024bitを表現するのに必要なintの数
+	const int require_int_num = 32;
 
-	const int DIM = 1024 / 32;
-	const int rand_num = 1024;
-	const int trial_num = 50000000;
-
+	// seed設定
 	srand(10);
+
+	// -----------------------------------------------------------------------
+
+	// ランダム生成の初期化
 	xor128(1);
 
-	//--
+	// 生成するランダムなハイパーベクトルの数
+	const int item_memory_num = 1024;
 
+	// ランダムなハイパーベクトルを格納
 	unsigned int **item_memory_array;
-	makeArrayInt(&item_memory_array, rand_num, DIM);
+	makeArrayInt(&item_memory_array, item_memory_num, require_int_num);
 
-	for (int i = 0; i < rand_num; i++)
+	// 生成
+	for (int i = 0; i < item_memory_num; i++) // 1024
 	{
-		for (int j = 0; j < DIM; j++)
+		for (int j = 0; j < require_int_num; j++) // 32
 		{
 			unsigned int tmp = 0;
 			if (i == 0 && j == 0)
@@ -184,39 +158,49 @@ int main(int argc, char const *argv[])
 		}
 	}
 
-	//--
+	// -----------------------------------------------------------------------
+	// 実験
 
+	// 試行回数
+	int trial_num = 50000000;
+
+	// ロードデータ格納
 	unsigned int **data;
-	makeArrayInt(&data, DIM, trial_num);
+	makeArrayInt(&data, require_int_num, trial_num);
 
-	for (int i = 0; i < trial_num; i++)
+	// アイテムメモリからロード
+	for (int i = 0; i < trial_num; i++) // 5000万
 	{
 		int addr = rand() % 1024;
-		for (int j = 0; j < DIM; j++)
+		for (int j = 0; j < require_int_num; j++) // 32
 		{
 			data[j][i] = item_memory_array[addr][j];
 		}
 	}
 
-	unsigned int result[DIM];
-	for (int i = 0; i < DIM; i++)
+	// 試行
+	unsigned int result[require_int_num];
+	for (int i = 0; i < require_int_num; i++)
 	{
-		result[i] = grab_bit(data[i], trial_num);
+		// bound
+		result[i] = bounding(data[i], trial_num);
 	}
 
-	for (int i = 0; i < DIM; i++)
+	// 結果出力
+	for (int i = 0; i < require_int_num; i++)
 	{
 		printf("%u\n", result[i]);
 	}
 
-	//--
+	// 解放
+	freeArrayInt(&data, require_int_num);
+	freeArrayInt(&item_memory_array, item_memory_num);
 
-	freeArrayInt(&data, DIM);
-	freeArrayInt(&item_memory_array, rand_num);
+	// -----------------------------------------------------------------------
 
 	clock_t end = clock();
 	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\n  time %lf[ms]\n", time);
+	printf("\n\nBound time %lf[ms]\n", time);
 
 	return 0;
 }

@@ -72,6 +72,7 @@ module counter
                       //   box <= box + box_1;
                   end
 
+
                   // コア数可変
                   // 1コア
                   //   box_1 <= select;
@@ -89,8 +90,8 @@ module counter
                         + select[ 7 ]
                         + select[ 8 ]
                         + select[ 9 ]
-                        + select[ 10 ];
-                  // + select[ 11 ];
+                        + select[ 10 ]
+                        + select[ 11 ];
                   //   box_3 <=
                   //   box_4 <=
                   // box_4 <=

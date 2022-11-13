@@ -7,12 +7,12 @@
 #include <math.h>
 #include <time.h>
 
-// --------------------- メモリリークチェック、デストラクター -----------------------
+// // --------------------- メモリリークチェック、デストラクター -----------------------
 
-__attribute__((destructor)) static void destructor()
-{
-	system("leaks -q a.out");
-}
+// __attribute__((destructor)) static void destructor()
+// {
+// 	system("leaks -q a.out");
+// }
 
 // -----------------------------------------------------------------------
 

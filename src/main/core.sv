@@ -191,12 +191,6 @@ module core
                               buff <= 0;
                               store <= 0;
                           end
-
-                          else if ( inst [ 12 ] ) begin
-                              reg_2 <= reg_0 ^ reg_2;
-                              buff <= 0;
-                              store <= 0;
-                          end
                       end
 
                       // アドレスいらん

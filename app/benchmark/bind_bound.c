@@ -7,12 +7,12 @@
 #include <math.h>
 #include <time.h>
 
-// --------------------- メモリリークチェック、デストラクター -----------------------
+// // --------------------- メモリリークチェック、デストラクター -----------------------
 
-__attribute__((destructor)) static void destructor()
-{
-	system("leaks -q a.out");
-}
+// __attribute__((destructor)) static void destructor()
+// {
+// 	system("leaks -q a.out");
+// }
 
 // -----------------------------------------------------------------------
 
@@ -167,6 +167,7 @@ int main(int argc, char const *argv[])
 		result_majority[i] = 0;
 	}
 
+	// 多数決
 	unsigned int main_mask = 1 << (32 - 1);
 	for (int i = 0; i < require_int_num; i++) // 32
 	{
