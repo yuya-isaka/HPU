@@ -36,14 +36,6 @@ module counter
 
     reg         store_n, store_nn;
 
-    always_ff @( posedge clk ) begin
-
-                  store_n <= store;
-                  store_nn <= store_n;
-
-              end;
-
-
     // 分散RAM (符号付き)
     reg signed [ W-1:0 ]      box;
 
@@ -55,6 +47,9 @@ module counter
     // reg signed [ 3:0 ]      box_4;
 
     always_ff @( posedge clk ) begin
+
+                  store_n <= store;
+                  store_nn <= store_n;
 
                   if ( rst ) begin
                       // コア数可変

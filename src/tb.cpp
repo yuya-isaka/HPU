@@ -88,17 +88,10 @@ uint16_t assemble(int addr_flag, const char inst_str[], uint16_t addr)
       result = inst | addr;
     }
 
-    // l.xor
-    else if (strcmp(inst_str, "lxor") == 0)
-    {
-      uint16_t inst = 40960;
-      result = inst | addr;
-    }
-
     // wb.item
     else if (strcmp(inst_str, "wbitem") == 0)
     {
-      uint16_t inst = 36864;
+      uint16_t inst = 40960;
       result = inst | addr;
     }
 
