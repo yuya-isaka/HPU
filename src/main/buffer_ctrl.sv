@@ -58,7 +58,7 @@ module buffer_ctrl
 
             // コア数可変
             // 計算数可変 (現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分)
-            counter #( .W( 30 ), .CORENUM( 12 ) ) counter
+            counter #( .W( 28 ), .CORENUM( 12 ) ) counter
                     (
 
                         // in
