@@ -214,8 +214,31 @@ int main(int argc, char const *argv[])
 	int all_ngram = 0;
 	int even = 0;
 
+	// ---------------------------------------------
+
 	// ランダム生成の初期化
 	xor128(1);
+
+	// ランダムなハイパーベクトルを生成
+	unsigned int **item_memory_array;
+	makeArrayInt(&item_memory_array, rand_num, DIM);
+
+	for (int i = 0; i < rand_num; i++)
+	{
+		for (int j = 0; j < DIM; j++)
+		{
+			unsigned int tmp = 0;
+			if (i == 0 && j == 0)
+			{
+				tmp = 88675123;
+			}
+			else
+			{
+				tmp = xor128(0);
+			}
+			item_memory_array[i][j] = tmp;
+		}
+	}
 
 	// ---------------------------------------------
 
@@ -283,29 +306,6 @@ int main(int argc, char const *argv[])
 		}
 
 		// コード ----------------------------------------
-		// ---------------------------------------------
-
-		// ランダムなハイパーベクトルを生成
-		unsigned int **item_memory_array;
-		makeArrayInt(&item_memory_array, rand_num, DIM);
-
-		for (int i = 0; i < rand_num; i++)
-		{
-			for (int j = 0; j < DIM; j++)
-			{
-				unsigned int tmp = 0;
-				if (i == 0 && j == 0)
-				{
-					tmp = 88675123;
-				}
-				else
-				{
-					tmp = xor128(0);
-				}
-				item_memory_array[i][j] = tmp;
-			}
-		}
-
 		// ---------------------------------------------
 
 		unsigned int **item_memory_array_new;
@@ -383,10 +383,14 @@ int main(int argc, char const *argv[])
 		// ---------------------------------------------
 
 		freeArrayInt(&item_memory_array_new, DIM);
-		freeArrayInt(&item_memory_array, rand_num);
 		freeArray(&ascii_array, all_ngram);
 	}
+
+	freeArrayInt(&item_memory_array, rand_num);
+
 	printf("---------------------------------------------------------\n\n");
+
+	// 時間計測
 	clock_t end = clock();
 	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
 	printf("\n\n  time %lf[ms]\n", time);
