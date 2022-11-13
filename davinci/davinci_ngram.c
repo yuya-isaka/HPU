@@ -15,6 +15,7 @@ __attribute__((destructor)) static void destructor()
 
 // -----------------------------------------------------------------------
 
+// y列x行のuint16_t２次元配列を確保
 void makeArray(uint16_t ***a, const int y, const int x)
 {
 	*a = (uint16_t **)calloc(y, sizeof(uint16_t *));
@@ -24,6 +25,7 @@ void makeArray(uint16_t ***a, const int y, const int x)
 	}
 }
 
+// y列x行のuint16_t２次元配列を解放
 void freeArray(uint16_t ***a, const int y)
 {
 	for (int i = 0; i < y; i++)
@@ -33,6 +35,9 @@ void freeArray(uint16_t ***a, const int y)
 	free(*a);
 }
 
+// -----------------------------------------------------------------------
+
+// y列x行のunsigned int２次元配列を確保
 void makeArrayInt(unsigned int ***a, const int y, const int x)
 {
 	*a = (unsigned int **)calloc(y, sizeof(unsigned int *));
@@ -42,6 +47,7 @@ void makeArrayInt(unsigned int ***a, const int y, const int x)
 	}
 }
 
+// y列x行のunsigned int２次元配列を解放
 void freeArrayInt(unsigned int ***a, const int y)
 {
 	for (int i = 0; i < y; i++)
@@ -51,6 +57,9 @@ void freeArrayInt(unsigned int ***a, const int y)
 	free(*a);
 }
 
+// -----------------------------------------------------------------------
+
+// ランダム生成（xorshift）
 unsigned int xor128(int reset)
 {
 	// 内部で値を保持（seed） パターン１
@@ -87,6 +96,9 @@ unsigned int xor128(int reset)
 	}
 }
 
+// unsigned int 32bitのシフト
+// num回右論理シフトしたやつを返す
+// 引数のvには、右論理シフトではみだしたやつを（32-num)回論理左シフトして取り出す
 unsigned int shifter_32(unsigned int *v, unsigned int num)
 {
 	// num回 論理右シフト
@@ -99,37 +111,28 @@ unsigned int shifter_32(unsigned int *v, unsigned int num)
 	return tmp_v;
 }
 
-// 多数決関数　&& 加算
-unsigned int grab_bit(unsigned int result_array[], size_t size)
-{
-	unsigned int result = 0;
-
-	// 次元数可変
-	unsigned int mask = (int)1 << (32 - 1);
-	while (mask)
-	{
-		int tmp = 0;
-		for (int i = 0; i < size; i++)
-		{
-			tmp += (mask & result_array[i] ? 1 : 0);
-		}
-		// 多数決で1の数が過半数なら、resultにmaskを加える（→対象のbit番目が1になる）
-		if (tmp > (size / 2))
-		{
-			result += mask;
-		}
-		mask >>= 1;
-	}
-	return result;
-}
-
+// unsigned int 1024bitのシフト
+// 32bitのシフトを繰り返すことでエミュレート（現状31シフトが限界）
 void shifter_1024(unsigned int **new, unsigned int **original, const unsigned int DIM, unsigned int num)
 {
+	// original[DIM] 	... unsigned int のデータが32個格納（1024次元をエミュレート）
+	// new[DIM] 		... unsigned int のデータが32個格納（1024次元をエミュレート）
+
+	// original配列に格納されているデータをシフトしたデータをnew配列に格納
+
+	// シフトしたデータを一時的に格納
 	unsigned int *result_tmp = (unsigned int *)calloc(DIM, sizeof(unsigned int));
+
+	// 32回繰り返す
 	for (int i = 0; i < DIM; i++)
 	{
+
+		// tmp		... num回右論理シフトした際にはみ出した部分を（32-num)回左論理シフトしたやつ
+		// tmp_v 	... num回右論理シフトしたやつ
 		unsigned int tmp = (*original)[i];
 		unsigned int tmp_v = shifter_32(&tmp, num);
+
+		// シフト
 		result_tmp[i] |= tmp_v;
 		if (i == 0)
 		{
@@ -141,11 +144,42 @@ void shifter_1024(unsigned int **new, unsigned int **original, const unsigned in
 		}
 	}
 
+	// 結果を移す
 	for (int i = 0; i < DIM; i++)
 	{
 		(*new)[i] = result_tmp[i];
 	}
+
 	free(result_tmp);
+}
+
+// 多数決関数　&& 加算
+// 32bitの各ビットの立っている数を数えて多数決関数を実行し結果ベクトルを生成
+// result_array[size] ... すべてのデータの 結果（unsigned int) が入っている。1024次元ならこのbounding関数を32回使う
+unsigned int bounding(unsigned int result_array[], size_t size)
+{
+	unsigned int result = 0;
+
+	//
+	unsigned int mask = (int)1 << (32 - 1);
+
+	while (mask)
+	{
+		int tmp = 0;
+		for (int i = 0; i < size; i++)
+		{
+			tmp += (mask & result_array[i] ? 1 : 0);
+		}
+
+		// 多数決で1の数が過半数なら、resultにmaskを加える（→対象のbit番目が1になる）
+		if (tmp > (size / 2))
+		{
+			result += mask;
+		}
+
+		mask >>= 1;
+	}
+	return result;
 }
 
 int main(int argc, char const *argv[])
@@ -309,7 +343,7 @@ int main(int argc, char const *argv[])
 
 		for (int i = 0; i < DIM; i++)
 		{
-			result[i] = grab_bit(item_memory_array_new_t[i], all_ngram);
+			result[i] = bounding(item_memory_array_new_t[i], all_ngram);
 		}
 
 		// デバッグ用
