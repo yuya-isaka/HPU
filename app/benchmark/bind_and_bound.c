@@ -205,7 +205,7 @@ int main(int argc, char const *argv[])
 
 	clock_t end = clock();
 	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\nBind-Bound time %lf[ms]\n", time);
+	printf("\n\nBind_and_bound time %lf[ms]\n", time);
 
 	return 0;
 }

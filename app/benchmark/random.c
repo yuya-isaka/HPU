@@ -126,7 +126,7 @@ int main(int argc, char const *argv[])
 	// タイム確認
 	clock_t end = clock();
 	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\nBind time %lf[ms]\n\n", time);
+	printf("\n\nRandom time %lf[ms]\n\n", time);
 
 	// -----------------------------------------------------------------------
 
