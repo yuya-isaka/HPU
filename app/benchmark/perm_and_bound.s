@@ -1,9 +1,9 @@
-	.file	"bound.c"
+	.file	"perm_and_bound.c"
 	.text
 	.p2align 4
 	.type	xor128.part.0, @function
 xor128.part.0:
-.LFB55:
+.LFB57:
 	.cfi_startproc
 	movl	x.4591(%rip), %eax
 	movl	w.4594(%rip), %ecx
@@ -24,7 +24,7 @@ xor128.part.0:
 	movl	%eax, w.4594(%rip)
 	ret
 	.cfi_endproc
-.LFE55:
+.LFE57:
 	.size	xor128.part.0, .-xor128.part.0
 	.p2align 4
 	.globl	makeArrayInt
@@ -150,10 +150,126 @@ xor128:
 .LFE52:
 	.size	xor128, .-xor128
 	.p2align 4
+	.globl	shifter_32
+	.type	shifter_32, @function
+shifter_32:
+.LFB53:
+	.cfi_startproc
+	endbr64
+	movl	%esi, %ecx
+	movl	$1, %edx
+	movl	(%rdi), %eax
+	sall	%cl, %edx
+	movl	$32, %ecx
+	subl	$1, %edx
+	subl	%esi, %ecx
+	andl	%eax, %edx
+	sall	%cl, %edx
+	movl	%esi, %ecx
+	movl	%edx, (%rdi)
+	shrl	%cl, %eax
+	ret
+	.cfi_endproc
+.LFE53:
+	.size	shifter_32, .-shifter_32
+	.p2align 4
+	.globl	shifter_1024
+	.type	shifter_1024, @function
+shifter_1024:
+.LFB54:
+	.cfi_startproc
+	endbr64
+	pushq	%r13
+	.cfi_def_cfa_offset 16
+	.cfi_offset 13, -16
+	movq	%rsi, %r13
+	movl	$4, %esi
+	pushq	%r12
+	.cfi_def_cfa_offset 24
+	.cfi_offset 12, -24
+	pushq	%rbp
+	.cfi_def_cfa_offset 32
+	.cfi_offset 6, -32
+	movl	%ecx, %ebp
+	pushq	%rbx
+	.cfi_def_cfa_offset 40
+	.cfi_offset 3, -40
+	movq	%rdi, %rbx
+	movl	%edx, %edi
+	movq	%rdi, %r12
+	subq	$8, %rsp
+	.cfi_def_cfa_offset 48
+	call	calloc@PLT
+	movq	%rax, %rdi
+	testl	%r12d, %r12d
+	je	.L26
+	movl	$1, %r9d
+	movl	%ebp, %ecx
+	leal	-1(%r12), %r8d
+	xorl	%edx, %edx
+	sall	%cl, %r9d
+	movl	$32, %r10d
+	movq	0(%r13), %r11
+	leaq	(%rax,%r8,4), %r12
+	subl	$1, %r9d
+	subl	%ebp, %r10d
+	jmp	.L24
+	.p2align 4,,10
+	.p2align 3
+.L22:
+	orl	%eax, -4(%rdi,%rdx,4)
+	leaq	1(%rdx), %rax
+	cmpq	%rdx, %r8
+	je	.L30
+.L27:
+	movq	%rax, %rdx
+.L24:
+	movl	(%r11,%rdx,4), %esi
+	movl	%r10d, %ecx
+	movl	%esi, %eax
+	andl	%r9d, %eax
+	sall	%cl, %eax
+	movl	%ebp, %ecx
+	shrl	%cl, %esi
+	orl	%esi, (%rdi,%rdx,4)
+	testq	%rdx, %rdx
+	jne	.L22
+	orl	%eax, (%r12)
+	leaq	1(%rdx), %rax
+	cmpq	%rdx, %r8
+	jne	.L27
+.L30:
+	movq	(%rbx), %rcx
+	xorl	%edx, %edx
+	.p2align 4,,10
+	.p2align 3
+.L25:
+	movl	(%rdi,%rdx,4), %eax
+	movl	%eax, (%rcx,%rdx,4)
+	movq	%rdx, %rax
+	addq	$1, %rdx
+	cmpq	%rax, %r8
+	jne	.L25
+.L26:
+	addq	$8, %rsp
+	.cfi_def_cfa_offset 40
+	popq	%rbx
+	.cfi_def_cfa_offset 32
+	popq	%rbp
+	.cfi_def_cfa_offset 24
+	popq	%r12
+	.cfi_def_cfa_offset 16
+	popq	%r13
+	.cfi_def_cfa_offset 8
+	jmp	free@PLT
+	.cfi_endproc
+.LFE54:
+	.size	shifter_1024, .-shifter_1024
+	.p2align 4
 	.globl	bounding
 	.type	bounding, @function
 bounding:
-.LFB53:
+.LFB55:
 	.cfi_startproc
 	endbr64
 	pushq	%rbx
@@ -169,47 +285,47 @@ bounding:
 	movl	$-2147483648, %esi
 	.p2align 4,,10
 	.p2align 3
-.L20:
+.L32:
 	movq	%r11, %rax
 	xorl	%edx, %edx
 	testq	%r10, %r10
-	je	.L22
+	je	.L34
 	.p2align 4,,10
 	.p2align 3
-.L21:
+.L33:
 	xorl	%ecx, %ecx
 	testl	%esi, (%rax)
 	setne	%cl
 	addq	$4, %rax
 	addl	%ecx, %edx
 	cmpq	%rax, %rdi
-	jne	.L21
+	jne	.L33
 	movslq	%edx, %rdx
 	leal	(%r9,%rsi), %eax
 	cmpq	%rbx, %rdx
 	cmova	%eax, %r9d
-.L22:
+.L34:
 	shrl	%esi
 	subl	$1, %r8d
-	jne	.L20
+	jne	.L32
 	movl	%r9d, %eax
 	popq	%rbx
 	.cfi_def_cfa_offset 8
 	ret
 	.cfi_endproc
-.LFE53:
+.LFE55:
 	.size	bounding, .-bounding
 	.section	.rodata.str1.1,"aMS",@progbits,1
 .LC0:
 	.string	"%u\n"
 .LC3:
-	.string	"\n\nBound time %lf[ms]\n"
+	.string	"\n\nPermu time %lf[ms]\n"
 	.section	.text.startup,"ax",@progbits
 	.p2align 4
 	.globl	main
 	.type	main, @function
 main:
-.LFB54:
+.LFB56:
 	.cfi_startproc
 	endbr64
 	pushq	%r15
@@ -230,15 +346,15 @@ main:
 	pushq	%rbx
 	.cfi_def_cfa_offset 56
 	.cfi_offset 3, -56
-	subq	$168, %rsp
-	.cfi_def_cfa_offset 224
+	subq	$200, %rsp
+	.cfi_def_cfa_offset 256
 	movq	%fs:40, %rax
-	movq	%rax, 152(%rsp)
+	movq	%rax, 184(%rsp)
 	xorl	%eax, %eax
-	movq	%rsp, %rbp
+	leaq	24(%rsp), %rbp
 	call	clock@PLT
 	movl	$10, %edi
-	movq	%rax, %rbx
+	movq	%rax, 8(%rsp)
 	call	srand@PLT
 	movl	$32, %edx
 	movl	$1024, %esi
@@ -251,110 +367,137 @@ main:
 	xorl	%r10d, %r10d
 	.p2align 4,,10
 	.p2align 3
-.L29:
+.L41:
 	movl	%r10d, %r8d
 	leaq	0(,%r10,8), %rdi
 	xorl	%esi, %esi
-	jmp	.L33
+	jmp	.L45
 	.p2align 4,,10
 	.p2align 3
-.L30:
-	movq	(%rsp), %rax
+.L42:
+	movq	24(%rsp), %rax
 	movq	(%rax,%rdi), %rax
 	movl	$88675123, (%rax,%rsi,4)
-.L31:
+.L43:
 	addq	$1, %rsi
-.L33:
+.L45:
 	movl	%r8d, %eax
 	orl	%esi, %eax
-	je	.L30
+	je	.L42
 	call	xor128.part.0
 	movl	%eax, %r9d
-	movq	(%rsp), %rax
+	movq	24(%rsp), %rax
 	movq	(%rax,%rdi), %rax
 	movl	%r9d, (%rax,%rsi,4)
 	cmpl	$31, %esi
-	jne	.L31
+	jne	.L43
 	addq	$1, %r10
 	cmpq	$1024, %r10
-	jne	.L29
-	leaq	8(%rsp), %r12
-	movl	$50000000, %edx
-	movl	$32, %esi
-	xorl	%r13d, %r13d
+	jne	.L41
+	leaq	32(%rsp), %r12
+	movl	$32, %edx
+	movl	$50000000, %esi
+	xorl	%r14d, %r14d
 	movq	%r12, %rdi
 	call	makeArrayInt
 	.p2align 4,,10
 	.p2align 3
-.L35:
+.L46:
 	call	rand@PLT
-	movq	8(%rsp), %r8
+	movl	%eax, %r13d
+	call	rand@PLT
+	movq	32(%rsp), %rdi
 	cltd
+	shrl	$27, %edx
+	addq	%r14, %rdi
+	addq	$8, %r14
+	leal	(%rax,%rdx), %ecx
+	andl	$31, %ecx
+	subl	%edx, %ecx
+	movl	%r13d, %edx
+	sarl	$31, %edx
 	shrl	$22, %edx
-	addl	%edx, %eax
+	leal	0(%r13,%rdx), %eax
 	andl	$1023, %eax
 	subl	%edx, %eax
-	movq	(%rsp), %rdx
+	movq	24(%rsp), %rdx
 	cltq
-	movq	(%rdx,%rax,8), %rsi
+	leaq	(%rdx,%rax,8), %rsi
+	movl	$32, %edx
+	call	shifter_1024
+	cmpq	$400000000, %r14
+	jne	.L46
+	leaq	40(%rsp), %r13
+	movl	$50000000, %edx
+	movl	$32, %esi
+	movq	%r13, %rdi
+	call	makeArrayInt
+	movq	32(%rsp), %rdi
+	movq	40(%rsp), %r8
+	xorl	%ecx, %ecx
+.L47:
+	movq	(%r8,%rcx,2), %rsi
 	xorl	%eax, %eax
 	.p2align 4,,10
 	.p2align 3
-.L34:
-	movl	(%rsi,%rax,4), %ecx
-	movq	(%r8,%rax,8), %rdx
+.L48:
+	movq	(%rdi,%rax,8), %rdx
+	movl	(%rdx,%rcx), %edx
+	movl	%edx, (%rsi,%rax,4)
 	addq	$1, %rax
-	movl	%ecx, (%rdx,%r13)
-	cmpq	$32, %rax
-	jne	.L34
-	addq	$4, %r13
-	cmpq	$200000000, %r13
-	jne	.L35
-	xorl	%r14d, %r14d
-	leaq	16(%rsp), %r13
-.L40:
-	movq	(%r8,%r14,8), %r11
+	cmpq	$50000000, %rax
+	jne	.L48
+	addq	$4, %rcx
+	cmpq	$128, %rcx
+	jne	.L47
+	xorl	%r15d, %r15d
+	leaq	48(%rsp), %r14
+.L49:
+	movq	(%r8,%r15,8), %r11
 	movl	$32, %r10d
 	xorl	%r9d, %r9d
 	movl	$-2147483648, %esi
 	leaq	200000000(%r11), %rdi
 	.p2align 4,,10
 	.p2align 3
-.L36:
+.L50:
 	movq	%r11, %rax
 	xorl	%edx, %edx
 	.p2align 4,,10
 	.p2align 3
-.L37:
+.L51:
 	xorl	%ecx, %ecx
 	testl	%esi, (%rax)
 	setne	%cl
 	addq	$4, %rax
 	addl	%ecx, %edx
 	cmpq	%rax, %rdi
-	jne	.L37
+	jne	.L51
 	leal	(%r9,%rsi), %eax
 	cmpl	$25000000, %edx
 	cmovg	%eax, %r9d
 	shrl	%esi
 	subl	$1, %r10d
-	jne	.L36
-	movl	%r9d, 0(%r13,%r14,4)
-	addq	$1, %r14
-	cmpq	$32, %r14
-	jne	.L40
-	leaq	144(%rsp), %r15
-	leaq	.LC0(%rip), %r14
-.L41:
-	movl	0(%r13), %edx
-	movq	%r14, %rsi
+	jne	.L50
+	movl	%r9d, (%r14,%r15,4)
+	addq	$1, %r15
+	cmpq	$32, %r15
+	jne	.L49
+	leaq	176(%rsp), %r15
+	leaq	.LC0(%rip), %rbx
+.L54:
+	movl	(%r14), %edx
+	movq	%rbx, %rsi
 	movl	$1, %edi
 	xorl	%eax, %eax
-	addq	$4, %r13
+	addq	$4, %r14
 	call	__printf_chk@PLT
-	cmpq	%r13, %r15
-	jne	.L41
+	cmpq	%r14, %r15
+	jne	.L54
 	movl	$32, %esi
+	movq	%r13, %rdi
+	call	freeArrayInt
+	movl	$50000000, %esi
 	movq	%r12, %rdi
 	call	freeArrayInt
 	movl	$1024, %esi
@@ -362,18 +505,18 @@ main:
 	call	freeArrayInt
 	call	clock@PLT
 	pxor	%xmm0, %xmm0
-	movl	$1, %edi
+	subq	8(%rsp), %rax
 	leaq	.LC3(%rip), %rsi
-	subq	%rbx, %rax
 	cvtsi2sdq	%rax, %xmm0
-	divsd	.LC1(%rip), %xmm0
+	movl	$1, %edi
 	movl	$1, %eax
+	divsd	.LC1(%rip), %xmm0
 	mulsd	.LC2(%rip), %xmm0
 	call	__printf_chk@PLT
-	movq	152(%rsp), %rax
+	movq	184(%rsp), %rax
 	xorq	%fs:40, %rax
-	jne	.L50
-	addq	$168, %rsp
+	jne	.L64
+	addq	$200, %rsp
 	.cfi_remember_state
 	.cfi_def_cfa_offset 56
 	xorl	%eax, %eax
@@ -390,11 +533,11 @@ main:
 	popq	%r15
 	.cfi_def_cfa_offset 8
 	ret
-.L50:
+.L64:
 	.cfi_restore_state
 	call	__stack_chk_fail@PLT
 	.cfi_endproc
-.LFE54:
+.LFE56:
 	.size	main, .-main
 	.data
 	.align 4

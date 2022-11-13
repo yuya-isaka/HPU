@@ -3,53 +3,34 @@
 	.p2align 4
 	.type	xor128.part.0, @function
 xor128.part.0:
-.LFB55:
+.LFB54:
 	.cfi_startproc
-	movl	x.4593(%rip), %eax
-	movl	w.4596(%rip), %ecx
+	movl	x.4591(%rip), %eax
+	movl	w.4594(%rip), %ecx
 	movl	%eax, %edx
 	sall	$11, %edx
 	xorl	%eax, %edx
-	movl	y.4594(%rip), %eax
-	movl	%eax, x.4593(%rip)
-	movl	z.4595(%rip), %eax
-	movl	%ecx, z.4595(%rip)
-	movl	%eax, y.4594(%rip)
+	movl	y.4592(%rip), %eax
+	movl	%eax, x.4591(%rip)
+	movl	z.4593(%rip), %eax
+	movl	%ecx, z.4593(%rip)
+	movl	%eax, y.4592(%rip)
 	movl	%ecx, %eax
 	shrl	$19, %eax
 	xorl	%ecx, %eax
 	xorl	%edx, %eax
 	shrl	$8, %edx
 	xorl	%edx, %eax
-	movl	%eax, w.4596(%rip)
+	movl	%eax, w.4594(%rip)
 	ret
 	.cfi_endproc
-.LFE55:
+.LFE54:
 	.size	xor128.part.0, .-xor128.part.0
-	.section	.rodata.str1.1,"aMS",@progbits,1
-.LC0:
-	.string	"leaks -q a.out"
-	.section	.text.exit,"ax",@progbits
-	.p2align 4
-	.type	destructor, @function
-destructor:
-.LFB50:
-	.cfi_startproc
-	endbr64
-	leaq	.LC0(%rip), %rdi
-	jmp	system@PLT
-	.cfi_endproc
-.LFE50:
-	.size	destructor, .-destructor
-	.section	.fini_array,"aw"
-	.align 8
-	.quad	destructor
-	.text
 	.p2align 4
 	.globl	makeArrayInt
 	.type	makeArrayInt, @function
 makeArrayInt:
-.LFB51:
+.LFB50:
 	.cfi_startproc
 	endbr64
 	pushq	%r13
@@ -74,21 +55,21 @@ makeArrayInt:
 	call	calloc@PLT
 	movq	%rax, 0(%r13)
 	testl	%r12d, %r12d
-	jle	.L4
+	jle	.L3
 	movq	%rax, %rbx
 	leal	-1(%r12), %eax
 	leaq	8(%rbx,%rax,8), %r12
 	.p2align 4,,10
 	.p2align 3
-.L6:
+.L5:
 	movl	$4, %esi
 	movq	%rbp, %rdi
 	addq	$8, %rbx
 	call	calloc@PLT
 	movq	%rax, -8(%rbx)
 	cmpq	%r12, %rbx
-	jne	.L6
-.L4:
+	jne	.L5
+.L3:
 	addq	$8, %rsp
 	.cfi_def_cfa_offset 40
 	popq	%rbx
@@ -101,13 +82,13 @@ makeArrayInt:
 	.cfi_def_cfa_offset 8
 	ret
 	.cfi_endproc
-.LFE51:
+.LFE50:
 	.size	makeArrayInt, .-makeArrayInt
 	.p2align 4
 	.globl	freeArrayInt
 	.type	freeArrayInt, @function
 freeArrayInt:
-.LFB52:
+.LFB51:
 	.cfi_startproc
 	endbr64
 	pushq	%r12
@@ -121,20 +102,20 @@ freeArrayInt:
 	.cfi_def_cfa_offset 32
 	.cfi_offset 3, -32
 	testl	%esi, %esi
-	jle	.L11
+	jle	.L10
 	leal	-1(%rsi), %eax
 	xorl	%ebx, %ebx
 	leaq	8(,%rax,8), %r12
 	.p2align 4,,10
 	.p2align 3
-.L12:
+.L11:
 	movq	0(%rbp), %rax
 	movq	(%rax,%rbx), %rdi
 	addq	$8, %rbx
 	call	free@PLT
 	cmpq	%r12, %rbx
-	jne	.L12
-.L11:
+	jne	.L11
+.L10:
 	movq	0(%rbp), %rdi
 	popq	%rbx
 	.cfi_def_cfa_offset 24
@@ -144,39 +125,39 @@ freeArrayInt:
 	.cfi_def_cfa_offset 8
 	jmp	free@PLT
 	.cfi_endproc
-.LFE52:
+.LFE51:
 	.size	freeArrayInt, .-freeArrayInt
 	.p2align 4
 	.globl	xor128
 	.type	xor128, @function
 xor128:
-.LFB53:
+.LFB52:
 	.cfi_startproc
 	endbr64
 	testl	%edi, %edi
-	jne	.L19
+	jne	.L18
 	jmp	xor128.part.0
 	.p2align 4,,10
 	.p2align 3
-.L19:
-	movl	$123456789, x.4593(%rip)
+.L18:
+	movl	$123456789, x.4591(%rip)
 	xorl	%eax, %eax
-	movl	$362436069, y.4594(%rip)
-	movl	$521288629, z.4595(%rip)
-	movl	$88675123, w.4596(%rip)
+	movl	$362436069, y.4592(%rip)
+	movl	$521288629, z.4593(%rip)
+	movl	$88675123, w.4594(%rip)
 	ret
 	.cfi_endproc
-.LFE53:
+.LFE52:
 	.size	xor128, .-xor128
-	.section	.rodata.str1.1
-.LC3:
+	.section	.rodata.str1.1,"aMS",@progbits,1
+.LC2:
 	.string	"\n\nBind time %lf[ms]\n"
 	.section	.text.startup,"ax",@progbits
 	.p2align 4
 	.globl	main
 	.type	main, @function
 main:
-.LFB54:
+.LFB53:
 	.cfi_startproc
 	endbr64
 	pushq	%r14
@@ -207,41 +188,41 @@ main:
 	movl	$32, %edx
 	movl	$1024, %esi
 	movq	%rbp, %rdi
-	movl	$123456789, x.4593(%rip)
-	movl	$362436069, y.4594(%rip)
-	movl	$521288629, z.4595(%rip)
-	movl	$88675123, w.4596(%rip)
+	movl	$123456789, x.4591(%rip)
+	movl	$362436069, y.4592(%rip)
+	movl	$521288629, z.4593(%rip)
+	movl	$88675123, w.4594(%rip)
 	call	makeArrayInt
 	xorl	%r10d, %r10d
 	.p2align 4,,10
 	.p2align 3
-.L21:
+.L20:
 	movl	%r10d, %r8d
 	leaq	0(,%r10,8), %rdi
 	xorl	%esi, %esi
-	jmp	.L25
+	jmp	.L24
 	.p2align 4,,10
 	.p2align 3
-.L22:
+.L21:
 	movq	8(%rsp), %rax
 	movq	(%rax,%rdi), %rax
 	movl	$88675123, (%rax,%rsi,4)
-.L23:
+.L22:
 	addq	$1, %rsi
-.L25:
+.L24:
 	movl	%r8d, %eax
 	orl	%esi, %eax
-	je	.L22
+	je	.L21
 	call	xor128.part.0
 	movl	%eax, %r9d
 	movq	8(%rsp), %rax
 	movq	(%rax,%rdi), %rax
 	movl	%r9d, (%rax,%rsi,4)
 	cmpl	$31, %esi
-	jne	.L23
+	jne	.L22
 	addq	$1, %r10
 	cmpq	$1024, %r10
-	jne	.L21
+	jne	.L20
 	leaq	16(%rsp), %r12
 	movl	$32, %edx
 	movl	$50000000, %esi
@@ -250,7 +231,7 @@ main:
 	call	makeArrayInt
 	.p2align 4,,10
 	.p2align 3
-.L27:
+.L26:
 	call	rand@PLT
 	movl	%eax, %r13d
 	call	rand@PLT
@@ -275,16 +256,16 @@ main:
 	xorl	%eax, %eax
 	.p2align 4,,10
 	.p2align 3
-.L26:
+.L25:
 	movl	(%rdi,%rax), %edx
 	xorl	(%rsi,%rax), %edx
 	movl	%edx, (%rcx,%rax)
 	addq	$4, %rax
 	cmpq	$128, %rax
-	jne	.L26
+	jne	.L25
 	addq	$8, %r14
 	cmpq	$400000000, %r14
-	jne	.L27
+	jne	.L26
 	movl	$50000000, %esi
 	movq	%r12, %rdi
 	call	freeArrayInt
@@ -294,16 +275,16 @@ main:
 	call	clock@PLT
 	pxor	%xmm0, %xmm0
 	movl	$1, %edi
-	leaq	.LC3(%rip), %rsi
+	leaq	.LC2(%rip), %rsi
 	subq	%rbx, %rax
 	cvtsi2sdq	%rax, %xmm0
-	divsd	.LC1(%rip), %xmm0
+	divsd	.LC0(%rip), %xmm0
 	movl	$1, %eax
-	mulsd	.LC2(%rip), %xmm0
+	mulsd	.LC1(%rip), %xmm0
 	call	__printf_chk@PLT
 	movq	24(%rsp), %rax
 	xorq	%fs:40, %rax
-	jne	.L33
+	jne	.L32
 	addq	$32, %rsp
 	.cfi_remember_state
 	.cfi_def_cfa_offset 48
@@ -319,40 +300,40 @@ main:
 	popq	%r14
 	.cfi_def_cfa_offset 8
 	ret
-.L33:
+.L32:
 	.cfi_restore_state
 	call	__stack_chk_fail@PLT
 	.cfi_endproc
-.LFE54:
+.LFE53:
 	.size	main, .-main
 	.data
 	.align 4
-	.type	w.4596, @object
-	.size	w.4596, 4
-w.4596:
+	.type	w.4594, @object
+	.size	w.4594, 4
+w.4594:
 	.long	88675123
 	.align 4
-	.type	z.4595, @object
-	.size	z.4595, 4
-z.4595:
+	.type	z.4593, @object
+	.size	z.4593, 4
+z.4593:
 	.long	521288629
 	.align 4
-	.type	y.4594, @object
-	.size	y.4594, 4
-y.4594:
+	.type	y.4592, @object
+	.size	y.4592, 4
+y.4592:
 	.long	362436069
 	.align 4
-	.type	x.4593, @object
-	.size	x.4593, 4
-x.4593:
+	.type	x.4591, @object
+	.size	x.4591, 4
+x.4591:
 	.long	123456789
 	.section	.rodata.cst8,"aM",@progbits,8
 	.align 8
-.LC1:
+.LC0:
 	.long	0
 	.long	1093567616
 	.align 8
-.LC2:
+.LC1:
 	.long	0
 	.long	1083129856
 	.ident	"GCC: (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0"
