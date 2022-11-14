@@ -43,15 +43,10 @@ module core
     // アイテムメモリーからロードしたデータの格納場所
     reg [ DIM:0 ]           reg_tmp;
 
-    // フォワーディング処理フラグ
-    reg                     forward_flag;
-
 
     // 更新対象
     //  - item_memory
     //  - reg_tmp
-    //  - forward_flag
-
     always_ff @( posedge clk ) begin
 
                   // 書き込み
@@ -73,10 +68,17 @@ module core
                   // 常に垂れ流しで読み出しでOK
                   // (必要ない場合は使わない)
                   reg_tmp <= item_memory[ get_d[ 9:0 ] ];
+              end;
+
+
+
+    // フォワーディング処理フラグ
+    reg                     forward_flag;
+
+    always_ff @( posedge clk ) begin
 
                   // フォワーディングフラグ
                   forward_flag <= ( wb_flag & ( wb_addr == get_d[ 9:0 ] ) );
-
               end;
 
 
