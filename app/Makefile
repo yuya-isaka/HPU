@@ -1,12 +1,19 @@
-test:
-	arm-linux-gnueabihf-gcc test_hdc.c -o test_hdc
-	arm-linux-gnueabihf-gcc test_hdc_pre.c -o test_hdc_pre
-	arm-linux-gnueabihf-gcc test_hdc_next.c -o test_hdc_next
 
-# sudo ./test_hdc
+default:
+	arm-linux-gnueabihf-gcc -O2 addr_test.c -o addr_test
+
+check:
+	arm-linux-gnueabihf-gcc addr_test.c -Wall -o addr_test
+
+asm:
+	arm-linux-gnueabihf-gcc -Wall -O2 -S -o addr_test.s addr_test.c -lm
+
 
 %: %.c
 	arm-linux-gnueabihf-gcc $@.c -o $@
 
+
 clean:
-	rm test_hdc test_hdc_pre test_hdc_next
+	rm addr_test
+
+.PHONY: default check asm clean

@@ -351,13 +351,49 @@ Top.anno.json
 Top.fir
 rtl
 
-
 *.dump
-# *.bin
 
 vivado_prj
+vivado_prj_2
+vivado_prj_3
+vivado_prj_4
+vivado_prj_5
 kako
 sim
 *.vcd
+boot
 
-hdc
+# バイナリたち
+# davinci
+davinci_ngram
+ohashi_ngram
+
+# app
+addr_test
+
+ohashi_bind
+ohashi_bound
+ohashi_perm
+ohashi_random
+
+random
+bind
+bind_bound
+bind_and_bound
+perm
+perm_bound
+perm_and_bound
+bound
+bound2
+random_peta
+bind_peta
+bind_bound_peta
+bind_and_bound_peta
+perm_peta
+perm_bound_peta
+perm_and_bound_peta
+bound_peta
+bound2_peta
+
+
+.svlint.toml

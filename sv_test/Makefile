@@ -1,11 +1,13 @@
 SHELL = /bin/bash
+TARGET_ARCH = linux64
 
 SIM_DIR = sim
+VERILATOR = verilator
 
-TARGET_ARCH = linux64
-VERILATOR   = verilator
+# verilator_top = new Vsv_test; より
+TOP = Vsv_test
 
-VERILATOR_OPTS = \
+VERILATOR_OPTION = \
 	-Wall \
 	-Wno-WIDTH \
 	-Wno-UNUSED \
@@ -15,31 +17,29 @@ VERILATOR_OPTS = \
 	-Wno-fatal \
 	--Mdir sim \
 	--trace \
+	-MAKEFLAGS "OBJCACHE=ccache CXX=clang++ LINK=clang++" \
+	--compiler clang \
 
-VERILATOR_MAKE_OPTS = OPT="-O3 -I ../../../"
+VERILATOR_MAKE_OPTION = \
+	OPT="-O3 -I ../../../" \
 
-DESIGN_SRCS = \
+DESIGN_SRC = \
 ./sv_test.sv
 
-VERILATOR_CPP_TB = tb_sv_test.cpp
+VERILATOR_TB = tb_sv_test.cpp
 
-default: $(SIM_DIR)/Vtop
-	./sim/Vsv_test
+default: $(SIM_DIR)/$(TOP)
+	./sim/$(TOP)
 
-sim: $(SIM_DIR)/Vtop
-
-$(SIM_DIR)/Vtop: $(DESIGN_SRCS) $(VERILATOR_CPP_TB)
-	$(VERILATOR) $(VERILATOR_OPTS) $(DESIGN_SRCS) --exe ../$(VERILATOR_CPP_TB)
-	cd sim; make $(VERILATOR_MAKE_OPTS) -f Vsv_test.mk Vsv_test__ALL.a
-	cd sim; make $(VERILATOR_MAKE_OPTS) -f Vsv_test.mk Vsv_test
+$(SIM_DIR)/$(TOP): $(DESIGN_SRC) $(VERILATOR_TB)
+	$(VERILATOR) $(VERILATOR_OPTION) $(DESIGN_SRC) --exe ../$(VERILATOR_TB)
+	cd sim; make $(VERILATOR_MAKE_OPTION) -f $(TOP).mk Vsv_test__ALL.a
+	cd sim; make $(VERILATOR_MAKE_OPTION) -f $(TOP).mk $(TOP)
 
 clean:
 	rm -rf sim/ tmp.vcd
 
-run :
-	./sim/Vsv_test
-
 format :
-	iStyle --style=kr -n $(DESIGN_SRCS)
+	iStyle --style=kr -n $(DESIGN_SRC)
 
-.PHONY:
+.PHONY: clean format

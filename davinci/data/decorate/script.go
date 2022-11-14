@@ -10,12 +10,12 @@ import (
 
 func main() {
 
-	train_en_path := "data/train/en"
-	train_fr_path := "data/train/fr"
-	train_ge_path := "data/train/ge"
-	test_path_1 := "data/test/test_file"
-	test_path_2 := "data/test/test_file2"
-	test_path_3 := "data/test/test_file3"
+	train_en_path := "/Users/yuyaisaka/workspace/project/project-zynq/zynq-test/davinci/data/original_train/en"
+	train_fr_path := "/Users/yuyaisaka/workspace/project/project-zynq/zynq-test/davinci/data/original_train/fr"
+	train_ge_path := "/Users/yuyaisaka/workspace/project/project-zynq/zynq-test/davinci/data/original_train/ge"
+	test_path_1 := "/Users/yuyaisaka/workspace/project/project-zynq/zynq-test/davinci/data/original_test/test_file1"
+	test_path_2 := "/Users/yuyaisaka/workspace/project/project-zynq/zynq-test/davinci/data/original_test/test_file2"
+	test_path_3 := "/Users/yuyaisaka/workspace/project/project-zynq/zynq-test/davinci/data/original_test/test_file3"
 
 	en_data, err := ioutil.ReadFile(train_en_path)
 	if err != nil {
