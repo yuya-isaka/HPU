@@ -193,7 +193,7 @@ module core
                           end
 
                           // l.xor
-                          if ( inst[ 12 ] ) begin
+                          else if ( inst[ 12 ] ) begin
                               reg_2 <= reg_0 ^ reg_2;
                               buff <= 0;
                               store <= 0;
@@ -211,50 +211,50 @@ module core
                                   reg_2 <= { reg_2[ 0 ], reg_2[ DIM:1 ] };
                               end
 
-                              //   // 2
-                              //   else if ( inst[ 11 ] ) begin
-                              //       reg_2 <= { reg_2[ 1:0 ], reg_2[ DIM:2 ] };
-                              //   end
+                              // 2
+                              else if ( inst[ 11 ] ) begin
+                                  reg_2 <= { reg_2[ 1:0 ], reg_2[ DIM:2 ] };
+                              end
 
-                              //   // 4
-                              //   else if ( inst[ 10 ] ) begin
-                              //       reg_2 <= { reg_2[ 3:0 ], reg_2[ DIM:4 ] };
-                              //   end
+                              // 4
+                              else if ( inst[ 10 ] ) begin
+                                  reg_2 <= { reg_2[ 3:0 ], reg_2[ DIM:4 ] };
+                              end
 
-                              //   // 8
-                              //   else if ( inst[ 9 ] ) begin
-                              //       reg_2 <= { reg_2[ 7:0 ], reg_2[ DIM:8 ] };
-                              //   end
+                              // 8
+                              else if ( inst[ 9 ] ) begin
+                                  reg_2 <= { reg_2[ 7:0 ], reg_2[ DIM:8 ] };
+                              end
 
-                              //   // 16
-                              //   else if ( inst[ 8 ] ) begin
-                              //       reg_2 <= { reg_2[ 15:0 ], reg_2[ DIM:16 ] };
-                              //   end
+                              // 16
+                              else if ( inst[ 8 ] ) begin
+                                  reg_2 <= { reg_2[ 15:0 ], reg_2[ DIM:16 ] };
+                              end
 
-                              //   // 32
-                              //   else if ( inst[ 7 ] ) begin
-                              //       reg_2 <= { reg_2[ 31:0 ], reg_2[ DIM:32 ] };
-                              //   end
+                              // 32
+                              else if ( inst[ 7 ] ) begin
+                                  reg_2 <= { reg_2[ 31:0 ], reg_2[ DIM:32 ] };
+                              end
 
-                              //   // 64
-                              //   else if ( inst[ 6 ] ) begin
-                              //       reg_2 <= { reg_2[ 63:0 ], reg_2[ DIM:64 ] };
-                              //   end
+                              // 64
+                              else if ( inst[ 6 ] ) begin
+                                  reg_2 <= { reg_2[ 63:0 ], reg_2[ DIM:64 ] };
+                              end
 
-                              //   // 128
-                              //   else if ( inst[ 5 ] ) begin
-                              //       reg_2 <= { reg_2[ 127:0 ], reg_2[ DIM:128 ] };
-                              //   end
+                              // 128
+                              else if ( inst[ 5 ] ) begin
+                                  reg_2 <= { reg_2[ 127:0 ], reg_2[ DIM:128 ] };
+                              end
 
-                              //   // 256
-                              //   else if ( inst[ 4 ] ) begin
-                              //       reg_2 <= { reg_2[ 255:0 ], reg_2[ DIM:256 ] };
-                              //   end
+                              // 256
+                              else if ( inst[ 4 ] ) begin
+                                  reg_2 <= { reg_2[ 255:0 ], reg_2[ DIM:256 ] };
+                              end
 
-                              //   // 512
-                              //   else if ( inst[ 3 ] ) begin
-                              //       reg_2 <= { reg_2[ 511:0 ], reg_2[ DIM:512 ] };
-                              //   end
+                              // 512
+                              else if ( inst[ 3 ] ) begin
+                                  reg_2 <= { reg_2[ 511:0 ], reg_2[ DIM:512 ] };
+                              end
 
                               buff <= 0;
                               store <= 0;
@@ -268,45 +268,45 @@ module core
                                   reg_2 <= { reg_2[ DIM-1:0 ], reg_2[ DIM ] };
                               end
 
-                              //   // 2
-                              //   else if ( inst[ 11 ] ) begin
-                              //       reg_2 <= { reg_2[ DIM-2:0 ], reg_2[ DIM:DIM-1 ] };
-                              //   end
+                              // 2
+                              else if ( inst[ 11 ] ) begin
+                                  reg_2 <= { reg_2[ DIM-2:0 ], reg_2[ DIM:DIM-1 ] };
+                              end
 
-                              //   // 4
-                              //   else if ( inst[ 10 ] ) begin
-                              //       reg_2 <= { reg_2[ DIM-4:0 ], reg_2[ DIM:DIM-3 ] };
-                              //   end
+                              // 4
+                              else if ( inst[ 10 ] ) begin
+                                  reg_2 <= { reg_2[ DIM-4:0 ], reg_2[ DIM:DIM-3 ] };
+                              end
 
-                              //   // 8
-                              //   else if ( inst[ 9 ] ) begin
-                              //       reg_2 <= { reg_2[ DIM-8:0 ], reg_2[ DIM:DIM-7 ] };
-                              //   end
+                              // 8
+                              else if ( inst[ 9 ] ) begin
+                                  reg_2 <= { reg_2[ DIM-8:0 ], reg_2[ DIM:DIM-7 ] };
+                              end
 
-                              //   // 16
-                              //   else if ( inst[ 8 ] ) begin
-                              //       reg_2 <= { reg_2[ DIM-16:0 ], reg_2[ DIM:DIM-15 ] };
-                              //   end
+                              // 16
+                              else if ( inst[ 8 ] ) begin
+                                  reg_2 <= { reg_2[ DIM-16:0 ], reg_2[ DIM:DIM-15 ] };
+                              end
 
-                              //   // 32
-                              //   else if ( inst[ 7 ] ) begin
-                              //       reg_2 <= { reg_2[ DIM-32:0 ], reg_2[ DIM:DIM-31 ] };
-                              //   end
+                              // 32
+                              else if ( inst[ 7 ] ) begin
+                                  reg_2 <= { reg_2[ DIM-32:0 ], reg_2[ DIM:DIM-31 ] };
+                              end
 
-                              //   // 64
-                              //   else if ( inst[ 6 ] ) begin
-                              //       reg_2 <= { reg_2[ DIM-64:0 ], reg_2[ DIM:DIM-63 ] };
-                              //   end
+                              // 64
+                              else if ( inst[ 6 ] ) begin
+                                  reg_2 <= { reg_2[ DIM-64:0 ], reg_2[ DIM:DIM-63 ] };
+                              end
 
-                              //   // 128
-                              //   else if ( inst[ 5 ] ) begin
-                              //       reg_2 <= { reg_2[ DIM-128:0 ], reg_2[ DIM:DIM-127 ] };
-                              //   end
+                              // 128
+                              else if ( inst[ 5 ] ) begin
+                                  reg_2 <= { reg_2[ DIM-128:0 ], reg_2[ DIM:DIM-127 ] };
+                              end
 
-                              //   // 256
-                              //   else if ( inst[ 4 ] ) begin
-                              //       reg_2 <= { reg_2[ DIM-256:0 ], reg_2[ DIM:DIM-255 ] };
-                              //   end
+                              // 256
+                              else if ( inst[ 4 ] ) begin
+                                  reg_2 <= { reg_2[ DIM-256:0 ], reg_2[ DIM:DIM-255 ] };
+                              end
 
                               buff <= 0;
                               store <= 0;

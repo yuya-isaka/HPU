@@ -27,12 +27,12 @@ module buffer_ctrl
          input wire [ DIM:0 ]                   core_result_8,
          input wire [ DIM:0 ]                   core_result_9,
          input wire [ DIM:0 ]                   core_result_10,
-         input wire [ DIM:0 ]                   core_result_11,
-         input wire [ DIM:0 ]                   core_result_12,
-          input wire [ DIM:0 ]                   core_result_13,
-          input wire [ DIM:0 ]                   core_result_14,
-          input wire [ DIM:0 ]                   core_result_15,
-          input wire [ DIM:0 ]                   core_result_16,
+         //  input wire [ DIM:0 ]                   core_result_11,
+         //  input wire [ DIM:0 ]                   core_result_12,
+         //  input wire [ DIM:0 ]                   core_result_13,
+         //  input wire [ DIM:0 ]                   core_result_14,
+         //  input wire [ DIM:0 ]                   core_result_15,
+         //  input wire [ DIM:0 ]                   core_result_16,
          // 1コア
          input wire [ CORENUM-1:0 ]             store,
          //  input wire                         store,
@@ -58,7 +58,7 @@ module buffer_ctrl
 
             // コア数可変
             // 計算数可変 (現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分)
-            counter #( .W( 30 ), .CORENUM( 16 ) ) counter
+            counter #( .W( 30 ), .CORENUM( 10 ) ) counter
                     (
 
                         // in
@@ -71,12 +71,12 @@ module buffer_ctrl
                         // この順番で渡す必要がある
                         .core_result(
                             {
-                                core_result_16[ i ],
-                                core_result_15[ i ],
-                                core_result_14[ i ],
-                                core_result_13[ i ],
-                                core_result_12[ i ],
-                                core_result_11[ i ],
+                                // core_result_16[ i ],
+                                // core_result_15[ i ],
+                                // core_result_14[ i ],
+                                // core_result_13[ i ],
+                                // core_result_12[ i ],
+                                // core_result_11[ i ],
                                 core_result_10[ i ],
                                 core_result_9[ i ],
                                 core_result_8[ i ],
