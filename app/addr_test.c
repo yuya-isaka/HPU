@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#include <string.h> // strcomp
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -26,6 +27,7 @@ unsigned int item_memory_array_new[DIM][RANNUM];
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// 渡された32ビットのvを、バイナリでコマンドライン出力
 void printb(unsigned int v)
 {
   unsigned int mask = (int)1 << (sizeof(v) * 8 - 1);
@@ -34,10 +36,13 @@ void printb(unsigned int v)
   while (mask >>= 1);
 }
 
+// printbを使いつつ整形して、バイナリをコマンドライン出力
 void putb(unsigned int v)
 {
   putchar('0'), putchar('b'), printb(v), putchar('\n');
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 unsigned int shifter_32(unsigned int *v, unsigned int num)
 {
@@ -90,6 +95,8 @@ void shifter_ngram(const int NGRAM)
   }
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 unsigned int bounding(unsigned int result_array[], size_t size)
 {
   unsigned int result = 0;
@@ -110,6 +117,8 @@ unsigned int bounding(unsigned int result_array[], size_t size)
   }
   return result;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 unsigned int xor128(int reset)
 {
@@ -147,91 +156,160 @@ unsigned int xor128(int reset)
   }
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 // 簡易アセンブラ
-// アドレスが必要か、命令コード、アドレス
-uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
+uint16_t assemble(const char inst_str[], uint16_t addr)
 {
-  if (addr_flag)
+  if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0 || strcmp(inst_str, "lxor") == 0)
   {
     uint16_t result = 0;
+
     // load
-    if (inst_num == 1)
+    if (strcmp(inst_str, "load") == 0)
     {
-      uint16_t inst = 3 << 14;
+      uint16_t inst = 49152;
       result = inst | addr;
     }
-    // l.rshift
-    else if (inst_num == 2)
-    {
-      uint16_t inst = 5 << 13;
-      result = inst | addr;
-    }
-    // l.lshift
-    else if (inst_num == 4)
-    {
-      uint16_t inst = 9 << 12;
-      result = inst | addr;
-    }
-    // l.xor
-    else if (inst_num == 6)
-    {
-      uint16_t inst = 17 << 11;
-      result = inst | addr;
-    }
+
     // wb.item
-    else if (inst_num == 12)
+    else if (strcmp(inst_str, "wbitem") == 0)
     {
-      uint16_t inst = 33 << 10;
+      uint16_t inst = 40960;
       result = inst | addr;
     }
-    else
+
+    // l.xor
+    else if (strcmp(inst_str, "lxor") == 0)
     {
-      printf("error");
+      uint16_t inst = 36864;
+      result = inst | addr;
     }
+
     return result;
   }
+
   else
   {
     uint16_t inst = 0;
-    // rshift
-    if (inst_num == 3)
-    {
-      inst = 1 << 14;
-    }
-    // lshift
-    else if (inst_num == 5)
-    {
-      inst = 1 << 13;
-    }
+
     // xor
-    else if (inst_num == 7)
+    if (strcmp(inst_str, "xor") == 0)
     {
-      inst = 1 << 12;
+      inst = 4096;
     }
+
     // store
-    else if (inst_num == 8)
+    else if (strcmp(inst_str, "store") == 0)
     {
-      inst = 1 << 11;
+      inst = 2048;
     }
-    // lastore
-    else if (inst_num == 9)
+
+    // last
+    else if (strcmp(inst_str, "last") == 0)
     {
-      inst = 1 << 10;
+      inst = 1024;
     }
+
     // move
-    else if (inst_num == 10)
+    else if (strcmp(inst_str, "move") == 0)
     {
-      inst = 1 << 9;
+      inst = 512;
     }
+
     // wb
-    else if (inst_num == 11)
+    else if (strcmp(inst_str, "wb") == 0)
     {
-      inst = 1 << 8;
+      inst = 256;
     }
+
+    // rshift
+    else if (strcmp(inst_str, "rshift1") == 0)
+    {
+      inst = 20480;
+    }
+
+    else if (strcmp(inst_str, "rshift2") == 0)
+    {
+      inst = 18432;
+    }
+
+    else if (strcmp(inst_str, "rshift4") == 0)
+    {
+      inst = 17408;
+    }
+    else if (strcmp(inst_str, "rshift8") == 0)
+    {
+      inst = 16896;
+    }
+    else if (strcmp(inst_str, "rshift16") == 0)
+    {
+      inst = 16640;
+    }
+    else if (strcmp(inst_str, "rshift32") == 0)
+    {
+      inst = 16512;
+    }
+    else if (strcmp(inst_str, "rshift64") == 0)
+    {
+      inst = 16448;
+    }
+    else if (strcmp(inst_str, "rshift128") == 0)
+    {
+      inst = 16416;
+    }
+    else if (strcmp(inst_str, "rshift256") == 0)
+    {
+      inst = 16400;
+    }
+    else if (strcmp(inst_str, "rshift512") == 0)
+    {
+      inst = 16392;
+    }
+
+    // lshift
+    else if (strcmp(inst_str, "lshift1") == 0)
+    {
+      inst = 12288;
+    }
+    else if (strcmp(inst_str, "lshift2") == 0)
+    {
+      inst = 10240;
+    }
+    else if (strcmp(inst_str, "lshift4") == 0)
+    {
+      inst = 9216;
+    }
+    else if (strcmp(inst_str, "lshift8") == 0)
+    {
+      inst = 8704;
+    }
+    else if (strcmp(inst_str, "lshift16") == 0)
+    {
+      inst = 8448;
+    }
+    else if (strcmp(inst_str, "lshift32") == 0)
+    {
+      inst = 8320;
+    }
+    else if (strcmp(inst_str, "lshift64") == 0)
+    {
+      inst = 8256;
+    }
+    else if (strcmp(inst_str, "lshift128") == 0)
+    {
+      inst = 8224;
+    }
+    else if (strcmp(inst_str, "lshift256") == 0)
+    {
+      inst = 8208;
+    }
+
     else
     {
       printf("error");
     }
+
     return inst;
   }
 }
@@ -293,7 +371,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       if (i == 0)
       {
         uint16_t addr = MAJORITY_ADDR;
-        uint16_t inst = assemble(1, 1, addr);
+        uint16_t inst = assemble("load", addr);
         src[send_num] = inst;
       }
       else
@@ -308,7 +386,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
     {
       if (i == 0)
       {
-        uint16_t inst = assemble(0, 8, 0);
+        uint16_t inst = assemble("store", 0);
         src[send_num] = inst;
       }
       else
@@ -332,7 +410,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
         if (i < REMAINDAR)
         {
           uint16_t addr = NGRAM * i + j;
-          uint16_t inst = assemble(1, 1, addr);
+          uint16_t inst = assemble("load", addr);
           src[send_num] = inst;
         }
         else
@@ -348,7 +426,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i < REMAINDAR)
         {
-          uint16_t inst = assemble(0, 10, 0);
+          uint16_t inst = assemble("move", 0);
           src[send_num] = inst;
         }
         else
@@ -365,7 +443,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
         if (i < REMAINDAR)
         {
           uint16_t addr = NGRAM * i + 1 + j;
-          uint16_t inst = assemble(1, 2, addr);
+          uint16_t inst = assemble("load", addr);
           src[send_num] = inst;
         }
         else
@@ -381,7 +459,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i < REMAINDAR)
         {
-          uint16_t inst = assemble(0, 7, 0);
+          uint16_t inst = assemble("rshift1", 0);
           src[send_num] = inst;
         }
         else
@@ -397,7 +475,23 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i < REMAINDAR)
         {
-          uint16_t inst = assemble(0, 10, 0);
+          uint16_t inst = assemble("xor", 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < REMAINDAR)
+        {
+          uint16_t inst = assemble("move", 0);
           src[send_num] = inst;
         }
         else
@@ -414,7 +508,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
         if (i < REMAINDAR)
         {
           uint16_t addr = NGRAM * i + 2 + j;
-          uint16_t inst = assemble(1, 2, addr);
+          uint16_t inst = assemble("load", addr);
           src[send_num] = inst;
         }
         else
@@ -430,7 +524,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i < REMAINDAR)
         {
-          uint16_t inst = assemble(0, 3, 0);
+          uint16_t inst = assemble("rshift2", 0);
           src[send_num] = inst;
         }
         else
@@ -446,7 +540,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i < REMAINDAR)
         {
-          uint16_t inst = assemble(0, 7, 0);
+          uint16_t inst = assemble("xor", 0);
           src[send_num] = inst;
         }
         else
@@ -463,7 +557,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
         if (i < REMAINDAR)
         {
           // LASTは確定済みなので９を代入
-          uint16_t inst = assemble(0, 8, 0);
+          uint16_t inst = assemble("store", 0);
           src[send_num] = inst;
         }
         else
@@ -480,7 +574,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i == 0)
         {
-          uint16_t inst = assemble(0, 9, 0);
+          uint16_t inst = assemble("last", 0);
           src[send_num] = inst;
         }
         else
@@ -502,7 +596,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
         if (i < CORENUM)
         {
           uint16_t addr = NGRAM * i + j;
-          uint16_t inst = assemble(1, 1, addr);
+          uint16_t inst = assemble("load", addr);
           src[send_num] = inst;
         }
         else
@@ -518,7 +612,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i < CORENUM)
         {
-          uint16_t inst = assemble(0, 10, 0);
+          uint16_t inst = assemble("move", 0);
           src[send_num] = inst;
         }
         else
@@ -535,7 +629,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
         if (i < CORENUM)
         {
           uint16_t addr = NGRAM * i + 1 + j;
-          uint16_t inst = assemble(1, 2, addr);
+          uint16_t inst = assemble("load", addr);
           src[send_num] = inst;
         }
         else
@@ -551,7 +645,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i < CORENUM)
         {
-          uint16_t inst = assemble(0, 7, 0);
+          uint16_t inst = assemble("rshift1", 0);
           src[send_num] = inst;
         }
         else
@@ -567,7 +661,23 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i < CORENUM)
         {
-          uint16_t inst = assemble(0, 10, 0);
+          uint16_t inst = assemble("xor", 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < CORENUM)
+        {
+          uint16_t inst = assemble("move", 0);
           src[send_num] = inst;
         }
         else
@@ -584,7 +694,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
         if (i < CORENUM)
         {
           uint16_t addr = NGRAM * i + 2 + j;
-          uint16_t inst = assemble(1, 2, addr);
+          uint16_t inst = assemble("load", addr);
           src[send_num] = inst;
         }
         else
@@ -600,7 +710,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i < CORENUM)
         {
-          uint16_t inst = assemble(0, 3, 0);
+          uint16_t inst = assemble("rshift2", 0);
           src[send_num] = inst;
         }
         else
@@ -616,7 +726,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i < CORENUM)
         {
-          uint16_t inst = assemble(0, 7, 0);
+          uint16_t inst = assemble("xor", 0);
           src[send_num] = inst;
         }
         else
@@ -632,16 +742,8 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i < CORENUM)
         {
-          if (j == LAST)
-          {
-            uint16_t inst = assemble(0, 8, 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            uint16_t inst = assemble(0, 8, 0);
-            src[send_num] = inst;
-          }
+          uint16_t inst = assemble("store", 0);
+          src[send_num] = inst;
         }
         else
         {
@@ -661,7 +763,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
   {
     if (i == 0)
     {
-      uint16_t inst = assemble(0, 9, 0);
+      uint16_t inst = assemble("last", 0);
       src[send_num] = inst;
     }
     else
@@ -747,10 +849,10 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       printf("\n  Error %u %u\n", result_real, dst[j]);
       printf("  CORENUM=%d  ADDRNUM=%d\n\n", CORENUM, ADDRNUM);
     }
-    // else
-    // {
-    //   printf("  Success\n");
-    // }
+    else
+    {
+      printf("  Success\n");
+    }
 
     free(result_array);
   }
@@ -883,11 +985,12 @@ int main()
 
   const int NGRAM = 3;
   const int MAJORITY_ADDR = 1023;
+  const int CORENUM_MAX = 10;
 
-  int CORENUM = 16;
+  int CORENUM = 10;
   int ADDRNUM = 0;
 
-  for (int j = 1; j <= 16; j++)
+  for (int j = 1; j <= CORENUM_MAX; j++)
   {
     CORENUM = j;
     for (int i = 3; i <= RANNUM; i += 3)

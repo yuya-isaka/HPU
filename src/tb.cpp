@@ -77,7 +77,7 @@ void putb(unsigned int v)
 // 簡易アセンブラ
 uint16_t assemble(const char inst_str[], uint16_t addr)
 {
-  if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0)
+  if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0 || strcmp(inst_str, "lxor") == 0)
   {
     uint16_t result = 0;
 
@@ -92,6 +92,13 @@ uint16_t assemble(const char inst_str[], uint16_t addr)
     else if (strcmp(inst_str, "wbitem") == 0)
     {
       uint16_t inst = 40960;
+      result = inst | addr;
+    }
+
+    // l.xor
+    else if (strcmp(inst_str, "lxor") == 0)
+    {
+      uint16_t inst = 36864;
       result = inst | addr;
     }
 
@@ -1508,7 +1515,7 @@ int main(int argc, char **argv)
   // }
 
   ADDRNUM = 90;
-  DEBUG = 0;
+  DEBUG = 1;
   check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
   // ADDRNUM = 54;

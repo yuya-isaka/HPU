@@ -203,8 +203,8 @@ int main(int argc, char const *argv[])
 
 	const int train_num = 2;
 	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
-	// const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
+	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
 	const int ngram = 3;
 	const int DIM = 1024 / 32;
 	const int rand_num = 27;
@@ -280,11 +280,11 @@ int main(int argc, char const *argv[])
 
 		all_ngram = strlen(content) - ngram + 1;
 		// 偶数なら１こ生やす
+		even = all_ngram % 2 == 0;
 		if (even)
 		{
 			all_ngram++;
 		}
-		even = all_ngram % 2 == 0;
 
 		// 確認
 		// printf("content: %s\n", content); // myname...
