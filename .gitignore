@@ -378,11 +378,13 @@ addr_test
 addr_test.s
 
 ohashi_bind
+ohashi_bind_bound
 ohashi_bound
 ohashi_perm
 ohashi_random
 
 ohashi_bind.s
+ohashi_bind_bound.s
 ohashi_bound.s
 ohashi_perm.s
 ohashi_random.s

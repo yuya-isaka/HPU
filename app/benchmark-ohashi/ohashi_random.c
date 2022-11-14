@@ -17,97 +17,6 @@ volatile int *dst;
 unsigned long src_phys;
 unsigned long dst_phys;
 
-// ------------------------------------------------------------------------------------------------
-
-// 簡易アセンブラ
-// アドレスが必要か、命令コード、アドレス
-uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
-{
-	if (addr_flag)
-	{
-		uint16_t result = 0;
-		// load
-		if (inst_num == 1)
-		{
-			uint16_t inst = 3 << 14;
-			result = inst | addr;
-		}
-		// l.rshift
-		else if (inst_num == 2)
-		{
-			uint16_t inst = 5 << 13;
-			result = inst | addr;
-		}
-		// l.lshift
-		else if (inst_num == 4)
-		{
-			uint16_t inst = 9 << 12;
-			result = inst | addr;
-		}
-		// l.xor
-		else if (inst_num == 6)
-		{
-			uint16_t inst = 17 << 11;
-			result = inst | addr;
-		}
-		// wb.item
-		else if (inst_num == 12)
-		{
-			uint16_t inst = 33 << 10;
-			result = inst | addr;
-		}
-		else
-		{
-			printf("error");
-		}
-		return result;
-	}
-	else
-	{
-		uint16_t inst = 0;
-		// rshift
-		if (inst_num == 3)
-		{
-			inst = 1 << 14;
-		}
-		// lshift
-		else if (inst_num == 5)
-		{
-			inst = 1 << 13;
-		}
-		// xor
-		else if (inst_num == 7)
-		{
-			inst = 1 << 12;
-		}
-		// store
-		else if (inst_num == 8)
-		{
-			inst = 1 << 11;
-		}
-		// last
-		else if (inst_num == 9)
-		{
-			inst = 1 << 10;
-		}
-		// move
-		else if (inst_num == 10)
-		{
-			inst = 1 << 9;
-		}
-		// wb
-		else if (inst_num == 11)
-		{
-			inst = 1 << 8;
-		}
-		else
-		{
-			printf("error");
-		}
-		return inst;
-	}
-}
-
 // ----------------------------------------------------------------------------------------------------------------------------------------------
 
 int main(int argc, char const *argv[])
@@ -208,7 +117,7 @@ int main(int argc, char const *argv[])
 
 	clock_t end = clock();
 	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\n  time %lf[ms]\n", time);
+	printf("\nRandom time %lf[ms]\n", time);
 
 	return 0;
 }
