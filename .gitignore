@@ -366,15 +366,26 @@ boot
 # バイナリたち
 # davinci
 davinci_ngram
+davinci_ngram_peta
 ohashi_ngram
+davinci_ngram.s
+davinci_ngram_peta.s
+ohashi_ngram.s
 
 # app
 addr_test
+
+addr_test.s
 
 ohashi_bind
 ohashi_bound
 ohashi_perm
 ohashi_random
+
+ohashi_bind.s
+ohashi_bound.s
+ohashi_perm.s
+ohashi_random.s
 
 random
 bind
@@ -394,6 +405,26 @@ perm_bound_peta
 perm_and_bound_peta
 bound_peta
 bound2_peta
+
+random.s
+bind.s
+bind_bound.s
+bind_and_bound.s
+perm.s
+perm_bound.s
+perm_and_bound.s
+bound.s
+bound2.s
+random_peta.s
+bind_peta.s
+bind_bound_peta.s
+bind_and_bound_peta.s
+perm_peta.s
+perm_bound_peta.s
+perm_and_bound_peta.s
+bound_peta.s
+bound2_peta.s
+
 
 
 .svlint.toml
