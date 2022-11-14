@@ -113,9 +113,7 @@ module counter
                         + select[ 30 ]
                         + select[ 31 ]
                         + select[ 32 ]
-                        + select[ 33 ]
-                        + select[ 34 ]
-                        + select[ 35 ];
+                        + select[ 33 ];
                   //   box_2 <=
                   //   box_3 <=
                   //   box_4 <=

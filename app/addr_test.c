@@ -20,7 +20,7 @@
 // 変わらん
 
 // 追加されるランダムな値はRANNUM-1番目
-#define RANNUM 1024
+#define RANNUM 512
 #define BUSWIDTH 1024
 unsigned int item_memory_array[DIM][RANNUM];
 unsigned int item_memory_array_new[DIM][RANNUM];
@@ -159,9 +159,10 @@ unsigned int xor128(int reset)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 簡易アセンブラ
+// 10種類の命令
 uint16_t assemble(const char inst_str[], uint16_t addr)
 {
-  if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0 || strcmp(inst_str, "lxor") == 0)
+  if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0)
   {
     uint16_t result = 0;
 
@@ -179,13 +180,6 @@ uint16_t assemble(const char inst_str[], uint16_t addr)
       result = inst | addr;
     }
 
-    // l.xor
-    else if (strcmp(inst_str, "lxor") == 0)
-    {
-      uint16_t inst = 36864;
-      result = inst | addr;
-    }
-
     return result;
   }
 
@@ -193,8 +187,20 @@ uint16_t assemble(const char inst_str[], uint16_t addr)
   {
     uint16_t inst = 0;
 
+    // rshift
+    if (strcmp(inst_str, "rshift") == 0)
+    {
+      inst = 16384;
+    }
+
+    // lshift
+    else if (strcmp(inst_str, "lshift") == 0)
+    {
+      inst = 8192;
+    }
+
     // xor
-    if (strcmp(inst_str, "xor") == 0)
+    else if (strcmp(inst_str, "xor") == 0)
     {
       inst = 4096;
     }
@@ -221,88 +227,6 @@ uint16_t assemble(const char inst_str[], uint16_t addr)
     else if (strcmp(inst_str, "wb") == 0)
     {
       inst = 256;
-    }
-
-    // rshift
-    else if (strcmp(inst_str, "rshift1") == 0)
-    {
-      inst = 20480;
-    }
-
-    else if (strcmp(inst_str, "rshift2") == 0)
-    {
-      inst = 18432;
-    }
-
-    else if (strcmp(inst_str, "rshift4") == 0)
-    {
-      inst = 17408;
-    }
-    else if (strcmp(inst_str, "rshift8") == 0)
-    {
-      inst = 16896;
-    }
-    else if (strcmp(inst_str, "rshift16") == 0)
-    {
-      inst = 16640;
-    }
-    else if (strcmp(inst_str, "rshift32") == 0)
-    {
-      inst = 16512;
-    }
-    else if (strcmp(inst_str, "rshift64") == 0)
-    {
-      inst = 16448;
-    }
-    else if (strcmp(inst_str, "rshift128") == 0)
-    {
-      inst = 16416;
-    }
-    else if (strcmp(inst_str, "rshift256") == 0)
-    {
-      inst = 16400;
-    }
-    else if (strcmp(inst_str, "rshift512") == 0)
-    {
-      inst = 16392;
-    }
-
-    // lshift
-    else if (strcmp(inst_str, "lshift1") == 0)
-    {
-      inst = 12288;
-    }
-    else if (strcmp(inst_str, "lshift2") == 0)
-    {
-      inst = 10240;
-    }
-    else if (strcmp(inst_str, "lshift4") == 0)
-    {
-      inst = 9216;
-    }
-    else if (strcmp(inst_str, "lshift8") == 0)
-    {
-      inst = 8704;
-    }
-    else if (strcmp(inst_str, "lshift16") == 0)
-    {
-      inst = 8448;
-    }
-    else if (strcmp(inst_str, "lshift32") == 0)
-    {
-      inst = 8320;
-    }
-    else if (strcmp(inst_str, "lshift64") == 0)
-    {
-      inst = 8256;
-    }
-    else if (strcmp(inst_str, "lshift128") == 0)
-    {
-      inst = 8224;
-    }
-    else if (strcmp(inst_str, "lshift256") == 0)
-    {
-      inst = 8208;
     }
 
     else
@@ -459,7 +383,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i < REMAINDAR)
         {
-          uint16_t inst = assemble("rshift1", 0);
+          uint16_t inst = assemble("rshift", 0);
           src[send_num] = inst;
         }
         else
@@ -524,7 +448,23 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i < REMAINDAR)
         {
-          uint16_t inst = assemble("rshift2", 0);
+          uint16_t inst = assemble("rshift", 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < REMAINDAR)
+        {
+          uint16_t inst = assemble("rshift", 0);
           src[send_num] = inst;
         }
         else
@@ -645,7 +585,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i < CORENUM)
         {
-          uint16_t inst = assemble("rshift1", 0);
+          uint16_t inst = assemble("rshift", 0);
           src[send_num] = inst;
         }
         else
@@ -710,7 +650,23 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       {
         if (i < CORENUM)
         {
-          uint16_t inst = assemble("rshift2", 0);
+          uint16_t inst = assemble("rshift", 0);
+          src[send_num] = inst;
+        }
+        else
+        {
+          src[send_num] = 0;
+        }
+        send_num++;
+      }
+      // ------------------------------------------------------
+
+      // 1024bit ---------------------------------------------
+      for (int i = 0; i < (BUSWIDTH / 16); i++)
+      {
+        if (i < CORENUM)
+        {
+          uint16_t inst = assemble("rshift", 0);
           src[send_num] = inst;
         }
         else
@@ -849,10 +805,10 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       printf("\n  Error %u %u\n", result_real, dst[j]);
       printf("  CORENUM=%d  ADDRNUM=%d\n\n", CORENUM, ADDRNUM);
     }
-    else
-    {
-      printf("  Success\n");
-    }
+    // else
+    // {
+    //   printf("  Success\n");
+    // }
 
     free(result_array);
   }
@@ -984,12 +940,11 @@ int main()
   ///////////////////////////////////////////////////////////////////////////////// initial, udmabuf, uio 設定 ///////////////////////////////////////////////////////////////////////////////////
 
   const int NGRAM = 3;
-  const int MAJORITY_ADDR = 1023;
-  const int CORENUM_MAX = 10;
+  const int MAJORITY_ADDR = 511;
+  const int CORENUM_MAX = 34;
 
-  int CORENUM = 10;
+  int CORENUM = 0;
   int ADDRNUM = 0;
-
   for (int j = 1; j <= CORENUM_MAX; j++)
   {
     CORENUM = j;

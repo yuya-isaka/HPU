@@ -88,7 +88,7 @@ module top
 
     // コア数可変
     // 2コア -------------------
-    parameter CORENUM = 36;
+    parameter CORENUM = 34;
     // ------------------------
 
 
@@ -123,7 +123,7 @@ module top
     // 次元数可変
     // buffer_ctrl #( .DIM( 31 ), .CORENUM( 16 ) ) buffer_ctrl
     // buffer_ctrl #( .DIM( 1023 ), .CORENUM( 16 ) ) buffer_ctrl
-    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 36 ) ) buffer_ctrl
+    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 34 ) ) buffer_ctrl
                 (
 
                     // in
@@ -166,8 +166,6 @@ module top
                     .core_result_32( core_result[ 31 ] ),
                     .core_result_33( core_result[ 32 ] ),
                     .core_result_34( core_result[ 33 ] ),
-                    .core_result_35( core_result[ 34 ] ),
-                    .core_result_36( core_result[ 35 ] ),
                     // 1コア
                     .store( store[ CORENUM-1:0 ] ),
                     // .store( store ),
@@ -189,7 +187,7 @@ module top
 
     // コア数可変
     // stream_ctrl #( .CORENUM( 16 ) ) stream_ctrl
-    stream_ctrl #( .CORENUM( 36 ) ) stream_ctrl
+    stream_ctrl #( .CORENUM( 34 ) ) stream_ctrl
                 (
 
                     // in
