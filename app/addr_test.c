@@ -941,7 +941,7 @@ int main()
 
   const int NGRAM = 3;
   const int MAJORITY_ADDR = 511;
-  const int CORENUM_MAX = 34;
+  const int CORENUM_MAX = 32;
 
   int CORENUM = 0;
   int ADDRNUM = 0;

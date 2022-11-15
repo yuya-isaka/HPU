@@ -211,7 +211,7 @@ int main(int argc, char const *argv[])
 
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
-	const int core_num = 34;
+	const int core_num = 32;
 	const int trial_num = 50000000;
 
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
@@ -349,7 +349,7 @@ int main(int argc, char const *argv[])
 	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
 	clock_t end = clock();
 	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\nOhashi_bind_bound time %lf[ms]\n", time);
+	printf("Ohashi_bind_bound time %lf[ms]\n", time);
 
 	return 0;
 }

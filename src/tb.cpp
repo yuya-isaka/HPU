@@ -1513,7 +1513,7 @@ int main(int argc, char **argv)
   printf("\n ====================================== 開始 ========================================= \n\n");
 
   const int NGRAM = 3;
-  const int CORENUM = 34;
+  const int CORENUM = 32;
   int DEBUG = 0;
   int ADDRNUM = 0;
   // 次元数可変 (結果を何個出力するかに使う)

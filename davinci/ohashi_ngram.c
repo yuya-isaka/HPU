@@ -227,7 +227,7 @@ int main(int argc, char const *argv[])
 	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
 	const int ngram = 3;
-	const int core_num = 34;
+	const int core_num = 32;
 	const int instruction_num = 11;
 	const int majority_addr = 26;
 	int all_ngram = 0;
@@ -478,7 +478,7 @@ int main(int argc, char const *argv[])
 
 			// 最後じゃないかつ値を超えてたら
 			// (2^26-8) / 2 が限界
-			if (j != (all_instruction - 1) && send_num >= 33000000)
+			if (send_num >= 33000000)
 			{
 
 				printf("------------DMA再発行-----------\n");
@@ -562,7 +562,7 @@ int main(int argc, char const *argv[])
 	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
 	clock_t end = clock();
 	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\nOhashi_ngram time %lf[ms]\n", time);
+	printf("Ohashi_ngram time %lf[ms]\n", time);
 
 	return 0;
 }
