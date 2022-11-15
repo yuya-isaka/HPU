@@ -49,8 +49,6 @@ module buffer_ctrl
          input wire [ DIM:0 ]                   core_result_30,
          input wire [ DIM:0 ]                   core_result_31,
          input wire [ DIM:0 ]                   core_result_32,
-         input wire [ DIM:0 ]                   core_result_33,
-         input wire [ DIM:0 ]                   core_result_34,
          // 1コア
          input wire [ CORENUM-1:0 ]             store,
          //  input wire                         store,
@@ -76,7 +74,7 @@ module buffer_ctrl
 
             // コア数可変
             // 計算数可変 (現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分)
-            counter #( .W( 26 ), .CORENUM( 34 ) ) counter
+            counter #( .W( 26 ), .CORENUM( 32 ) ) counter
                     (
 
                         // in
@@ -89,8 +87,6 @@ module buffer_ctrl
                         // この順番で渡す必要がある
                         .core_result(
                             {
-                                core_result_34[ i ],
-                                core_result_33[ i ],
                                 core_result_32[ i ],
                                 core_result_31[ i ],
                                 core_result_30[ i ],
