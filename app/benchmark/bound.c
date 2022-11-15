@@ -162,7 +162,7 @@ int main(int argc, char const *argv[])
 	// 実験
 
 	// 試行回数
-	int trial_num = 50000000;
+	int trial_num = 5000000;
 
 	// ロードデータ格納
 	unsigned int **data;

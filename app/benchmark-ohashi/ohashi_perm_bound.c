@@ -212,7 +212,7 @@ int main(int argc, char const *argv[])
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
 	const int core_num = 32;
-	const int trial_num = 50000000;
+	const int trial_num = 5000000;
 	const int perm_num = 2;
 
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
@@ -229,10 +229,6 @@ int main(int argc, char const *argv[])
 		{
 			src[send_num++] = assemble("load", rand() % 512);
 		}
-		for (int j = core_num; j < 64; j++)
-		{
-			src[send_num++] = 0;
-		}
 
 		// シフト
 		if (perm_num >= 512)
@@ -243,10 +239,6 @@ int main(int argc, char const *argv[])
 				for (int k = 0; k < core_num; k++)
 				{
 					src[send_num++] = assemble("lshift", 0);
-				}
-				for (int k = core_num; k < 64; k++)
-				{
-					src[send_num++] = 0;
 				}
 			}
 		}
@@ -259,10 +251,6 @@ int main(int argc, char const *argv[])
 				{
 					src[send_num++] = assemble("rshift", 0);
 				}
-				for (int k = core_num; k < 64; k++)
-				{
-					src[send_num++] = 0;
-				}
 			}
 		}
 
@@ -270,10 +258,6 @@ int main(int argc, char const *argv[])
 		for (int j = 0; j < core_num; j++)
 		{
 			src[send_num++] = assemble("store", 0);
-		}
-		for (int j = core_num; j < 64; j++)
-		{
-			src[send_num++] = 0;
 		}
 
 		// ----------------------------------------------------------------------------------------------------------------------------------------------

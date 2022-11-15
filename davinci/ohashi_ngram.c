@@ -19,128 +19,6 @@ unsigned long dst_phys;
 
 // ------------------------------------------------------------------------------------------------
 
-// y列x行のuint16_t２次元配列を確保
-void makeArray(uint16_t ***a, const int y, const int x)
-{
-	*a = (uint16_t **)calloc(y, sizeof(uint16_t *));
-	for (int i = 0; i < y; i++)
-	{
-		(*a)[i] = (uint16_t *)calloc(x, sizeof(uint16_t));
-	}
-}
-
-// y列x行のuint16_t２次元配列を解放
-void freeArray(uint16_t ***a, const int y)
-{
-	for (int i = 0; i < y; i++)
-	{
-		free((*a)[i]);
-	}
-	free(*a);
-}
-
-// -----------------------------------------------------------------------
-
-// // 簡易アセンブラ
-// uint16_t assemble(const char inst_str[], uint16_t addr)
-// {
-// 	if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "lrshift") == 0 || strcmp(inst_str, "llshift") == 0 || strcmp(inst_str, "lxor") == 0 || strcmp(inst_str, "wbitem") == 0)
-// 	{
-// 		uint16_t result = 0;
-
-// 		// load
-// 		if (strcmp(inst_str, "load") == 0)
-// 		{
-// 			uint16_t inst = 49152;
-// 			result = inst | addr;
-// 		}
-
-// 		// lrshift
-// 		else if (strcmp(inst_str, "lrshift") == 0)
-// 		{
-// 			uint16_t inst = 40960;
-// 			result = inst | addr;
-// 		}
-
-// 		// llshift
-// 		else if (strcmp(inst_str, "llshift") == 0)
-// 		{
-// 			uint16_t inst = 36864;
-// 			result = inst | addr;
-// 		}
-
-// 		// lxor
-// 		else if (strcmp(inst_str, "lxor") == 0)
-// 		{
-// 			uint16_t inst = 34816;
-// 			result = inst | addr;
-// 		}
-
-// 		// wb.item
-// 		else if (strcmp(inst_str, "wbitem") == 0)
-// 		{
-// 			uint16_t inst = 33792;
-// 			result = inst | addr;
-// 		}
-
-// 		return result;
-// 	}
-
-// 	else
-// 	{
-// 		uint16_t inst = 0;
-
-// 		// rshift
-// 		if (strcmp(inst_str, "rshift") == 0)
-// 		{
-// 			inst = 16384;
-// 		}
-
-// 		// lshift
-// 		else if (strcmp(inst_str, "lshift") == 0)
-// 		{
-// 			inst = 8192;
-// 		}
-
-// 		// xor
-// 		else if (strcmp(inst_str, "xor") == 0)
-// 		{
-// 			inst = 4096;
-// 		}
-
-// 		// store
-// 		else if (strcmp(inst_str, "store") == 0)
-// 		{
-// 			inst = 2048;
-// 		}
-
-// 		// last
-// 		else if (strcmp(inst_str, "last") == 0)
-// 		{
-// 			inst = 1024;
-// 		}
-
-// 		// move
-// 		else if (strcmp(inst_str, "move") == 0)
-// 		{
-// 			inst = 512;
-// 		}
-
-// 		// wb
-// 		else if (strcmp(inst_str, "wb") == 0)
-// 		{
-// 			inst = 256;
-// 		}
-
-// 		else
-// 		{
-// 			printf("error");
-// 		}
-
-// 		return inst;
-// 	}
-// }
-
 // 簡易アセンブラ
 // 10種類の命令
 uint16_t assemble(const char inst_str[], uint16_t addr)
@@ -385,39 +263,16 @@ int main(int argc, char const *argv[])
 
 		// ---------------------------------------------
 
-		// 何個の命令が必要か算出
-		int all_instruction = all_ngram / core_num;
-		if (all_ngram % core_num != 0)
-		{
-			all_instruction++;
-		}
-		all_instruction *= instruction_num;
+		// // 何個の命令が必要か算出
+		// int all_instruction = all_ngram / core_num;
+		// if (all_ngram % core_num != 0)
+		// {
+		// 	all_instruction++;
+		// }
+		// all_instruction *= instruction_num;
 
-		// 確認
-		printf("all_instruction: %d\n\n", all_instruction);
-
-		// ---------------------------------------------
-
-		makeArray(&src_tmp, core_num, all_instruction);
-		makeArray(&ascii_array, all_ngram, ngram);
-
-		// 一時的な命令格納場所
-		for (int i = 0; i < core_num; i++)
-		{
-			for (int j = 0; j < all_instruction; j++)
-			{
-				src_tmp[i][j] = 0;
-			}
-		}
-
-		// 得られた文字列からアドレスを取得
-		for (int i = 0; i < all_ngram; i++)
-		{
-			for (int j = 0; j < ngram; j++)
-			{
-				ascii_array[i][j] = (unsigned char)(content[i + j]) - 97;
-			}
-		}
+		// // 確認
+		// printf("all_instruction: %d\n\n", all_instruction);
 
 		//////////////////////////////////////////////////////////////////////////////////////////////////
 		// 事前にPermしたものをメモリに格納
@@ -431,19 +286,19 @@ int main(int argc, char const *argv[])
 		{
 			int ascii_addr = j;
 
-			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			for (int i = 0; i < core_num; i++)
 			{
 				uint16_t inst = assemble("load", ascii_addr);
 				src[send_num++] = inst;
 			}
 
-			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			for (int i = 0; i < core_num; i++)
 			{
 				uint16_t inst = assemble("rshift", 0);
 				src[send_num++] = inst;
 			}
 
-			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			for (int i = 0; i < core_num; i++)
 			{
 				uint16_t inst = assemble("wbitem", ascii_addr + 27);
 				src[send_num++] = inst;
@@ -454,19 +309,19 @@ int main(int argc, char const *argv[])
 		{
 			int ascii_addr = j + 27;
 
-			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			for (int i = 0; i < core_num; i++)
 			{
 				uint16_t inst = assemble("load", ascii_addr);
 				src[send_num++] = inst;
 			}
 
-			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			for (int i = 0; i < core_num; i++)
 			{
 				uint16_t inst = assemble("rshift", 0);
 				src[send_num++] = inst;
 			}
 
-			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			for (int i = 0; i < core_num; i++)
 			{
 				uint16_t inst = assemble("wbitem", ascii_addr + 27);
 				src[send_num++] = inst;
@@ -509,88 +364,13 @@ int main(int argc, char const *argv[])
 		// アクセラレータ起動
 		top[0x00 / 4] = 2;
 
-		// ---------------------------------------------------
-		// ↓ コード---------------------------------------------
-
-		int instruction = 0;
-		int core = 0;
-		for (int i = 0; i < all_ngram; i++)
-		{
-			// load
-			uint16_t addr = ascii_array[i][0];
-			uint16_t inst = assemble("load", addr);
-			src_tmp[core][instruction] = inst;
-			instruction++;
-
-			// move
-			inst = assemble("move", 0);
-			src_tmp[core][instruction] = inst;
-			instruction++;
-
-			// load
-			addr = ascii_array[i][1] + 27;
-			inst = assemble("load", addr);
-			src_tmp[core][instruction] = inst;
-			instruction++;
-
-			// // rshift
-			// inst = assemble("rshift", 0);
-			// src_tmp[core][instruction] = inst;
-			// instruction++;
-
-			// xor
-			inst = assemble("xor", 0);
-			src_tmp[core][instruction] = inst;
-			instruction++;
-
-			// move
-			inst = assemble("move", 0);
-			src_tmp[core][instruction] = inst;
-			instruction++;
-
-			// load
-			addr = ascii_array[i][2] + 27 + 27;
-			inst = assemble("load", addr);
-			src_tmp[core][instruction] = inst;
-			instruction++;
-
-			// // rshift
-			// inst = assemble("rshift", 0);
-			// src_tmp[core][instruction] = inst;
-			// instruction++;
-
-			// // rshift
-			// inst = assemble("rshift", 0);
-			// src_tmp[core][instruction] = inst;
-			// instruction++;
-
-			// xor
-			inst = assemble("xor", 0);
-			src_tmp[core][instruction] = inst;
-			instruction++;
-
-			// store
-			inst = assemble("store", 0);
-			src_tmp[core][instruction] = inst;
-			instruction++;
-
-			if (core != (core_num - 1))
-			{
-				instruction -= instruction_num;
-			}
-
-			core = (core + 1) % core_num;
-		}
-
-		// ---------------------------------------------
-
 		send_num = 0;
 
 		// 偶数のとき指定した値をsrc配列に入れておく
 		if (even)
 		{
 			// load
-			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			for (int i = 0; i < core_num; i++)
 			{
 				if (i == 0)
 				{
@@ -606,7 +386,7 @@ int main(int argc, char const *argv[])
 			}
 
 			// store
-			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			for (int i = 0; i < core_num; i++)
 			{
 				if (i == 0)
 				{
@@ -621,41 +401,54 @@ int main(int argc, char const *argv[])
 			}
 		}
 
-		// ---------------------------------------------
+		// ---------------------------------------------------
+		// ↓ コード---------------------------------------------
 
-		// デバッグ
-		// int debug_flag = 0;
-		// int debug_mass = 1;
-		// for (int j = 0; j < all_instruction; j++)
-		// {
-		// 	if (debug_flag == 0)
-		// 	{
-		// 		printf("命令の塊%d\n", debug_mass);
-		// 		debug_mass++;
-		// 	}
-		// 	for (int i = 0; i < core_num; i++)
-		// 	{
-		// 		printf("%7d ", src_tmp[i][j]);
-		// 	}
-		// 	debug_flag++;
-		// 	if (debug_flag == instruction_num)
-		// 	{
-		// 		printf("\n");
-		// 		debug_flag = 0;
-		// 	}
-		// 	printf("\n");
-		// }
+		int all_instruction = all_ngram / 32;
+		int remaind_instruction = all_ngram % 32;
 
-		// ---------------------------------------------
-
-		// 命令をsrc配列に埋める
-		for (int j = 0; j < all_instruction; j++)
+		for (int i = 0; i < all_instruction; i++)
 		{
-
-			for (int i = 0; i < core_num; i++)
+			int flag = 0;
+			for (int j = 0; j < core_num; j++)
 			{
-				src[send_num] = src_tmp[i][j];
-				send_num++;
+				uint16_t addr = (unsigned char)(content[i + flag]) - 97;
+				src[send_num++] = assemble("load", addr);
+				flag++;
+			}
+			for (int j = 0; j < core_num; j++)
+			{
+				src[send_num++] = assemble("move", 0);
+			}
+			flag = 1;
+			for (int j = 0; j < core_num; j++)
+			{
+				uint16_t addr = (unsigned char)(content[i + flag]) - 97 + 27;
+				src[send_num++] = assemble("load", addr);
+				flag++;
+			}
+			for (int j = 0; j < core_num; j++)
+			{
+				src[send_num++] = assemble("xor", 0);
+			}
+			for (int j = 0; j < core_num; j++)
+			{
+				src[send_num++] = assemble("move", 0);
+			}
+			flag = 2;
+			for (int j = 0; j < core_num; j++)
+			{
+				uint16_t addr = (unsigned char)(content[i + flag]) - 97 + 27;
+				src[send_num++] = assemble("load", addr);
+				flag++;
+			}
+			for (int j = 0; j < core_num; j++)
+			{
+				src[send_num++] = assemble("xor", 0);
+			}
+			for (int j = 0; j < core_num; j++)
+			{
+				src[send_num++] = assemble("store", 0);
 			}
 
 			// 最後じゃないかつ値を超えてたら
@@ -693,6 +486,104 @@ int main(int argc, char const *argv[])
 			}
 		}
 
+		int flag = all_instruction * 32;
+		for (int j = 0; j < core_num; j++)
+		{
+			if (j < remaind_instruction)
+			{
+				uint16_t addr = (unsigned char)(content[flag]) - 97;
+				src[send_num++] = assemble("load", addr);
+				flag++;
+			}
+			else
+			{
+				src[send_num++] = 0;
+			}
+		}
+		for (int j = 0; j < core_num; j++)
+		{
+			if (j < remaind_instruction)
+			{
+				src[send_num++] = assemble("move", 0);
+			}
+			else
+			{
+				src[send_num++] = 0;
+			}
+		}
+		flag = flag + 1;
+		for (int j = 0; j < core_num; j++)
+		{
+			if (j < remaind_instruction)
+			{
+				uint16_t addr = (unsigned char)(content[flag]) - 97 + 27;
+				src[send_num++] = assemble("load", 0);
+				flag++;
+			}
+			else
+			{
+				src[send_num++] = 0;
+			}
+		}
+		for (int j = 0; j < core_num; j++)
+		{
+			if (j < remaind_instruction)
+			{
+				src[send_num++] = assemble("xor", 0);
+			}
+			else
+			{
+				src[send_num++] = 0;
+			}
+		}
+		for (int j = 0; j < core_num; j++)
+		{
+			if (j < remaind_instruction)
+			{
+				src[send_num++] = assemble("move", 0);
+			}
+			else
+			{
+				src[send_num++] = 0;
+			}
+		}
+		flag = flag + 1;
+		for (int j = 0; j < core_num; j++)
+		{
+			if (j < remaind_instruction)
+			{
+				uint16_t addr = (unsigned char)(content[flag]) - 97 + 27 + 27;
+				src[send_num++] = assemble("load", 0);
+				flag++;
+			}
+			else
+			{
+				src[send_num++] = 0;
+			}
+		}
+		for (int j = 0; j < core_num; j++)
+		{
+			if (j < remaind_instruction)
+			{
+				src[send_num++] = assemble("xor", 0);
+			}
+			else
+			{
+				src[send_num++] = 0;
+			}
+		}
+		for (int j = 0; j < core_num; j++)
+		{
+			if (j < remaind_instruction)
+			{
+				src[send_num++] = assemble("store", 0);
+			}
+			else
+			{
+				src[send_num++] = 0;
+			}
+		}
+
 		// last命令
 		for (int i = 0; i < 1; i++)
 		{
@@ -703,9 +594,6 @@ int main(int argc, char const *argv[])
 
 		// ↑ コード---------------------------------------------
 		// ---------------------------------------------------
-
-		freeArray(&ascii_array, ngram);
-		freeArray(&src_tmp, core_num);
 
 		// 最後の送信
 		dma[0x00 / 4] = 1;

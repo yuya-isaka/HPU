@@ -97,7 +97,7 @@ int main(int argc, char const *argv[])
 	xor128(1);
 
 	// 生成するランダムなハイパーベクトルの数
-	const int item_memory_num = 1024;
+	const int item_memory_num = 512;
 
 	// ランダムなハイパーベクトルを格納
 	unsigned int **item_memory_array;
@@ -125,7 +125,7 @@ int main(int argc, char const *argv[])
 	// 実験
 
 	// 試行回数
-	int trial_num = 50000000;
+	int trial_num = 5000000;
 
 	// 結果を格納
 	unsigned int **result_bind;
@@ -134,11 +134,22 @@ int main(int argc, char const *argv[])
 	// 試行
 	for (int i = 0; i < trial_num; i++) // 5000万
 	{
-		int addr1 = rand() % 1024;
-		int addr2 = rand() % 1024;
-		for (int j = 0; j < require_int_num; j++) // 32
+		if (i == 0)
 		{
-			result_bind[i][j] = item_memory_array[addr1][j] ^ item_memory_array[addr2][j];
+			int addr1 = rand() % 512;
+			int addr2 = rand() % 512;
+			for (int j = 0; j < require_int_num; j++) // 32
+			{
+				result_bind[i][j] = item_memory_array[addr1][j] ^ item_memory_array[addr2][j];
+			}
+		}
+		else
+		{
+			int addr1 = rand() % 512;
+			for (int j = 0; j < require_int_num; j++) // 32
+			{
+				result_bind[i][j] = result_bind[i - 1][j] ^ item_memory_array[addr1][j];
+			}
 		}
 	}
 

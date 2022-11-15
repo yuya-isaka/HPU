@@ -237,7 +237,7 @@ int main(int argc, char const *argv[])
 	xor128(1);
 
 	// 生成するランダムなハイパーベクトルの数
-	const int item_memory_num = 1024;
+	const int item_memory_num = 512;
 
 	// ランダムなハイパーベクトルを格納
 	unsigned int **item_memory_array;
@@ -265,7 +265,7 @@ int main(int argc, char const *argv[])
 	// 実験
 
 	// int trial_num = 50000000;
-	const int trial_num = 50000000;
+	const int trial_num = 5000000;
 	const int perm_num = 2;
 
 	// Permutation結果を格納
@@ -276,7 +276,7 @@ int main(int argc, char const *argv[])
 	for (int i = 0; i < trial_num; i++)
 	{
 		// アドレス生成
-		int addr = rand() % 1024;
+		int addr = rand() % 512;
 
 		// // Permutation回数
 		// int num = rand() % 1024;

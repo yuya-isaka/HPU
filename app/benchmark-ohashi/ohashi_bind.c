@@ -212,19 +212,19 @@ int main(int argc, char const *argv[])
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
 	const int core_num = 32;
-	const int trial_num = 50000000;
+	const int trial_num = 5000000;
 
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
 	int send_num = 0;
 
+	int addr1[core_num];
+	int addr2[core_num];
 	for (int i = 0; i < trial_num; i += core_num)
 	{
 
 		// ----------------------------------------------------------------------------------------------------------------------------------------------
 
-		int addr1[core_num];
-		int addr2[core_num];
 		for (int j = 0; j < core_num; j++)
 		{
 			addr1[j] = rand() % 512;
@@ -235,36 +235,20 @@ int main(int argc, char const *argv[])
 		{
 			src[send_num++] = assemble("load", addr1[j]);
 		}
-		for (int j = core_num; j < 64; j++)
-		{
-			src[send_num++] = 0;
-		}
 
 		for (int j = 0; j < core_num; j++)
 		{
 			src[send_num++] = assemble("move", 0);
-		}
-		for (int j = core_num; j < 64; j++)
-		{
-			src[send_num++] = 0;
 		}
 
 		for (int j = 0; j < core_num; j++)
 		{
 			src[send_num++] = assemble("load", addr2[j]);
 		}
-		for (int j = core_num; j < 64; j++)
-		{
-			src[send_num++] = 0;
-		}
 
 		for (int j = 0; j < core_num; j++)
 		{
 			src[send_num++] = assemble("xor", 0);
-		}
-		for (int j = core_num; j < 64; j++)
-		{
-			src[send_num++] = 0;
 		}
 
 		// ----------------------------------------------------------------------------------------------------------------------------------------------
@@ -276,10 +260,6 @@ int main(int argc, char const *argv[])
 			{
 				uint16_t inst = assemble("last", 0);
 				src[send_num++] = inst;
-			}
-			for (int i = 1; i < 64; i++)
-			{
-				src[send_num++] = 0;
 			}
 
 			dma[0x00 / 4] = 1;

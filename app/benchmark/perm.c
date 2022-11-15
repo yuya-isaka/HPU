@@ -199,7 +199,8 @@ int main(int argc, char const *argv[])
 	// -----------------------------------------------------------------------
 	// 実験
 
-	int trial_num = 50000000;
+	int trial_num = 5000000;
+	const int perm_num = 2;
 
 	// Permutation結果を格納
 	unsigned int **result;
@@ -209,13 +210,13 @@ int main(int argc, char const *argv[])
 	for (int i = 0; i < trial_num; i++)
 	{
 		// アドレス生成
-		int addr = rand() % 1024;
+		int addr = rand() % 512;
 
 		// Permutation回数
-		int num = rand() % 1024;
+		// int num = rand() % 1024;
 
 		// Perm
-		shifter_1024(&result[i], &item_memory_array[addr], require_int_num, num);
+		shifter_1024(&result[i], &item_memory_array[addr], require_int_num, perm_num);
 	}
 
 	// 解放
