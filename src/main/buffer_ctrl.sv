@@ -27,12 +27,28 @@ module buffer_ctrl
          input wire [ DIM:0 ]                   core_result_8,
          input wire [ DIM:0 ]                   core_result_9,
          input wire [ DIM:0 ]                   core_result_10,
-         //  input wire [ DIM:0 ]                   core_result_11,
-         //  input wire [ DIM:0 ]                   core_result_12,
-         //  input wire [ DIM:0 ]                   core_result_13,
-         //  input wire [ DIM:0 ]                   core_result_14,
-         //  input wire [ DIM:0 ]                   core_result_15,
-         //  input wire [ DIM:0 ]                   core_result_16,
+         input wire [ DIM:0 ]                   core_result_11,
+         input wire [ DIM:0 ]                   core_result_12,
+         input wire [ DIM:0 ]                   core_result_13,
+         input wire [ DIM:0 ]                   core_result_14,
+         input wire [ DIM:0 ]                   core_result_15,
+         input wire [ DIM:0 ]                   core_result_16,
+         input wire [ DIM:0 ]                   core_result_17,
+         input wire [ DIM:0 ]                   core_result_18,
+         input wire [ DIM:0 ]                   core_result_19,
+         input wire [ DIM:0 ]                   core_result_20,
+         input wire [ DIM:0 ]                   core_result_21,
+         input wire [ DIM:0 ]                   core_result_22,
+         input wire [ DIM:0 ]                   core_result_23,
+         input wire [ DIM:0 ]                   core_result_24,
+         input wire [ DIM:0 ]                   core_result_25,
+         input wire [ DIM:0 ]                   core_result_26,
+         input wire [ DIM:0 ]                   core_result_27,
+         input wire [ DIM:0 ]                   core_result_28,
+         input wire [ DIM:0 ]                   core_result_29,
+         input wire [ DIM:0 ]                   core_result_30,
+         input wire [ DIM:0 ]                   core_result_31,
+         input wire [ DIM:0 ]                   core_result_32,
          // 1コア
          input wire [ CORENUM-1:0 ]             store,
          //  input wire                         store,
@@ -58,7 +74,7 @@ module buffer_ctrl
 
             // コア数可変
             // 計算数可変 (現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分)
-            counter #( .W( 30 ), .CORENUM( 10 ) ) counter
+            counter #( .W( 26 ), .CORENUM( 32 ) ) counter
                     (
 
                         // in
@@ -71,12 +87,28 @@ module buffer_ctrl
                         // この順番で渡す必要がある
                         .core_result(
                             {
-                                // core_result_16[ i ],
-                                // core_result_15[ i ],
-                                // core_result_14[ i ],
-                                // core_result_13[ i ],
-                                // core_result_12[ i ],
-                                // core_result_11[ i ],
+                                core_result_32[ i ],
+                                core_result_31[ i ],
+                                core_result_30[ i ],
+                                core_result_29[ i ],
+                                core_result_28[ i ],
+                                core_result_27[ i ],
+                                core_result_26[ i ],
+                                core_result_25[ i ],
+                                core_result_24[ i ],
+                                core_result_23[ i ],
+                                core_result_22[ i ],
+                                core_result_21[ i ],
+                                core_result_20[ i ],
+                                core_result_19[ i ],
+                                core_result_18[ i ],
+                                core_result_17[ i ],
+                                core_result_16[ i ],
+                                core_result_15[ i ],
+                                core_result_14[ i ],
+                                core_result_13[ i ],
+                                core_result_12[ i ],
+                                core_result_11[ i ],
                                 core_result_10[ i ],
                                 core_result_9[ i ],
                                 core_result_8[ i ],
@@ -86,7 +118,7 @@ module buffer_ctrl
                                 core_result_4[ i ],
                                 core_result_3[ i ],
                                 core_result_2[ i ],
-                                core_result_1[ i]
+                                core_result_1[ i ]
                             }
                         ),
 

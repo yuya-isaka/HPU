@@ -47,8 +47,8 @@ module counter
 
     // コア数可変
     // 4bitあれば十分
-    reg signed [ 3:0 ]      box_1;
-    reg signed [ 3:0 ]      box_2;
+    reg signed [ 5:0 ]      box_1;
+    // reg signed [ 3:0 ]      box_2;
     // reg signed [ 3:0 ]      box_3;
 
 
@@ -58,7 +58,7 @@ module counter
                       // コア数可変
                       box <= 0;
                       box_1 <= 0;
-                      box_2 <= 0;
+                      //   box_2 <= 0;
                   end
 
                   // store_nと分離することで、storeが連続で実行されても対応可能にした
@@ -67,8 +67,8 @@ module counter
                       // 16コア
                       box <=
                           box
-                          + box_1
-                          + box_2;
+                          + box_1;
+                      //   + box_2;
                       // 1-4コア
                       //   box <= box + box_1;
                   end
@@ -84,19 +84,35 @@ module counter
                         + select[ 1 ]
                         + select[ 2 ]
                         + select[ 3 ]
-                        + select[ 4 ];
-                  box_2 <=
-                        select[ 5 ]
+                        + select[ 4 ]
+                        + select[ 5 ]
                         + select[ 6 ]
                         + select[ 7 ]
                         + select[ 8 ]
-                        + select[ 9 ];
-                  // + select[ 10 ]
-                  // + select[ 11 ]
-                  // +select[ 12 ]
-                  // + select[ 13 ]
-                  // + select[ 14 ]
-                  // + select[ 15 ];
+                        + select[ 9 ]
+                        + select[ 10 ]
+                        + select[ 11 ]
+                        + select[ 12 ]
+                        + select[ 13 ]
+                        + select[ 14 ]
+                        + select[ 15 ]
+                        + select[ 16 ]
+                        + select[ 17 ]
+                        + select[ 18 ]
+                        + select[ 19 ]
+                        + select[ 20 ]
+                        + select[ 21 ]
+                        + select[ 22 ]
+                        + select[ 23 ]
+                        + select[ 24 ]
+                        + select[ 25 ]
+                        + select[ 26 ]
+                        + select[ 27 ]
+                        + select[ 28 ]
+                        + select[ 29 ]
+                        + select[ 30 ]
+                        + select[ 31 ];
+                  //   box_2 <=
                   //   box_3 <=
                   //   box_4 <=
                   // box_4 <=

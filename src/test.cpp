@@ -13,7 +13,7 @@ const int DIM = 1024 / 32;
 
 // 変わらん
 // 追加されるランダムな値はRANNUM-1番目
-const int RANNUM = 1024;
+const int RANNUM = 512;
 unsigned int item_memory_array[DIM][RANNUM];
 unsigned int item_memory_array_new[DIM][RANNUM];
 
@@ -33,6 +33,8 @@ void putb(unsigned int v)
 {
 	printf("  0"), putchar('b'), printb(v), putchar('\n');
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 2個の値を返す
 // 1. 右にnum回シフトしたやつを返す
@@ -91,8 +93,10 @@ void shifter_ngram(const int NGRAM)
 	}
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 // 多数決関数　&& 加算
-unsigned int addition(unsigned int result_array[], size_t size)
+unsigned int bounding(unsigned int result_array[], size_t size)
 {
 	unsigned int result = 0;
 
@@ -114,6 +118,8 @@ unsigned int addition(unsigned int result_array[], size_t size)
 	}
 	return result;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // xorshiftのランダム生成関数（32bitごとに出力）
 unsigned int xor128(int reset)
@@ -248,7 +254,7 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR)
 			// printf("ランダム：%u\n", result_array[num]);
 			// putb(result_array[num]);
 		}
-		unsigned int result_real = addition(result_array, ARNUM);
+		unsigned int result_real = bounding(result_array, ARNUM);
 		printf("  %u\n", result_real);
 		// putb(result_real);
 
@@ -265,7 +271,7 @@ int main(int argc, char **argv)
 	printf("\n ------------------------------- 開始 ------------------------------- \n\n\n");
 
 	const int NGRAM = 3;
-	const int MAJORITY_ADDR = 1023;
+	const int MAJORITY_ADDR = 511;
 	int ADDRNUM = 0;
 
 	// const int SIMULATION_COUNT = 100;

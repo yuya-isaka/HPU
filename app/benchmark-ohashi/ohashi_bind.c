@@ -20,90 +20,81 @@ unsigned long dst_phys;
 // ------------------------------------------------------------------------------------------------
 
 // 簡易アセンブラ
-// アドレスが必要か、命令コード、アドレス
-uint16_t assemble(int addr_flag, unsigned int inst_num, uint16_t addr)
+// 10種類の命令
+uint16_t assemble(const char inst_str[], uint16_t addr)
 {
-	if (addr_flag)
+	if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0)
 	{
 		uint16_t result = 0;
+
 		// load
-		if (inst_num == 1)
+		if (strcmp(inst_str, "load") == 0)
 		{
-			uint16_t inst = 3 << 14;
+			uint16_t inst = 49152;
 			result = inst | addr;
 		}
-		// l.rshift
-		else if (inst_num == 2)
-		{
-			uint16_t inst = 5 << 13;
-			result = inst | addr;
-		}
-		// l.lshift
-		else if (inst_num == 4)
-		{
-			uint16_t inst = 9 << 12;
-			result = inst | addr;
-		}
-		// l.xor
-		else if (inst_num == 6)
-		{
-			uint16_t inst = 17 << 11;
-			result = inst | addr;
-		}
+
 		// wb.item
-		else if (inst_num == 12)
+		else if (strcmp(inst_str, "wbitem") == 0)
 		{
-			uint16_t inst = 33 << 10;
+			uint16_t inst = 40960;
 			result = inst | addr;
 		}
-		else
-		{
-			printf("error");
-		}
+
 		return result;
 	}
+
 	else
 	{
 		uint16_t inst = 0;
+
 		// rshift
-		if (inst_num == 3)
+		if (strcmp(inst_str, "rshift") == 0)
 		{
-			inst = 1 << 14;
+			inst = 16384;
 		}
+
 		// lshift
-		else if (inst_num == 5)
+		else if (strcmp(inst_str, "lshift") == 0)
 		{
-			inst = 1 << 13;
+			inst = 8192;
 		}
+
 		// xor
-		else if (inst_num == 7)
+		else if (strcmp(inst_str, "xor") == 0)
 		{
-			inst = 1 << 12;
+			inst = 4096;
 		}
+
 		// store
-		else if (inst_num == 8)
+		else if (strcmp(inst_str, "store") == 0)
 		{
-			inst = 1 << 11;
+			inst = 2048;
 		}
+
 		// last
-		else if (inst_num == 9)
+		else if (strcmp(inst_str, "last") == 0)
 		{
-			inst = 1 << 10;
+			inst = 1024;
 		}
+
 		// move
-		else if (inst_num == 10)
+		else if (strcmp(inst_str, "move") == 0)
 		{
-			inst = 1 << 9;
+			inst = 512;
 		}
+
 		// wb
-		else if (inst_num == 11)
+		else if (strcmp(inst_str, "wb") == 0)
 		{
-			inst = 1 << 8;
+			inst = 256;
 		}
+
 		else
 		{
 			printf("error");
 		}
+
 		return inst;
 	}
 }
@@ -198,13 +189,15 @@ int main(int argc, char const *argv[])
 		return 0;
 	}
 
-	// // ランダム生成
-	// top[0x04 / 4] = 1023;
-	// top[0x00 / 4] = 1;
-	// while (top[0x00 / 4] & 0x1)
-	// 	;
+	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
-	// const int core_num = 16;
+	// ランダム生成
+	top[0x04 / 4] = 511;
+	top[0x00 / 4] = 1;
+	while (top[0x00 / 4] & 0x1)
+		;
+
+	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
 	// DMAリセット
 	dma[0x30 / 4] = 4;
@@ -216,68 +209,72 @@ int main(int argc, char const *argv[])
 
 	srand(10);
 
-	int send_num = 0;
+	// ----------------------------------------------------------------------------------------------------------------------------------------------
+
+	const int core_num = 32;
 	const int trial_num = 50000000;
 
-	// 一度流れる命令を決めて、それがひたすら実行される
+	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
-	for (int i = 0; i < trial_num; i += 16)
+	int send_num = 0;
+
+	for (int i = 0; i < trial_num; i += core_num)
 	{
 
-		for (int j = 0; j < 16; j++)
+		// ----------------------------------------------------------------------------------------------------------------------------------------------
+
+		int addr1[core_num];
+		int addr2[core_num];
+		for (int j = 0; j < core_num; j++)
 		{
-			src[send_num++] = assemble(1, 2, rand() % 1024);
+			addr1[j] = rand() % 1024;
+			addr2[j] = rand() % 1024;
 		}
-		for (int j = 16; j < 64; j++)
+
+		for (int j = 0; j < core_num; j++)
+		{
+			src[send_num++] = assemble("load", addr1[j]);
+		}
+		for (int j = core_num; j < 64; j++)
 		{
 			src[send_num++] = 0;
 		}
 
-		for (int j = 0; j < 16; j++)
+		for (int j = 0; j < core_num; j++)
 		{
-			src[send_num++] = assemble(1, 6, rand() % 1024);
+			src[send_num++] = assemble("move", 0);
 		}
-		for (int j = 16; j < 64; j++)
+		for (int j = core_num; j < 64; j++)
 		{
 			src[send_num++] = 0;
 		}
 
-		// for (int j = 0; j < 16; j++)
-		// {
-		// 	src[send_num++] = assemble(0, 8, 0);
-		// }
-		// for (int j = 16; j < 64; j++)
-		// {
-		// 	src[send_num++] = 0;
-		// }
+		for (int j = 0; j < core_num; j++)
+		{
+			src[send_num++] = assemble("load", addr2[j]);
+		}
+		for (int j = core_num; j < 64; j++)
+		{
+			src[send_num++] = 0;
+		}
 
-		// if (num > 512)
-		// {
-		// 	uint16_t inst = assemble(1, 4, addr);
-		// 	src[send_num++] = inst;
-		// 	for (int j = 0; j < (1024 - num - 1); j++)
-		// 	{
-		// 		inst = assemble(0, 5, 0);
-		// 		src[send_num++] = inst;
-		// 	}
-		// }
-		// else
-		// {
-		// 	uint16_t inst = assemble(1, 2, addr);
-		// 	src[send_num++] = inst;
-		// 	for (int j = 0; j < (num - 1); j++)
-		// 	{
-		// 		inst = assemble(0, 3, 0);
-		// 		src[send_num++] = inst;
-		// 	}
-		// }
+		for (int j = 0; j < core_num; j++)
+		{
+			src[send_num++] = assemble("xor", 0);
+		}
+		for (int j = core_num; j < 64; j++)
+		{
+			src[send_num++] = 0;
+		}
+
+		// ----------------------------------------------------------------------------------------------------------------------------------------------
 
 		if (send_num >= 33000000)
 		{
 			// last命令
 			for (int j = 0; j < 1; j++)
 			{
-				uint16_t inst = assemble(0, 9, 0);
+				uint16_t inst = assemble("last", 0);
 				src[send_num++] = inst;
 			}
 			for (int i = 1; i < 64; i++)
@@ -305,16 +302,20 @@ int main(int argc, char const *argv[])
 		}
 	}
 
+	// ----------------------------------------------------------------------------------------------------------------------------------------------
+
 	// last命令
 	for (int j = 0; j < 1; j++)
 	{
-		uint16_t inst = assemble(0, 9, 0);
+		uint16_t inst = assemble("last", 0);
 		src[send_num++] = inst;
 	}
 	for (int i = 1; i < 64; i++)
 	{
 		src[send_num++] = 0;
 	}
+
+	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
 	dma[0x00 / 4] = 1;
 	dma[0x18 / 4] = src_phys;
@@ -334,10 +335,12 @@ int main(int argc, char const *argv[])
 
 	top[0x00 / 4] = 0;
 
+	// ----------------------------------------------------------------------------------------------------------------------------------------------
+
 	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
 	clock_t end = clock();
 	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\n  time %lf[ms]\n", time);
+	printf("Ohashi_bind time %lf[ms]\n", time);
 
 	return 0;
 }
