@@ -134,7 +134,7 @@ int main(int argc, char const *argv[])
 	xor128(1);
 
 	// 生成するランダムなハイパーベクトルの数
-	const int item_memory_num = 1024;
+	const int item_memory_num = 512;
 
 	// ランダムなハイパーベクトルを格納
 	unsigned int **item_memory_array;
@@ -171,7 +171,7 @@ int main(int argc, char const *argv[])
 	// アイテムメモリからロード
 	for (int i = 0; i < trial_num; i++) // 5000万
 	{
-		int addr = rand() % 1024;
+		int addr = rand() % 512;
 		for (int j = 0; j < require_int_num; j++) // 32
 		{
 			data[j][i] = item_memory_array[addr][j];

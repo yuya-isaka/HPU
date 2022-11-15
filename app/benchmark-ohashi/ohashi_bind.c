@@ -227,8 +227,8 @@ int main(int argc, char const *argv[])
 		int addr2[core_num];
 		for (int j = 0; j < core_num; j++)
 		{
-			addr1[j] = rand() % 1024;
-			addr2[j] = rand() % 1024;
+			addr1[j] = rand() % 512;
+			addr2[j] = rand() % 512;
 		}
 
 		for (int j = 0; j < core_num; j++)

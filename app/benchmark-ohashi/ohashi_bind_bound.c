@@ -227,8 +227,8 @@ int main(int argc, char const *argv[])
 		int addr2[core_num];
 		for (int j = 0; j < core_num; j++)
 		{
-			addr1[j] = rand() % 1024;
-			addr2[j] = rand() % 1024;
+			addr1[j] = rand() % 512;
+			addr2[j] = rand() % 512;
 		}
 
 		for (int j = 0; j < core_num; j++)
@@ -260,7 +260,7 @@ int main(int argc, char const *argv[])
 
 		for (int j = 0; j < core_num; j++)
 		{
-			src[send_num++] = assemble("xor", addr2[j]);
+			src[send_num++] = assemble("xor", 0);
 		}
 		for (int j = core_num; j < 64; j++)
 		{

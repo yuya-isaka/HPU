@@ -222,10 +222,10 @@ int main(int argc, char const *argv[])
 	{
 
 		// ----------------------------------------------------------------------------------------------------------------------------------------------
-		int addr = rand() % 1024;
 
 		for (int j = 0; j < core_num; j++)
 		{
+			int addr = rand() % 512;
 			src[send_num++] = assemble("load", addr);
 		}
 		for (int j = core_num; j < 64; j++)

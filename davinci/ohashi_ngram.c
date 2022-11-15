@@ -41,6 +41,106 @@ void freeArray(uint16_t ***a, const int y)
 
 // -----------------------------------------------------------------------
 
+// // 簡易アセンブラ
+// uint16_t assemble(const char inst_str[], uint16_t addr)
+// {
+// 	if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "lrshift") == 0 || strcmp(inst_str, "llshift") == 0 || strcmp(inst_str, "lxor") == 0 || strcmp(inst_str, "wbitem") == 0)
+// 	{
+// 		uint16_t result = 0;
+
+// 		// load
+// 		if (strcmp(inst_str, "load") == 0)
+// 		{
+// 			uint16_t inst = 49152;
+// 			result = inst | addr;
+// 		}
+
+// 		// lrshift
+// 		else if (strcmp(inst_str, "lrshift") == 0)
+// 		{
+// 			uint16_t inst = 40960;
+// 			result = inst | addr;
+// 		}
+
+// 		// llshift
+// 		else if (strcmp(inst_str, "llshift") == 0)
+// 		{
+// 			uint16_t inst = 36864;
+// 			result = inst | addr;
+// 		}
+
+// 		// lxor
+// 		else if (strcmp(inst_str, "lxor") == 0)
+// 		{
+// 			uint16_t inst = 34816;
+// 			result = inst | addr;
+// 		}
+
+// 		// wb.item
+// 		else if (strcmp(inst_str, "wbitem") == 0)
+// 		{
+// 			uint16_t inst = 33792;
+// 			result = inst | addr;
+// 		}
+
+// 		return result;
+// 	}
+
+// 	else
+// 	{
+// 		uint16_t inst = 0;
+
+// 		// rshift
+// 		if (strcmp(inst_str, "rshift") == 0)
+// 		{
+// 			inst = 16384;
+// 		}
+
+// 		// lshift
+// 		else if (strcmp(inst_str, "lshift") == 0)
+// 		{
+// 			inst = 8192;
+// 		}
+
+// 		// xor
+// 		else if (strcmp(inst_str, "xor") == 0)
+// 		{
+// 			inst = 4096;
+// 		}
+
+// 		// store
+// 		else if (strcmp(inst_str, "store") == 0)
+// 		{
+// 			inst = 2048;
+// 		}
+
+// 		// last
+// 		else if (strcmp(inst_str, "last") == 0)
+// 		{
+// 			inst = 1024;
+// 		}
+
+// 		// move
+// 		else if (strcmp(inst_str, "move") == 0)
+// 		{
+// 			inst = 512;
+// 		}
+
+// 		// wb
+// 		else if (strcmp(inst_str, "wb") == 0)
+// 		{
+// 			inst = 256;
+// 		}
+
+// 		else
+// 		{
+// 			printf("error");
+// 		}
+
+// 		return inst;
+// 	}
+// }
+
 // 簡易アセンブラ
 // 10種類の命令
 uint16_t assemble(const char inst_str[], uint16_t addr)
@@ -224,8 +324,8 @@ int main(int argc, char const *argv[])
 	const int instruction_bit = 16;
 	const int train_num = 2;
 	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
-	const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
+	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	// const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
 	const int ngram = 3;
 	const int core_num = 32;
 	const int instruction_num = 11;

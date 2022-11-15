@@ -1,13 +1,13 @@
 generate:
 	python3 fpga-bit-to-bin.py --flip design_1_wrapper.bit output.bin
 
-script:
+send_script:
 	scp -r ../script petalinux@192.168.1.24:/home/petalinux/
 
-app:
+send_app:
 	scp -r  ../app petalinux@192.168.1.24:/home/petalinux/
 
-davinci:
+send_davinci:
 	scp -r ../davinci petalinux@192.168.1.24:/home/petalinux/
 
 cp:
