@@ -38,14 +38,14 @@ module counter
     reg         store_nn;
 
     always_ff @( posedge clk ) begin
-                //   if ( store != 0) begin
-                //       store_n <= 1'b1;
-                //   end
-                //   else begin
-                //       store_n <= 1'b0;
-                //   end
-                // 全コアが同じタイミングでストアすると仮定
-                  store_n <= store[0];
+                  //   if ( store != 0) begin
+                  //       store_n <= 1'b1;
+                  //   end
+                  //   else begin
+                  //       store_n <= 1'b0;
+                  //   end
+                  // 全コアが同じタイミングでストアすると仮定
+                  store_n <= store[ 0 ];
                   store_nn <= store_n;
               end;
 
@@ -54,8 +54,8 @@ module counter
 
     // コア数可変
     // 4bitあれば十分
-    reg signed [ 4:0 ]      box_1;
-    reg signed [ 4:0 ]      box_2;
+    reg signed [ 5:0 ]      box_1;
+    // reg signed [ 4:0 ]      box_2;
     // reg signed [ 3:0 ]      box_3;
 
 
@@ -65,7 +65,7 @@ module counter
                       // コア数可変
                       box <= 0;
                       box_1 <= 0;
-                      box_2 <= 0;
+                      //   box_2 <= 0;
                   end
 
                   // store_nと分離することで、storeが連続で実行されても対応可能にした
@@ -74,8 +74,8 @@ module counter
                       // 16コア
                       box <=
                           box
-                          + box_1
-                          + box_2;
+                          + box_1;
+                      //   + box_2;
                       // 1-4コア
                       //   box <= box + box_1;
                   end
@@ -102,9 +102,8 @@ module counter
                         + select[ 12 ]
                         + select[ 13 ]
                         + select[ 14 ]
-                        + select[ 15 ];
-                  box_2 <=
-                        select[ 16 ]
+                        + select[ 15 ]
+                        + select[ 16 ]
                         + select[ 17 ]
                         + select[ 18 ]
                         + select[ 19 ]

@@ -320,15 +320,15 @@ int main(int argc, char const *argv[])
 	// ---------------------------------------------
 	uint16_t **src_tmp;
 	uint16_t **ascii_array;
-	const int bus_width = 1024;
+	const int bus_width = 512;
 	const int instruction_bit = 16;
 	const int train_num = 2;
 	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
-	// const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
+	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
+	const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
 	const int ngram = 3;
 	const int core_num = 32;
-	const int instruction_num = 11;
+	const int instruction_num = 8;
 	const int majority_addr = 26;
 	int all_ngram = 0;
 	int even = 0;
@@ -419,6 +419,93 @@ int main(int argc, char const *argv[])
 			}
 		}
 
+		//////////////////////////////////////////////////////////////////////////////////////////////////
+		// 事前にPermしたものをメモリに格納
+
+		// アクセラレータ起動
+		top[0x00 / 4] = 2;
+
+		int send_num = 0;
+
+		for (int j = 0; j < 26; j++)
+		{
+			int ascii_addr = j;
+
+			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			{
+				uint16_t inst = assemble("load", ascii_addr);
+				src[send_num++] = inst;
+			}
+
+			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			{
+				uint16_t inst = assemble("rshift", 0);
+				src[send_num++] = inst;
+			}
+
+			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			{
+				uint16_t inst = assemble("wbitem", ascii_addr + 27);
+				src[send_num++] = inst;
+			}
+		}
+
+		for (int j = 0; j < 26; j++)
+		{
+			int ascii_addr = j + 27;
+
+			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			{
+				uint16_t inst = assemble("load", ascii_addr);
+				src[send_num++] = inst;
+			}
+
+			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			{
+				uint16_t inst = assemble("rshift", 0);
+				src[send_num++] = inst;
+			}
+
+			for (int i = 0; i < (bus_width / instruction_bit); i++)
+			{
+				uint16_t inst = assemble("wbitem", ascii_addr + 27);
+				src[send_num++] = inst;
+			}
+		}
+
+		// last命令
+		for (int i = 0; i < 1; i++)
+		{
+			uint16_t inst = assemble("last", 0);
+			src[send_num++] = inst;
+		}
+		for (int i = 1; i < (bus_width / instruction_bit); i++)
+		{
+			src[send_num++] = 0;
+		}
+
+		// 最後の送信
+		dma[0x00 / 4] = 1;
+		dma[0x18 / 4] = src_phys;
+		dma[0x28 / 4] = send_num * 2; // 16ビットがsend_num個
+
+		dma[0x30 / 4] = 1;
+		dma[0x48 / 4] = dst_phys;
+		dma[0x58 / 4] = (bus_width / 32) * 2 * 4; // 32個 * 4バイト = 128バイト = 1024ビット
+
+		while ((dma[0x34 / 4] & 0x1000) != 0x1000)
+			;
+
+		// アクセラレータ終了
+		top[0x00 / 4] = 0;
+
+		dma[0x30 / 4] = 4;
+		dma[0x00 / 4] = 4;
+		while (dma[0x00 / 4] & 0x4)
+			;
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////
+
 		// アクセラレータ起動
 		top[0x00 / 4] = 2;
 
@@ -441,15 +528,15 @@ int main(int argc, char const *argv[])
 			instruction++;
 
 			// load
-			addr = ascii_array[i][1];
+			addr = ascii_array[i][1] + 27;
 			inst = assemble("load", addr);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// rshift
-			inst = assemble("rshift", 0);
-			src_tmp[core][instruction] = inst;
-			instruction++;
+			// // rshift
+			// inst = assemble("rshift", 0);
+			// src_tmp[core][instruction] = inst;
+			// instruction++;
 
 			// xor
 			inst = assemble("xor", 0);
@@ -462,20 +549,20 @@ int main(int argc, char const *argv[])
 			instruction++;
 
 			// load
-			addr = ascii_array[i][2];
+			addr = ascii_array[i][2] + 27 + 27;
 			inst = assemble("load", addr);
 			src_tmp[core][instruction] = inst;
 			instruction++;
 
-			// rshift
-			inst = assemble("rshift", 0);
-			src_tmp[core][instruction] = inst;
-			instruction++;
+			// // rshift
+			// inst = assemble("rshift", 0);
+			// src_tmp[core][instruction] = inst;
+			// instruction++;
 
-			// rshift
-			inst = assemble("rshift", 0);
-			src_tmp[core][instruction] = inst;
-			instruction++;
+			// // rshift
+			// inst = assemble("rshift", 0);
+			// src_tmp[core][instruction] = inst;
+			// instruction++;
 
 			// xor
 			inst = assemble("xor", 0);
@@ -497,7 +584,7 @@ int main(int argc, char const *argv[])
 
 		// ---------------------------------------------
 
-		int send_num = 0;
+		send_num = 0;
 
 		// 偶数のとき指定した値をsrc配列に入れておく
 		if (even)
@@ -570,11 +657,6 @@ int main(int argc, char const *argv[])
 				src[send_num] = src_tmp[i][j];
 				send_num++;
 			}
-			for (int i = core_num; i < (bus_width / instruction_bit); i++)
-			{
-				src[send_num] = 0;
-				send_num++;
-			}
 
 			// 最後じゃないかつ値を超えてたら
 			// (2^26-8) / 2 が限界
@@ -590,11 +672,6 @@ int main(int argc, char const *argv[])
 					src[send_num] = inst;
 					send_num++;
 				}
-				for (int i = 1; i < (bus_width / instruction_bit); i++)
-				{
-					src[send_num] = 0;
-					send_num++;
-				}
 
 				dma[0x00 / 4] = 1;
 				dma[0x18 / 4] = src_phys;
@@ -602,7 +679,7 @@ int main(int argc, char const *argv[])
 
 				dma[0x30 / 4] = 1;
 				dma[0x48 / 4] = dst_phys;
-				dma[0x58 / 4] = (bus_width / 32) * 4; // 32個 * 4バイト = 128バイト = 1024ビット
+				dma[0x58 / 4] = (bus_width / 32) * 2 * 4; // 32個 * 4バイト = 128バイト = 1024ビット
 
 				while ((dma[0x34 / 4] & 0x1000) != 0x1000)
 					;
@@ -623,11 +700,6 @@ int main(int argc, char const *argv[])
 			src[send_num] = inst;
 			send_num++;
 		}
-		for (int i = 1; i < (bus_width / instruction_bit); i++)
-		{
-			src[send_num] = 0;
-			send_num++;
-		}
 
 		// ↑ コード---------------------------------------------
 		// ---------------------------------------------------
@@ -642,7 +714,7 @@ int main(int argc, char const *argv[])
 
 		dma[0x30 / 4] = 1;
 		dma[0x48 / 4] = dst_phys;
-		dma[0x58 / 4] = (bus_width / 32) * 4; // 32個 * 4バイト = 128バイト = 1024ビット
+		dma[0x58 / 4] = (bus_width / 32) * 2 * 4; // 32個 * 4バイト = 128バイト = 1024ビット
 
 		while ((dma[0x34 / 4] & 0x1000) != 0x1000)
 			;

@@ -24,7 +24,8 @@ module stream_ctrl
          // out
          output reg                             dst_valid,
          output reg                             dst_last,
-         output logic                           stream_v
+         output logic                           stream_v,
+         output wire                            last_stream
 
      );
 
@@ -49,14 +50,12 @@ module stream_ctrl
     // sign_bitが更新されるまで3サイクル待つ
     reg         last_n;
     reg         last_nn;
-    reg         last_stream;
 
     always_ff @( posedge clk ) begin
 
                   if ( rst ) begin
                       last_n <= 0;
                       last_nn <= 0;
-                      last_stream <= 0;
                   end
 
                   else begin
@@ -70,7 +69,6 @@ module stream_ctrl
                       end
 
                       last_nn <= last_n;
-                      last_stream <= last_nn;
                   end
               end;
 
@@ -170,42 +168,41 @@ module stream_ctrl
 
 
     // 引き金: start
-    // wire [ 1:0 ]        i;
-    // wire                last_stream;
+    wire [ 1:0 ]        i;
 
     // 各コアで違う結果を返したい時に使うかも？
-    // agu #( .W( 2 ) ) agu_stream_i
-    //     (
+    agu #( .W( 2 ) ) agu_stream_i
+        (
 
-    //         // in
-    //         .ini( 2'd0 ),
-    //         .fin( 2'd0 ),
-    //         .start( start ),
-    //         .clk( clk ),
-    //         .rst( rst ),
-    //         .en( dst_ready ),
+            // in
+            .ini( 2'd0 ),
+            .fin( 2'd1 ),
+            .start( start ),
+            .clk( clk ),
+            .rst( rst ),
+            .en( dst_ready ),
 
 
-    //         // out
-    //         .data( i ),
-    //         .last( last_stream )
+            // out
+            .data( i ),
+            .last( last_stream )
 
-    //     );
+        );
 
 
     //================================================================
 
 
     // 引き金： stream_ok_keep
-    // logic       start;
+    logic       start;
 
-    // always_comb begin
-    //                 start = 1'b0;
+    always_comb begin
+                    start = 1'b0;
 
-    //                 if ( dst_ready & stream_ok_keep ) begin
-    //                     start = 1'b1;
-    //                 end
-    //             end;
+                    if ( dst_ready & stream_ok_keep ) begin
+                        start = 1'b1;
+                    end
+                end;
 
 
     // 引き金: stream_active

@@ -32,7 +32,7 @@ DESIGN_SRC = \
 ./kit/counter.sv \
 ./kit/xorshift.sv \
 ./kit/selector.sv \
-# ./kit/agu.sv \
+./kit/agu.sv \
 
 VERILATOR_TB = tb.cpp
 

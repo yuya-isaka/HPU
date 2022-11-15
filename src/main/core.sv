@@ -247,6 +247,7 @@ module core
                           end
 
                           // nop (すべて0のはず)
+                          // (reg1やreg2の値は保持)
                           else begin
                               buff <= 0;
                               store <= 0;

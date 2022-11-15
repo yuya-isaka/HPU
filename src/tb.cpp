@@ -1462,17 +1462,17 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
     eval();
   }
 
-  eval();
-  eval();
-  eval();
+  // eval();
+  // eval();
+  // eval();
 
   /////////////////////////////////////////////////////////////////////////////////////////  Output ////////////////////////////////////////////////////////////////////////////////////
 
   // printf("\n --------------------------- Output ---------------------------- \n\n\n");
 
-  for (int i = 0; i < 1; i++)
+  for (int i = 0; i < 2; i++)
   {
-    for (int j = 0; j < DIM; j++)
+    for (int j = 0; j < 16; j++)
     {
       printf("  %u\n", verilator_top->M_AXIS_TDATA[j]);
       // putb(verilator_top->M_AXIS_TDATA[j]);

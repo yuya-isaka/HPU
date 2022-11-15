@@ -49,14 +49,14 @@ module top
 
         // AXI Stream Master Interface -------------------
         input wire                      M_AXIS_TREADY,
-        output wire [ 1023:0 ]          M_AXIS_TDATA,
+        output wire [ 511:0 ]          M_AXIS_TDATA,
         output wire                     M_AXIS_TVALID,
         output wire [ 7:0 ]             M_AXIS_TSTRB,
         output wire                     M_AXIS_TLAST,
         // -----------------------------------------------
 
         // AXI Stream Slave Interface --------------------
-        input wire [ 1023:0 ]           S_AXIS_TDATA,
+        input wire [ 511:0 ]           S_AXIS_TDATA,
         input wire [ 7:0 ]              S_AXIS_TSTRB,
         input wire                      S_AXIS_TLAST,
         input wire                      S_AXIS_TVALID,
@@ -168,11 +168,12 @@ module top
                     .store( store[ CORENUM-1:0 ] ),
                     // .store( store ),
                     .stream_v( stream_v ),
+                    .last_stream( last_stream ),
 
 
                     // out
                     // バス幅可変
-                    .stream_d( M_AXIS_TDATA[ 1023:0 ] ),
+                    .stream_d( M_AXIS_TDATA[ 511:0 ] ),
                     .sign_bit( sign_bit[ DIM:0 ] )
 
                 );
@@ -182,6 +183,7 @@ module top
     // 計算結果を送るタイミングの１クロック前に立つ
     // counterの値(sign_bit)をM_AXIS_TDATAに格納するタイミングを知らせる役割
     wire              stream_v;
+    wire              last_stream;
 
     // コア数可変
     // stream_ctrl #( .CORENUM( 16 ) ) stream_ctrl
@@ -201,7 +203,8 @@ module top
                     // out
                     .dst_valid( M_AXIS_TVALID ),
                     .dst_last( M_AXIS_TLAST ),
-                    .stream_v( stream_v)
+                    .stream_v( stream_v ),
+                    .last_stream( last_stream )
 
                 );
 
