@@ -345,6 +345,7 @@ int main(int argc, char const *argv[])
 	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
 	printf("計算時間（アクセラレータ）: %lf[ms]\n", time);
 
+	// 結果出力
 	for (int j = 0; j < 32; j++)
 	{
 		printf("%u\n", dst[j]);
