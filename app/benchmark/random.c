@@ -80,14 +80,13 @@ unsigned int xor128(int reset)
 
 int main(int argc, char const *argv[])
 {
+	// プログラム全体の時間
+	clock_t start_program = clock();
 
 	// -----------------------------------------------------------------------
 
-	// 時間測る
+	// 初期化時間
 	clock_t start = clock();
-
-	// 1024bitを表現するのに必要なintの数
-	const int require_int_num = 32;
 
 	// -----------------------------------------------------------------------
 
@@ -97,9 +96,21 @@ int main(int argc, char const *argv[])
 	// 生成するランダムなハイパーベクトルの数
 	const int item_memory_num = 1024;
 
+	// 1024bitを表現するのに必要なintの数
+	const int require_int_num = 32;
+
 	// ランダムなハイパーベクトルを格納
 	unsigned int **item_memory_array;
 	makeArrayInt(&item_memory_array, item_memory_num, require_int_num);
+
+	clock_t end = clock();
+	double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  初期化時間: %lf[ms]\n", time);
+
+	// -----------------------------------------------------------------------
+
+	// 計算時間
+	start = clock();
 
 	// 生成
 	for (int i = 0; i < item_memory_num; i++) // 1024
@@ -119,16 +130,28 @@ int main(int argc, char const *argv[])
 		}
 	}
 
+	end = clock();
+	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  計算時間: %lf[ms]\n", time);
+
+	// -----------------------------------------------------------------------
+
+	// メモリ解放時間
+	start = clock();
+
 	freeArrayInt(&item_memory_array, item_memory_num);
 
-	// -----------------------------------------------------------------------
-
-	// タイム確認
-	clock_t end = clock();
-	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\nRandom time %lf[ms]\n\n", time);
+	end = clock();
+	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  メモリ解放時間: %lf[ms]\n", time);
 
 	// -----------------------------------------------------------------------
+
+	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
+
+	end = clock();
+	time = ((double)(end - start_program)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  プログラム合計時間: %lf[ms]\n", time);
 
 	return 0;
 }

@@ -155,24 +155,27 @@ void shifter_1024(unsigned int **new, unsigned int **original, const unsigned in
 
 int main(int argc, char const *argv[])
 {
+	// プログラム全体の時間
+	clock_t start_program = clock();
+
+	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
+
 	// -----------------------------------------------------------------------
 
-	// 時間測る
+	// 初期化時間
 	clock_t start = clock();
-
-	// 1024bitを表現するのに必要なintの数
-	const int require_int_num = 32;
 
 	// seed設定
 	srand(10);
-
-	// -----------------------------------------------------------------------
 
 	// ランダム生成の初期化
 	xor128(1);
 
 	// 生成するランダムなハイパーベクトルの数
 	const int item_memory_num = 1024;
+
+	// 1024bitを表現するのに必要なintの数
+	const int require_int_num = 32;
 
 	// ランダムなハイパーベクトルを格納
 	unsigned int **item_memory_array;
@@ -195,6 +198,10 @@ int main(int argc, char const *argv[])
 			item_memory_array[i][j] = tmp;
 		}
 	}
+
+	clock_t end = clock();
+	double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  初期化時間: %lf[ms]\n", time);
 
 	// -----------------------------------------------------------------------
 	// 実験

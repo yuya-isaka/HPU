@@ -116,25 +116,27 @@ unsigned int bounding(unsigned int result_array[], size_t train_size)
 
 int main(int argc, char const *argv[])
 {
+	// プログラム全体の時間
+	clock_t start_program = clock();
 
-	// -----------------------------------------------------------------------
+	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
 
-	// 時間測る
+	// ----------------------------------------------------------------------------------------------------------------------------------------------
+
+	// 初期化時間
 	clock_t start = clock();
-
-	// 1024bitを表現するのに必要なintの数
-	const int require_int_num = 32;
 
 	// seed設定
 	srand(10);
-
-	// -----------------------------------------------------------------------
 
 	// ランダム生成の初期化
 	xor128(1);
 
 	// 生成するランダムなハイパーベクトルの数
 	const int item_memory_num = 512;
+
+	// 1024bitを表現するのに必要なintの数
+	const int require_int_num = 32;
 
 	// ランダムなハイパーベクトルを格納
 	unsigned int **item_memory_array;
@@ -158,33 +160,89 @@ int main(int argc, char const *argv[])
 		}
 	}
 
+	clock_t end = clock();
+	double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  初期化時間: %lf[ms]\n", time);
+
 	// -----------------------------------------------------------------------
-	// 実験
+
+	// データ準備時間
+	start = clock();
 
 	// 試行回数
-	int trial_num = 5000000;
+	int trial_num = 50000000;
+
+	int *addr = (int *)calloc(trial_num, sizeof(int));
+
+	for (int i = 0; i < trial_num; i++)
+	{
+		addr[i] = rand() % 512;
+	}
 
 	// ロードデータ格納
 	unsigned int **data;
 	makeArrayInt(&data, require_int_num, trial_num);
 
+	unsigned int result[require_int_num];
+
+	end = clock();
+	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  データ準備時間: %lf[ms]\n", time);
+
+	// -----------------------------------------------------------------------
+
+	// 計算時間
+	start = clock();
+
+	// ロード時間
+	clock_t start_load = clock();
+
 	// アイテムメモリからロード
-	for (int i = 0; i < trial_num; i++) // 5000万
+	for (int j = 0; j < require_int_num; j++) // 32
 	{
-		int addr = rand() % 512;
-		for (int j = 0; j < require_int_num; j++) // 32
+		for (int i = 0; i < trial_num; i++) // 5000万
 		{
-			data[j][i] = item_memory_array[addr][j];
+			data[j][i] = item_memory_array[addr[i]][j];
 		}
 	}
 
+	end = clock();
+	time = ((double)(end - start_load)) / CLOCKS_PER_SEC * 1000.0;
+	printf("   (Load計算時間: %lf[ms])\n", time);
+
+	// Bounding時間
+	clock_t start_bound = clock();
+
 	// 試行
-	unsigned int result[require_int_num];
 	for (int i = 0; i < require_int_num; i++)
 	{
 		// bound
 		result[i] = bounding(data[i], trial_num);
 	}
+
+	end = clock();
+	time = ((double)(end - start_bound)) / CLOCKS_PER_SEC * 1000.0;
+	printf("   (Bounding計算時間: %lf[ms])\n", time);
+
+	end = clock();
+	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  計算時間: %lf[ms]\n", time);
+
+	// -----------------------------------------------------------------------
+
+	// メモリ解放時間
+	start = clock();
+
+	// 解放
+	free(addr);
+	freeArrayInt(&data, require_int_num);
+	freeArrayInt(&item_memory_array, item_memory_num);
+
+	end = clock();
+	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  メモリ解放時間: %lf[ms]\n", time);
+
+	// -----------------------------------------------------------------------
 
 	// 結果出力
 	for (int i = 0; i < require_int_num; i++)
@@ -192,15 +250,13 @@ int main(int argc, char const *argv[])
 		printf("%u\n", result[i]);
 	}
 
-	// 解放
-	freeArrayInt(&data, require_int_num);
-	freeArrayInt(&item_memory_array, item_memory_num);
-
 	// -----------------------------------------------------------------------
 
-	clock_t end = clock();
-	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\nBound time %lf[ms]\n", time);
+	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
+
+	end = clock();
+	time = ((double)(end - start_program)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  プログラム合計時間: %lf[ms]\n", time);
 
 	return 0;
 }

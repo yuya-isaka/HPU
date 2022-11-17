@@ -120,14 +120,12 @@ int main(int argc, char const *argv[])
 	// プログラム全体の時間
 	clock_t start_program = clock();
 
-	// -----------------------------------------------------------------------
-
-	// 初期化時間
-	clock_t start = clock();
-
 	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
 
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
+
+	// 初期化時間
+	clock_t start = clock();
 
 	// seed設定
 	srand(10);
@@ -197,8 +195,10 @@ int main(int argc, char const *argv[])
 
 	// -----------------------------------------------------------------------
 
+	// 計算時間
 	start = clock();
 
+	// Binding時間
 	clock_t start_bind = clock();
 
 	// 試行
@@ -212,8 +212,9 @@ int main(int argc, char const *argv[])
 
 	end = clock();
 	time = ((double)(end - start_bind)) / CLOCKS_PER_SEC * 1000.0;
-	printf("   (Binding計算時間: %lf[ms])\n", time);
+	printf("   (Load+Binding計算時間: %lf[ms])\n", time);
 
+	// Bounding時間
 	clock_t start_bound = clock();
 
 	// Bound & 多数決
@@ -245,6 +246,8 @@ int main(int argc, char const *argv[])
 	end = clock();
 	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
 	printf("  メモリ解放時間: %lf[ms]\n", time);
+
+	// -----------------------------------------------------------------------
 
 	// 結果出力
 	for (int i = 0; i < require_int_num; i++) // 32
