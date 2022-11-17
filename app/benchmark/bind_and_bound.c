@@ -120,7 +120,7 @@ int main(int argc, char const *argv[])
 	// -----------------------------------------------------------------------
 
 	// 時間測る
-	clock_t start = clock();
+	// clock_t start = clock();
 
 	// 1024bitを表現するのに必要なintの数
 	const int require_int_num = 32;
@@ -168,25 +168,15 @@ int main(int argc, char const *argv[])
 	unsigned int **result_bind;
 	makeArrayInt(&result_bind, require_int_num, trial_num);
 
+	clock_t start = clock();
 	// 試行
 	for (int i = 0; i < trial_num; i++) // 5000万
 	{
-		if (i == 0)
+		int addr1 = rand() % 512;
+		int addr2 = rand() % 512;
+		for (int j = 0; j < require_int_num; j++) // 32
 		{
-			int addr1 = rand() % 512;
-			int addr2 = rand() % 512;
-			for (int j = 0; j < require_int_num; j++) // 32
-			{
-				result_bind[i][j] = item_memory_array[addr1][j] ^ item_memory_array[addr2][j];
-			}
-		}
-		else
-		{
-			int addr1 = rand() % 512;
-			for (int j = 0; j < require_int_num; j++) // 32
-			{
-				result_bind[j][i] = result_bind[j][i - 1] ^ item_memory_array[addr1][j];
-			}
+			result_bind[j][i] = item_memory_array[addr1][j] ^ item_memory_array[addr2][j];
 		}
 	}
 
@@ -197,6 +187,9 @@ int main(int argc, char const *argv[])
 		// bound
 		result_bind_bound[i] = bounding(result_bind[i], trial_num);
 	}
+	clock_t end = clock();
+	double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("\n\n演算 time %lf[ms]\n", time);
 
 	// 結果出力
 	for (int i = 0; i < require_int_num; i++) // 32
@@ -210,8 +203,8 @@ int main(int argc, char const *argv[])
 
 	// -----------------------------------------------------------------------
 
-	clock_t end = clock();
-	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	end = clock();
+	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
 	printf("\n\nBind_and_bound time %lf[ms]\n", time);
 
 	return 0;

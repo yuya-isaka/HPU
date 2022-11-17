@@ -209,6 +209,10 @@ int main(int argc, char const *argv[])
 
 	srand(10);
 
+	clock_t end = clock();
+	double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("初期化コスト time %lf[ms]\n", time);
+
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
 	const int core_num = 32;
@@ -220,6 +224,7 @@ int main(int argc, char const *argv[])
 
 	int addr1[core_num];
 	int addr2[core_num];
+	start = clock();
 	for (int i = 0; i < trial_num; i += core_num)
 	{
 
@@ -255,6 +260,7 @@ int main(int argc, char const *argv[])
 
 		if (send_num >= 33000000)
 		{
+			printf("再発行\n");
 			// last命令
 			for (int j = 0; j < 1; j++)
 			{
@@ -279,11 +285,19 @@ int main(int argc, char const *argv[])
 				;
 
 			send_num = 0;
+			end = clock();
+			const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+			printf("毎回コスト time %lf[ms]\n", time);
+			start = clock();
 		}
 	}
+	end = clock();
+	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("毎回コスト time %lf[ms]\n", time);
 
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
+	start = clock();
 	// last命令
 	for (int j = 0; j < 1; j++)
 	{
@@ -315,12 +329,16 @@ int main(int argc, char const *argv[])
 
 	top[0x00 / 4] = 0;
 
+	end = clock();
+	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("最後コスト time %lf[ms]\n", time);
+
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
 	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
-	clock_t end = clock();
-	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("Ohashi_bind time %lf[ms]\n", time);
+	// clock_t end = clock();
+	// const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	// printf("Ohashi_bind time %lf[ms]\n", time);
 
 	return 0;
 }
