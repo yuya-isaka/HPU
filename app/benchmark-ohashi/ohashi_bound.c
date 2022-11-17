@@ -251,11 +251,13 @@ int main(int argc, char const *argv[])
 		{
 			int addr = rand() % 512;
 			src[send_num++] = assemble("load", addr);
+			count++;
 		}
 
 		for (int j = 0; j < core_num; j++)
 		{
 			src[send_num++] = assemble("store", 0);
+			count++;
 		}
 
 		// ----------------------------------------------------------------------------------------------------------------------------------------------

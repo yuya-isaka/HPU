@@ -249,6 +249,7 @@ int main(int argc, char const *argv[])
 		for (int j = 0; j < core_num; j++)
 		{
 			src[send_num++] = assemble("load", rand() % 512);
+			count++;
 		}
 
 		// シフト
@@ -260,6 +261,7 @@ int main(int argc, char const *argv[])
 				for (int k = 0; k < core_num; k++)
 				{
 					src[send_num++] = assemble("lshift", 0);
+					count++;
 				}
 			}
 		}
@@ -271,6 +273,7 @@ int main(int argc, char const *argv[])
 				for (int k = 0; k < core_num; k++)
 				{
 					src[send_num++] = assemble("rshift", 0);
+					count++;
 				}
 			}
 		}
