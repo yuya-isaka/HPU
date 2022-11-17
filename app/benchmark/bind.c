@@ -168,7 +168,7 @@ int main(int argc, char const *argv[])
 
 	end = clock();
 	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("  計算時間: %lf[ms]\n", time);
+	printf("  計算時間(Load+Binding): %lf[ms]\n", time);
 
 	// -----------------------------------------------------------------------
 

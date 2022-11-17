@@ -170,7 +170,7 @@ int main(int argc, char const *argv[])
 	start = clock();
 
 	// 試行回数
-	int trial_num = 50000000;
+	const int trial_num = 50000000;
 
 	int *addr = (int *)calloc(trial_num, sizeof(int));
 

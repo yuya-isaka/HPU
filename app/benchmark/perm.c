@@ -204,37 +204,65 @@ int main(int argc, char const *argv[])
 	printf("  初期化時間: %lf[ms]\n", time);
 
 	// -----------------------------------------------------------------------
-	// 実験
 
-	int trial_num = 5000000;
-	const int perm_num = 2;
+	// データ準備時間
+	start = clock();
+
+	const int trial_num = 50000000;
+	const int perm_num = 3;
+
+	int *addr = (int *)calloc(trial_num, sizeof(int));
+
+	for (int i = 0; i < trial_num; i++)
+	{
+		addr[i] = rand() % 512;
+	}
 
 	// Permutation結果を格納
 	unsigned int **result;
 	makeArrayInt(&result, trial_num, require_int_num);
 
-	// 試行
-	for (int i = 0; i < trial_num; i++)
-	{
-		// アドレス生成
-		int addr = rand() % 512;
-
-		// Permutation回数
-		// int num = rand() % 1024;
-
-		// Perm
-		shifter_1024(&result[i], &item_memory_array[addr], require_int_num, perm_num);
-	}
-
-	// 解放
-	freeArrayInt(&result, trial_num);
-	freeArrayInt(&item_memory_array, item_memory_num);
+	end = clock();
+	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  データ準備時間: %lf[ms]\n", time);
 
 	// -----------------------------------------------------------------------
 
-	clock_t end = clock();
-	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\nPerm time %lf[ms]\n", time);
+	// 計算時間
+	start = clock();
+
+	// 試行
+	for (int i = 0; i < trial_num; i++)
+	{
+		// Perm
+		shifter_1024(&result[i], &item_memory_array[addr[i]], require_int_num, perm_num);
+	}
+
+	end = clock();
+	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  計算時間(Load+Permutation): %lf[ms]\n", time);
+
+	// -----------------------------------------------------------------------
+
+	// メモリ解放時間
+	start = clock();
+
+	// 解放
+	free(addr);
+	freeArrayInt(&result, trial_num);
+	freeArrayInt(&item_memory_array, item_memory_num);
+
+	end = clock();
+	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  メモリ解放時間: %lf[ms]\n", time);
+
+	// -----------------------------------------------------------------------
+
+	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
+
+	end = clock();
+	time = ((double)(end - start_program)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  プログラム合計時間: %lf[ms]\n", time);
 
 	return 0;
 }
