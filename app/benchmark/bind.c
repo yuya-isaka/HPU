@@ -148,7 +148,7 @@ int main(int argc, char const *argv[])
 
 	// 結果を格納
 	unsigned int **result_bind;
-	makeArrayInt(&result_bind, trial_num, require_int_num);
+	makeArrayInt(&result_bind, require_int_num, trial_num);
 
 	end = clock();
 	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
@@ -160,11 +160,11 @@ int main(int argc, char const *argv[])
 	start = clock();
 
 	// 試行
-	for (int i = 0; i < trial_num; i++) // 5000万
+	for (int j = 0; j < require_int_num; j++) // 32
 	{
-		for (int j = 0; j < require_int_num; j++) // 32
+		for (int i = 0; i < trial_num; i++) // 5000万
 		{
-			result_bind[i][j] = item_memory_array[addr1[i]][j] ^ item_memory_array[addr2[i]][j];
+			result_bind[j][i] = item_memory_array[addr1[i]][j] ^ item_memory_array[addr2[i]][j];
 		}
 	}
 
@@ -180,7 +180,7 @@ int main(int argc, char const *argv[])
 	// 解放
 	free(addr1);
 	free(addr2);
-	freeArrayInt(&result_bind, trial_num);
+	freeArrayInt(&result_bind, require_int_num);
 	freeArrayInt(&item_memory_array, item_memory_num);
 
 	end = clock();

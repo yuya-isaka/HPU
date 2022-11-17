@@ -174,8 +174,7 @@ int main(int argc, char const *argv[])
 
 	// 試行回数
 	// int trial_num = 10000000;
-	// const int trial_num = 50000000;
-	const int trial_num = 50000;
+	const int trial_num = 50000000;
 
 	int *addr1 = (int *)calloc(trial_num, sizeof(int));
 	int *addr2 = (int *)calloc(trial_num, sizeof(int));
@@ -188,7 +187,7 @@ int main(int argc, char const *argv[])
 
 	// 結果を格納
 	unsigned int **result_bind;
-	makeArrayInt(&result_bind, trial_num, require_int_num);
+	makeArrayInt(&result_bind, require_int_num, trial_num);
 
 	unsigned int result_bind_bound[require_int_num];
 
@@ -199,14 +198,15 @@ int main(int argc, char const *argv[])
 	// -----------------------------------------------------------------------
 
 	start = clock();
+
 	clock_t start_bind = clock();
 
 	// 試行
-	for (int i = 0; i < trial_num; i++) // 5000万
+	for (int j = 0; j < require_int_num; j++) // 32
 	{
-		for (int j = 0; j < require_int_num; j++) // 32
+		for (int i = 0; i < trial_num; i++) // 5000万
 		{
-			result_bind[i][j] = item_memory_array[addr1[i]][j] ^ item_memory_array[addr2[i]][j];
+			result_bind[j][i] = item_memory_array[addr1[i]][j] ^ item_memory_array[addr2[i]][j];
 		}
 	}
 
@@ -219,38 +219,8 @@ int main(int argc, char const *argv[])
 	// Bound & 多数決
 	for (int i = 0; i < require_int_num; i++) // 32
 	{
-		printf("   (Binding計算時間: %lf[ms])\n", time);
 		// bound
-		// result_bind_bound[i] = bounding(result_bind[i], trial_num);
-
-		// Populationカウントをして、その後多数決関数を実行
-		unsigned int result_bind_bound_tmp = 0;
-
-		// マスクをずらしながら各次元の1が立っている数を調べる
-		unsigned int mask = (int)1 << (32 - 1);
-
-		while (mask)
-		{
-			int buff = 0;
-
-			// 訓練データの数だけ足し算
-			for (int j = 0; j < trial_num; j++)
-			{
-				buff += (mask & result_bind[j][i] ? 1 : 0);
-			}
-
-			// 多数決で1の数が過半数なら、resultにmaskを加える（→対象のbit番目が1になる）
-			if (buff > (trial_num / 2))
-			{
-				// 多数決で1が優位だったら、該当ビットを立たせる
-				result_bind_bound_tmp += mask;
-			}
-
-			mask >>= 1;
-			printf("   (Binding計算時間: %lf[ms])\n", time);
-		}
-
-		result_bind_bound[i] = result_bind_bound_tmp;
+		result_bind_bound[i] = bounding(result_bind[i], trial_num);
 	}
 
 	end = clock();
@@ -269,7 +239,7 @@ int main(int argc, char const *argv[])
 	// 解放
 	free(addr1);
 	free(addr2);
-	freeArrayInt(&result_bind, trial_num);
+	freeArrayInt(&result_bind, require_int_num);
 	freeArrayInt(&item_memory_array, item_memory_num);
 
 	end = clock();
