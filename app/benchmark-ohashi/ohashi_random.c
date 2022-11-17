@@ -143,7 +143,7 @@ int main(int argc, char const *argv[])
 
 	end = clock();
 	time = ((double)(end - start_program)) / CLOCKS_PER_SEC * 1000.0;
-	printf("プログラム時間（CPU＋アクセラレータ）: %lf[ms]\n", time);
+	printf("プログラム合計時間（CPU＋アクセラレータ）: %lf[ms]\n", time);
 
 	return 0;
 }
