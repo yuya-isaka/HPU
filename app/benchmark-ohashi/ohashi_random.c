@@ -21,8 +21,17 @@ unsigned long dst_phys;
 
 int main(int argc, char const *argv[])
 {
+	// プログラム全体の時間
+	clock_t start_program = clock();
+
+	// ----------------------------------------------------------------------------------------------------------------------------------------------
+
+	// 初期化の時間
 	clock_t start = clock();
+
 	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
+
+	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
 	int fd0, fd1, dmaf, topf;
 
@@ -54,27 +63,11 @@ int main(int argc, char const *argv[])
 	}
 	// printf("dst_phys: %lx\n", dst_phys);
 
-	if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
-	{
-		perror("  Failed: open /dev/udmabuf0");
-		return 0;
-	}
-	if ((fd1 = open("/dev/udmabuf1", O_RDWR)) < 0)
-	{
-		perror("  Failed: open /dev/udmabuf1");
-		return 0;
-	}
-	if ((dmaf = open("/dev/uio0", O_RDWR | O_SYNC)) < 0)
-	{
-		perror("  Falied: open /dev/uio0");
-		return 0;
-	}
 	if ((topf = open("/dev/uio1", O_RDWR | O_SYNC)) < 0)
 	{
 		perror("  Failed: open /dev/uio1");
 		return 0;
 	}
-
 	top = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, topf, 0);
 	if (top == MAP_FAILED)
 	{
@@ -82,11 +75,23 @@ int main(int argc, char const *argv[])
 		close(topf);
 		return 0;
 	}
+
+	if ((dmaf = open("/dev/uio0", O_RDWR | O_SYNC)) < 0)
+	{
+		perror("  Falied: open /dev/uio0");
+		return 0;
+	}
 	dma = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, dmaf, 0);
 	if (dma == MAP_FAILED)
 	{
 		perror("  mmap dma");
 		close(dmaf);
+		return 0;
+	}
+
+	if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
+	{
+		perror("  Failed: open /dev/udmabuf0");
 		return 0;
 	}
 	// 500MB
@@ -98,6 +103,12 @@ int main(int argc, char const *argv[])
 		close(fd0);
 		return 0;
 	}
+
+	if ((fd1 = open("/dev/udmabuf1", O_RDWR)) < 0)
+	{
+		perror("  Failed: open /dev/udmabuf1");
+		return 0;
+	}
 	// 4MB
 	dst = (int *)mmap(NULL, 0x3D0900, PROT_READ | PROT_WRITE, MAP_SHARED, fd1, 0);
 	if (dst == MAP_FAILED)
@@ -107,7 +118,14 @@ int main(int argc, char const *argv[])
 		return 0;
 	}
 
+	clock_t end = clock();
+	double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("初期化時間（CPU）: %lf[ms]\n", time);
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// 計算時間（アクセラレータ）
+	start = clock();
 
 	// ランダム生成
 	top[0x04 / 4] = 511;
@@ -115,13 +133,17 @@ int main(int argc, char const *argv[])
 	while (top[0x00 / 4] & 0x1)
 		;
 
+	end = clock();
+	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("計算時間（アクセラレータ）: %lf[ms]\n", time);
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
 
-	clock_t end = clock();
-	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("Random time %lf[ms]\n", time);
+	end = clock();
+	time = ((double)(end - start_program)) / CLOCKS_PER_SEC * 1000.0;
+	printf("プログラム時間（CPU＋アクセラレータ）: %lf[ms]\n", time);
 
 	return 0;
 }

@@ -79,10 +79,12 @@ unsigned int xor128(int reset)
 
 int main(int argc, char const *argv[])
 {
+	// プログラム全体の時間
+	clock_t start_program = clock();
 
 	// -----------------------------------------------------------------------
 
-	// 時間測る
+	// 初期化時間
 	clock_t start = clock();
 
 	// 1024bitを表現するのに必要なintの数
@@ -121,11 +123,18 @@ int main(int argc, char const *argv[])
 		}
 	}
 
+	clock_t end = clock();
+	double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("初期化時間: %lf[ms]\n", time);
+
 	// -----------------------------------------------------------------------
 	// 実験
 
+	// 計算時間
+	start = clock();
+
 	// 試行回数
-	int trial_num = 5000000;
+	int trial_num = 50000000;
 
 	// 結果を格納
 	unsigned int **result_bind;
@@ -155,14 +164,19 @@ int main(int argc, char const *argv[])
 
 	// 解放
 	freeArrayInt(&result_bind, trial_num);
+
+	end = clock();
+	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("計算時間: %lf[ms]\n", time);
+
 	freeArrayInt(&item_memory_array, item_memory_num);
 
 	// -----------------------------------------------------------------------
 
 	// タイム確認
-	clock_t end = clock();
-	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\nBind time %lf[ms]\n", time);
+	end = clock();
+	time = ((double)(end - start_program)) / CLOCKS_PER_SEC * 1000.0;
+	printf("プログラム時間: %lf[ms]\n", time);
 
 	// -----------------------------------------------------------------------
 

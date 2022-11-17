@@ -113,6 +113,8 @@ int main(int argc, char const *argv[])
 
 	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
 
+	// ----------------------------------------------------------------------------------------------------------------------------------------------
+
 	int fd0, fd1, dmaf, topf;
 
 	if ((fd0 = open("/sys/class/u-dma-buf/udmabuf0/phys_addr", O_RDONLY)) != -1)
@@ -143,32 +145,24 @@ int main(int argc, char const *argv[])
 	}
 	// printf("dst_phys: %lx\n", dst_phys);
 
-	if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
-	{
-		perror("  Failed: open /dev/udmabuf0");
-		return 0;
-	}
-	if ((fd1 = open("/dev/udmabuf1", O_RDWR)) < 0)
-	{
-		perror("  Failed: open /dev/udmabuf1");
-		return 0;
-	}
-	if ((dmaf = open("/dev/uio0", O_RDWR | O_SYNC)) < 0)
-	{
-		perror("  Falied: open /dev/uio0");
-		return 0;
-	}
+	// ----------------------------------------------------------------------------------------------------------------------------------------------
+
 	if ((topf = open("/dev/uio1", O_RDWR | O_SYNC)) < 0)
 	{
 		perror("  Failed: open /dev/uio1");
 		return 0;
 	}
-
 	top = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, topf, 0);
 	if (top == MAP_FAILED)
 	{
 		perror("  mmap top");
 		close(topf);
+		return 0;
+	}
+
+	if ((dmaf = open("/dev/uio0", O_RDWR | O_SYNC)) < 0)
+	{
+		perror("  Falied: open /dev/uio0");
 		return 0;
 	}
 	dma = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, dmaf, 0);
@@ -178,6 +172,12 @@ int main(int argc, char const *argv[])
 		close(dmaf);
 		return 0;
 	}
+
+	if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
+	{
+		perror("  Failed: open /dev/udmabuf0");
+		return 0;
+	}
 	// 500MB
 	// もしかしたら8MBでいいのか。。。
 	src = (uint16_t *)mmap(NULL, 0x1DCD6500, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
@@ -185,6 +185,12 @@ int main(int argc, char const *argv[])
 	{
 		perror("  mmap src");
 		close(fd0);
+		return 0;
+	}
+
+	if ((fd1 = open("/dev/udmabuf1", O_RDWR)) < 0)
+	{
+		perror("  Failed: open /dev/udmabuf1");
 		return 0;
 	}
 	// 4MB
@@ -225,15 +231,17 @@ int main(int argc, char const *argv[])
 
 	const int core_num = 32;
 	const int trial_num = 50000000;
+	const int send_num_max = 33000000;
 
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
-	int send_num = 0;
-
 	int addr1[core_num];
 	int addr2[core_num];
+
+	int send_num = 0;
 	int send_num_array[100];
 	int send_num_count = 0;
+	int count = 0;
 
 	for (int i = 0; i < trial_num; i += core_num)
 	{
@@ -249,51 +257,59 @@ int main(int argc, char const *argv[])
 		for (int j = 0; j < core_num; j++)
 		{
 			src[send_num++] = assemble("load", addr1[j]);
+			count++;
 		}
 
 		for (int j = 0; j < core_num; j++)
 		{
 			src[send_num++] = assemble("move", 0);
+			count++;
 		}
 
 		for (int j = 0; j < core_num; j++)
 		{
 			src[send_num++] = assemble("load", addr2[j]);
+			count++;
 		}
 
 		for (int j = 0; j < core_num; j++)
 		{
 			src[send_num++] = assemble("xor", 0);
+			count++;
 		}
 
 		for (int j = 0; j < core_num; j++)
 		{
 			src[send_num++] = assemble("store", 0);
+			count++;
 		}
 
-		// ----------------------------------------------------------------------------------------------------------------------------------------------
+		// --------------------------------------------------------------------------------------------------------------------------------------------
 
-		if (send_num >= 33000000)
+		if (count >= send_num_max)
 		{
 			// last命令
-			for (int j = 0; j < 1; j++)
+			for (int j = 0; j < core_num; j++)
 			{
 				uint16_t inst = assemble("last", 0);
 				src[send_num++] = inst;
+				count++;
 			}
-			send_num_array[send_num_count++] = send_num;
+			send_num_array[send_num_count++] = count;
+			count = 0;
 		}
 	}
 
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
 	// last命令
-	for (int i = 0; i < 1; i++)
+	for (int i = 0; i < core_num; i++)
 	{
 		uint16_t inst = assemble("last", 0);
 		src[send_num++] = inst;
+		count++;
 	}
-	send_num_array[send_num_count++] = send_num;
+	send_num_array[send_num_count++] = count;
 
 	end = clock();
 	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
@@ -343,6 +359,7 @@ int main(int argc, char const *argv[])
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
 	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
+
 	end = clock();
 	time = ((double)(end - start_program)) / CLOCKS_PER_SEC * 1000.0;
 	printf("プログラム時間（CPU＋アクセラレータ）: %lf[ms]\n", time);

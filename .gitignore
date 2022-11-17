@@ -400,6 +400,7 @@ perm_bound
 perm_and_bound
 bound
 bound2
+write_test
 random_peta
 bind_peta
 bind_bound_peta
@@ -409,6 +410,7 @@ perm_bound_peta
 perm_and_bound_peta
 bound_peta
 bound2_peta
+write_test_peta
 
 random.s
 bind.s
