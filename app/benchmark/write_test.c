@@ -100,7 +100,8 @@ int main(int argc, char const *argv[])
 	uint16_t *src = (uint16_t *)calloc(300000000, sizeof(uint16_t));
 
 	const int core_num = 32;
-	const int trial_num = 50000000;
+	// const int trial_num = 50000000;
+	const int trial_num = 10000000;
 	const int send_num_max = 33000000;
 
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
@@ -158,7 +159,6 @@ int main(int argc, char const *argv[])
 
 		if (count >= send_num_max)
 		{
-			printf("aaa\n");
 			// last命令
 			for (int j = 0; j < core_num; j++)
 			{
