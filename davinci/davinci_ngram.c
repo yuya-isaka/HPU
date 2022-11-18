@@ -6,7 +6,7 @@
 #include <math.h>
 #include <time.h>
 
-// // --------------------- メモリリークチェック、デストラクター -----------------------
+// --------------------- メモリリークチェック、デストラクター -----------------------
 
 // __attribute__((destructor)) static void destructor()
 // {
@@ -80,11 +80,11 @@ unsigned int xor128(int reset)
 		y = 362436069;
 		z = 521288629;
 		w = 88675123;
+
 		return 0;
 	}
 	else
 	{
-
 		// 前回のxを使う
 		unsigned int t = x ^ (x << 11);
 		// 更新
@@ -105,11 +105,9 @@ unsigned int shifter_32(unsigned int *v, unsigned int num)
 {
 	// num回 論理右シフト
 	unsigned int tmp_v = *v >> num;
-
 	// 右にシフトしたやつを取り出して、左に(32-num)回 論理左シフト
 	unsigned int tmp_num = (1 << num) - 1;
 	*v = (*v & tmp_num) << (32 - num);
-
 	return tmp_v;
 }
 
@@ -119,21 +117,16 @@ void shifter_1024(unsigned int **new, unsigned int **original, const unsigned in
 {
 	// original[DIM] 	... unsigned int のデータが32個格納（1024次元をエミュレート）
 	// new[DIM] 		... unsigned int のデータが32個格納（1024次元をエミュレート）
-
 	// original配列に格納されているデータをシフトしたデータをnew配列に格納
-
 	// シフトしたデータを一時的に格納
 	unsigned int *result_tmp = (unsigned int *)calloc(DIM, sizeof(unsigned int));
-
 	// 32回繰り返す
 	for (int i = 0; i < DIM; i++)
 	{
-
 		// tmp		... num回右論理シフトした際にはみ出した部分を（32-num)回左論理シフトしたやつ
 		// tmp_v 	... num回右論理シフトしたやつ
 		unsigned int tmp = (*original)[i];
 		unsigned int tmp_v = shifter_32(&tmp, num);
-
 		// シフト
 		result_tmp[i] |= tmp_v;
 		if (i == 0)
@@ -145,13 +138,11 @@ void shifter_1024(unsigned int **new, unsigned int **original, const unsigned in
 			result_tmp[i - 1] |= tmp;
 		}
 	}
-
 	// 結果を移す
 	for (int i = 0; i < DIM; i++)
 	{
 		(*new)[i] = result_tmp[i];
 	}
-
 	free(result_tmp);
 }
 
@@ -163,43 +154,42 @@ void shifter_1024(unsigned int **new, unsigned int **original, const unsigned in
 unsigned int bounding(unsigned int result_array[], size_t train_size)
 {
 	// Populationカウントをして、その後多数決関数を実行
-
 	unsigned int result = 0;
-
 	// マスクをずらしながら各次元の1が立っている数を調べる
 	unsigned int mask = (int)1 << (32 - 1);
-
 	while (mask)
 	{
 		int buff = 0;
-
 		// 訓練データの数だけ足し算
 		for (int i = 0; i < train_size; i++)
 		{
 			buff += (mask & result_array[i] ? 1 : 0);
 		}
-
 		// 多数決で1の数が過半数なら、resultにmaskを加える（→対象のbit番目が1になる）
 		if (buff > (train_size / 2))
 		{
 			// 多数決で1が優位だったら、該当ビットを立たせる
 			result += mask;
 		}
-
 		mask >>= 1;
 	}
-
 	return result;
 }
+
 // -----------------------------------------------------------------------
 
 int main(int argc, char const *argv[])
 {
 
-	clock_t start = clock();
-	printf("\n\n");
+	// プログラム全体の時間
+	clock_t start_program = clock();
 
-	// ---------------------------------------------
+	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
+
+	// ----------------------------------------------------------------------------------------------------------------------------------------------
+
+	// 初期化時間
+	clock_t start = clock();
 
 	const int train_num = 2;
 	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
@@ -210,7 +200,6 @@ int main(int argc, char const *argv[])
 	const int rand_num = 27;
 	// 偶数のときにユーザが適当に追加する値のアドレス
 	const int majority_tmp = 26;
-
 	int all_ngram = 0;
 	int even = 0;
 
@@ -240,11 +229,18 @@ int main(int argc, char const *argv[])
 		}
 	}
 
-	// ---------------------------------------------
+	clock_t end = clock();
+	double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  初期化時間: %lf[ms]\n", time);
+
+	// -----------------------------------------------------------------------
 
 	// 英語とフランス語の数だけ繰り返す
 	for (int i = 0; i < train_num; i++)
 	{
+
+		// データ準備時間
+		start = clock();
 
 		// ファイル読み込み
 		const char *path = train_path[i];
@@ -256,9 +252,7 @@ int main(int argc, char const *argv[])
 			perror("  Failed: open file");
 			exit(1);
 		}
-
 		// ---------------------------------------------
-
 		// ファイルから文字列を取得
 		int ch;
 		int num = 0;
@@ -290,9 +284,7 @@ int main(int argc, char const *argv[])
 		// printf("content: %s\n", content); // myname...
 		printf("all_ngram: %d\n", all_ngram);
 		printf("even: %d\n", even);
-
 		// ---------------------------------------------
-
 		// 得られた文字列からアドレスを取得
 		uint16_t **ascii_array;
 		makeArray(&ascii_array, all_ngram, ngram);
@@ -301,12 +293,8 @@ int main(int argc, char const *argv[])
 			for (int j = 0; j < ngram; j++)
 			{
 				ascii_array[i][j] = (unsigned char)(content[i + j]) - 97;
-				// printf("%d ", ascii_array[i][j]);
 			}
 		}
-
-		// コード ----------------------------------------
-		// ---------------------------------------------
 
 		unsigned int **item_memory_array_new;
 		makeArrayInt(&item_memory_array_new, DIM, all_ngram);
@@ -317,9 +305,21 @@ int main(int argc, char const *argv[])
 			repeat_num--;
 		}
 
+		unsigned int result[DIM];
+
+		end = clock();
+		time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+		printf("  データ準備時間: %lf[ms]\n", time);
+
+		// -----------------------------------------------------------------------
+
+		// 計算時間
+		start = clock();
+
 		// all_ngramの数だけ、shiftとxorのエンコーディングを計算
 		for (int i = 0; i < repeat_num; i++)
 		{
+
 			// -----------------------------------------------------
 			// シフトしたものをitem_memory_array_reuslt[ngram][DIM]に格納
 			unsigned int **item_memory_array_result;
@@ -345,55 +345,67 @@ int main(int argc, char const *argv[])
 			}
 			freeArrayInt(&item_memory_array_result, ngram);
 			// ------------------------------------------------------
-
 			// tmpに入ったエンコーディング結果でitem_memory_array_new[all_ngram][DIM]を更新
 			for (int k = 0; k < DIM; k++)
 			{
 				item_memory_array_new[k][i] = tmp[k];
 			}
 		}
-
 		// ---------------------------------------------
-
 		if (even)
 		{
 			for (int i = 0; i < DIM; i++)
 			{
-
 				item_memory_array_new[i][all_ngram - 1] = item_memory_array[majority_tmp][i];
 			}
 		}
-
 		// ---------------------------------------------
-
 		// 結果を格納
 		// Bounding
-		unsigned int result[DIM];
 		for (int i = 0; i < DIM; i++)
 		{
 			result[i] = bounding(item_memory_array_new[i], all_ngram);
 		}
 
+		end = clock();
+		time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+		printf("  計算時間: %lf[ms]\n", time);
+
+		// ---------------------------------------------
 		// デバッグ用
 		for (int j = 0; j < DIM; j++)
 		{
 			printf("%u\n", result[j]);
 		}
-
 		// ---------------------------------------------
+
+		// メモリ解放時間
+		start = clock();
 
 		freeArrayInt(&item_memory_array_new, DIM);
 		freeArray(&ascii_array, all_ngram);
+
+		end = clock();
+		time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+		printf("  メモリ解放時間: %lf[ms]\n", time);
 	}
+
+	// メモリ解放時間
+	start = clock();
 
 	freeArrayInt(&item_memory_array, rand_num);
 
-	printf("---------------------------------------------------------\n\n");
+	end = clock();
+	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  メモリ解放時間: %lf[ms]\n", time);
 
-	// 時間計測
-	clock_t end = clock();
-	const double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n\nDavinci_ngram time %lf[ms]\n", time);
+	// -----------------------------------------------------------------------
+
+	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
+
+	end = clock();
+	time = ((double)(end - start_program)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  プログラム合計時間: %lf[ms]\n", time);
 
 	return 0;
 }

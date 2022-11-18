@@ -38,7 +38,14 @@ module counter
     reg         store_nn;
 
     always_ff @( posedge clk ) begin
-                  store_n <= store;
+                  //   if ( store != 0) begin
+                  //       store_n <= 1'b1;
+                  //   end
+                  //   else begin
+                  //       store_n <= 1'b0;
+                  //   end
+                  // 全コアが同じタイミングでストアすると仮定
+                  store_n <= store[ 0 ];
                   store_nn <= store_n;
               end;
 
@@ -48,7 +55,7 @@ module counter
     // コア数可変
     // 4bitあれば十分
     reg signed [ 5:0 ]      box_1;
-    // reg signed [ 3:0 ]      box_2;
+    // reg signed [ 4:0 ]      box_2;
     // reg signed [ 3:0 ]      box_3;
 
 

@@ -182,6 +182,7 @@ module core
                   end
 
                   // アクセラレータ動作中実行
+                  // 187MHzはexec->reg2がボトルネックだった
                   else if ( exec ) begin
 
                       // アドレス必要
@@ -247,6 +248,7 @@ module core
                           end
 
                           // nop (すべて0のはず)
+                          // (reg1やreg2の値は保持)
                           else begin
                               buff <= 0;
                               store <= 0;

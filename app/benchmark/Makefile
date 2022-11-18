@@ -9,6 +9,7 @@ default:
 	gcc -O2 -o perm perm.c -lm
 	gcc -O2 -o perm_bound perm_bound.c -lm
 	gcc -O2 -o perm_and_bound perm_and_bound.c -lm
+	gcc -O2 -o write_test write_test.c -lm
 
 check:
 	gcc -Wall -o bind bind.c -lm
@@ -20,6 +21,7 @@ check:
 	gcc -Wall -o perm perm.c -lm
 	gcc -Wall -o perm_bound perm_bound.c -lm
 	gcc -Wall -o perm_and_bound perm_and_bound.c -lm
+	gcc -Wall -o write_test write_test.c -lm
 
 asm:
 	gcc -Wall -O2 -S -o bind.s bind.c -lm
@@ -31,6 +33,7 @@ asm:
 	gcc -Wall -O2 -S -o perm.s perm.c -lm
 	gcc -Wall -O2 -S -o perm_bound.s perm_bound.c -lm
 	gcc -Wall -O2 -S -o perm_and_bound.s perm_and_bound.c -lm
+	gcc -Wall -O2 -S -o write_test write_test.c -lm
 
 
 linux:
@@ -43,6 +46,7 @@ linux:
 	arm-linux-gnueabihf-gcc -O2 -o perm_peta perm.c -lm
 	arm-linux-gnueabihf-gcc -O2 -o perm_bound_peta perm_bound.c -lm
 	arm-linux-gnueabihf-gcc -O2 -o perm_and_bound_peta perm_and_bound.c -lm
+	arm-linux-gnueabihf-gcc -O2 -o write_test_peta write_test.c -lm
 
 linux-check:
 	arm-linux-gnueabihf-gcc -Wall -o bind_peta bind.c -lm
@@ -54,6 +58,7 @@ linux-check:
 	arm-linux-gnueabihf-gcc -Wall -o perm_peta perm.c -lm
 	arm-linux-gnueabihf-gcc -Wall -o perm_bound_peta perm_bound.c -lm
 	arm-linux-gnueabihf-gcc -Wall -o perm_and_bound_peta perm_and_bound.c -lm
+	arm-linux-gnueabihf-gcc -Wall -o write_test_peta write_test.c -lm
 
 linux-asm:
 	arm-linux-gnueabihf-gcc -Wall -O2 -S -o bind_peta.s bind.c -lm
@@ -65,6 +70,7 @@ linux-asm:
 	arm-linux-gnueabihf-gcc -Wall -O2 -S -o perm_peta.s perm.c -lm
 	arm-linux-gnueabihf-gcc -Wall -O2 -S -o perm_bound_peta.s perm_bound.c -lm
 	arm-linux-gnueabihf-gcc -Wall -O2 -S -o perm_and_bound_peta.s perm_and_bound.c -lm
+	arm-linux-gnueabihf-gcc -Wall -O2 -S -o write_test_peta write_test.c -lm
 
 
 clean:

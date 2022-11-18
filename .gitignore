@@ -381,12 +381,14 @@ ohashi_bind
 ohashi_bind_bound
 ohashi_bound
 ohashi_perm
+ohashi_perm_bound
 ohashi_random
 
 ohashi_bind.s
 ohashi_bind_bound.s
 ohashi_bound.s
 ohashi_perm.s
+ohashi_perm_bound.s
 ohashi_random.s
 
 random
@@ -398,6 +400,7 @@ perm_bound
 perm_and_bound
 bound
 bound2
+write_test
 random_peta
 bind_peta
 bind_bound_peta
@@ -407,6 +410,7 @@ perm_bound_peta
 perm_and_bound_peta
 bound_peta
 bound2_peta
+write_test_peta
 
 random.s
 bind.s

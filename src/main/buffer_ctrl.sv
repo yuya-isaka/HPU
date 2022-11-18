@@ -53,10 +53,11 @@ module buffer_ctrl
          input wire [ CORENUM-1:0 ]             store,
          //  input wire                         store,
          input wire                             stream_v,
+         input wire                             last_stream,
 
 
          // out
-         output logic [ 1023:0 ]                stream_d,
+         output logic [ 511:0 ]                 stream_d,
          output wire  [ DIM:0 ]                 sign_bit
 
      );
@@ -147,7 +148,12 @@ module buffer_ctrl
                   // stream_vがたった次のタイミングに値を更新
                   // stram_vの次にdst_validが立つ設計
                   if ( stream_v ) begin
-                      stream_d <= sign_bit;
+                      if ( last_stream ) begin
+                          stream_d[ 511:0 ] <= sign_bit[ 1023:512 ];
+                      end
+                      else begin
+                          stream_d[ 511:0 ] <= sign_bit[ 511:0 ];
+                      end
                   end
               end;
 
