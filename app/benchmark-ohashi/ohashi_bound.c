@@ -229,8 +229,8 @@ int main(int argc, char const *argv[])
 	start = clock();
 
 	const int core_num = 32;
-	// const int trial_num = 5000000;
-	const int trial_num = 50000000;
+	// const int trial_num = 50000000;
+	const int trial_num = 3000000;
 	const int send_num_max = 33000000;
 
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
