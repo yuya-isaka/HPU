@@ -263,7 +263,7 @@ int main(int argc, char const *argv[])
 	start = clock();
 
 	// const int trial_num = 50000000;
-	const int trial_num = 3000000;
+	const int trial_num = 10000000;
 	const int perm_num = 3;
 
 	int *addr = (int *)calloc(trial_num, sizeof(int));

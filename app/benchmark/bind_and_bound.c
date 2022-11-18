@@ -172,7 +172,7 @@ int main(int argc, char const *argv[])
 
 	// 試行回数
 	// const int trial_num = 50000000;
-	const int trial_num = 3000000;
+	const int trial_num = 10000000;
 
 	int *addr1 = (int *)calloc(trial_num, sizeof(int));
 	int *addr2 = (int *)calloc(trial_num, sizeof(int));
