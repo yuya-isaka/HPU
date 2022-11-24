@@ -125,7 +125,7 @@ unsigned int shifter_32(unsigned int *v, unsigned int num)
 // perm ... 対象ハイパーベクトル、Peramutationする数 -> ハイパーベクトル（返り値）
 // bind ... 対象ハイパーベクトル、対象ハイパーベクトル -> ハイパーベクトル（返り値）
 // bound ...ハイパーベクトルの配列　->  ハイパーベクトル（返り値）
-void shifter_1024(unsigned int new[DIM], unsigned int original[DIM], const unsigned int DIM, unsigned int num)
+void shifter_1024(const unsigned int DIM, unsigned int new[DIM], unsigned int original[DIM], unsigned int num)
 {
 	// original[DIM] 	... unsigned int のデータが32個格納（1024次元をエミュレート）
 	// new[DIM] 		... unsigned int のデータが32個格納（1024次元をエミュレート）
@@ -137,7 +137,7 @@ void shifter_1024(unsigned int new[DIM], unsigned int original[DIM], const unsig
 	{
 		// tmp		... num回右論理シフトした際にはみ出した部分を（32-num)回左論理シフトしたやつ
 		// tmp_v 	... num回右論理シフトしたやつ
-		unsigned int tmp = (*original)[i];
+		unsigned int tmp = original[i];
 		unsigned int tmp_v = shifter_32(&tmp, num);
 		// シフト
 		result_tmp[i] |= tmp_v;
@@ -153,7 +153,7 @@ void shifter_1024(unsigned int new[DIM], unsigned int original[DIM], const unsig
 	// 結果を移す
 	for (int i = 0; i < DIM; i++)
 	{
-		(*new)[i] = result_tmp[i];
+		new[i] = result_tmp[i];
 	}
 	free(result_tmp);
 }
@@ -217,6 +217,7 @@ int main(int argc, char const *argv[])
 
 	// ---------------------------------------------
 
+	// ランダム生成の部分をそれぞれ作る ----------------------------
 	// ランダム生成の初期化
 	xor128(1);
 
@@ -339,7 +340,7 @@ int main(int argc, char const *argv[])
 			for (int j = 0; j < ngram; j++)
 			{
 				// shift
-				shifter_1024(&item_memory_array_result[j], &item_memory_array[ascii_array[i][j]], DIM, j);
+				shifter_1024(DIM, item_memory_array_result[j], item_memory_array[ascii_array[i][j]], j);
 			}
 			// シフト後のデータを各LEGNTHでxorしtmpに格納
 			unsigned int tmp[DIM];
