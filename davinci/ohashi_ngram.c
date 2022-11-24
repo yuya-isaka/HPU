@@ -241,6 +241,7 @@ int main(int argc, char const *argv[])
 	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
 	const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
 	const int ngram = 3;
+	const int core_num_max = 32;
 	const int core_num = 32;
 	const int instruction_num = 11;
 	const int majority_addr = 26;
@@ -422,7 +423,7 @@ int main(int argc, char const *argv[])
 		if (even)
 		{
 			// load
-			for (int i = 0; i < core_num; i++)
+			for (int i = 0; i < core_num_max; i++)
 			{
 				if (i == 0)
 				{
@@ -439,7 +440,7 @@ int main(int argc, char const *argv[])
 			}
 
 			// store
-			for (int i = 0; i < core_num; i++)
+			for (int i = 0; i < core_num_max; i++)
 			{
 				if (i == 0)
 				{
@@ -460,21 +461,37 @@ int main(int argc, char const *argv[])
 		// 命令をsrc配列に埋める
 		for (int j = 0; j < all_instruction; j++)
 		{
-			for (int i = 0; i < core_num; i++)
+			for (int i = 0; i < core_num_max; i++)
 			{
-				src[send_num++] = src_tmp[i][j];
-				count++;
+				if (i < core_num)
+				{
+					src[send_num++] = src_tmp[i][j];
+					count++;
+				}
+				else
+				{
+					src[send_num++] = 0;
+					count++;
+				}
 			}
 
 			if (count >= send_num_max)
 			{
 
 				// Last命令
-				for (int i = 0; i < core_num; i++)
+				for (int i = 0; i < core_num_max; i++)
 				{
-					uint16_t inst = assemble("last", 0);
-					src[send_num++] = inst;
-					count++;
+					if (i < core_num)
+					{
+						uint16_t inst = assemble("last", 0);
+						src[send_num++] = inst;
+						count++;
+					}
+					else
+					{
+						src[send_num++] = 0;
+						count++;
+					}
 				}
 				send_num_array[send_num_count++] = count;
 				count = 0;
@@ -482,11 +499,19 @@ int main(int argc, char const *argv[])
 		}
 
 		// last命令
-		for (int i = 0; i < core_num; i++)
+		for (int i = 0; i < core_num_max; i++)
 		{
-			uint16_t inst = assemble("last", 0);
-			src[send_num++] = inst;
-			count++;
+			if (i < core_num)
+			{
+				uint16_t inst = assemble("last", 0);
+				src[send_num++] = inst;
+				count++;
+			}
+			else
+			{
+				src[send_num++] = 0;
+				count++;
+			}
 		}
 		send_num_array[send_num_count++] = count;
 
