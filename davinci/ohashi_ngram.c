@@ -136,6 +136,7 @@ int main(int argc, char const *argv[])
 	// 初期化の時間
 	clock_t start = clock();
 
+	// initialの抽象化は後回し
 	int fd0, fd1, dmaf, topf;
 
 	if ((fd0 = open("/sys/class/u-dma-buf/udmabuf0/phys_addr", O_RDONLY)) != -1)

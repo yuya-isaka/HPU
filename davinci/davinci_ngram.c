@@ -113,7 +113,19 @@ unsigned int shifter_32(unsigned int *v, unsigned int num)
 
 // unsigned int 1024bitのシフト
 // 32bitのシフトを繰り返すことでエミュレート（現状31シフトが限界）
-void shifter_1024(unsigned int **new, unsigned int **original, const unsigned int DIM, unsigned int num)
+// 第一引数 ... uint32_t型の配列 (格納先)
+
+// 第二引数 ... uint32_t型の配列
+// 第三引数 ... 配列の個数
+// 第四引数 ... 右シフトする数
+// 8 - 128で割り切れる最大の数を型として使う
+// initila関数に次元設定→型が自動的に決まって
+
+// shifterとbindのインタフェースを揃える
+// perm ... 対象ハイパーベクトル、Peramutationする数 -> ハイパーベクトル（返り値）
+// bind ... 対象ハイパーベクトル、対象ハイパーベクトル -> ハイパーベクトル（返り値）
+// bound ...ハイパーベクトルの配列　->  ハイパーベクトル（返り値）
+void shifter_1024(unsigned int new[DIM], unsigned int original[DIM], const unsigned int DIM, unsigned int num)
 {
 	// original[DIM] 	... unsigned int のデータが32個格納（1024次元をエミュレート）
 	// new[DIM] 		... unsigned int のデータが32個格納（1024次元をエミュレート）
