@@ -1,7 +1,7 @@
 
 default:
 	gcc -O2 -o davinci_ngram davinci_ngram.c -lm
-	gcc -O2 -o davinci_ngram_intel davinci_ngram_intel.c -lm
+	g++ -mavx2 -O2 -o davinci_ngram_intel davinci_ngram_intel.cpp -lm
 
 check:
 	gcc -Wall -o davinci_ngram davinci_ngram.c -lm

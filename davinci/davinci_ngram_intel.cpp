@@ -5,8 +5,8 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-// #include <cstdlib>
-// #include <cstdio>
+#include <cstdlib>
+#include <cstdio>
 #include <x86intrin.h>
 
 // --------------------- メモリリークチェック、デストラクター -----------------------
