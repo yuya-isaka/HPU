@@ -15,7 +15,7 @@ mp:
 	rm test
 
 simd:
-	g++ -std=gnu++11 -mfpu=neon-fp-armv8 test_simd.cpp -o test
+	g++ -mavx2 test_simd.cpp -o test
 	./test
 	rm test
 

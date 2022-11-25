@@ -1,6 +1,7 @@
 
 default:
 	gcc -O2 -o davinci_ngram davinci_ngram.c -lm
+	gcc -O2 -o davinci_ngram_intel davinci_ngram_intel.c -lm
 
 check:
 	gcc -Wall -o davinci_ngram davinci_ngram.c -lm
