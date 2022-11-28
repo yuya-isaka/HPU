@@ -19,6 +19,15 @@ simd:
 	./test
 	rm test
 
+neon:
+	gcc test_neon.c -o test
+	./test
+	rm test
+
+neon-linux:
+	arm-linux-gnueabihf-gcc -mfpu=neon test_neon.c -o test_neon
+	rm test_neon
+
 %: %.c
 	gcc $@.c -o $@
 
