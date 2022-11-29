@@ -280,6 +280,14 @@ void bound_batch(uint32_t result_hv[HV_NUM], size_t batch_size, uint32_t **batch
 	uint32_t mask = (uint32_t)1 << (32 - 1);
 }
 
+void bind(uint32_t dst[HV_NUM], uint32_t src1[HV_NUM], uint32_t src2[HV_NUM])
+{
+	for (int i = 0; i < HV_NUM; i++)
+	{
+		dst[i] = src1[i] ^ src2[i];
+	}
+}
+
 // -----------------------------------------------------------------------
 
 int main(int argc, char const *argv[])
@@ -443,12 +451,8 @@ int main(int argc, char const *argv[])
 
 			for (uint32_t l = 0; l < NGRAM; l++)
 			{
-				for (uint32_t k = 0; k < HV_NUM; k++)
-				{
-					// xor
-					// item_memory_array_new[i][k] ^= item_memory_array_result[l][k];
-					bound_tmp[k] ^= item_memory_array_result[l][k];
-				}
+				// bind(item_memory_array_new[i], item_memory_array_new[i], item_memory_array_result[l]);
+				bind(bound_tmp, bound_tmp, item_memory_array_result[l]);
 			}
 			freeArrayU32(&item_memory_array_result, NGRAM);
 
