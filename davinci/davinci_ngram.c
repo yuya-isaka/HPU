@@ -135,37 +135,132 @@ uint32_t shifter_32(uint32_t *v, uint32_t num)
 // perm ... 対象ハイパーベクトル、Peramutationする数 -> ハイパーベクトル（返り値）
 // bind ... 対象ハイパーベクトル、対象ハイパーベクトル -> ハイパーベクトル（返り値）
 // bound ...ハイパーベクトルの配列　->  ハイパーベクトル（返り値）
+// void shifter_1024(uint32_t new[HV_NUM], uint32_t original[HV_NUM], uint32_t perm_num)
+// {
+// 	if (perm_num == 0)
+// 	{
+// 		memcpy(new, original, sizeof(uint32_t) * HV_NUM);
+// 		return;
+// 	}
+// 	// original[HV_NUM] 	... unsigned int のデータが32個格納（1024次元をエミュレート）
+// 	// new[HV_NUM] 		... unsigned int のデータが32個格納（1024次元をエミュレート）
+// 	// original配列に格納されているデータをシフトしたデータをnew配列に格納
+// 	// シフトしたデータを一時的に格納
+// 	uint32_t *result_tmp = (uint32_t *)calloc(HV_NUM, sizeof(uint32_t));
+// 	// 32回繰り返す
+// 	for (uint32_t i = 0; i < HV_NUM; i++)
+// 	{
+// 		// tmp		... num回右論理シフトした際にはみ出した部分を（32-num)回左論理シフトしたやつ
+// 		// tmp_v 	... num回右論理シフトしたやつ
+// 		uint32_t tmp = original[i];
+// 		uint32_t tmp_v = shifter_32(&tmp, perm_num);
+// 		// シフト
+// 		result_tmp[i] |= tmp_v;
+// 		if (i == 0)
+// 		{
+// 			result_tmp[HV_NUM - 1] |= tmp;
+// 		}
+// 		else
+// 		{
+// 			result_tmp[i - 1] |= tmp;
+// 		}
+// 	}
+// 	// 結果を移す
+// 	for (uint32_t i = 0; i < HV_NUM; i++)
+// 	{
+// 		new[i] = result_tmp[i];
+// 	}
+// 	free(result_tmp);
+// }
+
 void shifter_1024(uint32_t new[HV_NUM], uint32_t original[HV_NUM], uint32_t perm_num)
 {
-	// original[HV_NUM] 	... unsigned int のデータが32個格納（1024次元をエミュレート）
-	// new[HV_NUM] 		... unsigned int のデータが32個格納（1024次元をエミュレート）
+	// original[require_int_num] 	... unsigned int のデータが32個格納（1024次元をエミュレート）
+	// new[require_int_num] 		... unsigned int のデータが32個格納（1024次元をエミュレート）
+
 	// original配列に格納されているデータをシフトしたデータをnew配列に格納
-	// シフトしたデータを一時的に格納
-	uint32_t *result_tmp = (uint32_t *)calloc(HV_NUM, sizeof(uint32_t));
-	// 32回繰り返す
-	for (uint32_t i = 0; i < HV_NUM; i++)
+	if (perm_num == 0)
 	{
-		// tmp		... num回右論理シフトした際にはみ出した部分を（32-num)回左論理シフトしたやつ
-		// tmp_v 	... num回右論理シフトしたやつ
-		uint32_t tmp = original[i];
-		uint32_t tmp_v = shifter_32(&tmp, perm_num);
-		// シフト
-		result_tmp[i] |= tmp_v;
-		if (i == 0)
+		memcpy(new, original, sizeof(uint32_t) * HV_NUM);
+		return;
+	}
+
+	int flag = 1;
+	unsigned int perm = 0;
+	uint32_t result_hv[HV_NUM];
+	memset(result_hv, 0, sizeof(result_hv));
+
+	while (perm_num)
+	{
+		// あと何回かチェック
+		if (perm_num > 31)
 		{
-			result_tmp[HV_NUM - 1] |= tmp;
+			perm = 31;
+			perm_num -= 31;
 		}
 		else
 		{
-			result_tmp[i - 1] |= tmp;
+			perm = perm_num;
+			perm_num = 0;
+		}
+
+		if (flag)
+		{
+			// 32回繰り返す
+			for (int i = 0; i < HV_NUM; i++)
+			{
+				// tmp		... num回右論理シフトした際にはみ出した部分を（32-num)回左論理シフトしたやつ
+				// tmp_v 	... num回右論理シフトしたやつ
+				unsigned int tmp = original[i];
+				unsigned int tmp_v = shifter_32(&tmp, perm);
+
+				// シフト
+				result_hv[i] |= tmp_v;
+				if (i == 0)
+				{
+					result_hv[HV_NUM - 1] |= tmp;
+				}
+				else
+				{
+					result_hv[i - 1] |= tmp;
+				}
+			}
+			for (int i = 0; i < HV_NUM; i++)
+			{
+				new[i] = result_hv[i];
+				result_hv[i] = 0;
+			}
+			flag = 0;
+		}
+		else
+		{
+			// 32回繰り返す
+			for (int i = 0; i < HV_NUM; i++)
+			{
+
+				// tmp		... num回右論理シフトした際にはみ出した部分を（32-num)回左論理シフトしたやつ
+				// tmp_v 	... num回右論理シフトしたやつ
+				unsigned int tmp = new[i];
+				unsigned int tmp_v = shifter_32(&tmp, perm);
+
+				// シフト
+				result_hv[i] |= tmp_v;
+				if (i == 0)
+				{
+					result_hv[HV_NUM - 1] |= tmp;
+				}
+				else
+				{
+					result_hv[i - 1] |= tmp;
+				}
+			}
+			for (int i = 0; i < HV_NUM; i++)
+			{
+				new[i] = result_hv[i];
+				result_hv[i] = 0;
+			}
 		}
 	}
-	// 結果を移す
-	for (uint32_t i = 0; i < HV_NUM; i++)
-	{
-		new[i] = result_tmp[i];
-	}
-	free(result_tmp);
 }
 
 // -----------------------------------------------------------------------
@@ -215,10 +310,10 @@ int main(int argc, char const *argv[])
 	clock_t start = clock();
 
 	const uint32_t TRAIN_NUM = 2;
-	// const char *TRAIN_PATH[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
+	const char *TRAIN_PATH[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
 	// const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
-	const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
-	const uint32_t NGRAM = 513;
+	// const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
+	const uint32_t NGRAM = 100;
 	const uint32_t RAND_NUM = 27;
 	const uint32_t MAJORITY_ADDR = 26;
 	uint32_t ALL_NGRAM = 0;

@@ -10,6 +10,8 @@
 #define HV_DIM 1024
 #define HV_NUM HV_DIM / 32
 
+int32_t bound_buff[HV_DIM];
+
 void makeArrayU8(uint8_t ***a, const size_t y, const size_t x)
 {
 	*a = (uint8_t **)calloc(y, sizeof(uint8_t *));
@@ -76,6 +78,11 @@ uint32_t xor128(int reset)
 	}
 }
 
+void init_hv(void)
+{
+	memset(bound_buff, 0, sizeof(bound_buff));
+}
+
 // -----------------------------------------------------------------------
 
 uint32_t right_perm_31(uint32_t *over_hv, uint32_t perm_num)
@@ -86,6 +93,31 @@ uint32_t right_perm_31(uint32_t *over_hv, uint32_t perm_num)
 	return remain_hv;
 }
 
+void right_perm(uint32_t new_hv[HV_NUM], uint32_t base_hv[HV_NUM], uint32_t perm_num)
+{
+	uint32_t result_hv[HV_NUM];
+	memset(result_hv, 0, sizeof(result_hv));
+
+	uint32_t origin_hv = base_hv[0];
+	uint32_t origin_hv_perm = right_perm_31(&origin_hv, perm_num);
+
+	result_hv[0] |= origin_hv_perm;
+	result_hv[HV_NUM - 1] |= origin_hv;
+
+	for (int i = 1; i < HV_NUM; i++)
+	{
+		uint32_t origin_hv = base_hv[i];
+		uint32_t origin_hv_perm = right_perm_31(&origin_hv, perm_num);
+
+		result_hv[i] |= origin_hv_perm;
+		result_hv[i - 1] |= origin_hv;
+	}
+	for (int i = 0; i < HV_NUM; i++)
+	{
+		new_hv[i] = result_hv[i];
+	}
+}
+
 uint32_t left_perm_31(uint32_t *over_hv, uint32_t perm_num)
 {
 	uint32_t remain_hv = *over_hv << perm_num;
@@ -94,7 +126,32 @@ uint32_t left_perm_31(uint32_t *over_hv, uint32_t perm_num)
 	return remain_hv;
 }
 
-void perm(uint32_t new[HV_NUM], uint32_t origin[HV_NUM], uint32_t perm_num, uint32_t (*perm_func)(uint32_t *, uint32_t))
+void left_perm(uint32_t new_hv[HV_NUM], uint32_t base_hv[HV_NUM], uint32_t perm_num)
+{
+	uint32_t result_hv[HV_NUM];
+	memset(result_hv, 0, sizeof(result_hv));
+
+	uint32_t origin_hv = base_hv[HV_NUM - 1];
+	uint32_t origin_hv_perm = left_perm_31(&origin_hv, perm_num);
+
+	result_hv[HV_NUM - 1] |= origin_hv_perm;
+	result_hv[0] |= origin_hv;
+
+	for (int i = HV_NUM - 2; i >= 0; i--)
+	{
+		uint32_t origin_hv = base_hv[i];
+		uint32_t origin_hv_perm = left_perm_31(&origin_hv, perm_num);
+
+		result_hv[i] |= origin_hv_perm;
+		result_hv[i + 1] |= origin_hv;
+	}
+	for (int i = 0; i < HV_NUM; i++)
+	{
+		new_hv[i] = result_hv[i];
+	}
+}
+
+void perm(uint32_t new[HV_NUM], uint32_t origin[HV_NUM], uint32_t perm_num, void (*perm_func)(uint32_t *, uint32_t *, uint32_t))
 {
 	uint32_t repeat_perm_num = perm_num / 31;
 	uint32_t pre_perm_num;
@@ -108,39 +165,11 @@ void perm(uint32_t new[HV_NUM], uint32_t origin[HV_NUM], uint32_t perm_num, uint
 		repeat_perm_num--;
 	}
 
-	uint32_t origin_hv = origin[0];
-	uint32_t origin_hv_perm = perm_func(&origin_hv, pre_perm_num);
-
-	new[0] |= origin_hv_perm;
-	new[HV_NUM - 1] |= origin_hv;
-
-	for (int i = 1; i < HV_NUM; i++)
-	{
-		origin_hv = origin[i];
-		origin_hv_perm = perm_func(&origin_hv, pre_perm_num);
-
-		new[i] |= origin_hv_perm;
-		new[i - 1] |= origin_hv;
-	}
+	perm_func(new, origin, pre_perm_num);
 
 	for (int i = 0; i < repeat_perm_num; i++)
 	{
-		uint32_t origin_hv = new[0];
-		new[0] = 0;
-		uint32_t origin_hv_perm = perm_func(&origin_hv, 31);
-
-		new[0] |= origin_hv_perm;
-		new[HV_NUM - 1] |= origin_hv;
-
-		for (int i = 1; i < HV_NUM; i++)
-		{
-			origin_hv = new[i];
-			new[i] = 0;
-			origin_hv_perm = perm_func(&origin_hv, 31);
-
-			new[i] |= origin_hv_perm;
-			new[i - 1] |= origin_hv;
-		}
+		perm_func(new, new, 31);
 	}
 }
 
@@ -160,18 +189,51 @@ void perm_top(uint32_t new[HV_NUM], uint32_t origin[HV_NUM], uint32_t perm_num)
 	if (perm_num > (HV_DIM / 2))
 	{
 		perm_num = HV_DIM - perm_num;
-		perm(new, origin, perm_num, left_perm_31);
+		perm(new, origin, perm_num, left_perm);
 	}
 	else
 	{
-		perm(new, origin, perm_num, right_perm_31);
+		perm(new, origin, perm_num, right_perm);
 	}
 }
 
-// 多数決関数　&& 加算
-// 32bitの各ビットの立っている数を数えて多数決関数を実行し結果ベクトルを生成
-// result_array[train_size] ... すべてのデータの 結果（unsigned int) が入っている。1024次元ならこのbounding関数を32回使う
-uint32_t bounding(uint32_t result_array[], size_t train_size)
+void bound(uint32_t encoded_hv[HV_NUM])
+{
+	// reductionを使って並列化する必要性あり
+	// https://www.isus.jp/products/c-compilers/32-openmp-traps/
+	uint32_t index_assign = HV_NUM - 1;
+	for (int i = 0; i < HV_NUM; i++)
+	{
+		uint32_t hv = encoded_hv[i];
+		uint32_t mask = 1;
+		for (int j = 0; j < 32; j++)
+		{
+			uint32_t index = index_assign * 32 + j;
+			bound_buff[index] += (mask & hv ? -1 : 1);
+			mask <<= 1;
+		}
+		index_assign--;
+	}
+}
+
+void bound_extract(uint32_t bound_hv[HV_NUM])
+{
+	uint32_t mask = 1 << (32 - 1);
+	uint32_t index_assign = HV_NUM - 1;
+	for (int i = 0; i < HV_NUM; i++)
+	{
+		uint32_t hv = 0;
+		for (int j = 0; j < 32; j++)
+		{
+			uint32_t index = i * 32 + j;
+			uint32_t sign_bit = (bound_buff[index] & mask ? 1 : 0);
+			hv += (sign_bit << j);
+		}
+		bound_hv[index_assign--] = hv;
+	}
+}
+
+uint32_t bound_batch(uint32_t result_array[], size_t train_size)
 {
 	// Populationカウントをして、その後多数決関数を実行
 	uint32_t result = 0;
@@ -205,6 +267,8 @@ int main(int argc, char const *argv[])
 	// プログラム全体の時間
 	clock_t start_program = clock();
 
+	init_hv();
+
 	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
 
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
@@ -213,10 +277,10 @@ int main(int argc, char const *argv[])
 	clock_t start = clock();
 
 	const uint32_t TRAIN_NUM = 2;
-	// const char *TRAIN_PATH[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
+	const char *TRAIN_PATH[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
 	// const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
-	const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
-	const uint32_t NGRAM = 513;
+	// const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
+	const uint32_t NGRAM = 100;
 	const uint32_t RAND_NUM = 27;
 	const uint32_t MAJORITY_ADDR = 26;
 	uint32_t ALL_NGRAM = 0;
@@ -313,12 +377,12 @@ int main(int argc, char const *argv[])
 		{
 			for (uint32_t j = 0; j < NGRAM; j++)
 			{
-				ascii_array[i][j] = (unsigned char)(content[i + j]) - 97;
+				ascii_array[i][j] = (uint8_t)(content[i + j]) - 97;
 			}
 		}
 
-		uint32_t **item_memory_array_new;
-		makeArrayU32(&item_memory_array_new, HV_NUM, ALL_NGRAM);
+		// uint32_t **item_memory_array_new;
+		// makeArrayU32(&item_memory_array_new, HV_NUM, ALL_NGRAM);
 
 		uint32_t repeat_num = ALL_NGRAM;
 		if (EVEN)
@@ -326,7 +390,8 @@ int main(int argc, char const *argv[])
 			repeat_num--;
 		}
 
-		u_int32_t result[HV_NUM];
+		uint32_t result[HV_NUM];
+		memset(result, 0, sizeof(result));
 
 		end = clock();
 		time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
@@ -367,26 +432,29 @@ int main(int argc, char const *argv[])
 			freeArrayU32(&item_memory_array_result, NGRAM);
 			// ------------------------------------------------------
 			// tmpに入ったエンコーディング結果でitem_memory_array_new[ALL_NGRAM][HV_NUM]を更新
-			for (uint32_t k = 0; k < HV_NUM; k++)
-			{
-				item_memory_array_new[k][i] = tmp[k];
-			}
+			// for (uint32_t k = 0; k < HV_NUM; k++)
+			// {
+			// 	item_memory_array_new[k][i] = tmp[k];
+			// }
+			bound(tmp);
 		}
 		// ---------------------------------------------
 		if (EVEN)
 		{
-			for (uint32_t i = 0; i < HV_NUM; i++)
-			{
-				item_memory_array_new[i][ALL_NGRAM - 1] = item_memory_array[MAJORITY_ADDR][i];
-			}
+			// for (uint32_t i = 0; i < HV_NUM; i++)
+			// {
+			// 	item_memory_array_new[i][ALL_NGRAM - 1] = item_memory_array[MAJORITY_ADDR][i];
+			// }
+			bound(item_memory_array[MAJORITY_ADDR]);
 		}
 		// ---------------------------------------------
 		// 結果を格納
 		// Bounding
-		for (uint32_t i = 0; i < HV_NUM; i++)
-		{
-			result[i] = bounding(item_memory_array_new[i], ALL_NGRAM);
-		}
+		// for (uint32_t i = 0; i < HV_NUM; i++)
+		// {
+		// 	result[i] = bounding(item_memory_array_new[i], ALL_NGRAM);
+		// }
+		bound_extract(result);
 
 		end = clock();
 		time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
@@ -403,7 +471,7 @@ int main(int argc, char const *argv[])
 		// メモリ解放時間
 		start = clock();
 
-		freeArrayU32(&item_memory_array_new, HV_NUM);
+		// freeArrayU32(&item_memory_array_new, HV_NUM);
 		freeArrayU8(&ascii_array, ALL_NGRAM);
 
 		end = clock();
