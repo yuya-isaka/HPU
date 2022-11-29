@@ -233,30 +233,51 @@ void bound_extract(uint32_t bound_hv[HV_NUM])
 	}
 }
 
-uint32_t bound_batch(uint32_t result_array[], size_t train_size)
+// 現状こっちの方が微妙に早い
+// 3.32 -> 3.14 になる
+// 並列化するとどうなるかわからん
+void bound_batch(uint32_t result_hv[HV_NUM], size_t batch_size, uint32_t **batch_data)
 {
-	// Populationカウントをして、その後多数決関数を実行
-	uint32_t result = 0;
-	// マスクをずらしながら各次元の1が立っている数を調べる
-	uint32_t mask = (uint32_t)1 << (32 - 1);
+	uint32_t hv_buff[HV_DIM];
+	memset(hv_buff, 0, sizeof(hv_buff));
 
-	while (mask)
+	for (int i = 0; i < batch_size; i++)
 	{
-		uint32_t buff = 0;
-		// 訓練データの数だけ足し算
-		for (uint32_t i = 0; i < train_size; i++)
+		uint32_t index_assign = HV_NUM - 1;
+		for (int j = 0; j < HV_NUM; j++)
 		{
-			buff += (mask & result_array[i] ? 1 : 0);
+			uint32_t hv = batch_data[i][j];
+			uint32_t mask = 1;
+			for (int k = 0; k < 32; k++)
+			{
+				uint32_t index = index_assign * 32 + k;
+				hv_buff[index] += (mask & hv ? 1 : 0);
+				mask <<= 1;
+			}
+			index_assign--;
 		}
-		// 多数決で1の数が過半数なら、resultにmaskを加える（→対象のbit番目が1になる）
-		if (buff > (train_size / 2))
-		{
-			// 多数決で1が優位だったら、該当ビットを立たせる
-			result += mask;
-		}
-		mask >>= 1;
 	}
-	return result;
+
+	uint32_t threshold = batch_size / 2;
+	uint32_t index = HV_NUM - 1;
+	uint32_t counter = 0;
+	uint32_t tmp_hv = 0;
+	for (int i = 0; i < HV_DIM; i++)
+	{
+		if (hv_buff[i] > threshold)
+		{
+			tmp_hv |= 1 << counter;
+		}
+		counter++;
+		if (counter >= 32)
+		{
+			counter = 0;
+			result_hv[index--] = tmp_hv;
+			tmp_hv = 0;
+		}
+	}
+	uint32_t result = 0;
+	uint32_t mask = (uint32_t)1 << (32 - 1);
 }
 
 // -----------------------------------------------------------------------
@@ -267,8 +288,6 @@ int main(int argc, char const *argv[])
 	// プログラム全体の時間
 	clock_t start_program = clock();
 
-	init_hv();
-
 	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
 
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
@@ -277,10 +296,10 @@ int main(int argc, char const *argv[])
 	clock_t start = clock();
 
 	const uint32_t TRAIN_NUM = 2;
-	const char *TRAIN_PATH[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
+	// const char *TRAIN_PATH[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
 	// const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
-	// const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
-	const uint32_t NGRAM = 100;
+	const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
+	const uint32_t NGRAM = 5;
 	const uint32_t RAND_NUM = 27;
 	const uint32_t MAJORITY_ADDR = 26;
 	uint32_t ALL_NGRAM = 0;
@@ -324,6 +343,8 @@ int main(int argc, char const *argv[])
 
 		// データ準備時間
 		start = clock();
+
+		init_hv();
 
 		// ファイル読み込み
 		const char *PATH = TRAIN_PATH[i];
@@ -382,7 +403,7 @@ int main(int argc, char const *argv[])
 		}
 
 		// uint32_t **item_memory_array_new;
-		// makeArrayU32(&item_memory_array_new, HV_NUM, ALL_NGRAM);
+		// makeArrayU32(&item_memory_array_new, ALL_NGRAM, HV_NUM);
 
 		uint32_t repeat_num = ALL_NGRAM;
 		if (EVEN)
@@ -416,44 +437,33 @@ int main(int argc, char const *argv[])
 				perm_top(item_memory_array_result[j], item_memory_array[ascii_array[i][j]], j);
 			}
 			// シフト後のデータを各LEGNTHでxorしtmpに格納
-			uint32_t tmp[HV_NUM];
-			for (uint32_t j = 0; j < HV_NUM; j++)
+
+			uint32_t bound_tmp[HV_NUM];
+			memset(bound_tmp, 0, sizeof(bound_tmp));
+
+			for (uint32_t l = 0; l < NGRAM; l++)
 			{
-				tmp[j] = 0;
-			}
-			for (uint32_t k = 0; k < HV_NUM; k++)
-			{
-				for (uint32_t l = 0; l < NGRAM; l++)
+				for (uint32_t k = 0; k < HV_NUM; k++)
 				{
 					// xor
-					tmp[k] ^= item_memory_array_result[l][k];
+					// item_memory_array_new[i][k] ^= item_memory_array_result[l][k];
+					bound_tmp[k] ^= item_memory_array_result[l][k];
 				}
 			}
 			freeArrayU32(&item_memory_array_result, NGRAM);
-			// ------------------------------------------------------
-			// tmpに入ったエンコーディング結果でitem_memory_array_new[ALL_NGRAM][HV_NUM]を更新
-			// for (uint32_t k = 0; k < HV_NUM; k++)
-			// {
-			// 	item_memory_array_new[k][i] = tmp[k];
-			// }
-			bound(tmp);
+
+			bound(bound_tmp);
 		}
 		// ---------------------------------------------
 		if (EVEN)
 		{
-			// for (uint32_t i = 0; i < HV_NUM; i++)
-			// {
-			// 	item_memory_array_new[i][ALL_NGRAM - 1] = item_memory_array[MAJORITY_ADDR][i];
-			// }
+			// memcpy(item_memory_array_new[ALL_NGRAM - 1], item_memory_array[MAJORITY_ADDR], sizeof(uint32_t) * HV_NUM);
 			bound(item_memory_array[MAJORITY_ADDR]);
 		}
 		// ---------------------------------------------
 		// 結果を格納
 		// Bounding
-		// for (uint32_t i = 0; i < HV_NUM; i++)
-		// {
-		// 	result[i] = bounding(item_memory_array_new[i], ALL_NGRAM);
-		// }
+		// bound_batch(result, ALL_NGRAM, item_memory_array_new);
 		bound_extract(result);
 
 		end = clock();
@@ -471,7 +481,7 @@ int main(int argc, char const *argv[])
 		// メモリ解放時間
 		start = clock();
 
-		// freeArrayU32(&item_memory_array_new, HV_NUM);
+		// freeArrayU32(&item_memory_array_new, ALL_NGRAM);
 		freeArrayU8(&ascii_array, ALL_NGRAM);
 
 		end = clock();
