@@ -366,6 +366,7 @@ boot
 # バイナリたち
 # davinci
 davinci_ngram
+davinci_ngram_new
 davinci_ngram_peta
 ohashi_ngram
 davinci_ngram.s

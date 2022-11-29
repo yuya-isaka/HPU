@@ -1,3 +1,4 @@
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,45 +10,25 @@
 #define HV_DIM 1024
 #define HV_NUM HV_DIM / 32
 
-// -------------------- メモリリークチェック、デストラクター -----------------
-
-// M1のみ使用
-// __attribute__((destructor)) static void destructor()
-// {
-// 	system("leaks -q a.out");
-// }
-
-// -----------------------------------------------------------------------
-
-// y列x行のuint8_t２次元配列を確保
 void makeArrayU8(uint8_t ***a, const size_t y, const size_t x)
 {
-	// ポインタの配列準備
 	*a = (uint8_t **)calloc(y, sizeof(uint8_t *));
 
-	// ポインタの配列の各要素に『配列』を格納
 	for (int i = 0; i < y; i++)
 	{
 		(*a)[i] = (uint8_t *)calloc(x, sizeof(uint8_t));
 	}
 }
 
-// y列x行のuint8_t２次元配列を解放
 void freeArrayU8(uint8_t ***a, const size_t y)
 {
-	// ポインタの配列の各要素（配列）を解放
 	for (int i = 0; i < y; i++)
 	{
-		// (*a)[i]に配列が格納されている
 		free((*a)[i]);
 	}
-	// ポインタの配列を解放
 	free(*a);
 }
 
-// -----------------------------------------------------------------------
-
-// y列x行のuint32_tの２次元配列を確保
 void makeArrayU32(uint32_t ***a, const size_t y, const size_t x)
 {
 	*a = (uint32_t **)calloc(y, sizeof(uint32_t *));
@@ -57,7 +38,6 @@ void makeArrayU32(uint32_t ***a, const size_t y, const size_t x)
 	}
 }
 
-// y列x行のuint32_tの２次元配列を解放
 void freeArrayU32(uint32_t ***a, const size_t y)
 {
 	for (int i = 0; i < y; i++)
@@ -69,16 +49,8 @@ void freeArrayU32(uint32_t ***a, const size_t y)
 
 // -----------------------------------------------------------------------
 
-// ランダム生成（xorshift）
 uint32_t xor128(int reset)
 {
-	// 内部で値を保持（seed） パターン１
-	// static uint32_t x = 2380889285;
-	// static uint32_t y = 1631889387;
-	// static uint32_t z = 1698655726;
-	// static uint32_t w = 2336862850;
-
-	// 内部で値を保持（seed） パターン２
 	static uint32_t x = 123456789;
 	static uint32_t y = 362436069;
 	static uint32_t z = 521288629;
@@ -95,9 +67,7 @@ uint32_t xor128(int reset)
 	}
 	else
 	{
-		// 前回のxを使う
 		uint32_t t = x ^ (x << 11);
-		// 更新
 		x = y;
 		y = z;
 		z = w;
@@ -108,67 +78,95 @@ uint32_t xor128(int reset)
 
 // -----------------------------------------------------------------------
 
-// unsigned int 32bitのシフト
-// num回右論理シフトしたやつを返す
-// 引数のvには、右論理シフトではみだしたやつを（32-num)回論理左シフトして取り出す
-uint32_t shifter_32(uint32_t *v, uint32_t num)
+uint32_t right_perm_31(uint32_t *over_hv, uint32_t perm_num)
 {
-	// num回 論理右シフト
-	uint32_t tmp_v = *v >> num;
-	// 右にシフトしたやつを取り出して、左に(32-num)回 論理左シフト
-	uint32_t tmp_num = (1 << num) - 1;
-	*v = (*v & tmp_num) << (32 - num);
-	return tmp_v;
+	uint32_t remain_hv = *over_hv >> perm_num;
+	uint32_t mask = (1 << perm_num) - 1;
+	*over_hv = (*over_hv & mask) << (32 - perm_num);
+	return remain_hv;
 }
 
-// unsigned int 1024bitのシフト
-// 32bitのシフトを繰り返すことでエミュレート（現状31シフトが限界）
-// 第一引数 ... uint32_t型の配列 (格納先)
-
-// 第二引数 ... uint32_t型の配列
-// 第三引数 ... 配列の個数
-// 第四引数 ... 右シフトする数
-// 8 - 128で割り切れる最大の数を型として使う
-// initila関数に次元設定→型が自動的に決まって
-
-// shifterとbindのインタフェースを揃える
-// perm ... 対象ハイパーベクトル、Peramutationする数 -> ハイパーベクトル（返り値）
-// bind ... 対象ハイパーベクトル、対象ハイパーベクトル -> ハイパーベクトル（返り値）
-// bound ...ハイパーベクトルの配列　->  ハイパーベクトル（返り値）
-void shifter_1024(uint32_t new[HV_NUM], uint32_t original[HV_NUM], uint32_t perm_num)
+uint32_t left_perm_31(uint32_t *over_hv, uint32_t perm_num)
 {
-	// original[HV_NUM] 	... unsigned int のデータが32個格納（1024次元をエミュレート）
-	// new[HV_NUM] 		... unsigned int のデータが32個格納（1024次元をエミュレート）
-	// original配列に格納されているデータをシフトしたデータをnew配列に格納
-	// シフトしたデータを一時的に格納
-	uint32_t *result_tmp = (uint32_t *)calloc(HV_NUM, sizeof(uint32_t));
-	// 32回繰り返す
-	for (uint32_t i = 0; i < HV_NUM; i++)
-	{
-		// tmp		... num回右論理シフトした際にはみ出した部分を（32-num)回左論理シフトしたやつ
-		// tmp_v 	... num回右論理シフトしたやつ
-		uint32_t tmp = original[i];
-		uint32_t tmp_v = shifter_32(&tmp, perm_num);
-		// シフト
-		result_tmp[i] |= tmp_v;
-		if (i == 0)
-		{
-			result_tmp[HV_NUM - 1] |= tmp;
-		}
-		else
-		{
-			result_tmp[i - 1] |= tmp;
-		}
-	}
-	// 結果を移す
-	for (uint32_t i = 0; i < HV_NUM; i++)
-	{
-		new[i] = result_tmp[i];
-	}
-	free(result_tmp);
+	uint32_t remain_hv = *over_hv << perm_num;
+	uint32_t mask = UINT32_MAX << (32 - perm_num);
+	*over_hv = (*over_hv & mask) >> (32 - perm_num);
+	return remain_hv;
 }
 
-// -----------------------------------------------------------------------
+void perm(uint32_t new[HV_NUM], uint32_t origin[HV_NUM], uint32_t perm_num, uint32_t (*perm_func)(uint32_t *, uint32_t))
+{
+	uint32_t repeat_perm_num = perm_num / 31;
+	uint32_t pre_perm_num;
+	if (perm_num % 31 != 0)
+	{
+		pre_perm_num = perm_num % 31;
+	}
+	else
+	{
+		pre_perm_num = 31;
+		repeat_perm_num--;
+	}
+
+	uint32_t origin_hv = origin[0];
+	uint32_t origin_hv_perm = perm_func(&origin_hv, pre_perm_num);
+
+	new[0] |= origin_hv_perm;
+	new[HV_NUM - 1] |= origin_hv;
+
+	for (int i = 1; i < HV_NUM; i++)
+	{
+		origin_hv = origin[i];
+		origin_hv_perm = perm_func(&origin_hv, pre_perm_num);
+
+		new[i] |= origin_hv_perm;
+		new[i - 1] |= origin_hv;
+	}
+
+	for (int i = 0; i < repeat_perm_num; i++)
+	{
+		uint32_t origin_hv = new[0];
+		new[0] = 0;
+		uint32_t origin_hv_perm = perm_func(&origin_hv, 31);
+
+		new[0] |= origin_hv_perm;
+		new[HV_NUM - 1] |= origin_hv;
+
+		for (int i = 1; i < HV_NUM; i++)
+		{
+			origin_hv = new[i];
+			new[i] = 0;
+			origin_hv_perm = perm_func(&origin_hv, 31);
+
+			new[i] |= origin_hv_perm;
+			new[i - 1] |= origin_hv;
+		}
+	}
+}
+
+void perm_top(uint32_t new[HV_NUM], uint32_t origin[HV_NUM], uint32_t perm_num)
+{
+	if (perm_num == 0)
+	{
+		memcpy(new, origin, sizeof(uint32_t) * HV_NUM);
+		return;
+	}
+	else if (perm_num >= HV_DIM)
+	{
+		perror("Failed: permutation");
+		exit(1);
+	}
+
+	if (perm_num > (HV_DIM / 2))
+	{
+		perm_num = HV_DIM - perm_num;
+		perm(new, origin, perm_num, left_perm_31);
+	}
+	else
+	{
+		perm(new, origin, perm_num, right_perm_31);
+	}
+}
 
 // 多数決関数　&& 加算
 // 32bitの各ビットの立っている数を数えて多数決関数を実行し結果ベクトルを生成
@@ -350,7 +348,7 @@ int main(int argc, char const *argv[])
 			for (uint32_t j = 0; j < NGRAM; j++)
 			{
 				// shift
-				shifter_1024(item_memory_array_result[j], item_memory_array[ascii_array[i][j]], j);
+				perm_top(item_memory_array_result[j], item_memory_array[ascii_array[i][j]], j);
 			}
 			// シフト後のデータを各LEGNTHでxorしtmpに格納
 			uint32_t tmp[HV_NUM];
