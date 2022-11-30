@@ -1,11 +1,13 @@
-
-#include <stdint.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#include <math.h>
-#include <time.h>
+
+__attribute__((destructor)) static void destructor()
+{
+	system("leaks -q a.out");
+}
 
 // 分割コンパイル
 // 初期化関数
@@ -34,24 +36,6 @@ void makeArrayU8(uint8_t ***a, const size_t y, const size_t x)
 }
 
 void freeArrayU8(uint8_t ***a, const size_t y)
-{
-	for (int i = 0; i < y; i++)
-	{
-		free((*a)[i]);
-	}
-	free(*a);
-}
-
-void makeArrayU32(uint32_t ***a, const size_t y, const size_t x)
-{
-	*a = (uint32_t **)calloc(y, sizeof(uint32_t *));
-	for (int i = 0; i < y; i++)
-	{
-		(*a)[i] = (uint32_t *)calloc(x, sizeof(uint32_t));
-	}
-}
-
-void freeArrayU32(uint32_t ***a, const size_t y)
 {
 	for (int i = 0; i < y; i++)
 	{
@@ -299,6 +283,82 @@ void bind(uint32_t dst[HV_NUM], uint32_t src1[HV_NUM], uint32_t src2[HV_NUM])
 	}
 }
 
+void makeArrayU32(uint32_t ***a, const size_t y, const size_t x)
+{
+	*a = (uint32_t **)calloc(y, sizeof(uint32_t *));
+	for (int i = 0; i < y; i++)
+	{
+		(*a)[i] = (uint32_t *)calloc(x, sizeof(uint32_t));
+	}
+}
+
+void freeArrayU32(uint32_t ***a, const size_t y)
+{
+	for (int i = 0; i < y; i++)
+	{
+		free((*a)[i]);
+	}
+	free(*a);
+}
+
+uint32_t **makeItemMemory(uint32_t size)
+{
+	uint32_t **result = NULL;
+	makeArrayU32(&result, size, HV_NUM);
+
+	xor128(1);
+
+	for (uint32_t i = 0; i < size; i++)
+	{
+		for (uint32_t j = 0; j < HV_NUM; j++)
+		{
+			uint32_t tmp = 0;
+			if (i == 0 && j == 0)
+			{
+				tmp = 88675123;
+			}
+			else
+			{
+				tmp = xor128(0);
+			}
+			result[i][j] = tmp;
+		}
+	}
+
+	return result;
+}
+
+char *readFile(const char *PATH)
+{
+	FILE *file;
+	file = fopen(PATH, "r");
+	if (file == NULL)
+	{
+		perror("  Failed: open file");
+		exit(1);
+	}
+
+	uint32_t ch;
+	uint32_t num = 0;
+	// 与えられたファイルがひと続きの文字列と仮定 (2行になると｛10, 0x0a, LF(改行)｝ が入ってしまいズレる)
+	while ((ch = fgetc(file)) != EOF)
+	{
+		num++;
+	}
+	// printf("EOF: %d\n", EOF); // EOFは全て-1 (Mac, Linux, Petalinux)
+	fseek(file, 0, SEEK_SET);
+	char *content = (char *)calloc(num, sizeof(char));
+	const size_t DONE = fread(content, sizeof(char), num, file);
+	if (DONE < num)
+	{
+		perror("  Failed: fread file");
+		exit(1);
+	}
+	fclose(file);
+
+	return content;
+}
+
 // -----------------------------------------------------------------------
 
 int main(int argc, char const *argv[])
@@ -307,12 +367,12 @@ int main(int argc, char const *argv[])
 	// プログラム全体の時間
 	clock_t start_program = clock();
 
-	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
+	puts("\n  -------------------------------------- HDC Program START ------------------------------------\n");
 
 	// ----------------------------------------------------------------------------------------------------------------------------------------------
 
 	// 初期化時間
-	clock_t start = clock();
+	clock_t START = clock();
 
 	const uint32_t TRAIN_NUM = 2;
 	// const char *TRAIN_PATH[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
@@ -326,74 +386,26 @@ int main(int argc, char const *argv[])
 
 	// ---------------------------------------------
 
-	// ランダム生成の初期化
-	xor128(1);
-
 	// ランダムなハイパーベクトルを生成
-	uint32_t **item_memory_array;
-	makeArrayU32(&item_memory_array, RAND_NUM, HV_NUM);
+	uint32_t **item_memory = makeItemMemory(RAND_NUM);
 
-	for (uint32_t i = 0; i < RAND_NUM; i++)
-	{
-		for (uint32_t j = 0; j < HV_NUM; j++)
-		{
-			uint32_t tmp = 0;
-			if (i == 0 && j == 0)
-			{
-				tmp = 88675123;
-			}
-			else
-			{
-				tmp = xor128(0);
-			}
-			item_memory_array[i][j] = tmp;
-		}
-	}
-
-	clock_t end = clock();
-	double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("  初期化時間: %lf[ms]\n", time);
+	clock_t END = clock();
+	double TIME = ((double)(END - START)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  初期化時間: %lf[ms]\n", TIME);
 
 	// -----------------------------------------------------------------------
 
 	// 英語とフランス語の数だけ繰り返す
 	for (uint32_t i = 0; i < TRAIN_NUM; i++)
 	{
+		printf("\n------------- %sの学習 -------------\n\n", TRAIN_PATH[i]);
 
 		// データ準備時間
-		start = clock();
+		START = clock();
 
 		init_hv();
 
-		// ファイル読み込み
-		const char *PATH = TRAIN_PATH[i];
-		printf("\n------------- %sの学習 -------------\n\n", PATH);
-		FILE *file;
-		file = fopen(PATH, "r");
-		if (file == NULL)
-		{
-			perror("  Failed: open file");
-			exit(1);
-		}
-		// ---------------------------------------------
-		// ファイルから文字列を取得
-		uint32_t ch;
-		uint32_t num = 0;
-		// 与えられたファイルがひと続きの文字列と仮定 (2行になると｛10, 0x0a, LF(改行)｝ が入ってしまいズレる)
-		while ((ch = fgetc(file)) != EOF)
-		{
-			num++;
-		}
-		printf("EOF: %d\n", EOF); // EOFは全て-1 (Mac, Linux, Petalinux)
-		fseek(file, 0, SEEK_SET);
-		char *content = (char *)calloc(num, sizeof(char));
-		const size_t DONE = fread(content, sizeof(char), num, file);
-		if (DONE < num)
-		{
-			perror("  Failed: fread file");
-			exit(1);
-		}
-		fclose(file);
+		char *content = readFile(TRAIN_PATH[i]);
 
 		ALL_NGRAM = strlen(content) - NGRAM + 1;
 		// 偶数なら１こ生やす
@@ -433,14 +445,14 @@ int main(int argc, char const *argv[])
 		uint32_t result[HV_NUM];
 		memset(result, 0, sizeof(result));
 
-		end = clock();
-		time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-		printf("  データ準備時間: %lf[ms]\n", time);
+		END = clock();
+		TIME = ((double)(END - START)) / CLOCKS_PER_SEC * 1000.0;
+		printf("  データ準備時間: %lf[ms]\n", TIME);
 
 		// -----------------------------------------------------------------------
 
 		// 計算時間
-		start = clock();
+		START = clock();
 
 		// all_ngramの数だけ、shiftとxorのエンコーディングを計算
 		for (uint32_t i = 0; i < repeat_num; i++)
@@ -453,7 +465,7 @@ int main(int argc, char const *argv[])
 			for (uint32_t j = 0; j < NGRAM; j++)
 			{
 				// shift
-				perm_top(item_memory_array_result[j], item_memory_array[ascii_array[i][j]], j);
+				perm_top(item_memory_array_result[j], item_memory[ascii_array[i][j]], j);
 			}
 			// シフト後のデータを各LEGNTHでxorしtmpに格納
 
@@ -473,7 +485,7 @@ int main(int argc, char const *argv[])
 		if (EVEN)
 		{
 			// memcpy(item_memory_array_new[ALL_NGRAM - 1], item_memory_array[MAJORITY_ADDR], sizeof(uint32_t) * HV_NUM);
-			bound(item_memory_array[MAJORITY_ADDR]);
+			bound(item_memory[MAJORITY_ADDR]);
 		}
 		// ---------------------------------------------
 		// 結果を格納
@@ -481,9 +493,9 @@ int main(int argc, char const *argv[])
 		// bound_batch(result, ALL_NGRAM, item_memory_array_new);
 		bound_extract(result);
 
-		end = clock();
-		time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-		printf("  計算時間: %lf[ms]\n", time);
+		END = clock();
+		TIME = ((double)(END - START)) / CLOCKS_PER_SEC * 1000.0;
+		printf("  計算時間: %lf[ms]\n", TIME);
 
 		// ---------------------------------------------
 		// デバッグ用
@@ -494,32 +506,33 @@ int main(int argc, char const *argv[])
 		// ---------------------------------------------
 
 		// メモリ解放時間
-		start = clock();
+		START = clock();
 
 		// freeArrayU32(&item_memory_array_new, ALL_NGRAM);
 		freeArrayU8(&ascii_array, ALL_NGRAM);
+		free(content);
 
-		end = clock();
-		time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-		printf("  メモリ解放時間: %lf[ms]\n", time);
+		END = clock();
+		TIME = ((double)(END - START)) / CLOCKS_PER_SEC * 1000.0;
+		printf("  メモリ解放時間: %lf[ms]\n", TIME);
 	}
 
 	// メモリ解放時間
-	start = clock();
+	START = clock();
 
-	freeArrayU32(&item_memory_array, RAND_NUM);
+	freeArrayU32(&item_memory, RAND_NUM);
 
-	end = clock();
-	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("  メモリ解放時間: %lf[ms]\n", time);
+	END = clock();
+	TIME = ((double)(END - START)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  メモリ解放時間: %lf[ms]\n", TIME);
 
 	// -----------------------------------------------------------------------
 
-	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
+	puts("\n  --------------------------------------- HDC Program END -------------------------------------\n");
 
-	end = clock();
-	time = ((double)(end - start_program)) / CLOCKS_PER_SEC * 1000.0;
-	printf("  プログラム合計時間: %lf[ms]\n", time);
+	END = clock();
+	TIME = ((double)(END - start_program)) / CLOCKS_PER_SEC * 1000.0;
+	printf("  プログラム合計時間: %lf[ms]\n", TIME);
 
 	return 0;
 }

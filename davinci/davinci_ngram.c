@@ -4,7 +4,6 @@
 #include <time.h>
 #include <string.h>
 #include <math.h>
-#include <time.h>
 
 #define HV_DIM 1024
 #define HV_NUM HV_DIM / 32
@@ -12,10 +11,10 @@
 // -------------------- メモリリークチェック、デストラクター -----------------
 
 // M1のみ使用
-// __attribute__((destructor)) static void destructor()
-// {
-// 	system("leaks -q a.out");
-// }
+__attribute__((destructor)) static void destructor()
+{
+	system("leaks -q a.out");
+}
 
 // -----------------------------------------------------------------------
 
@@ -377,7 +376,7 @@ int main(int argc, char const *argv[])
 		{
 			num++;
 		}
-		printf("EOF: %d\n", EOF); // EOFは全て-1 (Mac, Linux, Petalinux)
+		// printf("EOF: %d\n", EOF); // EOFは全て-1 (Mac, Linux, Petalinux)
 		fseek(file, 0, SEEK_SET);
 		char *content = (char *)calloc(num, sizeof(char));
 		const size_t DONE = fread(content, sizeof(char), num, file);
