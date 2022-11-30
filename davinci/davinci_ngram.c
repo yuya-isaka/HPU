@@ -14,7 +14,7 @@ __attribute__((destructor)) static void destructor()
 	system("leaks -q davinci_ngram");
 }
 
-uint8_t **makeArrayU8(const uint32_t y, const uint32_t x)
+uint8_t **make_array_u8(const uint32_t y, const uint32_t x)
 {
 	uint8_t **data = (uint8_t **)calloc(y, sizeof(uint8_t *));
 	if (data == NULL)
@@ -36,7 +36,7 @@ uint8_t **makeArrayU8(const uint32_t y, const uint32_t x)
 	return data;
 }
 
-void freeArrayU8(uint8_t **data, const uint32_t y)
+void free_array_u8(uint8_t **data, const uint32_t y)
 {
 	for (uint32_t i = 0; i < y; i++)
 	{
@@ -45,7 +45,7 @@ void freeArrayU8(uint8_t **data, const uint32_t y)
 	free(data);
 }
 
-char *readFile(const char *PATH)
+char *read_file(const char *PATH)
 {
 	FILE *file;
 	file = fopen(PATH, "r");
@@ -105,13 +105,13 @@ int main(int argc, char const *argv[])
 	{
 		printf("\n------------- %sの学習 -------------\n\n", TRAIN_PATH[i]);
 
-		char *content = readFile(TRAIN_PATH[i]);
+		char *content = read_file(TRAIN_PATH[i]);
 		uint32_t ALL_NGRAM = strlen(content) - NGRAM + 1;
 		uint32_t EVEN = ALL_NGRAM % 2 == 0;
 		printf("ALL_NGRAM: %d\n", ALL_NGRAM);
 		printf("EVEN: %d\n", EVEN);
 
-		uint8_t **ascii_array = makeArrayU8(ALL_NGRAM, NGRAM);
+		uint8_t **ascii_array = make_array_u8(ALL_NGRAM, NGRAM);
 		for (uint32_t i = 0; i < ALL_NGRAM; i++)
 		{
 			for (uint32_t j = 0; j < NGRAM; j++)
@@ -156,7 +156,7 @@ int main(int argc, char const *argv[])
 			printf("%u\n", result[j]);
 		}
 
-		freeArrayU8(ascii_array, ALL_NGRAM);
+		free_array_u8(ascii_array, ALL_NGRAM);
 		free(content);
 
 		// hv -------------------------------------------------
