@@ -5,6 +5,7 @@
 #include <string.h>
 #include "hyper_vector.h"
 
+// エラー処理
 // SIMD化
 // マルチスレッド化
 // 無駄な乗算や除算、シーケンシャルアクセスになってない部分を探して直す
@@ -14,11 +15,11 @@ __attribute__((destructor)) static void destructor()
 	system("leaks -q davinci_ngram_new");
 }
 
-uint8_t **makeArrayU8(const size_t y, const size_t x)
+uint8_t **makeArrayU8(const uint32_t y, const uint32_t x)
 {
 	uint8_t **data = (uint8_t **)calloc(y, sizeof(uint8_t *));
 
-	for (int i = 0; i < y; i++)
+	for (uint32_t i = 0; i < y; i++)
 	{
 		data[i] = (uint8_t *)calloc(x, sizeof(uint8_t));
 	}
@@ -26,9 +27,9 @@ uint8_t **makeArrayU8(const size_t y, const size_t x)
 	return data;
 }
 
-void freeArrayU8(uint8_t **data, const size_t y)
+void freeArrayU8(uint8_t **data, const uint32_t y)
 {
-	for (int i = 0; i < y; i++)
+	for (uint32_t i = 0; i < y; i++)
 	{
 		free(data[i]);
 	}
@@ -55,7 +56,7 @@ char *readFile(const char *PATH)
 	// printf("EOF: %d\n", EOF); // EOFは全て-1 (Mac, Linux, Petalinux)
 	fseek(file, 0, SEEK_SET);
 	char *content = (char *)calloc(num, sizeof(char));
-	const size_t DONE = fread(content, sizeof(char), num, file);
+	const uint32_t DONE = (uint32_t)fread(content, sizeof(char), num, file);
 	if (DONE < num)
 	{
 		perror("  Failed: fread file");
@@ -72,21 +73,21 @@ int main(int argc, char const *argv[])
 {
 	puts("\n  -------------------------------------- HDC Program START ------------------------------------\n");
 
-	const int TRAIN_NUM = 2;
+	const uint32_t TRAIN_NUM = 2;
 	// const char *TRAIN_PATH[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
 	const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
 	// const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
 
-	const int NGRAM = 5;
-	const int RAND_NUM = 27;
-	const int MAJORITY_ADDR = 26;
+	const uint32_t NGRAM = 5;
+	const uint32_t RAND_NUM = 27;
+	const uint32_t MAJORITY_ADDR = 26;
 
 	// hv -------------------------------------------------
-	hv_t **item_memory = makeItemMemory(RAND_NUM);
+	hv_t **item_memory = hv_make_imem(RAND_NUM);
 	// hv -------------------------------------------------
 
 	// 英語とフランス語の数だけ繰り返す
-	for (int i = 0; i < TRAIN_NUM; i++)
+	for (uint32_t i = 0; i < TRAIN_NUM; i++)
 	{
 		printf("\n------------- %sの学習 -------------\n\n", TRAIN_PATH[i]);
 
@@ -108,28 +109,28 @@ int main(int argc, char const *argv[])
 		clock_t START_COMPUTE = clock();
 
 		// hv -------------------------------------------------
-		initHV();
+		hv_init();
 
 		for (uint32_t i = 0; i < ALL_NGRAM; i++)
 		{
-			hv_t *bound_tmp = makeHV();
+			hv_t *bound_tmp = hv_make();
 			for (uint32_t j = 0; j < NGRAM; j++)
 			{
 				hv_t *perm_result = perm(item_memory[ascii_array[i][j]], j);
 				hv_t *bind_result = bind(bound_tmp, perm_result);
-				copyHV(bound_tmp, bind_result);
-				freeHV(bind_result);
-				freeHV(perm_result);
+				hv_copy(bound_tmp, bind_result);
+				hv_free(bind_result);
+				hv_free(perm_result);
 			}
 
 			bound(bound_tmp);
-			freeHV(bound_tmp);
+			hv_free(bound_tmp);
 		}
 		if (EVEN)
 		{
 			bound(item_memory[MAJORITY_ADDR]);
 		}
-		hv_t *result = bound_extract();
+		hv_t *result = bound_result();
 		// hv -------------------------------------------------
 
 		clock_t END_COMPUTE = clock();
@@ -145,12 +146,12 @@ int main(int argc, char const *argv[])
 		free(content);
 
 		// hv -------------------------------------------------
-		freeHV(result);
+		hv_free(result);
 		// hv -------------------------------------------------
 	}
 
 	// hv -------------------------------------------------
-	freeArrayHV(item_memory, RAND_NUM);
+	hv_free_array(item_memory, RAND_NUM);
 	// hv -------------------------------------------------
 
 	puts("\n  --------------------------------------- HDC Program END -------------------------------------\n");
