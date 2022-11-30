@@ -1,11 +1,10 @@
 
 default:
-	gcc -O2 -o davinci_ngram davinci_ngram.c -lm
+	gcc -O2 -c -o hyper_vector.o hyper_vector.c
+	gcc -O2 -c -o davinci_ngram.o davinci_ngram.c
+	gcc -O2 -o davinci_ngram davinci_ngram.o hyper_vector.o
+	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
-
-new:
-	gcc -O2 -o davinci_ngram_new davinci_ngram_new.c -lm
-	./davinci_ngram_new
 
 # g++ -mavx2 -O2 -o davinci_ngram_intel davinci_ngram_intel.cpp -lm
 

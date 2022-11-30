@@ -23,9 +23,19 @@ unsigned long dst_phys;
 void makeArray(uint16_t ***a, const int y, const int x)
 {
 	*a = (uint16_t **)calloc(y, sizeof(uint16_t *));
+	if (*a == NULL)
+	{
+		perror("  Failed: calloc");
+		exit(1);
+	}
 	for (int i = 0; i < y; i++)
 	{
 		(*a)[i] = (uint16_t *)calloc(x, sizeof(uint16_t));
+		if ((*a)[i] == NULL)
+		{
+			perror("  Failed: calloc");
+			exit(1);
+		}
 	}
 }
 
@@ -287,6 +297,11 @@ int main(int argc, char const *argv[])
 		// printf("EOF: %d\n", EOF); // EOFは全て-1
 		fseek(file, 0, SEEK_SET);
 		char *content = (char *)calloc(num, sizeof(char));
+		if (content == NULL)
+		{
+			perror("  Failed: calloc");
+			exit(1);
+		}
 		size_t done = fread(content, sizeof(char), num, file);
 		if (done < num)
 		{
