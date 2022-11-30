@@ -13,7 +13,7 @@
 // M1のみ使用
 __attribute__((destructor)) static void destructor()
 {
-	system("leaks -q a.out");
+	system("leaks -q davinci_ngram");
 }
 
 // -----------------------------------------------------------------------

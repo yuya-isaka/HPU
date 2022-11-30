@@ -6,7 +6,7 @@
 
 __attribute__((destructor)) static void destructor()
 {
-	system("leaks -q a.out");
+	system("leaks -q davinci_ngram_new");
 }
 
 // 分割コンパイル
@@ -146,7 +146,13 @@ void left_perm(uint32_t new_hv[HV_NUM], uint32_t base_hv[HV_NUM], uint32_t perm_
 	}
 }
 
-void perm(uint32_t new[HV_NUM], uint32_t origin[HV_NUM], uint32_t perm_num, void (*perm_func)(uint32_t *, uint32_t *, uint32_t))
+uint32_t *makeHV(void)
+{
+	uint32_t *result = (uint32_t *)calloc(HV_NUM, sizeof(uint32_t));
+	return result;
+}
+
+void perm_left_right(uint32_t new[HV_NUM], uint32_t origin[HV_NUM], uint32_t perm_num, void (*perm_func)(uint32_t *, uint32_t *, uint32_t))
 {
 	uint32_t repeat_perm_num = perm_num / 31;
 	uint32_t pre_perm_num;
@@ -168,12 +174,14 @@ void perm(uint32_t new[HV_NUM], uint32_t origin[HV_NUM], uint32_t perm_num, void
 	}
 }
 
-void perm_top(uint32_t new[HV_NUM], uint32_t origin[HV_NUM], uint32_t perm_num)
+uint32_t *perm(uint32_t origin[HV_NUM], uint32_t perm_num)
 {
+	uint32_t *new = makeHV();
+
 	if (perm_num == 0)
 	{
 		memcpy(new, origin, sizeof(uint32_t) * HV_NUM);
-		return;
+		return new;
 	}
 	else if (perm_num >= HV_DIM)
 	{
@@ -184,12 +192,14 @@ void perm_top(uint32_t new[HV_NUM], uint32_t origin[HV_NUM], uint32_t perm_num)
 	if (perm_num > (HV_DIM / 2))
 	{
 		perm_num = HV_DIM - perm_num;
-		perm(new, origin, perm_num, left_perm);
+		perm_left_right(new, origin, perm_num, left_perm);
 	}
 	else
 	{
-		perm(new, origin, perm_num, right_perm);
+		perm_left_right(new, origin, perm_num, right_perm);
 	}
+
+	return new;
 }
 
 void bound(uint32_t encoded_hv[HV_NUM])
@@ -275,32 +285,39 @@ void bound_batch(uint32_t result_hv[HV_NUM], size_t batch_size, uint32_t **batch
 	uint32_t mask = (uint32_t)1 << (32 - 1);
 }
 
-void bind(uint32_t dst[HV_NUM], uint32_t src1[HV_NUM], uint32_t src2[HV_NUM])
+uint32_t *bind(uint32_t src1[HV_NUM], uint32_t src2[HV_NUM])
 {
+	uint32_t *dst = makeHV();
 	for (int i = 0; i < HV_NUM; i++)
 	{
 		dst[i] = src1[i] ^ src2[i];
 	}
+
+	return dst;
+}
+
+void freeHV(uint32_t *data)
+{
+	free(data);
 }
 
 uint32_t **makeArrayHV(uint32_t size)
 {
-	uint32_t **result = NULL;
-	result = (uint32_t **)calloc(size, sizeof(uint32_t *));
+	uint32_t **result = (uint32_t **)calloc(size, sizeof(uint32_t *));
 	for (int i = 0; i < size; i++)
 	{
-		result[i] = (uint32_t *)calloc(HV_NUM, sizeof(uint32_t));
+		result[i] = makeHV();
 	}
 	return result;
 }
 
-void freeArrayHV(uint32_t ***data, uint32_t size)
+void freeArrayHV(uint32_t **data, uint32_t size)
 {
 	for (int i = 0; i < size; i++)
 	{
-		free((*data)[i]);
+		freeHV(data[i]);
 	}
-	free(*data);
+	free(data);
 }
 
 uint32_t **makeItemMemory(uint32_t size)
@@ -327,6 +344,12 @@ uint32_t **makeItemMemory(uint32_t size)
 	}
 
 	return result;
+}
+
+void copyHV(uint32_t *dst, uint32_t *src)
+{
+	memcpy(dst, src, sizeof(uint32_t) * HV_NUM);
+	return;
 }
 
 char *readFile(const char *PATH)
@@ -431,8 +454,6 @@ int main(int argc, char const *argv[])
 			}
 		}
 
-		// uint32_t **item_memory_array_new = makeArrayHV(ALL_NGRAM);
-
 		uint32_t repeat_num = ALL_NGRAM;
 		if (EVEN)
 		{
@@ -454,28 +475,18 @@ int main(int argc, char const *argv[])
 		// all_ngramの数だけ、shiftとxorのエンコーディングを計算
 		for (uint32_t i = 0; i < repeat_num; i++)
 		{
-
-			// -----------------------------------------------------
-			// シフトしたものをitem_memory_array_reuslt[NGRAM][HV_NUM]に格納
-			uint32_t **item_memory_array_result = makeArrayHV(NGRAM);
+			uint32_t *bound_tmp = makeHV();
 			for (uint32_t j = 0; j < NGRAM; j++)
 			{
-				// shift
-				perm_top(item_memory_array_result[j], item_memory[ascii_array[i][j]], j);
+				uint32_t *perm_result = perm(item_memory[ascii_array[i][j]], j);
+				uint32_t *bind_result = bind(bound_tmp, perm_result);
+				copyHV(bound_tmp, bind_result);
+				freeHV(bind_result);
+				freeHV(perm_result);
 			}
-			// シフト後のデータを各LEGNTHでxorしtmpに格納
-
-			uint32_t bound_tmp[HV_NUM];
-			memset(bound_tmp, 0, sizeof(bound_tmp));
-
-			for (uint32_t l = 0; l < NGRAM; l++)
-			{
-				// bind(item_memory_array_new[i], item_memory_array_new[i], item_memory_array_result[l]);
-				bind(bound_tmp, bound_tmp, item_memory_array_result[l]);
-			}
-			freeArrayHV(&item_memory_array_result, NGRAM);
 
 			bound(bound_tmp);
+			freeHV(bound_tmp);
 		}
 		// ---------------------------------------------
 		if (EVEN)
@@ -516,7 +527,7 @@ int main(int argc, char const *argv[])
 	// メモリ解放時間
 	START = clock();
 
-	freeArrayHV(&item_memory, RAND_NUM);
+	freeArrayHV(item_memory, RAND_NUM);
 
 	END = clock();
 	TIME = ((double)(END - START)) / CLOCKS_PER_SEC * 1000.0;
