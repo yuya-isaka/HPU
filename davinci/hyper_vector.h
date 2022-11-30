@@ -1,3 +1,4 @@
+
 #ifndef HYPER_VECTOR_h_
 #define HYPER_VECTOR_h_
 

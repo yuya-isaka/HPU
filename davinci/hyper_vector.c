@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -121,7 +122,7 @@ hv_t *bind(hv_t src1[HV_NUM], hv_t src2[HV_NUM])
 	return dst;
 }
 
-static hv_t permRight31(hv_t *origin_hv, const uint32_t perm_num)
+static hv_t perm_right_31(hv_t *origin_hv, const uint32_t perm_num)
 {
 	hv_t remain_hv = *origin_hv >> perm_num;
 	hv_t mask = (1 << perm_num) - 1;
@@ -134,7 +135,7 @@ static hv_t *perm_right(hv_t base_hv[HV_NUM], const uint32_t perm_num)
 	hv_t *result_hv = hv_make();
 
 	hv_t origin_hv = base_hv[0];
-	hv_t origin_hv_perm = permRight31(&origin_hv, perm_num);
+	hv_t origin_hv_perm = perm_right_31(&origin_hv, perm_num);
 
 	result_hv[0] |= origin_hv_perm;
 	result_hv[HV_NUM - 1] |= origin_hv;
@@ -142,7 +143,7 @@ static hv_t *perm_right(hv_t base_hv[HV_NUM], const uint32_t perm_num)
 	for (uint32_t i = 1; i < HV_NUM; i++)
 	{
 		hv_t origin_hv = base_hv[i];
-		hv_t origin_hv_perm = permRight31(&origin_hv, perm_num);
+		hv_t origin_hv_perm = perm_right_31(&origin_hv, perm_num);
 
 		result_hv[i] |= origin_hv_perm;
 		result_hv[i - 1] |= origin_hv;
