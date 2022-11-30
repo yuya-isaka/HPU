@@ -6,9 +6,12 @@
 #include <string.h>
 #include "hyper_vector.h"
 
+// 64 * 16
+// 16 * 64でも動くようにする
 // SIMD化
 // マルチスレッド化
 // 無駄な乗算や除算、シーケンシャルアクセスになってない部分を探して直す
+// エミュレータとして改造
 
 __attribute__((destructor)) static void destructor()
 {
@@ -90,10 +93,10 @@ int main(int argc, char const *argv[])
 
 	const uint32_t TRAIN_NUM = 2;
 	// const char *TRAIN_PATH[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
-	// const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
+	// const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
+	const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
 
-	const uint32_t NGRAM = 5;
+	const uint32_t NGRAM = 3;
 	const uint32_t RAND_NUM = 27;
 	const uint32_t MAJORITY_ADDR = 26;
 
@@ -131,21 +134,22 @@ int main(int argc, char const *argv[])
 			hv_t *bound_tmp = hv_make();
 			for (uint32_t j = 0; j < NGRAM; j++)
 			{
-				hv_t *perm_result = perm(item_memory[ascii_array[i][j]], j);
-				hv_t *bind_result = bind(bound_tmp, perm_result);
+				hv_t *perm_result = hv_perm(item_memory[ascii_array[i][j]], j);
+				hv_t *bind_result = hv_bind(bound_tmp, perm_result);
 				hv_copy(bound_tmp, bind_result);
+
 				hv_free(bind_result);
 				hv_free(perm_result);
 			}
 
-			bound(bound_tmp);
+			hv_bound(bound_tmp);
 			hv_free(bound_tmp);
 		}
 		if (EVEN)
 		{
-			bound(item_memory[MAJORITY_ADDR]);
+			hv_bound(item_memory[MAJORITY_ADDR]);
 		}
-		hv_t *result = bound_result();
+		hv_t *result = hv_bound_result();
 		// hv -------------------------------------------------
 
 		clock_t END_COMPUTE = clock();
