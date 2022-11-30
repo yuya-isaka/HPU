@@ -109,10 +109,10 @@ hv_t *bind(hv_t src1[HV_NUM], hv_t src2[HV_NUM])
 	return dst;
 }
 
-static uint32_t permRight31(uint32_t *origin_hv, const uint32_t perm_num)
+static hv_t permRight31(hv_t *origin_hv, const uint32_t perm_num)
 {
-	uint32_t remain_hv = *origin_hv >> perm_num;
-	uint32_t mask = (1 << perm_num) - 1;
+	hv_t remain_hv = *origin_hv >> perm_num;
+	hv_t mask = (1 << perm_num) - 1;
 	*origin_hv = (*origin_hv & mask) << (32 - perm_num);
 	return remain_hv;
 }
@@ -121,16 +121,16 @@ static hv_t *perm_right(hv_t base_hv[HV_NUM], const uint32_t perm_num)
 {
 	hv_t *result_hv = hv_make();
 
-	uint32_t origin_hv = base_hv[0];
-	uint32_t origin_hv_perm = permRight31(&origin_hv, perm_num);
+	hv_t origin_hv = base_hv[0];
+	hv_t origin_hv_perm = permRight31(&origin_hv, perm_num);
 
 	result_hv[0] |= origin_hv_perm;
 	result_hv[HV_NUM - 1] |= origin_hv;
 
 	for (uint32_t i = 1; i < HV_NUM; i++)
 	{
-		uint32_t origin_hv = base_hv[i];
-		uint32_t origin_hv_perm = permRight31(&origin_hv, perm_num);
+		hv_t origin_hv = base_hv[i];
+		hv_t origin_hv_perm = permRight31(&origin_hv, perm_num);
 
 		result_hv[i] |= origin_hv_perm;
 		result_hv[i - 1] |= origin_hv;
@@ -139,10 +139,10 @@ static hv_t *perm_right(hv_t base_hv[HV_NUM], const uint32_t perm_num)
 	return result_hv;
 }
 
-static uint32_t perm_left_31(uint32_t *over_hv, const uint32_t perm_num)
+static hv_t perm_left_31(hv_t *over_hv, const uint32_t perm_num)
 {
-	uint32_t remain_hv = *over_hv << perm_num;
-	uint32_t mask = UINT32_MAX << (32 - perm_num);
+	hv_t remain_hv = *over_hv << perm_num;
+	hv_t mask = UINT32_MAX << (32 - perm_num);
 	*over_hv = (*over_hv & mask) >> (32 - perm_num);
 	return remain_hv;
 }
@@ -151,16 +151,16 @@ static hv_t *perm_left(hv_t base_hv[HV_NUM], const uint32_t perm_num)
 {
 	hv_t *result_hv = hv_make();
 
-	uint32_t origin_hv = base_hv[HV_NUM - 1];
-	uint32_t origin_hv_perm = perm_left_31(&origin_hv, perm_num);
+	hv_t origin_hv = base_hv[HV_NUM - 1];
+	hv_t origin_hv_perm = perm_left_31(&origin_hv, perm_num);
 
 	result_hv[HV_NUM - 1] |= origin_hv_perm;
 	result_hv[0] |= origin_hv;
 
 	for (uint32_t i = HV_NUM - 2; i >= 0; i--)
 	{
-		uint32_t origin_hv = base_hv[i];
-		uint32_t origin_hv_perm = perm_left_31(&origin_hv, perm_num);
+		hv_t origin_hv = base_hv[i];
+		hv_t origin_hv_perm = perm_left_31(&origin_hv, perm_num);
 
 		result_hv[i] |= origin_hv_perm;
 		result_hv[i + 1] |= origin_hv;
@@ -250,7 +250,7 @@ hv_t *bound_result(void)
 	uint32_t index_assign = HV_NUM - 1;
 	for (uint32_t i = 0; i < HV_NUM; i++)
 	{
-		uint32_t hv = 0;
+		hv_t hv = 0;
 		for (uint32_t j = 0; j < 32; j++)
 		{
 			uint32_t index = i * 32 + j;
