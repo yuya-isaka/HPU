@@ -1,7 +1,11 @@
 
 default:
 	gcc -O2 -o davinci_ngram davinci_ngram.c -lm
+	./davinci_ngram
+
+new:
 	gcc -O2 -o davinci_ngram_new davinci_ngram_new.c -lm
+	./davinci_ngram_new
 
 # g++ -mavx2 -O2 -o davinci_ngram_intel davinci_ngram_intel.cpp -lm
 
