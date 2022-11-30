@@ -131,21 +131,22 @@ int main(int argc, char const *argv[])
 			hv_t *bound_tmp = hv_make();
 			for (uint32_t j = 0; j < NGRAM; j++)
 			{
-				hv_t *perm_result = perm(item_memory[ascii_array[i][j]], j);
-				hv_t *bind_result = bind(bound_tmp, perm_result);
+				hv_t *perm_result = hv_perm(item_memory[ascii_array[i][j]], j);
+				hv_t *bind_result = hv_bind(bound_tmp, perm_result);
 				hv_copy(bound_tmp, bind_result);
+
 				hv_free(bind_result);
 				hv_free(perm_result);
 			}
 
-			bound(bound_tmp);
+			hv_bound(bound_tmp);
 			hv_free(bound_tmp);
 		}
 		if (EVEN)
 		{
-			bound(item_memory[MAJORITY_ADDR]);
+			hv_bound(item_memory[MAJORITY_ADDR]);
 		}
-		hv_t *result = bound_result();
+		hv_t *result = hv_bound_result();
 		// hv -------------------------------------------------
 
 		clock_t END_COMPUTE = clock();

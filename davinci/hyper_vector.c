@@ -111,7 +111,7 @@ void hv_copy(hv_t *dst, hv_t *src)
 	return;
 }
 
-hv_t *bind(hv_t src1[HV_NUM], hv_t src2[HV_NUM])
+hv_t *hv_bind(hv_t src1[HV_NUM], hv_t src2[HV_NUM])
 {
 	hv_t *dst = hv_make();
 	for (int i = 0; i < HV_NUM; i++)
@@ -208,7 +208,7 @@ static hv_t *perm_select(hv_t origin[HV_NUM], const uint32_t perm_num, hv_t *(*p
 	return new;
 }
 
-hv_t *perm(hv_t origin[HV_NUM], const uint32_t perm_num)
+hv_t *hv_perm(hv_t origin[HV_NUM], const uint32_t perm_num)
 {
 	if (perm_num == 0)
 	{
@@ -237,7 +237,7 @@ hv_t *perm(hv_t origin[HV_NUM], const uint32_t perm_num)
 	return new;
 }
 
-void bound(hv_t encoded_hv[HV_NUM])
+void hv_bound(hv_t encoded_hv[HV_NUM])
 {
 	// reductionを使って並列化する必要性あり
 	// https://www.isus.jp/products/c-compilers/32-openmp-traps/
@@ -256,7 +256,7 @@ void bound(hv_t encoded_hv[HV_NUM])
 	}
 }
 
-hv_t *bound_result(void)
+hv_t *hv_bound_result(void)
 {
 	hv_t *bound_hv = hv_make();
 	uint32_t mask = 1 << (32 - 1);
