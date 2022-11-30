@@ -15,6 +15,12 @@ void hv_init(void)
 hv_t *hv_make(void)
 {
 	hv_t *result = (hv_t *)calloc(HV_NUM, sizeof(hv_t));
+	if (result == NULL)
+	{
+		perror("  Failed: calloc");
+		exit(1);
+	}
+
 	return result;
 }
 
@@ -26,6 +32,12 @@ void hv_free(hv_t *data)
 hv_t **hv_make_array(const uint32_t size)
 {
 	hv_t **result = (hv_t **)calloc(size, sizeof(hv_t *));
+	if (result == NULL)
+	{
+		perror("  Failed: calloc");
+		exit(1);
+	}
+
 	for (uint32_t i = 0; i < size; i++)
 	{
 		result[i] = hv_make();
