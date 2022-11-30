@@ -6,9 +6,12 @@
 #include <string.h>
 #include "hyper_vector.h"
 
+// 64 * 16
+// 16 * 64でも動くようにする
 // SIMD化
 // マルチスレッド化
 // 無駄な乗算や除算、シーケンシャルアクセスになってない部分を探して直す
+// エミュレータとして改造
 
 __attribute__((destructor)) static void destructor()
 {
@@ -90,10 +93,10 @@ int main(int argc, char const *argv[])
 
 	const uint32_t TRAIN_NUM = 2;
 	// const char *TRAIN_PATH[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
-	// const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
+	// const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
+	const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
 
-	const uint32_t NGRAM = 5;
+	const uint32_t NGRAM = 3;
 	const uint32_t RAND_NUM = 27;
 	const uint32_t MAJORITY_ADDR = 26;
 

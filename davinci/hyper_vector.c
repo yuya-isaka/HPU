@@ -39,6 +39,7 @@ hv_t **hv_make_array(const uint32_t size)
 		exit(1);
 	}
 
+	// マルチスレッド
 	for (uint32_t i = 0; i < size; i++)
 	{
 		result[i] = hv_make();
@@ -48,6 +49,7 @@ hv_t **hv_make_array(const uint32_t size)
 
 void hv_free_array(hv_t **data, const uint32_t size)
 {
+	// マルチスレッド
 	for (uint32_t i = 0; i < size; i++)
 	{
 		hv_free(data[i]);
@@ -114,6 +116,8 @@ void hv_copy(hv_t *dst, hv_t *src)
 hv_t *hv_bind(hv_t src1[HV_NUM], hv_t src2[HV_NUM])
 {
 	hv_t *dst = hv_make();
+	// SIMD化
+	// マルチスレッド
 	for (int i = 0; i < HV_NUM; i++)
 	{
 		dst[i] = src1[i] ^ src2[i];
@@ -140,6 +144,8 @@ static hv_t *perm_right(hv_t base_hv[HV_NUM], const uint32_t perm_num)
 	result_hv[0] |= origin_hv_perm;
 	result_hv[HV_NUM - 1] |= origin_hv;
 
+	// SIMD化（新しいperm定義）
+	// マルチスレッド
 	for (uint32_t i = 1; i < HV_NUM; i++)
 	{
 		hv_t origin_hv = base_hv[i];
@@ -170,6 +176,7 @@ static hv_t *perm_left(hv_t base_hv[HV_NUM], const uint32_t perm_num)
 	result_hv[HV_NUM - 1] |= origin_hv_perm;
 	result_hv[0] |= origin_hv;
 
+	// マルチスレッド
 	for (uint32_t i = HV_NUM - 2; i >= 0; i--)
 	{
 		hv_t origin_hv = base_hv[i];
@@ -182,6 +189,7 @@ static hv_t *perm_left(hv_t base_hv[HV_NUM], const uint32_t perm_num)
 	return result_hv;
 }
 
+// SIMD化（新しいperm）
 static hv_t *perm_select(hv_t origin[HV_NUM], const uint32_t perm_num, hv_t *(*perm_func)(hv_t *, const uint32_t))
 {
 	uint32_t repeat_perm_num = perm_num / 31;
@@ -198,6 +206,7 @@ static hv_t *perm_select(hv_t origin[HV_NUM], const uint32_t perm_num, hv_t *(*p
 
 	hv_t *new = perm_func(origin, pre_perm_num);
 
+	// マルチスレッド
 	for (uint32_t i = 0; i < repeat_perm_num; i++)
 	{
 		hv_t *perm_result = perm_func(new, 31);
@@ -237,6 +246,8 @@ hv_t *hv_perm(hv_t origin[HV_NUM], const uint32_t perm_num)
 	return new;
 }
 
+// SIMD化むずい
+// マルチスレッド書き換え
 void hv_bound(hv_t encoded_hv[HV_NUM])
 {
 	// reductionを使って並列化する必要性あり
@@ -256,6 +267,8 @@ void hv_bound(hv_t encoded_hv[HV_NUM])
 	}
 }
 
+// SIMD化むずい
+// マルチスレッド書き換え
 hv_t *hv_bound_result(void)
 {
 	hv_t *bound_hv = hv_make();
