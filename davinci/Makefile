@@ -7,6 +7,10 @@ new:
 	gcc -O2 -o davinci_ngram_new davinci_ngram_new.c -lm
 	./davinci_ngram_new
 
+batch:
+	gcc -O2 -o davinci_ngram_new_batch davinci_ngram_new_batch.c -lm
+	./davinci_ngram_new_batch
+
 # g++ -mavx2 -O2 -o davinci_ngram_intel davinci_ngram_intel.cpp -lm
 
 check:

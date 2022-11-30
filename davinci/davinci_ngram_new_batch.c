@@ -431,7 +431,7 @@ int main(int argc, char const *argv[])
 			}
 		}
 
-		// uint32_t **item_memory_array_new = makeArrayHV(ALL_NGRAM);
+		uint32_t **item_memory_array_new = makeArrayHV(ALL_NGRAM);
 
 		uint32_t repeat_num = ALL_NGRAM;
 		if (EVEN)
@@ -470,24 +470,24 @@ int main(int argc, char const *argv[])
 
 			for (uint32_t l = 0; l < NGRAM; l++)
 			{
-				// bind(item_memory_array_new[i], item_memory_array_new[i], item_memory_array_result[l]);
-				bind(bound_tmp, bound_tmp, item_memory_array_result[l]);
+				bind(item_memory_array_new[i], item_memory_array_new[i], item_memory_array_result[l]);
+				// bind(bound_tmp, bound_tmp, item_memory_array_result[l]);
 			}
 			freeArrayHV(&item_memory_array_result, NGRAM);
 
-			bound(bound_tmp);
+			// bound(bound_tmp);
 		}
 		// ---------------------------------------------
 		if (EVEN)
 		{
-			// memcpy(item_memory_array_new[ALL_NGRAM - 1], item_memory_array[MAJORITY_ADDR], sizeof(uint32_t) * HV_NUM);
-			bound(item_memory[MAJORITY_ADDR]);
+			memcpy(item_memory_array_new[ALL_NGRAM - 1], item_memory[MAJORITY_ADDR], sizeof(uint32_t) * HV_NUM);
+			// bound(item_memory[MAJORITY_ADDR]);
 		}
 		// ---------------------------------------------
 		// 結果を格納
 		// Bounding
-		// bound_batch(result, ALL_NGRAM, item_memory_array_new);
-		bound_extract(result);
+		bound_batch(result, ALL_NGRAM, item_memory_array_new);
+		// bound_extract(result);
 
 		END = clock();
 		TIME = ((double)(END - START)) / CLOCKS_PER_SEC * 1000.0;
@@ -504,7 +504,7 @@ int main(int argc, char const *argv[])
 		// メモリ解放時間
 		START = clock();
 
-		// freeArrayHV(&item_memory_array_new, ALL_NGRAM);
+		freeArrayHV(&item_memory_array_new, ALL_NGRAM);
 		freeArrayU8(&ascii_array, ALL_NGRAM);
 		free(content);
 
