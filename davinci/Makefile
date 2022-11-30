@@ -4,7 +4,9 @@ default:
 	./davinci_ngram
 
 new:
-	gcc -O2 -o davinci_ngram_new davinci_ngram_new.c -lm
+	gcc -O2 -c -o hyper_vector.o hyper_vector.c
+	gcc -O2 -c -o davinci_ngram_new.o davinci_ngram_new.c
+	gcc -O2 -o davinci_ngram_new davinci_ngram_new.o hyper_vector.o
 	./davinci_ngram_new
 
 batch:
