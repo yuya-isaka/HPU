@@ -10,13 +10,8 @@
 #include <omp.h>
 #endif
 
-// SIMD化
-// 無駄な乗算や除算、シーケンシャルアクセスになってない部分を探して直す
-//
-// エミュレータとして改造
-// __attribute__((destructor))でfreeをdestructorで処理
-// 64 * 16
-// 16 * 64でも動くようにする
+// SIMD化前提で作り直してみる
+// 64 * 16で早くなるか
 
 #ifdef DEBUG
 __attribute__((destructor)) static void destructor()
