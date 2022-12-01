@@ -12,11 +12,14 @@
 // マルチスレッド化
 // 無駄な乗算や除算、シーケンシャルアクセスになってない部分を探して直す
 // エミュレータとして改造
+// __attribute__((destructor))でfreeをdestructorで処理
 
+#if defined(DEBUG)
 __attribute__((destructor)) static void destructor()
 {
 	system("leaks -q davinci_ngram");
 }
+#endif
 
 uint8_t **make_array_u8(const uint32_t y, const uint32_t x)
 {

@@ -1,7 +1,7 @@
 
 default:
 	gcc -O2 -c -o hyper_vector.o hyper_vector.c
-	gcc -O2 -c -o davinci_ngram.o davinci_ngram.c
+	gcc -O2 -c -DDEBUG -o davinci_ngram.o davinci_ngram.c
 	gcc -O2 -o davinci_ngram davinci_ngram.o hyper_vector.o
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
