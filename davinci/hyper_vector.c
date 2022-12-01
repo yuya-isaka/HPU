@@ -146,6 +146,31 @@ hv_t *hv_bind(hv_t src1[HV_NUM], hv_t src2[HV_NUM])
 {
 	hv_t *dst = hv_make();
 #ifdef SIMD
+	// hv_t src1_128[8][4];
+	// hv_t src2_128[8][4];
+	// hv_t dst_128[8][4];
+	// for (uint32_t i = 0; i < 8; i++)
+	// {
+	// 	for (uint32_t j = 0; j < 4; j++)
+	// 	{
+	// 		src1_128[i][j] = src1[i * 4 + j];
+	// 		src2_128[i][j] = src2[i * 4 + j];
+	// 	}
+	// }
+	// for (uint32_t i = 0; i < 8; i++)
+	// {
+	// 	uint32x4_t hv_neon_src1 = vld1q_u32(src1_128[i]);
+	// 	uint32x4_t hv_neon_src2 = vld1q_u32(src2_128[i]);
+	// 	uint32x4_t hv_neon_dst = veorq_u32(hv_neon_src1, hv_neon_src2);
+	// 	vst1q_u32(dst_128[i], hv_neon_dst);
+	// }
+	// for (uint32_t i = 0; i < 8; i++)
+	// {
+	// 	for (uint32_t j = 0; j < 4; j++)
+	// 	{
+	// 		dst[i * 4 + j] = dst_128[i][j];
+	// 	}
+	// }
 	for (uint32_t i = 0; i < HV_NUM; i += 4)
 	{
 		hv_t src1_128[4] = {src1[i], src1[i + 1], src1[i + 2], src1[i + 3]};
