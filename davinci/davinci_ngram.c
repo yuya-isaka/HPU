@@ -103,7 +103,7 @@ int main(int argc, char const *argv[])
 	// const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
 	const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
 
-	const uint32_t NGRAM = 10;
+	const uint32_t NGRAM = 100;
 	const uint32_t RAND_NUM = 27;
 	const uint32_t MAJORITY_ADDR = 26;
 
@@ -134,15 +134,16 @@ int main(int argc, char const *argv[])
 		clock_t START_COMPUTE = clock();
 
 		// hv -------------------------------------------------
-		hv_init();
 
-		// uint32_t TRAIN_SIZE = ALL_NGRAM;
-		// if (EVEN)
-		// {
-		// 	TRAIN_SIZE++;
-		// }
-
-		// hv_t **bound_buff = hv_make_array(TRAIN_SIZE);
+		// nobatch
+		// hv_init();
+		// batch
+		uint32_t TRAIN_SIZE = ALL_NGRAM;
+		if (EVEN)
+		{
+			TRAIN_SIZE++;
+		}
+		hv_t **bound_buff = hv_make_array(TRAIN_SIZE);
 
 #ifdef OPENMP
 #pragma omp parallel for
@@ -159,23 +160,29 @@ int main(int argc, char const *argv[])
 				hv_free(bind_result);
 				hv_free(perm_result);
 			}
-			// hv_copy(bound_buff[i], bound_tmp);
-			hv_bound(bound_tmp);
+
+			// nobatch
+			// hv_bound(bound_tmp);
+			// batch
+			hv_copy(bound_buff[i], bound_tmp);
+
 			hv_free(bound_tmp);
 		}
+
+		// nobatch
 		// if (EVEN)
 		// {
-		// 	hv_copy(bound_buff[TRAIN_SIZE - 1], item_memory[MAJORITY_ADDR]);
+		// 	hv_bound(item_memory[MAJORITY_ADDR]);
 		// }
-
-		// hv_t *result = hv_bound_batch(bound_buff, TRAIN_SIZE);
-		// hv_free_array(bound_buff, TRAIN_SIZE);
-
+		// hv_t *result = hv_bound_result();
+		// batch
 		if (EVEN)
 		{
-			hv_bound(item_memory[MAJORITY_ADDR]);
+			hv_copy(bound_buff[TRAIN_SIZE - 1], item_memory[MAJORITY_ADDR]);
 		}
-		hv_t *result = hv_bound_result();
+		hv_t *result = hv_bound_batch(bound_buff, TRAIN_SIZE);
+		hv_free_array(bound_buff, TRAIN_SIZE);
+
 		// hv -------------------------------------------------
 
 		clock_t END_COMPUTE = clock();
@@ -196,7 +203,9 @@ int main(int argc, char const *argv[])
 
 		// hv -------------------------------------------------
 		hv_free(result);
-		hv_finish();
+
+		// nobatch
+		// hv_finish();
 		// hv -------------------------------------------------
 	}
 

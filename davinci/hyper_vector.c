@@ -394,6 +394,7 @@ hv_t *hv_bound_batch(hv_t **batch_data, const uint32_t batch_size)
 	{
 		free(hv_buff[i]);
 	}
+	free(hv_buff);
 #endif
 
 	const uint32_t threshold = batch_size / 2;
