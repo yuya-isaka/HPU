@@ -6,6 +6,10 @@
 #include <string.h>
 #include "hyper_vector.h"
 
+#ifdef SIMD
+#include <arm_neon.h>
+#endif
+
 #ifdef OPENMP
 #include <omp.h>
 #endif
@@ -66,7 +70,6 @@ hv_t **hv_make_array(const uint32_t size)
 		exit(1);
 	}
 
-	// マルチスレッド
 	for (uint32_t i = 0; i < size; i++)
 	{
 		result[i] = hv_make();
@@ -76,7 +79,6 @@ hv_t **hv_make_array(const uint32_t size)
 
 void hv_free_array(hv_t **data, const uint32_t size)
 {
-	// マルチスレッド
 	for (uint32_t i = 0; i < size; i++)
 	{
 		hv_free(data[i]);
@@ -143,11 +145,29 @@ void hv_copy(hv_t *dst, hv_t *src)
 hv_t *hv_bind(hv_t src1[HV_NUM], hv_t src2[HV_NUM])
 {
 	hv_t *dst = hv_make();
-	// SIMD化
-	for (int i = 0; i < HV_NUM; i++)
+#ifdef SIMD
+	for (uint32_t i = 0; i < HV_NUM; i += 4)
+	{
+		hv_t src1_128[4] = {src1[i], src1[i + 1], src1[i + 2], src1[i + 3]};
+		uint32x4_t hv_neon_src1 = vld1q_u32(src1_128);
+		hv_t src2_128[4] = {src2[i], src2[i + 1], src2[i + 2], src2[i + 3]};
+		uint32x4_t hv_neon_src2 = vld1q_u32(src2_128);
+
+		uint32x4_t hv_neon_dst = veorq_u32(hv_neon_src1, hv_neon_src2);
+
+		hv_t dst_128[4];
+		vst1q_u32(dst_128, hv_neon_dst);
+		for (uint32_t j = 0; j < 4; j++)
+		{
+			dst[i + j] = dst_128[j];
+		}
+	}
+#else
+	for (uint32_t i = 0; i < HV_NUM; i++)
 	{
 		dst[i] = src1[i] ^ src2[i];
 	}
+#endif
 
 	return dst;
 }
