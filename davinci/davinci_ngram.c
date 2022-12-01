@@ -10,9 +10,9 @@
 #include <omp.h>
 #endif
 
-// マルチスレッド化
 // SIMD化
 // 無駄な乗算や除算、シーケンシャルアクセスになってない部分を探して直す
+//
 // エミュレータとして改造
 // __attribute__((destructor))でfreeをdestructorで処理
 // 64 * 16
@@ -136,14 +136,14 @@ int main(int argc, char const *argv[])
 		// hv -------------------------------------------------
 
 		// nobatch
-		// hv_init();
+		hv_init();
 		// batch
-		uint32_t TRAIN_SIZE = ALL_NGRAM;
-		if (EVEN)
-		{
-			TRAIN_SIZE++;
-		}
-		hv_t **bound_buff = hv_make_array(TRAIN_SIZE);
+		// uint32_t TRAIN_SIZE = ALL_NGRAM;
+		// if (EVEN)
+		// {
+		// 	TRAIN_SIZE++;
+		// }
+		// hv_t **bound_buff = hv_make_array(TRAIN_SIZE);
 
 #ifdef OPENMP
 #pragma omp parallel for
@@ -162,26 +162,26 @@ int main(int argc, char const *argv[])
 			}
 
 			// nobatch
-			// hv_bound(bound_tmp);
+			hv_bound(bound_tmp);
 			// batch
-			hv_copy(bound_buff[i], bound_tmp);
+			// hv_copy(bound_buff[i], bound_tmp);
 
 			hv_free(bound_tmp);
 		}
 
 		// nobatch
-		// if (EVEN)
-		// {
-		// 	hv_bound(item_memory[MAJORITY_ADDR]);
-		// }
-		// hv_t *result = hv_bound_result();
-		// batch
 		if (EVEN)
 		{
-			hv_copy(bound_buff[TRAIN_SIZE - 1], item_memory[MAJORITY_ADDR]);
+			hv_bound(item_memory[MAJORITY_ADDR]);
 		}
-		hv_t *result = hv_bound_batch(bound_buff, TRAIN_SIZE);
-		hv_free_array(bound_buff, TRAIN_SIZE);
+		hv_t *result = hv_bound_result();
+		// batch
+		// if (EVEN)
+		// {
+		// 	hv_copy(bound_buff[TRAIN_SIZE - 1], item_memory[MAJORITY_ADDR]);
+		// }
+		// hv_t *result = hv_bound_batch(bound_buff, TRAIN_SIZE);
+		// hv_free_array(bound_buff, TRAIN_SIZE);
 
 		// hv -------------------------------------------------
 
@@ -205,7 +205,7 @@ int main(int argc, char const *argv[])
 		hv_free(result);
 
 		// nobatch
-		// hv_finish();
+		hv_finish();
 		// hv -------------------------------------------------
 	}
 

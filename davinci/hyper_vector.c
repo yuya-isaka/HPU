@@ -144,13 +144,10 @@ hv_t *hv_bind(hv_t src1[HV_NUM], hv_t src2[HV_NUM])
 {
 	hv_t *dst = hv_make();
 	// SIMD化
-	// #pragma omp parallel for
 	for (int i = 0; i < HV_NUM; i++)
 	{
 		dst[i] = src1[i] ^ src2[i];
-		// printf("thread = %d, i = %2d\n", omp_get_thread_num(), i);
 	}
-	// printf("終わり");
 
 	return dst;
 }
@@ -174,7 +171,6 @@ static hv_t *perm_right(hv_t base_hv[HV_NUM], const uint32_t perm_num)
 	result_hv[HV_NUM - 1] |= origin_hv;
 
 	// SIMD化（新しいperm定義）
-	// #pragma omp parallel for
 	for (uint32_t i = 1; i < HV_NUM; i++)
 	{
 		hv_t origin_hv = base_hv[i];
@@ -206,7 +202,6 @@ static hv_t *perm_left(hv_t base_hv[HV_NUM], const uint32_t perm_num)
 	result_hv[0] |= origin_hv;
 
 	// SIMD化（新しいperm定義）
-	// #pragma omp parallel for
 	for (uint32_t i = HV_NUM - 2; i >= 0; i--)
 	{
 		hv_t origin_hv = base_hv[i];
@@ -236,7 +231,6 @@ static hv_t *perm_select(hv_t origin[HV_NUM], const uint32_t perm_num, hv_t *(*p
 
 	hv_t *new = perm_func(origin, pre_perm_num);
 
-	// マルチスレッドむずい
 	for (uint32_t i = 0; i < repeat_perm_num; i++)
 	{
 		hv_t *perm_result = perm_func(new, 31);
@@ -277,11 +271,8 @@ hv_t *hv_perm(hv_t origin[HV_NUM], const uint32_t perm_num)
 }
 
 // SIMD化むずい
-// マルチスレッド書き換え
 void hv_bound(hv_t encoded_hv[HV_NUM])
 {
-	// reductionを使って並列化する必要性あり
-	// https://www.isus.jp/products/c-compilers/32-openmp-traps/
 	uint32_t index_assign = HV_NUM - 1;
 	for (uint32_t i = 0; i < HV_NUM; i++)
 	{
@@ -302,7 +293,6 @@ void hv_bound(hv_t encoded_hv[HV_NUM])
 }
 
 // SIMD化むずい
-// マルチスレッド書き換え
 hv_t *hv_bound_result(void)
 {
 #ifdef OPENMP
