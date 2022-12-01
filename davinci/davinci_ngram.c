@@ -5,6 +5,7 @@
 #include <time.h>
 #include <string.h>
 #include "hyper_vector.h"
+
 #ifdef OPENMP
 #include <omp.h>
 #endif
@@ -163,10 +164,11 @@ int main(int argc, char const *argv[])
 		// hv -------------------------------------------------
 
 		clock_t END_COMPUTE = clock();
-#ifdef OPENMP
-		printf("thread = %d, end=%lf\n", omp_get_thread_num(), (double)END_COMPUTE);
-#endif
+
 		double TIME = ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
+#ifdef OPENMP
+		TIME = TIME / omp_get_max_threads();
+#endif
 		printf("  計算時間: %lf[ms]\n", TIME);
 
 		for (uint32_t j = 0; j < HV_NUM; j++)

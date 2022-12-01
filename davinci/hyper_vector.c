@@ -5,6 +5,7 @@
 #include <time.h>
 #include <string.h>
 #include "hyper_vector.h"
+
 #ifdef OPENMP
 #include <omp.h>
 #endif

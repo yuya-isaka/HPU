@@ -7,9 +7,9 @@ default:
 	./davinci_ngram
 
 omp:
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DOPENMP -o hyper_vector.o hyper_vector.c
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -o davinci_ngram.o davinci_ngram.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -o davinci_ngram davinci_ngram.o hyper_vector.o
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O2 -DOPENMP -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O2 -DDEBUG -DOPENMP -o davinci_ngram.o davinci_ngram.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O2 -o davinci_ngram davinci_ngram.o hyper_vector.o
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
