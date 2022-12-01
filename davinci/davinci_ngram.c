@@ -5,16 +5,19 @@
 #include <time.h>
 #include <string.h>
 #include "hyper_vector.h"
+#ifdef OPENMP
+#include <omp.h>
+#endif
 
-// 64 * 16
-// 16 * 64でも動くようにする
-// SIMD化
 // マルチスレッド化
+// SIMD化
 // 無駄な乗算や除算、シーケンシャルアクセスになってない部分を探して直す
 // エミュレータとして改造
 // __attribute__((destructor))でfreeをdestructorで処理
+// 64 * 16
+// 16 * 64でも動くようにする
 
-#if defined(DEBUG)
+#ifdef DEBUG
 __attribute__((destructor)) static void destructor()
 {
 	system("leaks -q davinci_ngram");
@@ -99,7 +102,7 @@ int main(int argc, char const *argv[])
 	// const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
 	const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
 
-	const uint32_t NGRAM = 3;
+	const uint32_t NGRAM = 10;
 	const uint32_t RAND_NUM = 27;
 	const uint32_t MAJORITY_ADDR = 26;
 
@@ -132,6 +135,9 @@ int main(int argc, char const *argv[])
 		// hv -------------------------------------------------
 		hv_init();
 
+#ifdef OPENMP
+#pragma omp parallel for
+#endif
 		for (uint32_t i = 0; i < ALL_NGRAM; i++)
 		{
 			hv_t *bound_tmp = hv_make();
@@ -148,6 +154,7 @@ int main(int argc, char const *argv[])
 			hv_bound(bound_tmp);
 			hv_free(bound_tmp);
 		}
+
 		if (EVEN)
 		{
 			hv_bound(item_memory[MAJORITY_ADDR]);
@@ -156,6 +163,9 @@ int main(int argc, char const *argv[])
 		// hv -------------------------------------------------
 
 		clock_t END_COMPUTE = clock();
+#ifdef OPENMP
+		printf("thread = %d, end=%lf\n", omp_get_thread_num(), (double)END_COMPUTE);
+#endif
 		double TIME = ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
 		printf("  計算時間: %lf[ms]\n", TIME);
 
