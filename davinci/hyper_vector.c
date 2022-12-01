@@ -10,11 +10,34 @@
 #include <omp.h>
 #endif
 
-extern int32_t bound_buff[HV_DIM];
+#ifdef OPENMP
+extern int32_t **hv_bound_buff;
+#else
+extern int32_t *hv_bound_buff;
+#endif
 
 void hv_init(void)
 {
-	memset(bound_buff, 0, sizeof(int32_t) * HV_DIM);
+#ifdef OPENMP
+	hv_bound_buff = (int32_t **)calloc(omp_get_max_threads(), sizeof(int32_t *));
+	for (uint32_t i = 0; i < omp_get_max_threads(); i++)
+	{
+		hv_bound_buff[i] = (int32_t *)calloc(HV_DIM, sizeof(int32_t));
+	}
+#else
+	hv_bound_buff = (int32_t *)calloc(HV_DIM, sizeof(int32_t));
+#endif
+}
+
+void hv_finish(void)
+{
+#ifdef OPENMP
+	for (uint32_t i = 0; i < omp_get_max_threads(); i++)
+	{
+		free(hv_bound_buff[i]);
+	}
+#endif
+	free(hv_bound_buff);
 }
 
 hv_t *hv_make(void)
@@ -268,9 +291,10 @@ void hv_bound(hv_t encoded_hv[HV_NUM])
 		{
 			uint32_t index = index_assign * 32 + j;
 #ifdef OPENMP
-#pragma omp atomic
+			hv_bound_buff[omp_get_thread_num()][index] += (mask & hv ? -1 : 1);
+#else
+			hv_bound_buff[index] += (mask & hv ? -1 : 1);
 #endif
-			bound_buff[index] += (mask & hv ? -1 : 1);
 			mask <<= 1;
 		}
 		index_assign--;
@@ -281,6 +305,17 @@ void hv_bound(hv_t encoded_hv[HV_NUM])
 // マルチスレッド書き換え
 hv_t *hv_bound_result(void)
 {
+#ifdef OPENMP
+	int32_t *hv_bound_buff_result = (int32_t *)calloc(HV_DIM, sizeof(int32_t));
+	for (uint32_t i = 0; i < omp_get_max_threads(); i++)
+	{
+		for (uint32_t j = 0; j < HV_DIM; j++)
+		{
+			hv_bound_buff_result[j] += hv_bound_buff[i][j];
+		}
+	}
+#endif
+
 	hv_t *bound_hv = hv_make();
 	uint32_t mask = 1 << (32 - 1);
 	uint32_t index_assign = HV_NUM - 1;
@@ -290,11 +325,108 @@ hv_t *hv_bound_result(void)
 		for (uint32_t j = 0; j < 32; j++)
 		{
 			uint32_t index = i * 32 + j;
-			uint32_t sign_bit = (bound_buff[index] & mask ? 1 : 0);
+#ifdef OPENMP
+			uint32_t sign_bit = (hv_bound_buff_result[index] & mask ? 1 : 0);
+#else
+			uint32_t sign_bit = (hv_bound_buff[index] & mask ? 1 : 0);
+#endif
 			hv += (sign_bit << j);
 		}
 		bound_hv[index_assign--] = hv;
 	}
 
+#ifdef OPENMP
+	free(hv_bound_buff_result);
+#endif
+
 	return bound_hv;
+}
+
+hv_t *hv_bound_batch(hv_t **batch_data, const uint32_t batch_size)
+{
+	hv_t *hv_result = hv_make();
+
+#ifdef OPENMP
+	uint32_t **hv_buff = (uint32_t **)calloc(omp_get_max_threads(), sizeof(uint32_t *));
+	for (uint32_t i = 0; i < omp_get_max_threads(); i++)
+	{
+		hv_buff[i] = (uint32_t *)calloc(HV_DIM, sizeof(uint32_t));
+	}
+#else
+	uint32_t *hv_buff = (uint32_t *)calloc(HV_DIM, sizeof(uint32_t));
+#endif
+
+#ifdef OPENMP
+#pragma omp parallel for
+#endif
+	for (uint32_t i = 0; i < batch_size; i++)
+	{
+		uint32_t index_assign = HV_NUM - 1;
+		for (uint32_t j = 0; j < HV_NUM; j++)
+		{
+			hv_t hv = batch_data[i][j];
+			uint32_t mask = 1;
+			for (uint32_t k = 0; k < 32; k++)
+			{
+				uint32_t index = index_assign * 32 + k;
+#ifdef OPENMP
+				hv_buff[omp_get_thread_num()][index] += (mask & hv ? 1 : 0);
+#else
+				hv_buff[index] += (mask & hv ? 1 : 0);
+#endif
+				mask <<= 1;
+			}
+			index_assign--;
+		}
+	}
+
+#ifdef OPENMP
+	uint32_t *hv_buff_result = (uint32_t *)calloc(HV_DIM, sizeof(uint32_t));
+	for (uint32_t i = 0; i < omp_get_max_threads(); i++)
+	{
+		for (uint32_t j = 0; j < HV_DIM; j++)
+		{
+			hv_buff_result[j] += hv_buff[i][j];
+		}
+	}
+
+	for (uint32_t i = 0; i < omp_get_max_threads(); i++)
+	{
+		free(hv_buff[i]);
+	}
+#endif
+
+	const uint32_t threshold = batch_size / 2;
+	uint32_t index = HV_NUM - 1;
+	uint32_t counter = 0;
+	uint32_t tmp_hv = 0;
+	for (uint32_t i = 0; i < HV_DIM; i++)
+	{
+#ifdef OPENMP
+		if (hv_buff_result[i] > threshold)
+		{
+			tmp_hv |= 1 << counter;
+		}
+#else
+		if (hv_buff[i] > threshold)
+		{
+			tmp_hv |= 1 << counter;
+		}
+#endif
+		counter++;
+		if (counter >= 32)
+		{
+			counter = 0;
+			hv_result[index--] = tmp_hv;
+			tmp_hv = 0;
+		}
+	}
+
+#ifdef OPENMP
+	free(hv_buff_result);
+#else
+	free(hv_buff);
+#endif
+
+	return hv_result;
 }

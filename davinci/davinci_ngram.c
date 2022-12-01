@@ -136,6 +136,14 @@ int main(int argc, char const *argv[])
 		// hv -------------------------------------------------
 		hv_init();
 
+		// uint32_t TRAIN_SIZE = ALL_NGRAM;
+		// if (EVEN)
+		// {
+		// 	TRAIN_SIZE++;
+		// }
+
+		// hv_t **bound_buff = hv_make_array(TRAIN_SIZE);
+
 #ifdef OPENMP
 #pragma omp parallel for
 #endif
@@ -151,10 +159,17 @@ int main(int argc, char const *argv[])
 				hv_free(bind_result);
 				hv_free(perm_result);
 			}
-
+			// hv_copy(bound_buff[i], bound_tmp);
 			hv_bound(bound_tmp);
 			hv_free(bound_tmp);
 		}
+		// if (EVEN)
+		// {
+		// 	hv_copy(bound_buff[TRAIN_SIZE - 1], item_memory[MAJORITY_ADDR]);
+		// }
+
+		// hv_t *result = hv_bound_batch(bound_buff, TRAIN_SIZE);
+		// hv_free_array(bound_buff, TRAIN_SIZE);
 
 		if (EVEN)
 		{
@@ -181,6 +196,7 @@ int main(int argc, char const *argv[])
 
 		// hv -------------------------------------------------
 		hv_free(result);
+		hv_finish();
 		// hv -------------------------------------------------
 	}
 
