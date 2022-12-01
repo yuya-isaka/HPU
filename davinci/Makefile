@@ -1,15 +1,22 @@
 
 default:
-	gcc -O2 -c -o hyper_vector.o hyper_vector.c
-	gcc -O2 -c -o davinci_ngram.o davinci_ngram.c
+	gcc -c -O2 -o hyper_vector.o hyper_vector.c
+	gcc -c -O2 -DDEBUG -o davinci_ngram.o davinci_ngram.c
 	gcc -O2 -o davinci_ngram davinci_ngram.o hyper_vector.o
+	rm hyper_vector.o davinci_ngram.o
+	./davinci_ngram
+
+omp:
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O2 -DOPENMP -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O2 -DDEBUG -DOPENMP -o davinci_ngram.o davinci_ngram.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O2 -DDEBUG -DOPENMP -o davinci_ngram davinci_ngram.o hyper_vector.o
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
 # g++ -mavx2 -O2 -o davinci_ngram_intel davinci_ngram_intel.cpp -lm
 
-check:
-	gcc -Wall -o davinci_ngram davinci_ngram.c -lm
+# check:
+# 	gcc -Wall -o davinci_ngram davinci_ngram.c -lm
 
 asm:
 	gcc -Wall -O2 -S -o davinci_ngram.s davinci_ngram.c -lm

@@ -6,17 +6,24 @@
 #include <string.h>
 #include "hyper_vector.h"
 
+#ifdef OPENMP
+#include <omp.h>
+#endif
+
+// SIMD化
+// 無駄な乗算や除算、シーケンシャルアクセスになってない部分を探して直す
+//
+// エミュレータとして改造
+// __attribute__((destructor))でfreeをdestructorで処理
 // 64 * 16
 // 16 * 64でも動くようにする
-// SIMD化
-// マルチスレッド化
-// 無駄な乗算や除算、シーケンシャルアクセスになってない部分を探して直す
-// エミュレータとして改造
 
+#ifdef DEBUG
 __attribute__((destructor)) static void destructor()
 {
 	system("leaks -q davinci_ngram");
 }
+#endif
 
 uint8_t **make_array_u8(const uint32_t y, const uint32_t x)
 {
@@ -96,7 +103,7 @@ int main(int argc, char const *argv[])
 	// const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
 	const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
 
-	const uint32_t NGRAM = 3;
+	const uint32_t NGRAM = 100;
 	const uint32_t RAND_NUM = 27;
 	const uint32_t MAJORITY_ADDR = 26;
 
@@ -127,8 +134,20 @@ int main(int argc, char const *argv[])
 		clock_t START_COMPUTE = clock();
 
 		// hv -------------------------------------------------
-		hv_init();
 
+		// nobatch
+		hv_init();
+		// batch
+		// uint32_t TRAIN_SIZE = ALL_NGRAM;
+		// if (EVEN)
+		// {
+		// 	TRAIN_SIZE++;
+		// }
+		// hv_t **bound_buff = hv_make_array(TRAIN_SIZE);
+
+#ifdef OPENMP
+#pragma omp parallel for
+#endif
 		for (uint32_t i = 0; i < ALL_NGRAM; i++)
 		{
 			hv_t *bound_tmp = hv_make();
@@ -142,18 +161,36 @@ int main(int argc, char const *argv[])
 				hv_free(perm_result);
 			}
 
+			// nobatch
 			hv_bound(bound_tmp);
+			// batch
+			// hv_copy(bound_buff[i], bound_tmp);
+
 			hv_free(bound_tmp);
 		}
+
+		// nobatch
 		if (EVEN)
 		{
 			hv_bound(item_memory[MAJORITY_ADDR]);
 		}
 		hv_t *result = hv_bound_result();
+		// batch
+		// if (EVEN)
+		// {
+		// 	hv_copy(bound_buff[TRAIN_SIZE - 1], item_memory[MAJORITY_ADDR]);
+		// }
+		// hv_t *result = hv_bound_batch(bound_buff, TRAIN_SIZE);
+		// hv_free_array(bound_buff, TRAIN_SIZE);
+
 		// hv -------------------------------------------------
 
 		clock_t END_COMPUTE = clock();
+
 		double TIME = ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
+#ifdef OPENMP
+		TIME = TIME / omp_get_max_threads();
+#endif
 		printf("  計算時間: %lf[ms]\n", TIME);
 
 		for (uint32_t j = 0; j < HV_NUM; j++)
@@ -166,6 +203,9 @@ int main(int argc, char const *argv[])
 
 		// hv -------------------------------------------------
 		hv_free(result);
+
+		// nobatch
+		hv_finish();
 		// hv -------------------------------------------------
 	}
 
