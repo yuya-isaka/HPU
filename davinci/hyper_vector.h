@@ -3,14 +3,22 @@
 #define HYPER_VECTOR_h_
 
 #define HV_DIM 1024
-#define HV_NUM HV_DIM / 32
+#define HV_NUM HV_DIM / ELEMENT_SIZE
 
+#ifdef HV64
+#define ELEMENT_SIZE 64
+typedef uint64_t hv_t;
+#else
+#define ELEMENT_SIZE 32
 typedef uint32_t hv_t;
+#endif
+
+typedef int32_t hv_int_t;
 
 #ifdef OPENMP
-int32_t **hv_bound_buff;
+hv_int_t **hv_bound_buff;
 #else
-int32_t *hv_bound_buff;
+hv_int_t *hv_bound_buff;
 #endif
 
 extern void hv_init(void);

@@ -100,7 +100,7 @@ int main(int argc, char const *argv[])
 	// const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
 	const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
 
-	const uint32_t NGRAM = 100;
+	const uint32_t NGRAM = 3;
 	const uint32_t RAND_NUM = 27;
 	const uint32_t MAJORITY_ADDR = 26;
 
@@ -192,7 +192,22 @@ int main(int argc, char const *argv[])
 
 		for (uint32_t j = 0; j < HV_NUM; j++)
 		{
+#ifdef HV64
+			union
+			{
+				struct
+				{
+					uint32_t data_0;
+					uint32_t data_1;
+				};
+				hv_t data;
+			} conv;
+			conv.data = result[j];
+			printf("%u\n", conv.data_0);
+			printf("%u\n", conv.data_1);
+#else
 			printf("%u\n", result[j]);
+#endif
 		}
 
 		free_array_u8(ascii_array, ALL_NGRAM);
