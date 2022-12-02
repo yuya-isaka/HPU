@@ -20,6 +20,13 @@ neon:
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
+neon2:
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -DSIMD -o hyper_vector_neon.o hyper_vector_neon.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -DSIMD -o davinci_ngram_neon.o davinci_ngram_neon.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -DDEBUG -DOPENMP -DSIMD -o davinci_ngram_neon davinci_ngram_neon.o hyper_vector_neon.o
+	rm hyper_vector_neon.o davinci_ngram_neon.o
+	./davinci_ngram_neon
+
 # g++ -mavx2 -O2 -o davinci_ngram_intel davinci_ngram_intel.cpp -lm
 
 # check:

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#include "hyper_vector.h"
+#include "hyper_vector_neon.h"
 
 #ifdef OPENMP
 #include <omp.h>
