@@ -10,9 +10,11 @@
 #include <omp.h>
 #endif
 
-// hardwareでpermutationを駆使したやつやと早くなるかも
+// 並列化とか色々高速化のヒントがハッカーの楽しみにある気がする
+// hardwareでpermutationを駆使したやつやと早くなるかも → 何コアいける？
 // Permutatoinはvshrq_n_u64とかを使って128のシフトを実現可能
 // populationカウントは統治戦略によって並列に実行可能
+// batchを分割統治で変える
 
 #ifdef DEBUG
 __attribute__((destructor)) static void destructor()
