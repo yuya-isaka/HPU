@@ -10,10 +10,9 @@
 #include <omp.h>
 #endif
 
-// SIMD化前提で作り直してみる
-// 64 * 16で早くなるか
-// 並列化もっとうまくできないか調査
-// population count（マルチスレッド、SIMD）
+// hardwareでpermutationを駆使したやつやと早くなるかも
+// Permutatoinはvshrq_n_u64とかを使って128のシフトを実現可能
+// populationカウントは統治戦略によって並列に実行可能
 
 #ifdef DEBUG
 __attribute__((destructor)) static void destructor()
@@ -100,7 +99,7 @@ int main(int argc, char const *argv[])
 	// const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
 	const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
 
-	const uint32_t NGRAM = 3;
+	const uint32_t NGRAM = 100;
 	const uint32_t RAND_NUM = 27;
 	const uint32_t MAJORITY_ADDR = 26;
 

@@ -216,8 +216,7 @@ hv_t *hv_bind(hv_t src1[HV_NUM], hv_t src2[HV_NUM])
 static hv_t perm_element_right(hv_t *origin_hv, const uint32_t perm_num)
 {
 	hv_t remain_hv = *origin_hv >> perm_num;
-	hv_t mask = ((hv_t)1 << perm_num) - 1;
-	*origin_hv = (*origin_hv & mask) << (ELEMENT_SIZE - perm_num);
+	*origin_hv = *origin_hv << (ELEMENT_SIZE - perm_num);
 	return remain_hv;
 }
 
@@ -244,15 +243,10 @@ static hv_t *perm_right(hv_t base_hv[HV_NUM], const uint32_t perm_num)
 	return result_hv;
 }
 
-static hv_t perm_element_left(hv_t *over_hv, const uint32_t perm_num)
+static hv_t perm_element_left(hv_t *origin_hv, const uint32_t perm_num)
 {
-	hv_t remain_hv = *over_hv << perm_num;
-#ifdef HV64
-	hv_t mask = UINT64_MAX << (ELEMENT_SIZE - perm_num);
-#else
-	hv_t mask = UINT32_MAX << (ELEMENT_SIZE - perm_num);
-#endif
-	*over_hv = (*over_hv & mask) >> (ELEMENT_SIZE - perm_num);
+	hv_t remain_hv = *origin_hv << perm_num;
+	*origin_hv = *origin_hv >> (ELEMENT_SIZE - perm_num);
 	return remain_hv;
 }
 
