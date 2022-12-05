@@ -1470,14 +1470,25 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 
   // printf("\n --------------------------- Output ---------------------------- \n\n\n");
 
-  for (int i = 0; i < 2; i++)
+  if (DIM == 32)
   {
-    for (int j = 0; j < 16; j++)
+    for (int i = 0; i < 2; i++)
     {
-      printf("  %u\n", verilator_top->M_AXIS_TDATA[j]);
+      for (int j = 0; j < 16; j++)
+      {
+        printf("  %u\n", verilator_top->M_AXIS_TDATA[j]);
+        // putb(verilator_top->M_AXIS_TDATA[j]);
+      }
+      eval();
+    }
+  }
+  else if (DIM == 1)
+  {
+    for (int i = 0; i < 2; i++)
+    {
+      printf("  %u\n", verilator_top->M_AXIS_TDATA[0]);
       // putb(verilator_top->M_AXIS_TDATA[j]);
     }
-    eval();
   }
   eval();
   eval();
@@ -1533,7 +1544,7 @@ int main(int argc, char **argv)
   //   printf(" -------------------\n\n");
   // }
 
-  ADDRNUM = 210;
+  ADDRNUM = 21;
   DEBUG = 0;
   check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
