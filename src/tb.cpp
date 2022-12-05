@@ -1476,6 +1476,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
     {
       printf("  %u\n", verilator_top->M_AXIS_TDATA[0]);
       // putb(verilator_top->M_AXIS_TDATA[j]);
+      eval();
     }
   }
   else
