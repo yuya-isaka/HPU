@@ -201,16 +201,14 @@ module core
 
                           // rshift
                           if ( inst[ 14 ] ) begin
-                            //   reg_2 <= { reg_2[ 0 ], reg_2[ DIM:1 ] };
-                              reg_2 <= (reg_2 >> inst[8:0]) | (reg_2 << (512 - inst[8:0]));
+                              reg_2 <= { reg_2[ 0 ], reg_2[ DIM:1 ] };
                               buff <= 0;
                               store <= 0;
                           end
 
                           // lshift
                           else if ( inst [ 13 ] ) begin
-                            //   reg_2 <= { reg_2[ DIM-1:0 ], reg_2[ DIM ] };
-                              reg_2 <= { reg_2 << inst[8:0] | reg_2 >> (512 - inst[8:0]) };
+                              reg_2 <= { reg_2[ DIM-1:0 ], reg_2[ DIM ] };
                               buff <= 0;
                               store <= 0;
                           end
