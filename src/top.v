@@ -68,7 +68,7 @@ module top
 
     // 次元数可変
     // 32次元 -----------------
-    parameter DIM = 63;
+    parameter DIM = 31;
     // -----------------------
 
     // 1024次元 ---------------
@@ -78,7 +78,7 @@ module top
 
     // 次元数可変
     // 32次元 -----------------
-    parameter WI = 1;
+    parameter WI = 0;
     // -----------------------
 
     // 1024次元 ---------------
@@ -88,7 +88,7 @@ module top
 
     // コア数可変
     // 2コア -------------------
-    parameter CORENUM = 16;
+    parameter CORENUM = 2;
     // ------------------------
 
 
@@ -124,7 +124,7 @@ module top
     // buffer_ctrl #( .DIM( 31 ), .CORENUM( 16 ) ) buffer_ctrl
     // buffer_ctrl #( .DIM( 1023 ), .CORENUM( 16 ) ) buffer_ctrl
     // buffer_ctrl #( .DIM( 1023 ), .CORENUM( 32 ) ) buffer_ctrl
-    buffer_ctrl #( .DIM( 63 ), .CORENUM( 16 ) ) buffer_ctrl
+    buffer_ctrl #( .DIM( 31 ), .CORENUM( 2 ) ) buffer_ctrl
                 (
 
                     // in
@@ -135,20 +135,20 @@ module top
                     // コア数可変
                     .core_result_1( core_result[ 0 ] ),
                     .core_result_2( core_result[ 1 ] ),
-                    .core_result_3( core_result[ 2 ] ),
-                    .core_result_4( core_result[ 3 ] ),
-                    .core_result_5( core_result[ 4 ] ),
-                    .core_result_6( core_result[ 5 ] ),
-                    .core_result_7( core_result[ 6 ] ),
-                    .core_result_8( core_result[ 7 ] ),
-                    .core_result_9( core_result[ 8 ] ),
-                    .core_result_10( core_result[ 9 ] ),
-                    .core_result_11( core_result[ 10 ] ),
-                    .core_result_12( core_result[ 11 ] ),
-                    .core_result_13( core_result[ 12 ] ),
-                    .core_result_14( core_result[ 13 ] ),
-                    .core_result_15( core_result[ 14 ] ),
-                    .core_result_16( core_result[ 15 ] ),
+                    // .core_result_3( core_result[ 2 ] ),
+                    // .core_result_4( core_result[ 3 ] ),
+                    // .core_result_5( core_result[ 4 ] ),
+                    // .core_result_6( core_result[ 5 ] ),
+                    // .core_result_7( core_result[ 6 ] ),
+                    // .core_result_8( core_result[ 7 ] ),
+                    // .core_result_9( core_result[ 8 ] ),
+                    // .core_result_10( core_result[ 9 ] ),
+                    // .core_result_11( core_result[ 10 ] ),
+                    // .core_result_12( core_result[ 11 ] ),
+                    // .core_result_13( core_result[ 12 ] ),
+                    // .core_result_14( core_result[ 13 ] ),
+                    // .core_result_15( core_result[ 14 ] ),
+                    // .core_result_16( core_result[ 15 ] ),
                     // .core_result_17( core_result[ 16 ] ),
                     // .core_result_18( core_result[ 17 ] ),
                     // .core_result_19( core_result[ 18 ] ),
@@ -188,7 +188,7 @@ module top
 
     // コア数可変
     // stream_ctrl #( .CORENUM( 32 ) ) stream_ctrl
-    stream_ctrl #( .CORENUM( 16 ) ) stream_ctrl
+    stream_ctrl #( .CORENUM( 2 ) ) stream_ctrl
                 (
 
                     // in
@@ -307,9 +307,9 @@ module top
             rand_num[ 31:0 ] <= rand_num_tmp;
         end
 
-        else if ( item_a_tmp == 1 ) begin
-            rand_num[ 63:32 ] <= rand_num_tmp;
-        end
+        // else if ( item_a_tmp == 1 ) begin
+        //     rand_num[ 63:32 ] <= rand_num_tmp;
+        // end
 
         // else if ( item_a_tmp == 2 ) begin
         //     rand_num[ 95:64 ] <= rand_num_tmp;
@@ -449,7 +449,7 @@ module top
 
     // 各コアのラスト信号
     // 1コア
-    wire [ CORENUM-1:0 ]              last;
+    wire [ CORENUM-1:0]              last;
     // wire                            last;
 
     // 各コアでエンコーディング
@@ -461,7 +461,7 @@ module top
 
             // 次元数可変
             // core #( .DIM( 1023 ) ) core
-            core #( .DIM( 63 ) ) core
+            core #( .DIM( 31 ) ) core
                  (
 
                      // in

@@ -34,13 +34,15 @@ module selector
                       // 0の時は +1 (MSBを0に近づける)
                       if ( core_result_bit == 1'b0 ) begin
                           // 1
-                          sel_bit <= $signed( 1 );
+                        //   sel_bit <= $signed( 1 );
+                          sel_bit <= 2'b01;
                       end
 
                       // 1の時は -1 (MSBを1に近づける)
                       else begin
                           // -1
-                          sel_bit <= $signed( 1'b1 );
+                        //   sel_bit <= $signed( 1'b1 );
+                          sel_bit <= 2'b11;
                       end
                   end
 

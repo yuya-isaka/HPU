@@ -1524,29 +1524,29 @@ int main(int argc, char **argv)
   printf("\n ====================================== 開始 ========================================= \n\n");
 
   const int NGRAM = 3;
-  const int CORENUM = 16;
+  const int CORENUM = 2;
   int DEBUG = 0;
   int ADDRNUM = 0;
   // 次元数可変 (結果を何個出力するかに使う)
-  const int DIM = 64 / 32;
+  const int DIM = 32 / 32;
   // const int DIM = 1024 / 32;
   const int MAJORITY_ADDR = 511;
 
-  const int SIMULATION_COUNT = 100;
-  for (int i = 3; i < SIMULATION_COUNT; i += 3)
-  {
-    ADDRNUM = i;
+  // const int SIMULATION_COUNT = 100;
+  // for (int i = 3; i < SIMULATION_COUNT; i += 3)
+  // {
+  //   ADDRNUM = i;
 
-    DEBUG = 1;
-    check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
-    // check2(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  //   DEBUG = 1;
+  //   check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  //   // check2(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
 
-    printf(" -------------------\n\n");
-  }
+  //   printf(" -------------------\n\n");
+  // }
 
-  // ADDRNUM = 21;
-  // DEBUG = 0;
-  // check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  ADDRNUM = 21;
+  DEBUG = 0;
+  check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
   // ADDRNUM = 54;
   // DEBUG = 1;

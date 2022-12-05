@@ -88,21 +88,21 @@ module counter
                   //   box_1 <= select[ 0 ] + select[ 1 ];
                   box_1 <=
                         select[ 0 ]
-                        + select[ 1 ]
-                        + select[ 2 ]
-                        + select[ 3 ]
-                        + select[ 4 ]
-                        + select[ 5 ]
-                        + select[ 6 ]
-                        + select[ 7 ]
-                        + select[ 8 ]
-                        + select[ 9 ]
-                        + select[ 10 ]
-                        + select[ 11 ]
-                        + select[ 12 ]
-                        + select[ 13 ]
-                        + select[ 14 ]
-                        + select[ 15 ];
+                        + select[ 1 ];
+                  // + select[ 2 ]
+                  // + select[ 3 ]
+                  // + select[ 4 ]
+                  // + select[ 5 ]
+                  // + select[ 6 ]
+                  // + select[ 7 ]
+                  // + select[ 8 ]
+                  // + select[ 9 ]
+                  // + select[ 10 ]
+                  // + select[ 11 ];
+                  // + select[ 12 ]
+                  // + select[ 13 ]
+                  // + select[ 14 ]
+                  // + select[ 15 ];
                   // + select[ 16 ]
                   // + select[ 17 ]
                   // + select[ 18 ]
