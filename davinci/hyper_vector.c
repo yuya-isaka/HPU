@@ -172,11 +172,11 @@ hv_t *hv_bind(hv_t src1[HV_NUM], hv_t src2[HV_NUM])
 	for (uint32_t i = 0; i < HV_NUM; i += 2)
 	{
 		hv_t src1_128[2] = {src1[i], src1[i + 1]};
-		uint32x4_t hv_neon_src1 = vld1q_u64(src1_128);
+		uint64x2_t hv_neon_src1 = vld1q_u64(src1_128);
 		hv_t src2_128[2] = {src2[i], src2[i + 1]};
-		uint32x4_t hv_neon_src2 = vld1q_u64(src2_128);
+		uint64x2_t hv_neon_src2 = vld1q_u64(src2_128);
 
-		uint32x4_t hv_neon_dst = veorq_u64(hv_neon_src1, hv_neon_src2);
+		uint64x2_t hv_neon_dst = veorq_u64(hv_neon_src1, hv_neon_src2);
 
 		hv_t dst_128[2];
 		vst1q_u64(dst_128, hv_neon_dst);
