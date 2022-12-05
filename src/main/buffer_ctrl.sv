@@ -19,12 +19,12 @@ module buffer_ctrl
          // コア数可変
          input wire [ DIM:0 ]                   core_result_1,
          input wire [ DIM:0 ]                   core_result_2,
-         //  input wire [ DIM:0 ]                   core_result_3,
-         //  input wire [ DIM:0 ]                   core_result_4,
-         //  input wire [ DIM:0 ]                   core_result_5,
-         //  input wire [ DIM:0 ]                   core_result_6,
-         //  input wire [ DIM:0 ]                   core_result_7,
-         //  input wire [ DIM:0 ]                   core_result_8,
+         input wire [ DIM:0 ]                   core_result_3,
+         input wire [ DIM:0 ]                   core_result_4,
+         input wire [ DIM:0 ]                   core_result_5,
+         input wire [ DIM:0 ]                   core_result_6,
+         input wire [ DIM:0 ]                   core_result_7,
+         input wire [ DIM:0 ]                   core_result_8,
          //  input wire [ DIM:0 ]                   core_result_9,
          //  input wire [ DIM:0 ]                   core_result_10,
          //  input wire [ DIM:0 ]                   core_result_11,
@@ -75,7 +75,7 @@ module buffer_ctrl
 
             // コア数可変
             // 計算数可変 (現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分)
-            counter #( .W( 30 ), .CORENUM( 2 ) ) counter
+            counter #( .W( 30 ), .CORENUM( 8 ) ) counter
                     (
 
                         // in
@@ -112,12 +112,12 @@ module buffer_ctrl
                                 // core_result_11[ j ],
                                 // core_result_10[ j ],
                                 // core_result_9[ j ],
-                                // core_result_8[ j ],
-                                // core_result_7[ j ],
-                                // core_result_6[ j ],
-                                // core_result_5[ j ],
-                                // core_result_4[ j ],
-                                // core_result_3[ j ],
+                                core_result_8[ j ],
+                                core_result_7[ j ],
+                                core_result_6[ j ],
+                                core_result_5[ j ],
+                                core_result_4[ j ],
+                                core_result_3[ j ],
                                 core_result_2[ j ],
                                 core_result_1[ j ]
                             }
