@@ -1,24 +1,17 @@
+#include <arm_neon.h>
 
 #ifndef HYPER_VECTOR_h_
 #define HYPER_VECTOR_h_
 
 #define HV_DIM 1024
-#define HV_NUM HV_DIM / ELEMENT_SIZE
+#define HV_NUM HV_DIM / 128
 
-#ifdef HV64
-#define ELEMENT_SIZE 64
-typedef uint64_t hv_t;
-#else
-#define ELEMENT_SIZE 32
-typedef uint32_t hv_t;
-#endif
-
-typedef int32_t hv_int_t;
+typedef uint32x4_t hv_t;
 
 #ifdef OPENMP
-hv_int_t **hv_bound_buff;
+int32x4_t **hv_bound_buff;
 #else
-hv_int_t *hv_bound_buff;
+int32x4_t *hv_bound_buff;
 #endif
 
 extern void hv_init(void);

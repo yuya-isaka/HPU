@@ -4,11 +4,16 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#include "hyper_vector.h"
+#include "hyper_vector_neon.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
+
+// SIMD化前提で作り直してみる
+// 64 * 16で早くなるか
+// 並列化もっとうまくできないか調査
+// population count（マルチスレッド、SIMD）
 
 #ifdef DEBUG
 __attribute__((destructor)) static void destructor()
@@ -187,22 +192,7 @@ int main(int argc, char const *argv[])
 
 		for (uint32_t j = 0; j < HV_NUM; j++)
 		{
-#ifdef HV64
-			union
-			{
-				struct
-				{
-					uint32_t data_0;
-					uint32_t data_1;
-				};
-				hv_t data;
-			} conv;
-			conv.data = result[j];
-			printf("%u\n", conv.data_0);
-			printf("%u\n", conv.data_1);
-#else
 			printf("%u\n", result[j]);
-#endif
 		}
 
 		free_array_u8(ascii_array, ALL_NGRAM);

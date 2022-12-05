@@ -9,7 +9,7 @@ module counter
          // counterで数える上限
          parameter W = 30,
          // コア数 (デバッグ用)
-         parameter CORENUM = 16
+         parameter CORENUM = 32
 
      )
      (
@@ -26,7 +26,7 @@ module counter
 
 
          // out
-         output logic 		                    sign_bit
+         output wire 		                    sign_bit
 
      );
 
@@ -94,31 +94,31 @@ module counter
                         + select[ 4 ]
                         + select[ 5 ]
                         + select[ 6 ]
-                        + select[ 7 ]
-                        + select[ 8 ]
-                        + select[ 9 ]
-                        + select[ 10 ]
-                        + select[ 11 ]
-                        + select[ 12 ]
-                        + select[ 13 ]
-                        + select[ 14 ]
-                        + select[ 15 ]
-                        + select[ 16 ]
-                        + select[ 17 ]
-                        + select[ 18 ]
-                        + select[ 19 ]
-                        + select[ 20 ]
-                        + select[ 21 ]
-                        + select[ 22 ]
-                        + select[ 23 ]
-                        + select[ 24 ]
-                        + select[ 25 ]
-                        + select[ 26 ]
-                        + select[ 27 ]
-                        + select[ 28 ]
-                        + select[ 29 ]
-                        + select[ 30 ]
-                        + select[ 31 ];
+                        + select[ 7 ];
+                  // + select[ 8 ]
+                  // + select[ 9 ]
+                  // + select[ 10 ]
+                  // + select[ 11 ];
+                  // + select[ 12 ]
+                  // + select[ 13 ]
+                  // + select[ 14 ]
+                  // + select[ 15 ];
+                  // + select[ 16 ]
+                  // + select[ 17 ]
+                  // + select[ 18 ]
+                  // + select[ 19 ]
+                  // + select[ 20 ]
+                  // + select[ 21 ]
+                  // + select[ 22 ]
+                  // + select[ 23 ]
+                  // + select[ 24 ]
+                  // + select[ 25 ]
+                  // + select[ 26 ]
+                  // + select[ 27 ]
+                  // + select[ 28 ]
+                  // + select[ 29 ]
+                  // + select[ 30 ]
+                  // + select[ 31 ];
                   //   box_2 <=
                   //   box_3 <=
                   //   box_4 <=
@@ -146,6 +146,7 @@ module counter
                      (
                          // in
                          .clk( clk ),
+                         .rst( rst ),
                          // 1コア
                          .store_bit( store[ k ] ),
                          //  .store_bit( store ),

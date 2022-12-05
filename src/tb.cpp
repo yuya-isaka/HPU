@@ -790,37 +790,37 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 
       //------------------------------------------------- 実験 -------------------------------------------------------
 
-      // wb.item
-      tmp = 0;
-      for (int i = 0; i < 1; i++)
-      {
-        conv.data_0 = assemble("wbitem", 1022);
-        conv.data_1 = 0;
-        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-        tmp++;
-      }
-      // 残り埋める
-      for (int i = tmp; i < 32; i++)
-      {
-        verilator_top->S_AXIS_TDATA[i] = 0;
-      }
-      eval();
+      // // wb.item
+      // tmp = 0;
+      // for (int i = 0; i < 1; i++)
+      // {
+      //   conv.data_0 = assemble("wbitem", 1022);
+      //   conv.data_1 = 0;
+      //   verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      //   tmp++;
+      // }
+      // // 残り埋める
+      // for (int i = tmp; i < 32; i++)
+      // {
+      //   verilator_top->S_AXIS_TDATA[i] = 0;
+      // }
+      // eval();
 
-      // load
-      tmp = 0;
-      for (int i = 0; i < 1; i++)
-      {
-        conv.data_0 = assemble("load", 1022);
-        conv.data_1 = 0;
-        verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-        tmp++;
-      }
-      // 残り埋める
-      for (int i = tmp; i < 32; i++)
-      {
-        verilator_top->S_AXIS_TDATA[i] = 0;
-      }
-      eval();
+      // // load
+      // tmp = 0;
+      // for (int i = 0; i < 1; i++)
+      // {
+      //   conv.data_0 = assemble("load", 1022);
+      //   conv.data_1 = 0;
+      //   verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      //   tmp++;
+      // }
+      // // 残り埋める
+      // for (int i = tmp; i < 32; i++)
+      // {
+      //   verilator_top->S_AXIS_TDATA[i] = 0;
+      // }
+      // eval();
 
       // 2連続でstoreすることも可能
       // tmp = 0;
@@ -1470,14 +1470,29 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
 
   // printf("\n --------------------------- Output ---------------------------- \n\n\n");
 
-  for (int i = 0; i < 2; i++)
+  if (DIM == 1)
   {
-    for (int j = 0; j < 16; j++)
+    for (int i = 0; i < 2; i++)
     {
-      printf("  %u\n", verilator_top->M_AXIS_TDATA[j]);
+      if (i == 1)
+      {
+        printf("  %u\n", verilator_top->M_AXIS_TDATA[0]);
+      }
       // putb(verilator_top->M_AXIS_TDATA[j]);
+      eval();
     }
-    eval();
+  }
+  else
+  {
+    for (int i = 0; i < 2; i++)
+    {
+      for (int j = 0; j < DIM / 2; j++)
+      {
+        printf("  %u\n", verilator_top->M_AXIS_TDATA[j]);
+        // putb(verilator_top->M_AXIS_TDATA[j]);
+      }
+      eval();
+    }
   }
   eval();
   eval();
@@ -1513,29 +1528,29 @@ int main(int argc, char **argv)
   printf("\n ====================================== 開始 ========================================= \n\n");
 
   const int NGRAM = 3;
-  const int CORENUM = 32;
+  const int CORENUM = 8;
   int DEBUG = 0;
   int ADDRNUM = 0;
   // 次元数可変 (結果を何個出力するかに使う)
-  // const int DIM = 32 / 32;
-  const int DIM = 1024 / 32;
+  const int DIM = 32 / 32;
+  // const int DIM = 1024 / 32;
   const int MAJORITY_ADDR = 511;
 
-  // const int SIMULATION_COUNT = 100;
-  // for (int i = 3; i < SIMULATION_COUNT; i += 3)
-  // {
-  //   ADDRNUM = i;
+  const int SIMULATION_COUNT = 100;
+  for (int i = 3; i < SIMULATION_COUNT; i += 3)
+  {
+    ADDRNUM = i;
 
-  //   DEBUG = 1;
-  //   check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
-  //   // check2(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+    DEBUG = 1;
+    check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+    // check2(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
 
-  //   printf(" -------------------\n\n");
-  // }
+    printf(" -------------------\n\n");
+  }
 
-  ADDRNUM = 210;
-  DEBUG = 0;
-  check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  // ADDRNUM = 21;
+  // DEBUG = 0;
+  // check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
   // ADDRNUM = 54;
   // DEBUG = 1;
