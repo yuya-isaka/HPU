@@ -6,7 +6,8 @@ module core
     #(
 
          // ハイパーベクトルの次元数
-         parameter DIM = 1023
+         parameter DIM = 1023,
+         parameter THREADS = 10
 
      )
      (
@@ -41,12 +42,9 @@ module core
     reg [ DIM:0 ]           item_memory [ 0:511 ];
 
     // アイテムメモリーからロードしたデータの格納場所
-    reg [ DIM:0 ]           reg_tmp;
+    reg [ DIM:0 ]           reg_0;
 
 
-    // 更新対象
-    //  - item_memory
-    //  - reg_tmp
     always_ff @( posedge clk ) begin
 
                   // 書き込み
@@ -67,38 +65,8 @@ module core
                   // 読み出し
                   // 常に垂れ流しで読み出しでOK
                   // (必要ない場合は使わない)
-                  reg_tmp <= item_memory[ get_d[ 9:0 ] ];
+                  reg_0 <= item_memory[ get_d[ 9:0 ] ];
               end;
-
-
-
-    // フォワーディング処理フラグ
-    reg                     forward_flag;
-
-    always_ff @( posedge clk ) begin
-
-                  // フォワーディングフラグ
-                  forward_flag <= ( wb_flag & ( wb_addr == get_d[ 9:0 ] ) );
-              end;
-
-
-
-    // 命令で使われるロードデータ
-    logic [ DIM:0 ]         reg_0;
-
-    // reg_tmpを使うかreg_2の値を使うか
-    // reg2の保持しておきつつ続けてreg2を使って更新したいとき、write_back命令を直前に発行
-    // (たぶん意外に便利に使える。write_backしたあとreg0にロードしてそのままreg2の値と計算するとかもできる)
-    always_comb begin
-                    // 通常はアイテムメモリーからロードした値を格納
-                    reg_0 = reg_tmp;
-
-                    // フォワーディングフラグが立っている場合、reg_2の値をフォワーディング
-                    if ( forward_flag ) begin
-                        reg_0 = reg_2;
-                    end
-                end;
-
 
 
     // 書き戻し命令が発行されたか否かのフラグ
@@ -110,11 +78,10 @@ module core
     // 命令
     reg [ 15:0 ]        inst;
 
+    // マルチスレッディング
+    reg signed [ 4:0 ]         thread_count;
 
-    // 更新対象
-    //  - inst
-    //  - wb_flag
-    //  - wb_addr
+
     always_ff @( posedge clk ) begin
 
                   // データ受信時実行
@@ -137,6 +104,15 @@ module core
                           wb_flag <= 0;
                           wb_addr <= 0;
                       end
+
+                      // マルチスレッド（10）
+                      // スレッド数可変
+                      if ( thread_count == 4'd4 ) begin
+                          thread_count <= 0;
+                      end
+                      else begin
+                          thread_count <= thread_count + 4'd1;
+                      end
                   end
 
                   // データを受信していないとき実行
@@ -147,21 +123,100 @@ module core
                       inst <= 0;
                       wb_flag <= 0;
                       wb_addr <= 0;
+                      // 初期値: -1
+                      thread_count <= $signed( 1'b1 );
                   end
               end;
 
+
+    wire [ DIM:0 ] permute_reg_after;
+
+    // 次元数可変
+    permute #( .DIM( 31 ) ) permute
+            (
+                // in
+                .clk( clk ),
+                .data( permute_reg_before[ DIM:0] ),
+                .permute_num( permute_num[ 9:0] ),
+
+                // out
+                .result( permute_reg_after[ DIM:0 ] )
+            );
 
 
     // reg_1, reg_2は値を保持しておく必要がある （reg_0はその度にロードされるから保持しなくていい）
 
     // レジスタ1
-    reg [ DIM:0 ]       reg_1;
+    logic [ DIM:0] reg_1;
+    reg [ DIM:0 ]       reg_1_threads [ THREADS-1:0 ];
+
+// スレッド数可変
+    always_comb begin
+                    case ( thread_count)
+                        5'd0:
+                            reg_1 = reg_1_threads[ 0 ];
+                        5'd1:
+                            reg_1 = reg_1_threads[ 1 ];
+                        5'd2:
+                            reg_1 = reg_1_threads[ 2 ];
+                        5'd3:
+                            reg_1 = reg_1_threads[ 3 ];
+                        5'd4:
+                            reg_1 = reg_1_threads[ 4 ];
+                        // 5'd5:
+                        //     reg_1 = reg_1_threads[ 5 ];
+                        // 5'd6:
+                        //     reg_1 = reg_1_threads[ 6 ];
+                        // 5'd7:
+                        //     reg_1 = reg_1_threads[ 7 ];
+                        // 5'd8:
+                        //     reg_1 = reg_1_threads[ 8 ];
+                        // 5'd9:
+                        //     reg_1 = reg_1_threads[ 9 ];
+                        default:
+                            reg_1 = 0;
+                    endcase
+                end;
 
     // レジスタ2
-    reg [ DIM:0 ]       reg_2;
+    logic [ DIM:0] reg_2;
+    reg [ DIM:0 ]       reg_2_threads [ THREADS-1:0 ];
+
+    always_comb begin
+                    case ( thread_count)
+                        5'd0:
+                            reg_2 = reg_2_threads[ 0 ];
+                        5'd1:
+                            reg_2 = reg_2_threads[ 1 ];
+                        5'd2:
+                            reg_2 = reg_2_threads[ 2 ];
+                        5'd3:
+                            reg_2 = reg_2_threads[ 3 ];
+                        5'd4:
+                            reg_2 = reg_2_threads[ 4 ];
+                        // 5'd5:
+                        //     reg_2 = reg_2_threads[ 5 ];
+                        // 5'd6:
+                        //     reg_2 = reg_2_threads[ 6 ];
+                        // 5'd7:
+                        //     reg_2 = reg_2_threads[ 7 ];
+                        // 5'd8:
+                        //     reg_2 = reg_2_threads[ 8 ];
+                        // 5'd9:
+                        //     reg_2 = reg_2_threads[ 9 ];
+                        default:
+                            reg_2 = 0;
+                    endcase
+                end;
 
     // storeする値を蓄える変数
     reg [ DIM:0 ]       buff;
+
+    reg                 permute_flag;
+
+    reg [ DIM:0 ]       permute_reg_before;
+
+    reg [ 9:0 ]         permute_num;
 
     // 更新対象
     //  - reg_1
@@ -171,14 +226,38 @@ module core
     //  - last  (port)
     always_ff @( posedge clk ) begin
 
+// スレッド数可変
                   // アクセラレータの動作終了と同時にリセット
                   // reg_1　reg_2 は保持したいため、リセット時にしか0に戻さない
                   if ( ~run ) begin
-                      reg_1 <= 0;
-                      reg_2 <= 0;
+                      reg_1_threads[ 0] <= 0;
+                      reg_1_threads[ 1] <= 0;
+                      reg_1_threads[ 2] <= 0;
+                      reg_1_threads[ 3] <= 0;
+                      reg_1_threads[ 4] <= 0;
+                    //   reg_1_threads[ 5] <= 0;
+                    //   reg_1_threads[ 6] <= 0;
+                    //   reg_1_threads[ 7] <= 0;
+                    //   reg_1_threads[ 8] <= 0;
+                    //   reg_1_threads[ 9] <= 0;
+
+                      reg_2_threads[ 0] <= 0;
+                      reg_2_threads[ 1] <= 0;
+                      reg_2_threads[ 2] <= 0;
+                      reg_2_threads[ 3] <= 0;
+                      reg_2_threads[ 4] <= 0;
+                    //   reg_2_threads[ 5] <= 0;
+                    //   reg_2_threads[ 6] <= 0;
+                    //   reg_2_threads[ 7] <= 0;
+                    //   reg_2_threads[ 8] <= 0;
+                    //   reg_2_threads[ 9] <= 0;
+
                       buff <= 0;
                       store <= 0;
                       last <= 0;
+                      permute_flag <= 0;
+                      permute_reg_before <= 0;
+                      permute_num <= 0;
                   end
 
                   // アクセラレータ動作中実行
@@ -190,40 +269,127 @@ module core
 
                           // load
                           if ( inst[ 14 ] ) begin
-                              reg_2 <= reg_0;
+
+                            // スレッド数可変
+                              case ( thread_count)
+                                  5'd0:
+                                      reg_2_threads[ 0] <= reg_0;
+                                  5'd1:
+                                      reg_2_threads[ 1] <= reg_0;
+                                  5'd2:
+                                      reg_2_threads[ 2] <= reg_0;
+                                  5'd3:
+                                      reg_2_threads[ 3] <= reg_0;
+                                  5'd4:
+                                      reg_2_threads[ 4] <= reg_0;
+                                //   5'd5:
+                                //       reg_2_threads[ 5] <= reg_0;
+                                //   5'd6:
+                                //   reg_2_threads[ 6] <= reg_0;
+                                //   5'd7:
+                                //       reg_2_threads[ 7] <= reg_0;
+                                //   5'd8:
+                                //       reg_2_threads[ 8] <= reg_0;
+                                //   5'd9:
+                                //       reg_2_threads[ 9] <= reg_0;
+                                  default:
+                                      ;
+                              endcase
                               buff <= 0;
                               store <= 0;
+                              permute_flag <= 0;
+                              permute_reg_before <= 0;
+                              permute_num <= 0;
                           end
                       end
 
                       // アドレスいらん
                       else begin
 
-                          // rshift
+                          // permute_num指定
                           if ( inst[ 14 ] ) begin
-                              reg_2 <= { reg_2[ 0 ], reg_2[ DIM:1 ] };
+                              permute_flag <= 1'b1;
+                              permute_reg_before <= reg_2;
+                              permute_num[ 9:0 ] <= inst[ 9:0 ];
                               buff <= 0;
                               store <= 0;
                           end
 
-                          // lshift
-                          else if ( inst [ 13 ] ) begin
-                              reg_2 <= { reg_2[ DIM-1:0 ], reg_2[ DIM ] };
+                          // permute結果取り出し
+                          else if ( inst[ 13 ] ) begin
+                            // スレッド数可変
+                              case ( thread_count)
+                                  5'd0:
+                                      reg_2_threads[ 0] <= permute_reg_after;
+                                  5'd1:
+                                      reg_2_threads[ 1] <= permute_reg_after;
+                                  5'd2:
+                                      reg_2_threads[ 2] <= permute_reg_after;
+                                  5'd3:
+                                      reg_2_threads[ 3] <= permute_reg_after;
+                                  5'd4:
+                                      reg_2_threads[ 4] <= permute_reg_after;
+                                //   5'd5:
+                                //       reg_2_threads[ 5] <= permute_reg_after;
+                                //   5'd6:
+                                //   reg_2_threads[ 6] <= permute_reg_after;
+                                //   5'd7:
+                                //       reg_2_threads[ 7] <= permute_reg_after;
+                                //   5'd8:
+                                //       reg_2_threads[ 8] <= permute_reg_after;
+                                //   5'd9:
+                                //       reg_2_threads[ 9] <= permute_reg_after;
+                                  default:
+                                      ;
+                              endcase
                               buff <= 0;
                               store <= 0;
+                              permute_flag <= 0;
+                              permute_reg_before <= 0;
+                              permute_num <= 0;
                           end
 
                           // xor
                           else if ( inst[ 12 ] ) begin
-                              reg_2 <= reg_1 ^ reg_2;
+                            // スレッド数可変
+                              case ( thread_count)
+                                  5'd0:
+                                      reg_2_threads[ 0] <= reg_1 ^ reg_2;
+                                  5'd1:
+                                      reg_2_threads[ 1] <= reg_1 ^ reg_2;
+                                  5'd2:
+                                      reg_2_threads[ 2] <= reg_1 ^ reg_2;
+                                  5'd3:
+                                      reg_2_threads[ 3] <= reg_1 ^ reg_2;
+                                  5'd4:
+                                      reg_2_threads[ 4] <= reg_1 ^ reg_2;
+                                //   5'd5:
+                                //       reg_2_threads[ 5] <= reg_1 ^ reg_2;
+                                //   5'd6:
+                                //   reg_2_threads[ 6] <= reg_1 ^ reg_2;
+                                //   5'd7:
+                                //       reg_2_threads[ 7] <= reg_1 ^ reg_2;
+                                //   5'd8:
+                                //       reg_2_threads[ 8] <= reg_1 ^ reg_2;
+                                //   5'd9:
+                                //       reg_2_threads[ 9] <= reg_1 ^ reg_2;
+                                  default:
+                                      ;
+                              endcase
                               buff <= 0;
                               store <= 0;
+                              permute_flag <= 0;
+                              permute_reg_before <= 0;
+                              permute_num <= 0;
                           end
 
                           // store
                           else if ( inst[ 11 ] ) begin
                               buff <= reg_2;
                               store <= 1;
+                              permute_flag <= 0;
+                              permute_reg_before <= 0;
+                              permute_num <= 0;
                           end
 
                           // last
@@ -231,20 +397,77 @@ module core
                               last <= 1;
                               buff <= 0;
                               store <= 0;
+                              permute_flag <= 0;
+                              permute_reg_before <= 0;
+                              permute_num <= 0;
                           end
 
                           // move
                           else if ( inst[ 9 ] ) begin
-                              reg_1 <= reg_2;
+                            // スレッド数可変
+                              case ( thread_count)
+                                  5'd0:
+                                      reg_1_threads[ 0] <= reg_2;
+                                  5'd1:
+                                      reg_1_threads[ 1] <= reg_2;
+                                  5'd2:
+                                      reg_1_threads[ 2] <= reg_2;
+                                  5'd3:
+                                      reg_1_threads[ 3] <= reg_2;
+                                  5'd4:
+                                      reg_1_threads[ 4] <= reg_2;
+                                //   5'd5:
+                                //       reg_1_threads[ 5] <= reg_2;
+                                //   5'd6:
+                                //   reg_1_threads[ 6] <= reg_2;
+                                //   5'd7:
+                                //       reg_1_threads[ 7] <= reg_2;
+                                //   5'd8:
+                                //       reg_1_threads[ 8] <= reg_2;
+                                //   5'd9:
+                                //       reg_1_threads[ 9] <= reg_2;
+                                  default:
+                                      ;
+                              endcase
                               buff <= 0;
                               store <= 0;
+                              permute_flag <= 0;
+                              permute_reg_before <= 0;
+                              permute_num <= 0;
                           end
 
                           // wb
                           else if ( inst[ 8 ] ) begin
-                              reg_2 <= sign_bit;
+                            // スレッド数可変
+                              case ( thread_count)
+                                  5'd0:
+                                      reg_2_threads[ 0] <= sign_bit;
+                                  5'd1:
+                                      reg_2_threads[ 1] <= sign_bit;
+                                  5'd2:
+                                      reg_2_threads[ 2] <= sign_bit;
+                                  5'd3:
+                                      reg_2_threads[ 3] <= sign_bit;
+                                  5'd4:
+                                      reg_2_threads[ 4] <= sign_bit;
+                                //   5'd5:
+                                //       reg_2_threads[ 5] <= sign_bit;
+                                //   5'd6:
+                                //   reg_2_threads[ 6] <= sign_bit;
+                                //   5'd7:
+                                //       reg_2_threads[ 7] <= sign_bit;
+                                //   5'd8:
+                                //       reg_2_threads[ 8] <= sign_bit;
+                                //   5'd9:
+                                //       reg_2_threads[ 9] <= sign_bit;
+                                  default:
+                                      ;
+                              endcase
                               buff <= 0;
                               store <= 0;
+                              permute_flag <= 0;
+                              permute_reg_before <= 0;
+                              permute_num <= 0;
                           end
 
                           // nop (すべて0のはず)
@@ -252,6 +475,9 @@ module core
                           else begin
                               buff <= 0;
                               store <= 0;
+                              permute_flag <= 0;
+                              permute_reg_before <= 0;
+                              permute_num <= 0;
                           end
                       end
                   end
@@ -264,6 +490,9 @@ module core
                       buff <= 0;
                       store <= 0;
                       last <= 0;
+                      permute_flag <= 0;
+                      permute_reg_before <= 0;
+                      permute_num <= 0;
                   end
               end;
 

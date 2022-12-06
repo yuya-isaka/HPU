@@ -449,7 +449,7 @@ module top
 
     // 各コアのラスト信号
     // 1コア
-    wire [ CORENUM-1:0]              last;
+    wire [ CORENUM-1:0 ]              last;
     // wire                            last;
 
     // 各コアでエンコーディング
@@ -460,8 +460,9 @@ module top
         for ( i = 0; i < CORENUM; i = i + 1 ) begin
 
             // 次元数可変
+            // スレッド数可変
             // core #( .DIM( 1023 ) ) core
-            core #( .DIM( 31 ) ) core
+            core #( .DIM( 31 ), .THREADS( 5 ) ) core
                  (
 
                      // in
