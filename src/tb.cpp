@@ -906,13 +906,18 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
     } //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     else
     {
+      // 0, 3, 6, 9, 12, 15, 18, 21
+      // 1, 4, 7, 10, 13
+      // 2, 5, 8, 11, 14
+      // 3, 6, 9, 12, 15
+      // 4, 7, 10, 13, 16
       for (int k = 0; k < THREADSNUM; k++)
       {
         // load
         tmp = 0;
         for (int i = 0; i < CORENUM; i++)
         {
-          uint16_t addr = NGRAM * i + j + k;
+          uint16_t addr = NGRAM * i + j + (24 * k);
           if (i % 2 == 0)
           {
             conv.data_0 = assemble("load", addr);
@@ -1003,13 +1008,18 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         // ----------------------------------------------
       }
 
+      // 1, 4, 7, 10, 13, 16, 19, 22
+      // 2, 5, 8, 11, 14
+      // 3, 6, 9, 12, 15
+      // 4, 7, 10, 13, 16
+      // 5, 8, 11, 14, 17
       for (int k = 0; k < THREADSNUM; k++)
       {
         // load
         tmp = 0;
         for (int i = 0; i < CORENUM; i++)
         {
-          uint16_t addr = NGRAM * i + 1 + j + k;
+          uint16_t addr = NGRAM * i + 1 + j + (24 * k);
           if (i % 2 == 0)
           {
             conv.data_0 = assemble("load", addr);
@@ -1228,13 +1238,18 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         // ----------------------------------------------
       }
 
+      // 2, 5, 8, 11, 14, 17, 20, 23
+      // 3, 6, 9, 12, 15
+      // 4, 7, 10, 13, 16
+      // 5, 8, 11, 14, 17
+      // 6, 9, 12, 15, 18
       for (int k = 0; k < THREADSNUM; k++)
       {
         // load
         tmp = 0;
         for (int i = 0; i < CORENUM; i++)
         {
-          uint16_t addr = NGRAM * i + 2 + j + k;
+          uint16_t addr = NGRAM * i + 2 + j + (24 * k);
           if (i % 2 == 0)
           {
             conv.data_0 = assemble("load", addr);

@@ -136,8 +136,8 @@ module core
             (
                 // in
                 .clk( clk ),
-                .data( permute_reg_before[ DIM:0] ),
-                .permute_num( permute_num[ 9:0] ),
+                .data( reg_2[ DIM:0] ),
+                .permute_num( inst[ 9:0] ),
 
                 // out
                 .result( permute_reg_after[ DIM:0 ] )
