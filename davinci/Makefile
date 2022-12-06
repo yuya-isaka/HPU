@@ -7,9 +7,9 @@ default:
 	./davinci_ngram
 
 check64:
-	gcc -c -O2 -DDEBUG -DHV64 -o hyper_vector.o hyper_vector.c
-	gcc -c -O2 -DDEBUG -DHV64 -o davinci_ngram.o davinci_ngram.c
-	gcc -O2 -DDEBUG -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
+	gcc -c -O3 -DDEBUG -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -c -O3 -DDEBUG -DHV64 -o davinci_ngram.o davinci_ngram.c
+	gcc -O3 -DDEBUG -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
@@ -21,11 +21,14 @@ omp:
 	./davinci_ngram
 
 omp64:
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.o davinci_ngram.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O2 -DDEBUG -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O2 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.o davinci_ngram.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O2 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
+
+# -ftree-vectorizeをつけても-O3と変わらない
+# -O2と-O3では4秒ほど差がある
 
 neon:
 	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -DSIMD -o hyper_vector.o hyper_vector.c
