@@ -1474,8 +1474,11 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int DIM,
   {
     for (int j = 0; j < 16; j++)
     {
-      printf("  %u\n", verilator_top->M_AXIS_TDATA[j]);
-      // putb(verilator_top->M_AXIS_TDATA[j]);
+      if (j < DIM)
+      {
+        printf("  %u\n", verilator_top->M_AXIS_TDATA[j]);
+        // putb(verilator_top->M_AXIS_TDATA[j]);
+      }
     }
     eval();
   }
@@ -1513,12 +1516,13 @@ int main(int argc, char **argv)
   printf("\n ====================================== 開始 ========================================= \n\n");
 
   const int NGRAM = 3;
-  const int CORENUM = 32;
+  // コア数可変
+  const int CORENUM = 8;
   int DEBUG = 0;
   int ADDRNUM = 0;
   // 次元数可変 (結果を何個出力するかに使う)
-  // const int DIM = 32 / 32;
-  const int DIM = 1024 / 32;
+  const int DIM = 32 / 32;
+  // const int DIM = 1024 / 32;
   const int MAJORITY_ADDR = 511;
 
   // const int SIMULATION_COUNT = 100;
@@ -1533,7 +1537,7 @@ int main(int argc, char **argv)
   //   printf(" -------------------\n\n");
   // }
 
-  ADDRNUM = 210;
+  ADDRNUM = 120;
   DEBUG = 0;
   check(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
