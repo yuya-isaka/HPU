@@ -181,12 +181,15 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
 {
 
   // CORENUMの数すべてを使わないケースがあるか調べる
+  // 120 / 3 % 8
+  // 240 / 3 % 8
   const int REMAINDAR = (ADDRNUM / NGRAM) % CORENUM;
 
   // ADDRNUM(計算する個数)が偶数か否かを設定(後で変えるかも)
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 
   // 最後の送信
+  // 120 / 3 / 5/ 8 = 1
   int LAST = (ADDRNUM / NGRAM / THREADSNUM) / CORENUM;
   // CORENUMの倍数だったらきっちりコアを使い切るので、最後の数が１個減る
   if (REMAINDAR == 0)
@@ -194,7 +197,9 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
     LAST--;
   }
   // 最後の送信がいつかを求める
-  LAST *= NGRAM * CORENUM;
+  // 0
+  //
+  LAST *= NGRAM * CORENUM * THREADSNUM;
 
   ////////////////////////////////////////////////////////////////////////////// Verilator setup /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1664,7 +1669,7 @@ int main(int argc, char **argv)
   //   printf(" -------------------\n\n");
   // }
 
-  ADDRNUM = 120;
+  ADDRNUM = 240;
   DEBUG = 0;
   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
