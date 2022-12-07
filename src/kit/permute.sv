@@ -21,7 +21,7 @@ module permute
      );
 
 
-// スレッド数可変
+    // スレッド数可変
     reg [ DIM:0 ] stage0;
     wire [ 9:0 ] stage0_permute_num;
     assign stage0_permute_num = permute_num;
@@ -38,7 +38,7 @@ module permute
     reg [ DIM:0 ] stage4;
     reg [ 9:0 ] stage4_permute_num;
 
-// スレッド数可変
+    // スレッド数可変
     always_ff @( posedge clk ) begin
                   stage1_permute_num[ 9:0 ] <= stage0_permute_num[ 9:0 ];
                   stage2_permute_num[ 9:0 ] <= stage1_permute_num[ 9:0 ];
@@ -46,7 +46,7 @@ module permute
                   stage4_permute_num[ 9:0 ] <= stage3_permute_num[ 9:0 ];
               end;
 
-// スレッド数可変
+    // スレッド数可変
     always_ff @( posedge clk ) begin
                   //stage 0, shift 0 or 1 bit
                   if( stage0_permute_num[ 0 ] ) begin

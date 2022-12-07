@@ -84,7 +84,7 @@ void putb(unsigned int v)
 // 10種類の命令
 uint16_t assemble(const char inst_str[], uint16_t addr)
 {
-  if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0 || strcmp(inst_str, "permute") == 0)
+  if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0 || strcmp(inst_str, "pwbitem") == 0 || strcmp(inst_str, "permute") == 0)
   {
     uint16_t result = 0;
     uint16_t inst = 0;
@@ -92,20 +92,26 @@ uint16_t assemble(const char inst_str[], uint16_t addr)
     // load
     if (strcmp(inst_str, "load") == 0)
     {
-      inst = 49152;
+      inst = 40960;
       result = inst | addr;
     }
 
     // wb.item
     else if (strcmp(inst_str, "wbitem") == 0)
     {
-      inst = 40960;
+      inst = 36864;
+      result = inst | addr;
+    }
+
+    else if (strcmp(inst_str, "pwbitem") == 0)
+    {
+      inst = 53248;
       result = inst | addr;
     }
 
     else if (strcmp(inst_str, "permute") == 0)
     {
-      inst = 16384;
+      inst = 34816;
       result = inst | addr;
     }
 
@@ -116,21 +122,40 @@ uint16_t assemble(const char inst_str[], uint16_t addr)
   {
     uint16_t inst = 0;
 
-    if (strcmp(inst_str, "permute_get") == 0)
+    // xor
+    if (strcmp(inst_str, "xor") == 0)
     {
       inst = 8192;
     }
 
-    // xor
-    else if (strcmp(inst_str, "xor") == 0)
+    // pxor
+    if (strcmp(inst_str, "pxor") == 0)
     {
-      inst = 4096;
+      inst = 24576;
     }
 
     // store
     else if (strcmp(inst_str, "store") == 0)
     {
+      inst = 4096;
+    }
+
+    // pstore
+    else if (strcmp(inst_str, "pstore") == 0)
+    {
+      inst = 20480;
+    }
+
+    // move
+    else if (strcmp(inst_str, "move") == 0)
+    {
       inst = 2048;
+    }
+
+    // pmove
+    else if (strcmp(inst_str, "pmove") == 0)
+    {
+      inst = 18432;
     }
 
     // last
@@ -139,16 +164,10 @@ uint16_t assemble(const char inst_str[], uint16_t addr)
       inst = 1024;
     }
 
-    // move
-    else if (strcmp(inst_str, "move") == 0)
-    {
-      inst = 512;
-    }
-
     // wb
     else if (strcmp(inst_str, "wb") == 0)
     {
-      inst = 256;
+      inst = 512;
     }
 
     // nop
@@ -1115,37 +1134,37 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         // ----------------------------------------------
       }
 
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        // rshift
-        tmp = 0;
-        for (int i = 0; i < CORENUM; i++)
-        {
-          if (i % 2 == 0)
-          {
-            conv.data_0 = assemble("permute_get", 0);
-            conv.data_1 = 0;
-          }
-          else
-          {
-            conv.data_1 = assemble("permute_get", 0);
-            verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-            tmp++;
-          }
-        }
-        // 奇数のとき最後の代入ができていない
-        if (CORENUM % 2 != 0)
-        {
-          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-          tmp++;
-        }
-        // 残り埋める
-        for (int i = tmp; i < 32; i++)
-        {
-          verilator_top->S_AXIS_TDATA[i] = 0;
-        }
-        eval();
-      }
+      // for (int k = 0; k < THREADSNUM; k++)
+      // {
+      //   // rshift
+      //   tmp = 0;
+      //   for (int i = 0; i < CORENUM; i++)
+      //   {
+      //     if (i % 2 == 0)
+      //     {
+      //       conv.data_0 = assemble("permute_get", 0);
+      //       conv.data_1 = 0;
+      //     }
+      //     else
+      //     {
+      //       conv.data_1 = assemble("permute_get", 0);
+      //       verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      //       tmp++;
+      //     }
+      //   }
+      //   // 奇数のとき最後の代入ができていない
+      //   if (CORENUM % 2 != 0)
+      //   {
+      //     verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      //     tmp++;
+      //   }
+      //   // 残り埋める
+      //   for (int i = tmp; i < 32; i++)
+      //   {
+      //     verilator_top->S_AXIS_TDATA[i] = 0;
+      //   }
+      //   eval();
+      // }
 
       for (int k = 0; k < THREADSNUM; k++)
       {
@@ -1155,12 +1174,12 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         {
           if (i % 2 == 0)
           {
-            conv.data_0 = assemble("xor", 0);
+            conv.data_0 = assemble("pxor", 0);
             conv.data_1 = 0;
           }
           else
           {
-            conv.data_1 = assemble("xor", 0);
+            conv.data_1 = assemble("pxor", 0);
             verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
             tmp++;
           }
@@ -1376,53 +1395,53 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         // ----------------------------------------------
       }
 
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        // rshift
-        tmp = 0;
-        for (int i = 0; i < CORENUM; i++)
-        {
-          if (i % 2 == 0)
-          {
-            conv.data_0 = assemble("permute_get", 0);
-            conv.data_1 = 0;
-          }
-          else
-          {
-            conv.data_1 = assemble("permute_get", 0);
-            verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-            tmp++;
-          }
-        }
-        // 奇数のとき最後の代入ができていない
-        if (CORENUM % 2 != 0)
-        {
-          verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
-          tmp++;
-        }
-        // 残り埋める
-        for (int i = tmp; i < 32; i++)
-        {
-          verilator_top->S_AXIS_TDATA[i] = 0;
-        }
-        eval();
-      }
+      // for (int k = 0; k < THREADSNUM; k++)
+      // {
+      //   // rshift
+      //   tmp = 0;
+      //   for (int i = 0; i < CORENUM; i++)
+      //   {
+      //     if (i % 2 == 0)
+      //     {
+      //       conv.data_0 = assemble("permute_get", 0);
+      //       conv.data_1 = 0;
+      //     }
+      //     else
+      //     {
+      //       conv.data_1 = assemble("permute_get", 0);
+      //       verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      //       tmp++;
+      //     }
+      //   }
+      //   // 奇数のとき最後の代入ができていない
+      //   if (CORENUM % 2 != 0)
+      //   {
+      //     verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
+      //     tmp++;
+      //   }
+      //   // 残り埋める
+      //   for (int i = tmp; i < 32; i++)
+      //   {
+      //     verilator_top->S_AXIS_TDATA[i] = 0;
+      //   }
+      //   eval();
+      // }
 
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < 32; i++)
-        {
-          verilator_top->S_AXIS_TDATA[i] = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        eval();
-        // ----------------------------------------------
-      }
+      // if (DEBUG)
+      // {
+      //   // 送信途中で止まる対策 -----------------------------
+      //   verilator_top->S_AXIS_TVALID = 0;
+      //   for (int i = 0; i < 32; i++)
+      //   {
+      //     verilator_top->S_AXIS_TDATA[i] = 0;
+      //   }
+      //   eval();
+      //   eval();
+      //   eval();
+      //   verilator_top->S_AXIS_TVALID = 1;
+      //   eval();
+      //   // ----------------------------------------------
+      // }
 
       for (int k = 0; k < THREADSNUM; k++)
       {
@@ -1432,12 +1451,12 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         {
           if (i % 2 == 0)
           {
-            conv.data_0 = assemble("xor", 0);
+            conv.data_0 = assemble("pxor", 0);
             conv.data_1 = 0;
           }
           else
           {
-            conv.data_1 = assemble("xor", 0);
+            conv.data_1 = assemble("pxor", 0);
             verilator_top->S_AXIS_TDATA[tmp] = conv.write_data;
             tmp++;
           }
@@ -1669,9 +1688,21 @@ int main(int argc, char **argv)
   //   printf(" -------------------\n\n");
   // }
 
-  ADDRNUM = 240;
-  DEBUG = 0;
-  check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  const int SIMULATION_COUNT = 500;
+  for (int i = 120; i < SIMULATION_COUNT; i += 120)
+  {
+    ADDRNUM = i;
+
+    DEBUG = 0;
+    check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+    // check2(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+
+    printf(" -------------------\n\n");
+  }
+
+  // ADDRNUM = 360;
+  // DEBUG = 0;
+  // check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
   // ADDRNUM = 54;
   // DEBUG = 1;

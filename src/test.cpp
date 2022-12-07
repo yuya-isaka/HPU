@@ -284,8 +284,19 @@ int main(int argc, char **argv)
 	// 	printf(" -------------------\n\n");
 	// }
 
-	ADDRNUM = 240;
-	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
+	const int SIMULATION_COUNT = 500;
+	for (int i = 120; i < SIMULATION_COUNT; i += 120)
+	{
+		ADDRNUM = i;
+
+		check(NGRAM, ADDRNUM, MAJORITY_ADDR);
+		xor128(1);
+
+		printf(" -------------------\n\n");
+	}
+
+	// ADDRNUM = 360;
+	// check(NGRAM, ADDRNUM, MAJORITY_ADDR);
 	// xor128(1);
 	// printf(" --------\n\n");
 	// ADDRNUM = 54;
