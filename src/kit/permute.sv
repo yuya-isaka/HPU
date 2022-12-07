@@ -80,7 +80,7 @@ module permute
     // スレッド数可変
     always_ff @( posedge clk ) begin
 
-                  if ( exec) begin
+                  if ( exec ) begin
 
                       stage1_permute_num[ 8:0 ] <= stage0_permute_num[ 9:1 ];
 
