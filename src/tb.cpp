@@ -412,7 +412,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -456,7 +455,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -501,7 +499,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -545,7 +542,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -589,7 +585,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -633,7 +628,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -678,7 +672,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -722,7 +715,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -766,7 +758,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -810,7 +801,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -980,7 +970,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -1028,7 +1017,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -1082,7 +1070,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -1130,7 +1117,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -1210,7 +1196,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -1258,7 +1243,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -1312,7 +1296,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -1391,7 +1374,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -1439,7 +1421,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       //   eval();
       //   eval();
       //   verilator_top->S_AXIS_TVALID = 1;
-      //   eval();
       //   // ----------------------------------------------
       // }
 
@@ -1487,7 +1468,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         eval();
         eval();
         verilator_top->S_AXIS_TVALID = 1;
-        eval();
         // ----------------------------------------------
       }
 
@@ -1688,21 +1668,21 @@ int main(int argc, char **argv)
   //   printf(" -------------------\n\n");
   // }
 
-  const int SIMULATION_COUNT = 500;
-  for (int i = 120; i < SIMULATION_COUNT; i += 120)
-  {
-    ADDRNUM = i;
+  // const int SIMULATION_COUNT = 500;
+  // for (int i = 120; i < SIMULATION_COUNT; i += 120)
+  // {
+  //   ADDRNUM = i;
 
-    DEBUG = 0;
-    check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
-    // check2(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  //   DEBUG = 1;
+  //   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  //   // check2(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
 
-    printf(" -------------------\n\n");
-  }
+  //   printf(" -------------------\n\n");
+  // }
 
-  // ADDRNUM = 360;
-  // DEBUG = 0;
-  // check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  ADDRNUM = 120;
+  DEBUG = 1;
+  check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
   // ADDRNUM = 54;
   // DEBUG = 1;
