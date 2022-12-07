@@ -208,6 +208,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 
   // 最後の送信
+  // 8 * 10 * 3 = 240
   // 120 / 3 / 5/ 8 = 1
   int LAST = (ADDRNUM / NGRAM / THREADSNUM) / CORENUM;
   // CORENUMの倍数だったらきっちりコアを使い切るので、最後の数が１個減る
@@ -1538,12 +1539,12 @@ int main(int argc, char **argv)
 
   const int NGRAM = 3;
   const int CORENUM = 8;
-  const int THREADSNUM = 5;
+  const int THREADSNUM = 10;
   int DEBUG = 0;
   int ADDRNUM = 0;
   // 次元数可変 (結果を何個出力するかに使う)
-  const int DIM = 32 / 32;
-  // const int DIM = 1024 / 32;
+  // const int DIM = 32 / 32;
+  const int DIM = 1024 / 32;
   const int MAJORITY_ADDR = 511;
 
   // const int SIMULATION_COUNT = 100;
@@ -1557,20 +1558,20 @@ int main(int argc, char **argv)
   //   printf(" -------------------\n\n");
   // }
 
-  const int SIMULATION_COUNT = 500;
-  for (int i = 120; i < SIMULATION_COUNT; i += 120)
-  {
-    ADDRNUM = i;
+  // const int SIMULATION_COUNT = 500;
+  // for (int i = 240; i < SIMULATION_COUNT; i += 240)
+  // {
+  //   ADDRNUM = i;
 
-    DEBUG = 1;
-    check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  //   DEBUG = 0;
+  //   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
 
-    printf(" -------------------\n\n");
-  }
+  //   printf(" -------------------\n\n");
+  // }
 
-  // ADDRNUM = 120;
-  // DEBUG = 1;
-  // check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  ADDRNUM = 240;
+  DEBUG = 0;
+  check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
   // ADDRNUM = 54;
   // DEBUG = 1;

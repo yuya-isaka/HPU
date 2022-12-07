@@ -52,6 +52,31 @@ module permute
     reg [ 9:0 ]         stage4_permute_num;
     // ----------------------------------------------
 
+    // STAGE5 ---------------------------------------
+    reg [ DIM:0 ]       stage5;
+    reg [ 9:0 ]         stage5_permute_num;
+    // ----------------------------------------------
+
+    // STAGE6 ---------------------------------------
+    reg [ DIM:0 ]       stage6;
+    reg [ 9:0 ]         stage6_permute_num;
+    // ----------------------------------------------
+
+    // STAGE7 ---------------------------------------
+    reg [ DIM:0 ]       stage7;
+    reg [ 9:0 ]         stage7_permute_num;
+    // ----------------------------------------------
+
+    // STAGE8 ---------------------------------------
+    reg [ DIM:0 ]       stage8;
+    reg [ 9:0 ]         stage8_permute_num;
+    // ----------------------------------------------
+
+    // STAGE9 ---------------------------------------
+    reg [ DIM:0 ]       stage9;
+    reg [ 9:0 ]         stage9_permute_num;
+    // ----------------------------------------------
+
     // スレッド数可変
     always_ff @( posedge clk ) begin
 
@@ -64,6 +89,16 @@ module permute
                       stage3_permute_num[ 9:0 ] <= stage2_permute_num[ 9:0 ];
 
                       stage4_permute_num[ 9:0 ] <= stage3_permute_num[ 9:0 ];
+
+                      stage5_permute_num[ 9:0 ] <= stage4_permute_num[ 9:0 ];
+
+                      stage6_permute_num[ 9:0 ] <= stage5_permute_num[ 9:0 ];
+
+                      stage7_permute_num[ 9:0 ] <= stage6_permute_num[ 9:0 ];
+
+                      stage8_permute_num[ 9:0 ] <= stage7_permute_num[ 9:0 ];
+
+                      stage9_permute_num[ 9:0 ] <= stage8_permute_num[ 9:0 ];
 
                   end
 
@@ -124,13 +159,64 @@ module permute
                       end
                       //------------------------------------------------------
 
+
+                      //stage 5, shift 0 or 32 bits ----------------------------
+                      if( stage5_permute_num[ 5 ] ) begin
+                          stage5 <= { stage4[ 31:0 ], stage4[ DIM:32 ] };
+                      end
+                      else begin
+                          stage5 <= stage4;
+                      end
+                      //------------------------------------------------------
+
+
+                      //stage 6, shift 0 or 64 bits ----------------------------
+                      if( stage6_permute_num[ 6 ] ) begin
+                          stage6 <= { stage5[ 63:0 ], stage5[ DIM:64 ] };
+                      end
+                      else begin
+                          stage6 <= stage5;
+                      end
+                      //------------------------------------------------------
+
+
+                      //stage 7, shift 0 or 128 bits ----------------------------
+                      if( stage7_permute_num[ 7 ] ) begin
+                          stage7 <= { stage6[ 127:0 ], stage6[ DIM:128 ] };
+                      end
+                      else begin
+                          stage7 <= stage6;
+                      end
+                      //------------------------------------------------------
+
+
+                      //stage 8, shift 0 or 256 bits ----------------------------
+                      if( stage8_permute_num[ 8 ] ) begin
+                          stage8 <= { stage7[ 255:0 ], stage7[ DIM:256 ] };
+                      end
+                      else begin
+                          stage8 <= stage7;
+                      end
+                      //------------------------------------------------------
+
+
+                      //stage 9, shift 0 or 512 bits ----------------------------
+                      if( stage9_permute_num[ 9 ] ) begin
+                          stage9 <= { stage8[ 511:0 ], stage8[ DIM:512 ] };
+                      end
+                      else begin
+                          stage9 <= stage8;
+                      end
+                      //------------------------------------------------------
+
+
                   end
 
               end;
 
 
     // スレッド数可変
-    assign result = stage4;
+    assign result = stage9;
 
 
 endmodule
