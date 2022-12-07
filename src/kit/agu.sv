@@ -54,7 +54,9 @@ module agu
                       else begin
                           run <= 1'b1;
                       end
+
                   end
+
               end;
 
 
@@ -76,7 +78,9 @@ module agu
                       else if ( en ) begin
                           data <= data + 1'b1;
                       end
+
                   end
+
               end;
 
 

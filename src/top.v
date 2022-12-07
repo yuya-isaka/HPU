@@ -43,20 +43,24 @@ module top
         output wire                     S_AXI_RVALID,
         // -----------------------------------------------
 
+
         // AXI Strem Interface ---------------------------
         input wire                      AXIS_ACLK,
         input wire                      AXIS_ARESETN,
+        // -----------------------------------------------
+
 
         // AXI Stream Master Interface -------------------
         input wire                      M_AXIS_TREADY,
-        output wire [ 511:0 ]          M_AXIS_TDATA,
+        output wire [ 511:0 ]           M_AXIS_TDATA,
         output wire                     M_AXIS_TVALID,
         output wire [ 7:0 ]             M_AXIS_TSTRB,
         output wire                     M_AXIS_TLAST,
         // -----------------------------------------------
 
+
         // AXI Stream Slave Interface --------------------
-        input wire [ 511:0 ]           S_AXIS_TDATA,
+        input wire [ 511:0 ]            S_AXIS_TDATA,
         input wire [ 7:0 ]              S_AXIS_TSTRB,
         input wire                      S_AXIS_TLAST,
         input wire                      S_AXIS_TVALID,
@@ -121,9 +125,6 @@ module top
 
     // コア数可変
     // 次元数可変
-    // buffer_ctrl #( .DIM( 31 ), .CORENUM( 16 ) ) buffer_ctrl
-    // buffer_ctrl #( .DIM( 1023 ), .CORENUM( 16 ) ) buffer_ctrl
-    // buffer_ctrl #( .DIM( 1023 ), .CORENUM( 32 ) ) buffer_ctrl
     buffer_ctrl #( .DIM( 31 ), .CORENUM( 8 ) ) buffer_ctrl
                 (
 
@@ -184,10 +185,10 @@ module top
     // 計算結果を送るタイミングの１クロック前に立つ
     // counterの値(sign_bit)をM_AXIS_TDATAに格納するタイミングを知らせる役割
     wire              stream_v;
+
     wire              last_stream;
 
     // コア数可変
-    // stream_ctrl #( .CORENUM( 32 ) ) stream_ctrl
     stream_ctrl #( .CORENUM( 8 ) ) stream_ctrl
                 (
 
@@ -227,7 +228,6 @@ module top
         end
 
         else begin
-
             if ( item_a_tmp == WI ) begin
                 item_a_tmp <= 5'd0;
             end
@@ -236,6 +236,7 @@ module top
                 item_a_tmp <= item_a_tmp + 5'd1;
             end
         end
+
     end
 
 
@@ -256,6 +257,7 @@ module top
         else begin
             update_item <= 0;
         end
+
     end
 
 
@@ -272,6 +274,7 @@ module top
         else if ( update_item ) begin
             item_a <= item_a + 10'd1;
         end
+
     end
 
 
@@ -430,6 +433,7 @@ module top
         // else if ( item_a_tmp == 31 ) begin
         //     rand_num[ 1023:992 ] <= rand_num_tmp;
         // end
+
     end
 
 
@@ -461,7 +465,6 @@ module top
 
             // 次元数可変
             // スレッド数可変
-            // core #( .DIM( 1023 ) ) core
             core #( .DIM( 31 ), .THREADS( 5 ) ) core
                  (
 
@@ -489,7 +492,6 @@ module top
                      // 1コア
                      .last( last[ i ] )
                      //  .last( last)
-
                  );
         end
     endgenerate
@@ -557,38 +559,48 @@ module top
 
         // リセット
         if ( ~S_AXI_ARESETN ) begin
+
             state <= 4'b0000;
             write_addr <= 0;
             write_data <= 0;
             read_addr <= 0;
+
         end
 
         // INI
         else if ( INI ) begin
 
             if ( S_AXI_AWVALID & S_AXI_WVALID ) begin
+
                 // go AWW
                 state <= 4'b0011;
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
                 write_data <= S_AXI_WDATA;
+
             end
 
             else if ( S_AXI_AWVALID ) begin
+
                 // go AW
                 state <= 4'b0001;
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
+
             end
 
             else if ( S_AXI_WVALID ) begin
+
                 // go W
                 state <= 4'b0010;
                 write_data <= S_AXI_WDATA;
+
             end
 
             else if ( S_AXI_ARVALID ) begin
+
                 // go AR1
                 state <= 4'b0100;
                 read_addr[ 11:2 ] <= S_AXI_ARADDR[ 11:2 ];
+
             end
         end
 
@@ -596,9 +608,11 @@ module top
         else if ( AW ) begin
 
             if ( S_AXI_WVALID ) begin
+
                 // go AWW
                 state <= 4'b0011;
                 write_data <= S_AXI_WDATA;
+
             end
         end
 
@@ -606,9 +620,11 @@ module top
         else if ( W ) begin
 
             if ( S_AXI_AWVALID ) begin
+
                 // go AWW
                 state <= 4'b0011;
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
+
             end
         end
 
@@ -635,6 +651,7 @@ module top
                 state <= 4'b0000;
             end
         end
+
     end
 
 
@@ -642,13 +659,13 @@ module top
 
 
     // 書き込み可能フラグ
-    wire            register_wflag;
+    wire    register_wflag;
 
     assign register_wflag = AWW & ( write_addr[ 11:10 ] == 2'b00 );
 
 
     // 読み込み可能フラグ
-    wire            register_rflag;
+    wire    register_rflag;
 
     assign register_rflag = AR1 & ( read_addr[ 11:10 ] == 2'b00 );
 
@@ -662,11 +679,11 @@ module top
 
     // gen ... 書き込みモードで１を代入
     // run ... 書き込みモードで2を代入
-    reg             gen, run;
+    reg                 gen, run;
 
     // item_memoryに格納するハイパーベクトルの数
     // (現状の最大値は1023)
-    reg [ 9:0 ]       item_memory_num;
+    reg [ 9:0 ]         item_memory_num;
 
 
     //================================================================
@@ -677,8 +694,10 @@ module top
 
         // 初期化
         if ( ~S_AXI_ARESETN ) begin
+
             { run, gen } <= 2'b00;
             item_memory_num <= 10'd0;
+
         end
 
         // 書き込み
@@ -699,6 +718,7 @@ module top
                 // 上記アドレス以外は何もしない
                 default:
                     ;
+
             endcase
 
         end
@@ -707,8 +727,11 @@ module top
         // (item_memory_num数のハイパーベクトルを生成して終了)
         // (現状S_AXI_ACLK, S_AXIS_ACLKが同じ周波数を用いているため問題ない)
         else if ( gen & item_a == item_memory_num & update_item ) begin
+
             gen <= 1'b0;
+
         end
+
     end
 
 
@@ -735,9 +758,10 @@ module top
                 // 上記アドレス以外は何もしない
                 default:
                     S_AXI_RDATA <= 0;
-            endcase
 
+            endcase
         end
+
     end
 
 

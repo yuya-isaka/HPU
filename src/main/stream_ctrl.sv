@@ -54,8 +54,10 @@ module stream_ctrl
     always_ff @( posedge clk ) begin
 
                   if ( rst ) begin
+
                       last_n <= 0;
                       last_nn <= 0;
+
                   end
 
                   else begin

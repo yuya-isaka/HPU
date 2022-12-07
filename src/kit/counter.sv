@@ -8,6 +8,7 @@ module counter
          // 現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分
          // counterで数える上限
          parameter W = 30,
+
          // コア数 (デバッグ用)
          parameter CORENUM = 32
 
@@ -35,18 +36,22 @@ module counter
 
 
     reg         store_n;
+
     reg         store_nn;
 
     always_ff @( posedge clk ) begin
+
                   //   if ( store != 0) begin
                   //       store_n <= 1'b1;
                   //   end
                   //   else begin
                   //       store_n <= 1'b0;
                   //   end
+
                   // 全コアが同じタイミングでストアすると仮定
                   store_n <= store[ 0 ];
                   store_nn <= store_n;
+
               end;
 
 
@@ -62,14 +67,17 @@ module counter
     always_ff @( posedge clk ) begin
 
                   if ( rst ) begin
+
                       // コア数可変
                       box <= 0;
                       box_1 <= 0;
                       //   box_2 <= 0;
+
                   end
 
                   // store_nと分離することで、storeが連続で実行されても対応可能にした
                   else if ( store_nn ) begin
+
                       // コア数可変
                       // 16コア
                       box <=
@@ -78,6 +86,7 @@ module counter
                       //   + box_2;
                       // 1-4コア
                       //   box <= box + box_1;
+
                   end
 
 
@@ -144,6 +153,7 @@ module counter
 
             selector selector
                      (
+
                          // in
                          .clk( clk ),
                          .rst( rst ),
@@ -154,10 +164,12 @@ module counter
                          .core_result_bit( core_result[ k ] ),
                          //  .core_result_bit( core_result ),
 
+
                          // out
                          // 1コア
                          .sel_bit( select[ k ] )
                          //  .sel_bit( select)
+
                      );
 
         end

@@ -42,6 +42,7 @@ module selector
                           // -1
                           sel_bit <= $signed( 1'b1 );
                       end
+
                   end
 
                   // ストアせん場合
@@ -49,6 +50,7 @@ module selector
                       // +0 で何もしないのと同じ
                       sel_bit <= 0;
                   end
+
               end;
 
 

@@ -20,14 +20,18 @@ module xorshift
 
     // レジスタ４つ
     reg [ 31:0 ]      x;
+
     reg [ 31:0 ]      y;
+
     reg [ 31:0 ]      z;
+
     reg [ 31:0 ]      w;
 
     always_ff @( posedge clk ) begin
 
                   // ランダム生成のフラグが立ったら、再び初期値を設定
                   if ( ~gen ) begin
+
                       // ランダム生成する際の初期値
                       // パターン１
                       // x <= 2380889285;
@@ -41,14 +45,18 @@ module xorshift
                       y <= 362436069;
                       z <= 521288629;
                       w <= 88675123;
+
                   end
 
                   else begin
+
                       x <= y;
                       y <= z;
                       z <= w;
                       w <= ( w ^ ( w >> 19 ) ) ^ ( ( x ^ ( x << 11 ) ) ^ ( ( x ^ ( x << 11 ) ) >> 8 ) );
+
                   end
+
               end;
 
 

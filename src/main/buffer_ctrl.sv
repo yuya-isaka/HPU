@@ -7,6 +7,7 @@ module buffer_ctrl
 
          // ハイパーベクトルの次元数
          parameter DIM = 1023,
+
          // コア数 (デバッグ用)
          parameter CORENUM = 16
 
@@ -149,15 +150,21 @@ module buffer_ctrl
                   // stream_vがたった次のタイミングに値を更新
                   // stram_vの次にdst_validが立つ設計
                   if ( stream_v ) begin
+
                       if ( last_stream ) begin
+
                           //   stream_d[ 511:0 ] <= sign_bit[ 1023:512 ];
                           stream_d[ 31:0 ] <= sign_bit[ 31:0 ];
                           stream_d[ 511:32 ] <= 0;
+
                       end
                       else begin
+
                           //   stream_d[ 511:0 ] <= sign_bit[ 511:0 ];
                           stream_d[ 511:0 ] <= 0;
+
                       end
+
                   end
               end;
 
