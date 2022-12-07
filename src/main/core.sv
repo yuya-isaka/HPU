@@ -378,34 +378,34 @@ module core
                               // スレッド数可変
                               case ( thread_count )
 
-                                  5'd0:
+                                  4'd0:
                                       reg_2_threads[ 0 ] <= reg_1 ^ reg_2;
 
-                                  5'd1:
+                                  4'd1:
                                       reg_2_threads[ 1 ] <= reg_1 ^ reg_2;
 
-                                  5'd2:
+                                  4'd2:
                                       reg_2_threads[ 2 ] <= reg_1 ^ reg_2;
 
-                                  5'd3:
+                                  4'd3:
                                       reg_2_threads[ 3 ] <= reg_1 ^ reg_2;
 
-                                  5'd4:
+                                  4'd4:
                                       reg_2_threads[ 4 ] <= reg_1 ^ reg_2;
 
-                                  5'd5:
+                                  4'd5:
                                       reg_2_threads[ 5 ] <= reg_1 ^ reg_2;
 
-                                  5'd6:
+                                  4'd6:
                                       reg_2_threads[ 6 ] <= reg_1 ^ reg_2;
 
-                                  5'd7:
+                                  4'd7:
                                       reg_2_threads[ 7 ] <= reg_1 ^ reg_2;
 
-                                  5'd8:
+                                  4'd8:
                                       reg_2_threads[ 8 ] <= reg_1 ^ reg_2;
 
-                                  5'd9:
+                                  4'd9:
                                       reg_2_threads[ 9 ] <= reg_1 ^ reg_2;
 
                                   default:
