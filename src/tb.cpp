@@ -1663,26 +1663,24 @@ int main(int argc, char **argv)
 
   //   DEBUG = 1;
   //   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
-  //   // check2(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
 
   //   printf(" -------------------\n\n");
   // }
 
-  // const int SIMULATION_COUNT = 500;
-  // for (int i = 120; i < SIMULATION_COUNT; i += 120)
-  // {
-  //   ADDRNUM = i;
+  const int SIMULATION_COUNT = 500;
+  for (int i = 120; i < SIMULATION_COUNT; i += 120)
+  {
+    ADDRNUM = i;
 
-  //   DEBUG = 1;
-  //   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
-  //   // check2(NGRAM, CORENUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+    DEBUG = 1;
+    check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
 
-  //   printf(" -------------------\n\n");
-  // }
+    printf(" -------------------\n\n");
+  }
 
-  ADDRNUM = 120;
-  DEBUG = 1;
-  check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  // ADDRNUM = 120;
+  // DEBUG = 1;
+  // check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
   // ADDRNUM = 54;
   // DEBUG = 1;
