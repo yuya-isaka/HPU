@@ -84,6 +84,7 @@ module permute
                       end
                       //-------------------------------------------------------
 
+
                       //stage 1, shift 0 or 2 bits ----------------------------
                       if( stage1_permute_num[ 1 ] ) begin
                           stage1 <= { stage0[ 1:0 ], stage0[ DIM:2 ] };
@@ -92,6 +93,7 @@ module permute
                           stage1 <= stage0;
                       end
                       //------------------------------------------------------
+
 
                       //stage 2, shift 0 or 4 bits ----------------------------
                       if( stage2_permute_num[ 2 ] ) begin
@@ -102,6 +104,7 @@ module permute
                       end
                       //------------------------------------------------------
 
+
                       //stage 3, shift 0 or 8 bits ----------------------------
                       if( stage3_permute_num[ 3 ] ) begin
                           stage3 <= { stage2[ 7:0 ], stage2[ DIM:8 ] };
@@ -110,6 +113,7 @@ module permute
                           stage3 <= stage2;
                       end
                       //------------------------------------------------------
+
 
                       //stage 4, shift 0 or 16 bits ----------------------------
                       if( stage4_permute_num[ 4 ] ) begin
