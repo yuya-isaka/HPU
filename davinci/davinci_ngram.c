@@ -10,6 +10,10 @@
 #include <omp.h>
 #endif
 
+// bindはSIMD化してもあんまり速くならなかった
+// permutationはvshrq_n_u64の挙動が変で使えない
+// boundingはそもそもSIMDにするメリットがない
+
 #ifdef DEBUG
 __attribute__((destructor)) static void destructor()
 {

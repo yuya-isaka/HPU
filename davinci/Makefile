@@ -27,6 +27,13 @@ omp64:
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
+auto:
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -Ofast -DDEBUG -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -Ofast -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.o davinci_ngram.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -Ofast -DDEBUG -DOPENMP -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
+	rm hyper_vector.o davinci_ngram.o
+	./davinci_ngram
+
 # -ftree-vectorizeをつけても-O3と変わらない
 # -O2と-O3では4秒ほど差がある
 
@@ -56,8 +63,12 @@ neon2:
 # check:
 # 	gcc -Wall -o davinci_ngram davinci_ngram.c -lm
 
+# gcc -Wall -O2 -S -o davinci_ngram.s davinci_ngram.c -lm
+
 asm:
-	gcc -Wall -O2 -S -o davinci_ngram.s davinci_ngram.c -lm
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -S -Ofast -DDEBUG -DOPENMP -DHV64 -o hyper_vector.s hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -S -Ofast -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.s davinci_ngram.c
+
 
 
 

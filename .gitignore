@@ -372,6 +372,7 @@ ohashi_ngram
 davinci_ngram.s
 davinci_ngram_peta.s
 ohashi_ngram.s
+hyper_vector.s
 
 # app
 addr_test
