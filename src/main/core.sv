@@ -262,6 +262,42 @@ module core
     (* ram_style = "block" *)
     reg [ DIM:0 ]           reg_2_threads [ THREADS-1:0 ];
 
+    always_ff @( posedge clk ) begin
+
+                  if ( exec ) begin
+
+                      // アドレス必要
+                      if ( inst[ 15 ] & inst[ 13] ) begin
+
+                          reg_2_threads[ thread_count] <= reg_0;
+
+                      end
+
+                      // アドレスいらん
+                      else begin
+
+                          // xor
+                          if ( inst[ 13 ] ) begin
+
+                              reg_2_threads[ thread_count] <= reg_1 ^ reg_2_tmp;
+
+                          end
+
+                          // wb
+                          else if ( inst[ 9 ] ) begin
+
+                              reg_2_threads[ thread_count] <= sign_bit;
+
+                          end
+
+                      end
+
+                  end
+
+                  reg_2 <= reg_2_threads[ thread_count_zure ];
+
+              end;
+
     // always_comb begin
 
     //                 if ( inst[ 14 ] ) begin
@@ -323,28 +359,6 @@ module core
                   // reg_1_threads　reg_2_threads は保持したいため、リセット時にしか0に戻さない
                   if ( ~run ) begin
 
-                      //   reg_1_threads[ 0 ] <= 0;
-                      //   reg_1_threads[ 1 ] <= 0;
-                      //   reg_1_threads[ 2 ] <= 0;
-                      //   reg_1_threads[ 3 ] <= 0;
-                      //   reg_1_threads[ 4 ] <= 0;
-                      //   reg_1_threads[ 5 ] <= 0;
-                      //   reg_1_threads[ 6 ] <= 0;
-                      //   reg_1_threads[ 7 ] <= 0;
-                      //   reg_1_threads[ 8 ] <= 0;
-                      //   reg_1_threads[ 9 ] <= 0;
-
-                      //   reg_2_threads[ 0 ] <= 0;
-                      //   reg_2_threads[ 1 ] <= 0;
-                      //   reg_2_threads[ 2 ] <= 0;
-                      //   reg_2_threads[ 3 ] <= 0;
-                      //   reg_2_threads[ 4 ] <= 0;
-                      //   reg_2_threads[ 5 ] <= 0;
-                      //   reg_2_threads[ 6 ] <= 0;
-                      //   reg_2_threads[ 7 ] <= 0;
-                      //   reg_2_threads[ 8 ] <= 0;
-                      //   reg_2_threads[ 9 ] <= 0;
-
                       buff <= 0;
                       store <= 0;
                       last <= 0;
@@ -358,49 +372,6 @@ module core
                       // アドレス必要
                       if ( inst[ 15 ] ) begin
 
-                          // load
-                          if ( inst[ 13 ] ) begin
-
-                              // スレッド数可変
-                              case ( thread_count )
-
-                                  4'd0:
-                                      reg_2_threads[ 0 ] <= reg_0;
-
-                                  4'd1:
-                                      reg_2_threads[ 1 ] <= reg_0;
-
-                                  4'd2:
-                                      reg_2_threads[ 2 ] <= reg_0;
-
-                                  4'd3:
-                                      reg_2_threads[ 3 ] <= reg_0;
-
-                                  4'd4:
-                                      reg_2_threads[ 4 ] <= reg_0;
-
-                                  //   4'd5:
-                                  //       reg_2_threads[ 5 ] <= reg_0;
-
-                                  //   4'd6:
-                                  //       reg_2_threads[ 6 ] <= reg_0;
-
-                                  //   4'd7:
-                                  //       reg_2_threads[ 7 ] <= reg_0;
-
-                                  //   4'd8:
-                                  //       reg_2_threads[ 8 ] <= reg_0;
-
-                                  //   4'd9:
-                                  //       reg_2_threads[ 9 ] <= reg_0;
-
-                                  default:
-                                      ;
-
-                              endcase
-
-                          end
-
                           buff <= 0;
                           store <= 0;
 
@@ -411,44 +382,6 @@ module core
 
                           // xor
                           if ( inst[ 13 ] ) begin
-
-                              // スレッド数可変
-                              case ( thread_count )
-
-                                  4'd0:
-                                      reg_2_threads[ 0 ] <= reg_1 ^ reg_2_tmp;
-
-                                  4'd1:
-                                      reg_2_threads[ 1 ] <= reg_1 ^ reg_2_tmp;
-
-                                  4'd2:
-                                      reg_2_threads[ 2 ] <= reg_1 ^ reg_2_tmp;
-
-                                  4'd3:
-                                      reg_2_threads[ 3 ] <= reg_1 ^ reg_2_tmp;
-
-                                  4'd4:
-                                      reg_2_threads[ 4 ] <= reg_1 ^ reg_2_tmp;
-
-                                  //   4'd5:
-                                  //       reg_2_threads[ 5 ] <= reg_1 ^ reg_2;
-
-                                  //   4'd6:
-                                  //       reg_2_threads[ 6 ] <= reg_1 ^ reg_2;
-
-                                  //   4'd7:
-                                  //       reg_2_threads[ 7 ] <= reg_1 ^ reg_2;
-
-                                  //   4'd8:
-                                  //       reg_2_threads[ 8 ] <= reg_1 ^ reg_2;
-
-                                  //   4'd9:
-                                  //       reg_2_threads[ 9 ] <= reg_1 ^ reg_2;
-
-                                  default:
-                                      ;
-
-                              endcase
 
                               buff <= 0;
                               store <= 0;
@@ -466,44 +399,6 @@ module core
                           // move
                           else if ( inst[ 11 ] ) begin
 
-                              //   // スレッド数可変
-                              //   case ( thread_count )
-
-                              //       4'd0:
-                              //           reg_1_threads[ 0 ] <= reg_2_tmp;
-
-                              //       4'd1:
-                              //           reg_1_threads[ 1 ] <= reg_2_tmp;
-
-                              //       4'd2:
-                              //           reg_1_threads[ 2 ] <= reg_2_tmp;
-
-                              //       4'd3:
-                              //           reg_1_threads[ 3 ] <= reg_2_tmp;
-
-                              //       4'd4:
-                              //           reg_1_threads[ 4 ] <= reg_2_tmp;
-
-                              //       //   4'd5:
-                              //       //       reg_1_threads[ 5 ] <= reg_2;
-
-                              //       //   4'd6:
-                              //       //       reg_1_threads[ 6 ] <= reg_2;
-
-                              //       //   4'd7:
-                              //       //       reg_1_threads[ 7 ] <= reg_2;
-
-                              //       //   4'd8:
-                              //       //       reg_1_threads[ 8 ] <= reg_2;
-
-                              //       //   4'd9:
-                              //       //       reg_1_threads[ 9 ] <= reg_2;
-
-                              //       default:
-                              //           ;
-
-                              //   endcase
-
                               buff <= 0;
                               store <= 0;
 
@@ -520,44 +415,6 @@ module core
 
                           // wb
                           else if ( inst[ 9 ] ) begin
-
-                              // スレッド数可変
-                              case ( thread_count )
-
-                                  4'd0:
-                                      reg_2_threads[ 0 ] <= sign_bit;
-
-                                  4'd1:
-                                      reg_2_threads[ 1 ] <= sign_bit;
-
-                                  4'd2:
-                                      reg_2_threads[ 2 ] <= sign_bit;
-
-                                  4'd3:
-                                      reg_2_threads[ 3 ] <= sign_bit;
-
-                                  4'd4:
-                                      reg_2_threads[ 4 ] <= sign_bit;
-
-                                  //   4'd5:
-                                  //       reg_2_threads[ 5 ] <= sign_bit;
-
-                                  //   4'd6:
-                                  //       reg_2_threads[ 6 ] <= sign_bit;
-
-                                  //   4'd7:
-                                  //       reg_2_threads[ 7 ] <= sign_bit;
-
-                                  //   4'd8:
-                                  //       reg_2_threads[ 8 ] <= sign_bit;
-
-                                  //   4'd9:
-                                  //       reg_2_threads[ 9 ] <= sign_bit;
-
-                                  default:
-                                      ;
-
-                              endcase
 
                               buff <= 0;
                               store <= 0;
@@ -588,54 +445,6 @@ module core
 
                   end
 
-                  case ( thread_count )
-
-                      4'd0: begin
-                          //   reg_1 <= reg_1_threads[ 1 ];
-                          reg_2 <= reg_2_threads[ 1 ];
-                      end
-
-                      4'd1: begin
-                          //   reg_1 <= reg_1_threads[ 2 ];
-                          reg_2 <= reg_2_threads[ 2 ];
-                      end
-
-                      4'd2: begin
-                          //   reg_1 <= reg_1_threads[ 3 ];
-                          reg_2 <= reg_2_threads[ 3 ];
-                      end
-
-                      4'd3: begin
-                          //   reg_1 <= reg_1_threads[ 4 ];
-                          reg_2 <= reg_2_threads[ 4 ];
-                      end
-
-                      4'd4: begin
-                          //   reg_1 <= reg_1_threads[ 0 ];
-                          reg_2 <= reg_2_threads[ 0 ];
-                      end
-
-                      // 4'd5:
-                      //     reg_1 = reg_1_threads[ 5 ];
-
-                      // 4'd6:
-                      //     reg_1 = reg_1_threads[ 6 ];
-
-                      // 4'd7:
-                      //     reg_1 = reg_1_threads[ 7 ];
-
-                      // 4'd8:
-                      //     reg_1 = reg_1_threads[ 8 ];
-
-                      // 4'd9:
-                      //     reg_1 = reg_1_threads[ 9 ];
-
-                      default: begin
-                          //   reg_1 <= reg_1_threads[ 0 ];
-                          reg_2 <= reg_2_threads[ 0 ];
-                      end
-
-                  endcase
               end;
 
 
