@@ -189,20 +189,11 @@ module core
 
                   end
 
-                  if ( thread_count == 4'd0) begin
-                      reg_1 <= reg_1_threads[ 1 ];
-                  end
-                  else if ( thread_count == 4'd1) begin
-                      reg_1 <= reg_1_threads[ 2 ];
-                  end
-                  else if ( thread_count == 4'd2) begin
-                      reg_1 <= reg_1_threads[ 3 ];
-                  end
-                  else if ( thread_count == 4'd3) begin
-                      reg_1 <= reg_1_threads[ 4 ];
+                  if ( thread_count == 4'd4) begin
+                      reg_1 <= reg_1_threads[ 0 ];
                   end
                   else begin
-                      reg_1 <= reg_1_threads[ 0 ];
+                      reg_1 <= reg_1_threads[ thread_count + 1 ];
                   end
 
               end;
