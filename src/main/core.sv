@@ -183,25 +183,10 @@ module core
 
     always_ff @( posedge clk ) begin
 
-                  if ( ~run ) begin
-
-                      reg_1_threads[ 0 ] <= 0;
-                      reg_1_threads[ 1 ] <= 0;
-                      reg_1_threads[ 2 ] <= 0;
-                      reg_1_threads[ 3 ] <= 0;
-                      reg_1_threads[ 4 ] <= 0;
-                      //   reg_1_threads[ 5 ] <= 0;
-                      //   reg_1_threads[ 6 ] <= 0;
-                      //   reg_1_threads[ 7 ] <= 0;
-                      //   reg_1_threads[ 8 ] <= 0;
-                      //   reg_1_threads[ 9 ] <= 0;
-
-                  end
-
-                  else if ( exec ) begin
+                  if ( exec ) begin
 
                       // move
-                      if ( ~inst[15] & inst[ 11 ] ) begin
+                      if ( ~inst[ 15] & inst[ 11 ] ) begin
 
                           // スレッド数可変
                           case ( thread_count )
@@ -282,10 +267,11 @@ module core
                       //     reg_1 = reg_1_threads[ 9 ];
 
                       default: begin
-                        reg_1 <= reg_1_threads[0];
+                          reg_1 <= reg_1_threads[ 0 ];
                       end
 
                   endcase
+
               end;
 
     // // スレッド数可変
