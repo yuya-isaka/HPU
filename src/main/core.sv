@@ -301,22 +301,22 @@ module core
                   // reg_1_threads　reg_2_threads は保持したいため、リセット時にしか0に戻さない
                   if ( ~run ) begin
 
-                      reg_1_threads[ 0 ] <= 0;
-                      reg_1_threads[ 1 ] <= 0;
-                      reg_1_threads[ 2 ] <= 0;
-                      reg_1_threads[ 3 ] <= 0;
-                      reg_1_threads[ 4 ] <= 0;
+                    //   reg_1_threads[ 0 ] <= 0;
+                    //   reg_1_threads[ 1 ] <= 0;
+                    //   reg_1_threads[ 2 ] <= 0;
+                    //   reg_1_threads[ 3 ] <= 0;
+                    //   reg_1_threads[ 4 ] <= 0;
                       //   reg_1_threads[ 5 ] <= 0;
                       //   reg_1_threads[ 6 ] <= 0;
                       //   reg_1_threads[ 7 ] <= 0;
                       //   reg_1_threads[ 8 ] <= 0;
                       //   reg_1_threads[ 9 ] <= 0;
 
-                      reg_2_threads[ 0 ] <= 0;
-                      reg_2_threads[ 1 ] <= 0;
-                      reg_2_threads[ 2 ] <= 0;
-                      reg_2_threads[ 3 ] <= 0;
-                      reg_2_threads[ 4 ] <= 0;
+                    //   reg_2_threads[ 0 ] <= 0;
+                    //   reg_2_threads[ 1 ] <= 0;
+                    //   reg_2_threads[ 2 ] <= 0;
+                    //   reg_2_threads[ 3 ] <= 0;
+                    //   reg_2_threads[ 4 ] <= 0;
                       //   reg_2_threads[ 5 ] <= 0;
                       //   reg_2_threads[ 6 ] <= 0;
                       //   reg_2_threads[ 7 ] <= 0;
@@ -609,8 +609,8 @@ module core
                       //     reg_1 = reg_1_threads[ 9 ];
 
                       default: begin
-                          reg_1 <= 0;
-                          reg_2 <= 0;
+                          reg_1 <= reg_1_threads[ 0 ];
+                          reg_2 <= reg_2_threads[ 0 ];
                       end
 
                   endcase
