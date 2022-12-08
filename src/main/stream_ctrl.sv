@@ -25,6 +25,7 @@ module stream_ctrl
          output reg                             dst_valid,
          output reg                             dst_last,
          output logic                           stream_v,
+         output wire [ 2:0 ]                    stream_i,
          output wire                            last_stream
 
      );
@@ -170,15 +171,15 @@ module stream_ctrl
 
 
     // 引き金: start
-    wire [ 1:0 ]        i;
+    // wire [ 2:0 ]        i;
 
     // 各コアで違う結果を返したい時に使うかも？
-    agu #( .W( 2 ) ) agu_stream_i
+    agu #( .W( 3 ) ) agu_stream_i
         (
 
             // in
             .ini( 2'd0 ),
-            .fin( 2'd1 ),
+            .fin( 2'd7 ),
             .start( start ),
             .clk( clk ),
             .rst( rst ),
@@ -186,7 +187,7 @@ module stream_ctrl
 
 
             // out
-            .data( i ),
+            .data( stream_i ),
             .last( last_stream )
 
         );

@@ -54,11 +54,12 @@ module buffer_ctrl
          input wire [ CORENUM-1:0 ]             store,
          //  input wire                         store,
          input wire                             stream_v,
-         input wire                             last_stream,
+         input wire [ 2:0 ]                     stream_i,
+         //  input wire                             last_stream,
 
 
          // out
-         output logic [ 511:0 ]                 stream_d,
+         output logic [ 127:0 ]                 stream_d,
          output wire  [ DIM:0 ]                 sign_bit
 
      );
@@ -151,19 +152,47 @@ module buffer_ctrl
                   // stram_vの次にdst_validが立つ設計
                   if ( stream_v ) begin
 
-                      if ( last_stream ) begin
+                      case ( stream_i )
 
-                          stream_d[ 511:0 ] <= sign_bit[ 1023:512 ];
-                          //   stream_d[ 31:0 ] <= sign_bit[ 31:0 ];
-                          //   stream_d[ 511:32 ] <= 0;
+                          3'd0:
+                              stream_d[ 127:0 ] <= sign_bit[ 127:0 ];
 
-                      end
-                      else begin
+                          3'd1:
+                              stream_d[ 127:0 ] <= sign_bit[ 255:128 ];
 
-                          stream_d[ 511:0 ] <= sign_bit[ 511:0 ];
-                          //   stream_d[ 511:0 ] <= 0;
+                          3'd2:
+                              stream_d[ 127:0 ] <= sign_bit[ 383:256 ];
 
-                      end
+                          3'd3:
+                              stream_d[ 127:0 ] <= sign_bit[ 511:384 ];
+
+                          3'd4:
+                              stream_d[ 127:0 ] <= sign_bit[ 639:512 ];
+
+                          3'd5:
+                              stream_d[ 127:0 ] <= sign_bit[ 767:640 ];
+
+                          3'd6:
+                              stream_d[ 127:0 ] <= sign_bit[ 896:768 ];
+
+                          3'd7:
+                              stream_d[ 127:0 ] <= sign_bit[ 1023:896 ];
+
+                      endcase
+
+                      //   if ( last_stream ) begin
+
+                      //       stream_d[ 511:0 ] <= sign_bit[ 1023:512 ];
+                      //       //   stream_d[ 31:0 ] <= sign_bit[ 31:0 ];
+                      //       //   stream_d[ 511:32 ] <= 0;
+
+                      //   end
+                      //   else begin
+
+                      //       stream_d[ 511:0 ] <= sign_bit[ 511:0 ];
+                      //       //   stream_d[ 511:0 ] <= 0;
+
+                      //   end
 
                   end
               end;

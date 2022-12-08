@@ -207,6 +207,8 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
   // ADDRNUM(計算する個数)が偶数か否かを設定(後で変えるかも)
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 
+  const int BUS = 8;
+
   // 最後の送信
   // 8 * 10 * 3 = 240
   // 120 / 3 / 5/ 8 = 1
@@ -952,7 +954,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           tmp++;
         }
         // 残り埋める
-        for (int i = tmp; i < 32; i++)
+        for (int i = tmp; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -963,7 +965,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       {
         // 送信途中で止まる対策 -----------------------------
         verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < 32; i++)
+        for (int i = 0; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -999,7 +1001,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           tmp++;
         }
         // 残り埋める
-        for (int i = tmp; i < 32; i++)
+        for (int i = tmp; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1010,7 +1012,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       {
         // 送信途中で止まる対策 -----------------------------
         verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < 32; i++)
+        for (int i = 0; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1052,7 +1054,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           tmp++;
         }
         // 残り埋める
-        for (int i = tmp; i < 32; i++)
+        for (int i = tmp; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1063,7 +1065,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       {
         // 送信途中で止まる対策 -----------------------------
         verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < 32; i++)
+        for (int i = 0; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1099,7 +1101,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           tmp++;
         }
         // 残り埋める
-        for (int i = tmp; i < 32; i++)
+        for (int i = tmp; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1110,7 +1112,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       {
         // 送信途中で止まる対策 -----------------------------
         verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < 32; i++)
+        for (int i = 0; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1146,7 +1148,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           tmp++;
         }
         // 残り埋める
-        for (int i = tmp; i < 32; i++)
+        for (int i = tmp; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1157,7 +1159,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       {
         // 送信途中で止まる対策 -----------------------------
         verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < 32; i++)
+        for (int i = 0; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1193,7 +1195,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           tmp++;
         }
         // 残り埋める
-        for (int i = tmp; i < 32; i++)
+        for (int i = tmp; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1204,7 +1206,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       {
         // 送信途中で止まる対策 -----------------------------
         verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < 32; i++)
+        for (int i = 0; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1246,7 +1248,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           tmp++;
         }
         // 残り埋める
-        for (int i = tmp; i < 32; i++)
+        for (int i = tmp; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1257,7 +1259,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       {
         // 送信途中で止まる対策 -----------------------------
         verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < 32; i++)
+        for (int i = 0; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1293,7 +1295,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           tmp++;
         }
         // 残り埋める
-        for (int i = tmp; i < 32; i++)
+        for (int i = tmp; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1304,7 +1306,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       {
         // 送信途中で止まる対策 -----------------------------
         verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < 32; i++)
+        for (int i = 0; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1340,7 +1342,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           tmp++;
         }
         // 残り埋める
-        for (int i = tmp; i < 32; i++)
+        for (int i = tmp; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1351,7 +1353,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       {
         // 送信途中で止まる対策 -----------------------------
         verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < 32; i++)
+        for (int i = 0; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1389,7 +1391,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
             tmp++;
           }
           // 残り埋める
-          for (int i = tmp; i < 32; i++)
+          for (int i = tmp; i < BUS; i++)
           {
             verilator_top->S_AXIS_TDATA[i] = 0;
           }
@@ -1406,7 +1408,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           tmp++;
         }
         // 残り埋める
-        for (int i = tmp; i < 32; i++)
+        for (int i = tmp; i < BUS; i++)
         {
           verilator_top->S_AXIS_TDATA[i] = 0;
         }
@@ -1439,7 +1441,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
             tmp++;
           }
           // 残り埋める
-          for (int i = tmp; i < 32; i++)
+          for (int i = tmp; i < BUS; i++)
           {
             verilator_top->S_AXIS_TDATA[i] = 0;
           }
@@ -1457,7 +1459,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
   verilator_top->S_AXIS_TVALID = 0;
 
   // 最後の送信途中で止まる対策 --------------
-  for (int i = 0; i < 32; i++)
+  for (int i = 0; i < BUS; i++)
   {
     verilator_top->S_AXIS_TDATA[i] = 0;
   }
@@ -1482,7 +1484,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
 
   if (DIM == 1)
   {
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 8; i++)
     {
       if (i == 1)
       {
@@ -1494,9 +1496,9 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
   }
   else
   {
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 8; i++)
     {
-      for (int j = 0; j < DIM / 2; j++)
+      for (int j = 0; j < 4; j++)
       {
         printf("  %u\n", verilator_top->M_AXIS_TDATA[j]);
         // putb(verilator_top->M_AXIS_TDATA[j]);
