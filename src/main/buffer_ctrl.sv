@@ -153,15 +153,15 @@ module buffer_ctrl
 
                       if ( last_stream ) begin
 
-                          //   stream_d[ 511:0 ] <= sign_bit[ 1023:512 ];
-                          stream_d[ 31:0 ] <= sign_bit[ 31:0 ];
-                          stream_d[ 511:32 ] <= 0;
+                          stream_d[ 511:0 ] <= sign_bit[ 1023:512 ];
+                          //   stream_d[ 31:0 ] <= sign_bit[ 31:0 ];
+                          //   stream_d[ 511:32 ] <= 0;
 
                       end
                       else begin
 
-                          //   stream_d[ 511:0 ] <= sign_bit[ 511:0 ];
-                          stream_d[ 511:0 ] <= 0;
+                          stream_d[ 511:0 ] <= sign_bit[ 511:0 ];
+                          //   stream_d[ 511:0 ] <= 0;
 
                       end
 

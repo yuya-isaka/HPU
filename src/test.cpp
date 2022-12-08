@@ -6,8 +6,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 次元数可変
-const int DIM = 32 / 32;
-// const int DIM = 1024 / 32;
+// const int DIM = 32 / 32;
+const int DIM = 1024 / 32;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -284,19 +284,19 @@ int main(int argc, char **argv)
 	// 	printf(" -------------------\n\n");
 	// }
 
-	const int SIMULATION_COUNT = 500;
-	for (int i = 120; i < SIMULATION_COUNT; i += 120)
-	{
-		ADDRNUM = i;
+	// const int SIMULATION_COUNT = 500;
+	// for (int i = 120; i < SIMULATION_COUNT; i += 120)
+	// {
+	// 	ADDRNUM = i;
 
-		check(NGRAM, ADDRNUM, MAJORITY_ADDR);
-		xor128(1);
+	// 	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
+	// 	xor128(1);
 
-		printf(" -------------------\n\n");
-	}
+	// 	printf(" -------------------\n\n");
+	// }
 
-	// ADDRNUM = 240;
-	// check(NGRAM, ADDRNUM, MAJORITY_ADDR);
+	ADDRNUM = 240;
+	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
 	// xor128(1);
 	// printf(" --------\n\n");
 	// ADDRNUM = 54;

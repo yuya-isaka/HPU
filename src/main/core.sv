@@ -127,8 +127,8 @@ module core
 
                       // マルチスレッド実行
                       // スレッド数可変
-                      //   if ( thread_count == 4'd9 ) begin
-                      if ( thread_count == 4'd4 ) begin
+                      //   if ( thread_count == 4'd4 ) begin
+                      if ( thread_count == 4'd9 ) begin
                           thread_count <= 0;
                       end
 
@@ -155,8 +155,8 @@ module core
     wire [ DIM:0 ]          permute_reg_result;
 
     // 次元数可変
-    // permute #( .DIM( 1023 ) ) permute
-    permute #( .DIM( 31 ) ) permute
+    // permute #( .DIM( 31 ) ) permute
+    permute #( .DIM( 1023 ) ) permute
             (
 
                 // in
@@ -177,7 +177,9 @@ module core
     always_comb begin
                     thread_count_zure = thread_count + 4'd1;
 
-                    if ( thread_count == 4'd4) begin
+                    // スレッド数可変
+                    // if ( thread_count == 4'd4) begin
+                    if ( thread_count == 4'd9) begin
                         thread_count_zure = 0;
                     end
                 end;
@@ -202,46 +204,6 @@ module core
                   reg_1 <= reg_1_threads[ thread_count_zure ];
 
               end;
-
-    // // スレッド数可変
-    // always_comb begin
-    //                 case ( thread_count )
-
-    //                     4'd0:
-    //                         reg_1 = reg_1_threads[ 0 ];
-
-    //                     4'd1:
-    //                         reg_1 = reg_1_threads[ 1 ];
-
-    //                     4'd2:
-    //                         reg_1 = reg_1_threads[ 2 ];
-
-    //                     4'd3:
-    //                         reg_1 = reg_1_threads[ 3 ];
-
-    //                     4'd4:
-    //                         reg_1 = reg_1_threads[ 4 ];
-
-    //                     // 4'd5:
-    //                     //     reg_1 = reg_1_threads[ 5 ];
-
-    //                     // 4'd6:
-    //                     //     reg_1 = reg_1_threads[ 6 ];
-
-    //                     // 4'd7:
-    //                     //     reg_1 = reg_1_threads[ 7 ];
-
-    //                     // 4'd8:
-    //                     //     reg_1 = reg_1_threads[ 8 ];
-
-    //                     // 4'd9:
-    //                     //     reg_1 = reg_1_threads[ 9 ];
-
-    //                     default:
-    //                         reg_1 = 0;
-
-    //                 endcase
-    //             end;
 
 
     // レジスタ2
@@ -298,55 +260,6 @@ module core
 
               end;
 
-    // always_comb begin
-
-    //                 if ( inst[ 14 ] ) begin
-
-    //                     reg_2 = permute_reg_result;
-
-    //                 end
-
-    //                 else begin
-
-    //                     // スレッド数可変
-    //                     case ( thread_count )
-
-    //                         4'd0:
-    //                             reg_2 = reg_2_threads[ 0 ];
-
-    //                         4'd1:
-    //                             reg_2 = reg_2_threads[ 1 ];
-
-    //                         4'd2:
-    //                             reg_2 = reg_2_threads[ 2 ];
-
-    //                         4'd3:
-    //                             reg_2 = reg_2_threads[ 3 ];
-
-    //                         4'd4:
-    //                             reg_2 = reg_2_threads[ 4 ];
-
-    //                         // 4'd5:
-    //                         //     reg_2 = reg_2_threads[ 5 ];
-
-    //                         // 4'd6:
-    //                         //     reg_2 = reg_2_threads[ 6 ];
-
-    //                         // 4'd7:
-    //                         //     reg_2 = reg_2_threads[ 7 ];
-
-    //                         // 4'd8:
-    //                         //     reg_2 = reg_2_threads[ 8 ];
-
-    //                         // 4'd9:
-    //                         //     reg_2 = reg_2_threads[ 9 ];
-
-    //                         default:
-    //                             reg_2 = 0;
-
-    //                     endcase
-    //                 end
-    //             end;
 
 
     // storeする値を蓄える変数
