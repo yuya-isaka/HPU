@@ -92,7 +92,7 @@ module top
 
     // コア数可変
     // 2コア -------------------
-    parameter CORENUM = 8;
+    parameter CORENUM = 16;
     // ------------------------
 
 
@@ -126,7 +126,7 @@ module top
     // コア数可変
     // 次元数可変
     // buffer_ctrl #( .DIM( 31 ), .CORENUM( 8 ) ) buffer_ctrl
-    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 8 ) ) buffer_ctrl
+    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 16 ) ) buffer_ctrl
                 (
 
                     // in
@@ -143,14 +143,14 @@ module top
                     .core_result_6( core_result[ 5 ] ),
                     .core_result_7( core_result[ 6 ] ),
                     .core_result_8( core_result[ 7 ] ),
-                    // .core_result_9( core_result[ 8 ] ),
-                    // .core_result_10( core_result[ 9 ] ),
-                    // .core_result_11( core_result[ 10 ] ),
-                    // .core_result_12( core_result[ 11 ] ),
-                    // .core_result_13( core_result[ 12 ] ),
-                    // .core_result_14( core_result[ 13 ] ),
-                    // .core_result_15( core_result[ 14 ] ),
-                    // .core_result_16( core_result[ 15 ] ),
+                    .core_result_9( core_result[ 8 ] ),
+                    .core_result_10( core_result[ 9 ] ),
+                    .core_result_11( core_result[ 10 ] ),
+                    .core_result_12( core_result[ 11 ] ),
+                    .core_result_13( core_result[ 12 ] ),
+                    .core_result_14( core_result[ 13 ] ),
+                    .core_result_15( core_result[ 14 ] ),
+                    .core_result_16( core_result[ 15 ] ),
                     // .core_result_17( core_result[ 16 ] ),
                     // .core_result_18( core_result[ 17 ] ),
                     // .core_result_19( core_result[ 18 ] ),
@@ -190,7 +190,7 @@ module top
     wire              last_stream;
 
     // コア数可変
-    stream_ctrl #( .CORENUM( 8 ) ) stream_ctrl
+    stream_ctrl #( .CORENUM( 16 ) ) stream_ctrl
                 (
 
                     // in

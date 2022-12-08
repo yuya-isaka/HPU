@@ -923,8 +923,8 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
     } //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     else
     {
-      // 0, 3, 6, 9, 12, 15, 18, 21
-      // 1, 4, 7, 10, 13
+      // 0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45
+      // 48, 4, 7, 10, 13
       // 2, 5, 8, 11, 14
       // 3, 6, 9, 12, 15
       // 4, 7, 10, 13, 16
@@ -934,7 +934,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         tmp = 0;
         for (int i = 0; i < CORENUM; i++)
         {
-          uint16_t addr = NGRAM * i + j + (24 * k);
+          uint16_t addr = NGRAM * i + j + (NGRAM * CORENUM * k);
           if (i % 2 == 0)
           {
             conv.data_0 = assemble("load", addr);
@@ -1034,7 +1034,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         tmp = 0;
         for (int i = 0; i < CORENUM; i++)
         {
-          uint16_t addr = NGRAM * i + 1 + j + (24 * k);
+          uint16_t addr = NGRAM * i + 1 + j + (NGRAM * CORENUM * k);
           if (i % 2 == 0)
           {
             conv.data_0 = assemble("load", addr);
@@ -1228,7 +1228,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         tmp = 0;
         for (int i = 0; i < CORENUM; i++)
         {
-          uint16_t addr = NGRAM * i + 2 + j + (24 * k);
+          uint16_t addr = NGRAM * i + 2 + j + (NGRAM * CORENUM * k);
           if (i % 2 == 0)
           {
             conv.data_0 = assemble("load", addr);
@@ -1541,7 +1541,7 @@ int main(int argc, char **argv)
 
   const int NGRAM = 3;
   // コア数可変
-  const int CORENUM = 8;
+  const int CORENUM = 16;
   // スレッド数可変
   const int THREADSNUM = 10;
   int DEBUG = 0;
@@ -1573,7 +1573,7 @@ int main(int argc, char **argv)
   //   printf(" -------------------\n\n");
   // }
 
-  ADDRNUM = 240;
+  ADDRNUM = 480;
   DEBUG = 0;
   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");

@@ -293,27 +293,11 @@ module core
                       // アドレスいらん
                       else begin
 
-                          // xor
-                          if ( inst[ 13 ] ) begin
-
-                              buff <= 0;
-                              store <= 0;
-
-                          end
-
                           // store
-                          else if ( inst[ 12 ] ) begin
+                          if ( inst[ 12 ] ) begin
 
                               buff <= reg_2_tmp;
                               store <= 1;
-
-                          end
-
-                          // move
-                          else if ( inst[ 11 ] ) begin
-
-                              buff <= 0;
-                              store <= 0;
 
                           end
 
@@ -321,14 +305,6 @@ module core
                           else if ( inst[ 10 ] ) begin
 
                               last <= 1;
-                              buff <= 0;
-                              store <= 0;
-
-                          end
-
-                          // wb
-                          else if ( inst[ 9 ] ) begin
-
                               buff <= 0;
                               store <= 0;
 
