@@ -172,6 +172,16 @@ module core
             );
 
 
+    logic [ 3:0] thread_count_zure;
+
+    always_comb begin
+                    thread_count_zure = thread_count + 4'd1;
+
+                    if ( thread_count == 4'd4) begin
+                        thread_count_zure = 0;
+                    end
+                end;
+
     // reg_1_thread, reg_2_threadsは値を保持
     // reg_0はその度にロードされるから保持しなくていい
 
@@ -189,12 +199,7 @@ module core
 
                   end
 
-                  if ( thread_count == 4'd4) begin
-                      reg_1 <= reg_1_threads[ 0 ];
-                  end
-                  else begin
-                      reg_1 <= reg_1_threads[ thread_count + 1 ];
-                  end
+                  reg_1 <= reg_1_threads[ thread_count_zure ];
 
               end;
 
