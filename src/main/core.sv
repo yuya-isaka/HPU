@@ -183,94 +183,27 @@ module core
 
     always_ff @( posedge clk ) begin
 
-                  if ( exec ) begin
+                  if ( exec & ~inst[ 15] & inst[ 11 ] ) begin
 
-                      // move
-                      if ( ~inst[ 15] & inst[ 11 ] ) begin
+                      reg_1_threads[ thread_count] <= reg_2_tmp;
 
-                          // スレッド数可変
-                          case ( thread_count )
-
-                              4'd0:
-                                  reg_1_threads[ 0 ] <= reg_2_tmp;
-
-                              4'd1:
-                                  reg_1_threads[ 1 ] <= reg_2_tmp;
-
-                              4'd2:
-                                  reg_1_threads[ 2 ] <= reg_2_tmp;
-
-                              4'd3:
-                                  reg_1_threads[ 3 ] <= reg_2_tmp;
-
-                              4'd4:
-                                  reg_1_threads[ 4 ] <= reg_2_tmp;
-
-                              //   4'd5:
-                              //       reg_1_threads[ 5 ] <= reg_2;
-
-                              //   4'd6:
-                              //       reg_1_threads[ 6 ] <= reg_2;
-
-                              //   4'd7:
-                              //       reg_1_threads[ 7 ] <= reg_2;
-
-                              //   4'd8:
-                              //       reg_1_threads[ 8 ] <= reg_2;
-
-                              //   4'd9:
-                              //       reg_1_threads[ 9 ] <= reg_2;
-
-                              default:
-                                  ;
-
-                          endcase
-
-                      end
                   end
 
-                  case ( thread_count )
-
-                      4'd0: begin
-                          reg_1 <= reg_1_threads[ 1 ];
-                      end
-
-                      4'd1: begin
-                          reg_1 <= reg_1_threads[ 2 ];
-                      end
-
-                      4'd2: begin
-                          reg_1 <= reg_1_threads[ 3 ];
-                      end
-
-                      4'd3: begin
-                          reg_1 <= reg_1_threads[ 4 ];
-                      end
-
-                      4'd4: begin
-                          reg_1 <= reg_1_threads[ 0 ];
-                      end
-
-                      // 4'd5:
-                      //     reg_1 = reg_1_threads[ 5 ];
-
-                      // 4'd6:
-                      //     reg_1 = reg_1_threads[ 6 ];
-
-                      // 4'd7:
-                      //     reg_1 = reg_1_threads[ 7 ];
-
-                      // 4'd8:
-                      //     reg_1 = reg_1_threads[ 8 ];
-
-                      // 4'd9:
-                      //     reg_1 = reg_1_threads[ 9 ];
-
-                      default: begin
-                          reg_1 <= reg_1_threads[ 0 ];
-                      end
-
-                  endcase
+                  if ( thread_count == 4'd0) begin
+                      reg_1 <= reg_1_threads[ 1 ];
+                  end
+                  else if ( thread_count == 4'd1) begin
+                      reg_1 <= reg_1_threads[ 2 ];
+                  end
+                  else if ( thread_count == 4'd2) begin
+                      reg_1 <= reg_1_threads[ 3 ];
+                  end
+                  else if ( thread_count == 4'd3) begin
+                      reg_1 <= reg_1_threads[ 4 ];
+                  end
+                  else begin
+                      reg_1 <= reg_1_threads[ 0 ];
+                  end
 
               end;
 
