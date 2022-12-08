@@ -20,6 +20,7 @@ omp:
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
+# 結論　これが一番速い
 omp64:
 	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
 	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.o davinci_ngram.c
