@@ -15,11 +15,13 @@
 // そもそもpermutationは63までのシフトしかできないから、SIMD化するメリットがない
 // boundingはそもそもSIMDにするメリットがない
 
+#ifdef __MACH__
 #ifdef DEBUG
 __attribute__((destructor)) static void destructor()
 {
 	system("leaks -q davinci_ngram");
 }
+#endif
 #endif
 
 uint8_t **make_array_u8(const uint32_t y, const uint32_t x)
