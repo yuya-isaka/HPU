@@ -207,7 +207,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
   // ADDRNUM(計算する個数)が偶数か否かを設定(後で変えるかも)
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 
-  const int BUS = 16;
+  const int BUS = 8;
 
   // 最後の送信
   // 8 * 10 * 3 = 240
@@ -1496,9 +1496,18 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
   }
   else
   {
-    for (int i = 0; i < 2; i++)
+    // for (int i = 0; i < 2; i++)
+    // {
+    //   for (int j = 0; j < DIM / 2; j++)
+    //   {
+    //     printf("  %u\n", verilator_top->M_AXIS_TDATA[j]);
+    //     // putb(verilator_top->M_AXIS_TDATA[j]);
+    //   }
+    //   eval();
+    // }
+    for (int i = 0; i < (32 / BUS); i++)
     {
-      for (int j = 0; j < DIM / 2; j++)
+      for (int j = 0; j < BUS; j++)
       {
         printf("  %u\n", verilator_top->M_AXIS_TDATA[j]);
         // putb(verilator_top->M_AXIS_TDATA[j]);

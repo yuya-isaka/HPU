@@ -172,14 +172,14 @@ module core
             );
 
 
-    logic [ 3:0] thread_count_zure;
+    logic [ 3:0 ] thread_count_zure;
 
     always_comb begin
                     thread_count_zure = thread_count + 4'd1;
 
                     // スレッド数可変
-                    // if ( thread_count == 4'd4) begin
-                    if ( thread_count == 4'd9) begin
+                    // if ( thread_count == 4'd4 ) begin
+                    if ( thread_count == 4'd9 ) begin
                         thread_count_zure = 0;
                     end
                 end;
@@ -195,9 +195,9 @@ module core
 
     always_ff @( posedge clk ) begin
 
-                  if ( exec & ~inst[ 15] & inst[ 11 ] ) begin
+                  if ( exec & ~inst[ 15 ] & inst[ 11 ] ) begin
 
-                      reg_1_threads[ thread_count] <= reg_2_tmp;
+                      reg_1_threads[ thread_count ] <= reg_2_tmp;
 
                   end
 
@@ -229,9 +229,9 @@ module core
                   if ( exec ) begin
 
                       // アドレス必要
-                      if ( inst[ 15 ] & inst[ 13] ) begin
+                      if ( inst[ 15 ] & inst[ 13 ] ) begin
 
-                          reg_2_threads[ thread_count] <= reg_0;
+                          reg_2_threads[ thread_count ] <= reg_0;
 
                       end
 
@@ -241,14 +241,14 @@ module core
                           // xor
                           if ( inst[ 13 ] ) begin
 
-                              reg_2_threads[ thread_count] <= reg_1 ^ reg_2_tmp;
+                              reg_2_threads[ thread_count ] <= reg_1 ^ reg_2_tmp;
 
                           end
 
                           // wb
                           else if ( inst[ 9 ] ) begin
 
-                              reg_2_threads[ thread_count] <= sign_bit;
+                              reg_2_threads[ thread_count ] <= sign_bit;
 
                           end
 
