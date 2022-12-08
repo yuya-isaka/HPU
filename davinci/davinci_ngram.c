@@ -12,6 +12,7 @@
 
 // bindはSIMD化してもあんまり速くならなかった
 // permutationはvshrq_n_u64の挙動が変で使えない
+// そもそもpermutationは63までのシフトしかできないから、SIMD化するメリットがない
 // boundingはそもそもSIMDにするメリットがない
 
 #ifdef DEBUG

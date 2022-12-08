@@ -169,22 +169,118 @@ hv_t *hv_bind(hv_t src1[HV_NUM], hv_t src2[HV_NUM])
 	hv_t *dst = hv_make();
 #ifdef SIMD
 #ifdef HV64
-	for (uint32_t i = 0; i < HV_NUM; i += 2)
-	{
-		hv_t src1_128[2] = {src1[i], src1[i + 1]};
-		uint64x2_t hv_neon_src1 = vld1q_u64(src1_128);
-		hv_t src2_128[2] = {src2[i], src2[i + 1]};
-		uint64x2_t hv_neon_src2 = vld1q_u64(src2_128);
+	// for (uint32_t i = 0; i < HV_NUM; i += 2)
+	// {
+	// 	hv_t src1_128[2] = {src1[i], src1[i + 1]};
+	// 	uint64x2_t hv_neon_src1 = vld1q_u64(src1_128);
+	// 	hv_t src2_128[2] = {src2[i], src2[i + 1]};
+	// 	uint64x2_t hv_neon_src2 = vld1q_u64(src2_128);
 
-		uint64x2_t hv_neon_dst = veorq_u64(hv_neon_src1, hv_neon_src2);
+	// 	uint64x2_t hv_neon_dst = veorq_u64(hv_neon_src1, hv_neon_src2);
 
-		hv_t dst_128[2];
-		vst1q_u64(dst_128, hv_neon_dst);
-		for (uint32_t j = 0; j < 2; j++)
-		{
-			dst[i + j] = dst_128[j];
-		}
-	}
+	// 	hv_t dst_128[2];
+	// 	vst1q_u64(dst_128, hv_neon_dst);
+	// 	for (uint32_t j = 0; j < 2; j++)
+	// 	{
+	// 		dst[i + j] = dst_128[j];
+	// 	}
+	// }
+
+	hv_t src1_128_1[2] = {src1[0], src1[1]};
+	hv_t src1_128_2[2] = {src1[2], src1[3]};
+	hv_t src1_128_3[2] = {src1[4], src1[5]};
+	hv_t src1_128_4[2] = {src1[6], src1[7]};
+	hv_t src1_128_5[2] = {src1[8], src1[9]};
+	hv_t src1_128_6[2] = {src1[10], src1[11]};
+	hv_t src1_128_7[2] = {src1[12], src1[13]};
+	hv_t src1_128_8[2] = {src1[14], src1[15]};
+
+	hv_t src2_128_1[2] = {src2[0], src2[1]};
+	hv_t src2_128_2[2] = {src2[2], src2[3]};
+	hv_t src2_128_3[2] = {src2[4], src2[5]};
+	hv_t src2_128_4[2] = {src2[6], src2[7]};
+	hv_t src2_128_5[2] = {src2[8], src2[9]};
+	hv_t src2_128_6[2] = {src2[10], src2[11]};
+	hv_t src2_128_7[2] = {src2[12], src2[13]};
+	hv_t src2_128_8[2] = {src2[14], src2[15]};
+
+	uint64x2_t hv_neon_src1_1 = vld1q_u64(src1_128_1);
+	uint64x2_t hv_neon_src1_2 = vld1q_u64(src1_128_2);
+	uint64x2_t hv_neon_src1_3 = vld1q_u64(src1_128_3);
+	uint64x2_t hv_neon_src1_4 = vld1q_u64(src1_128_4);
+	uint64x2_t hv_neon_src1_5 = vld1q_u64(src1_128_5);
+	uint64x2_t hv_neon_src1_6 = vld1q_u64(src1_128_6);
+	uint64x2_t hv_neon_src1_7 = vld1q_u64(src1_128_7);
+	uint64x2_t hv_neon_src1_8 = vld1q_u64(src1_128_8);
+
+	uint64x2_t hv_neon_src2_1 = vld1q_u64(src2_128_1);
+	uint64x2_t hv_neon_src2_2 = vld1q_u64(src2_128_2);
+	uint64x2_t hv_neon_src2_3 = vld1q_u64(src2_128_3);
+	uint64x2_t hv_neon_src2_4 = vld1q_u64(src2_128_4);
+	uint64x2_t hv_neon_src2_5 = vld1q_u64(src2_128_5);
+	uint64x2_t hv_neon_src2_6 = vld1q_u64(src2_128_6);
+	uint64x2_t hv_neon_src2_7 = vld1q_u64(src2_128_7);
+	uint64x2_t hv_neon_src2_8 = vld1q_u64(src2_128_8);
+
+	uint64x2_t hv_neon_dst_1 = veorq_u64(hv_neon_src1_1, hv_neon_src2_1);
+	uint64x2_t hv_neon_dst_2 = veorq_u64(hv_neon_src1_2, hv_neon_src2_2);
+	uint64x2_t hv_neon_dst_3 = veorq_u64(hv_neon_src1_3, hv_neon_src2_3);
+	uint64x2_t hv_neon_dst_4 = veorq_u64(hv_neon_src1_4, hv_neon_src2_4);
+	uint64x2_t hv_neon_dst_5 = veorq_u64(hv_neon_src1_5, hv_neon_src2_5);
+	uint64x2_t hv_neon_dst_6 = veorq_u64(hv_neon_src1_6, hv_neon_src2_6);
+	uint64x2_t hv_neon_dst_7 = veorq_u64(hv_neon_src1_7, hv_neon_src2_7);
+	uint64x2_t hv_neon_dst_8 = veorq_u64(hv_neon_src1_8, hv_neon_src2_8);
+
+	// hv_t dst_128_1[2];
+	// hv_t dst_128_2[2];
+	// hv_t dst_128_3[2];
+	// hv_t dst_128_4[2];
+	// hv_t dst_128_5[2];
+	// hv_t dst_128_6[2];
+	// hv_t dst_128_7[2];
+	// hv_t dst_128_8[2];
+	// vst1q_u64(dst_128_1, hv_neon_dst_1);
+	// vst1q_u64(dst_128_2, hv_neon_dst_2);
+	// vst1q_u64(dst_128_3, hv_neon_dst_3);
+	// vst1q_u64(dst_128_4, hv_neon_dst_4);
+	// vst1q_u64(dst_128_5, hv_neon_dst_5);
+	// vst1q_u64(dst_128_6, hv_neon_dst_6);
+	// vst1q_u64(dst_128_7, hv_neon_dst_7);
+	// vst1q_u64(dst_128_8, hv_neon_dst_8);
+
+	// dst[0] = dst_128_1[0];
+	// dst[1] = dst_128_1[1];
+	// dst[2] = dst_128_2[0];
+	// dst[3] = dst_128_2[1];
+	// dst[4] = dst_128_3[0];
+	// dst[5] = dst_128_3[1];
+	// dst[6] = dst_128_4[0];
+	// dst[7] = dst_128_4[1];
+	// dst[8] = dst_128_5[0];
+	// dst[9] = dst_128_5[1];
+	// dst[10] = dst_128_6[0];
+	// dst[11] = dst_128_6[1];
+	// dst[12] = dst_128_7[0];
+	// dst[13] = dst_128_7[1];
+	// dst[14] = dst_128_8[0];
+	// dst[15] = dst_128_8[1];
+
+	hv_t *dst_128_1 = &dst[0];
+	hv_t *dst_128_2 = &dst[2];
+	hv_t *dst_128_3 = &dst[4];
+	hv_t *dst_128_4 = &dst[6];
+	hv_t *dst_128_5 = &dst[8];
+	hv_t *dst_128_6 = &dst[10];
+	hv_t *dst_128_7 = &dst[12];
+	hv_t *dst_128_8 = &dst[14];
+	vst1q_u64(dst_128_1, hv_neon_dst_1);
+	vst1q_u64(dst_128_2, hv_neon_dst_2);
+	vst1q_u64(dst_128_3, hv_neon_dst_3);
+	vst1q_u64(dst_128_4, hv_neon_dst_4);
+	vst1q_u64(dst_128_5, hv_neon_dst_5);
+	vst1q_u64(dst_128_6, hv_neon_dst_6);
+	vst1q_u64(dst_128_7, hv_neon_dst_7);
+	vst1q_u64(dst_128_8, hv_neon_dst_8);
 #else
 	for (uint32_t i = 0; i < HV_NUM; i += 4)
 	{
