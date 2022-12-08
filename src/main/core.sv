@@ -127,7 +127,8 @@ module core
 
                       // マルチスレッド実行
                       // スレッド数可変
-                      if ( thread_count == 4'd9 ) begin
+                      //   if ( thread_count == 4'd9 ) begin
+                      if ( thread_count == 4'd4 ) begin
                           thread_count <= 0;
                       end
 
@@ -154,8 +155,8 @@ module core
     wire [ DIM:0 ]          permute_reg_result;
 
     // 次元数可変
-    // permute #( .DIM( 31 ) ) permute
-    permute #( .DIM( 1023 ) ) permute
+    // permute #( .DIM( 1023 ) ) permute
+    permute #( .DIM( 31 ) ) permute
             (
 
                 // in
@@ -198,20 +199,20 @@ module core
                         4'd4:
                             reg_1 = reg_1_threads[ 4 ];
 
-                        4'd5:
-                            reg_1 = reg_1_threads[ 5 ];
+                        // 4'd5:
+                        //     reg_1 = reg_1_threads[ 5 ];
 
-                        4'd6:
-                            reg_1 = reg_1_threads[ 6 ];
+                        // 4'd6:
+                        //     reg_1 = reg_1_threads[ 6 ];
 
-                        4'd7:
-                            reg_1 = reg_1_threads[ 7 ];
+                        // 4'd7:
+                        //     reg_1 = reg_1_threads[ 7 ];
 
-                        4'd8:
-                            reg_1 = reg_1_threads[ 8 ];
+                        // 4'd8:
+                        //     reg_1 = reg_1_threads[ 8 ];
 
-                        4'd9:
-                            reg_1 = reg_1_threads[ 9 ];
+                        // 4'd9:
+                        //     reg_1 = reg_1_threads[ 9 ];
 
                         default:
                             reg_1 = 0;
@@ -253,20 +254,20 @@ module core
                             4'd4:
                                 reg_2 = reg_2_threads[ 4 ];
 
-                            4'd5:
-                                reg_2 = reg_2_threads[ 5 ];
+                            // 4'd5:
+                            //     reg_2 = reg_2_threads[ 5 ];
 
-                            4'd6:
-                                reg_2 = reg_2_threads[ 6 ];
+                            // 4'd6:
+                            //     reg_2 = reg_2_threads[ 6 ];
 
-                            4'd7:
-                                reg_2 = reg_2_threads[ 7 ];
+                            // 4'd7:
+                            //     reg_2 = reg_2_threads[ 7 ];
 
-                            4'd8:
-                                reg_2 = reg_2_threads[ 8 ];
+                            // 4'd8:
+                            //     reg_2 = reg_2_threads[ 8 ];
 
-                            4'd9:
-                                reg_2 = reg_2_threads[ 9 ];
+                            // 4'd9:
+                            //     reg_2 = reg_2_threads[ 9 ];
 
                             default:
                                 reg_2 = 0;
@@ -291,22 +292,22 @@ module core
                       reg_1_threads[ 2 ] <= 0;
                       reg_1_threads[ 3 ] <= 0;
                       reg_1_threads[ 4 ] <= 0;
-                      reg_1_threads[ 5 ] <= 0;
-                      reg_1_threads[ 6 ] <= 0;
-                      reg_1_threads[ 7 ] <= 0;
-                      reg_1_threads[ 8 ] <= 0;
-                      reg_1_threads[ 9 ] <= 0;
+                      //   reg_1_threads[ 5 ] <= 0;
+                      //   reg_1_threads[ 6 ] <= 0;
+                      //   reg_1_threads[ 7 ] <= 0;
+                      //   reg_1_threads[ 8 ] <= 0;
+                      //   reg_1_threads[ 9 ] <= 0;
 
                       reg_2_threads[ 0 ] <= 0;
                       reg_2_threads[ 1 ] <= 0;
                       reg_2_threads[ 2 ] <= 0;
                       reg_2_threads[ 3 ] <= 0;
                       reg_2_threads[ 4 ] <= 0;
-                      reg_2_threads[ 5 ] <= 0;
-                      reg_2_threads[ 6 ] <= 0;
-                      reg_2_threads[ 7 ] <= 0;
-                      reg_2_threads[ 8 ] <= 0;
-                      reg_2_threads[ 9 ] <= 0;
+                      //   reg_2_threads[ 5 ] <= 0;
+                      //   reg_2_threads[ 6 ] <= 0;
+                      //   reg_2_threads[ 7 ] <= 0;
+                      //   reg_2_threads[ 8 ] <= 0;
+                      //   reg_2_threads[ 9 ] <= 0;
 
                       buff <= 0;
                       store <= 0;
@@ -342,20 +343,20 @@ module core
                                   4'd4:
                                       reg_2_threads[ 4 ] <= reg_0;
 
-                                  4'd5:
-                                      reg_2_threads[ 5 ] <= reg_0;
+                                  //   4'd5:
+                                  //       reg_2_threads[ 5 ] <= reg_0;
 
-                                  4'd6:
-                                      reg_2_threads[ 6 ] <= reg_0;
+                                  //   4'd6:
+                                  //       reg_2_threads[ 6 ] <= reg_0;
 
-                                  4'd7:
-                                      reg_2_threads[ 7 ] <= reg_0;
+                                  //   4'd7:
+                                  //       reg_2_threads[ 7 ] <= reg_0;
 
-                                  4'd8:
-                                      reg_2_threads[ 8 ] <= reg_0;
+                                  //   4'd8:
+                                  //       reg_2_threads[ 8 ] <= reg_0;
 
-                                  4'd9:
-                                      reg_2_threads[ 9 ] <= reg_0;
+                                  //   4'd9:
+                                  //       reg_2_threads[ 9 ] <= reg_0;
 
                                   default:
                                       ;
@@ -393,20 +394,20 @@ module core
                                   4'd4:
                                       reg_2_threads[ 4 ] <= reg_1 ^ reg_2;
 
-                                  4'd5:
-                                      reg_2_threads[ 5 ] <= reg_1 ^ reg_2;
+                                  //   4'd5:
+                                  //       reg_2_threads[ 5 ] <= reg_1 ^ reg_2;
 
-                                  4'd6:
-                                      reg_2_threads[ 6 ] <= reg_1 ^ reg_2;
+                                  //   4'd6:
+                                  //       reg_2_threads[ 6 ] <= reg_1 ^ reg_2;
 
-                                  4'd7:
-                                      reg_2_threads[ 7 ] <= reg_1 ^ reg_2;
+                                  //   4'd7:
+                                  //       reg_2_threads[ 7 ] <= reg_1 ^ reg_2;
 
-                                  4'd8:
-                                      reg_2_threads[ 8 ] <= reg_1 ^ reg_2;
+                                  //   4'd8:
+                                  //       reg_2_threads[ 8 ] <= reg_1 ^ reg_2;
 
-                                  4'd9:
-                                      reg_2_threads[ 9 ] <= reg_1 ^ reg_2;
+                                  //   4'd9:
+                                  //       reg_2_threads[ 9 ] <= reg_1 ^ reg_2;
 
                                   default:
                                       ;
@@ -447,20 +448,20 @@ module core
                                   4'd4:
                                       reg_1_threads[ 4 ] <= reg_2;
 
-                                  4'd5:
-                                      reg_1_threads[ 5 ] <= reg_2;
+                                  //   4'd5:
+                                  //       reg_1_threads[ 5 ] <= reg_2;
 
-                                  4'd6:
-                                      reg_1_threads[ 6 ] <= reg_2;
+                                  //   4'd6:
+                                  //       reg_1_threads[ 6 ] <= reg_2;
 
-                                  4'd7:
-                                      reg_1_threads[ 7 ] <= reg_2;
+                                  //   4'd7:
+                                  //       reg_1_threads[ 7 ] <= reg_2;
 
-                                  4'd8:
-                                      reg_1_threads[ 8 ] <= reg_2;
+                                  //   4'd8:
+                                  //       reg_1_threads[ 8 ] <= reg_2;
 
-                                  4'd9:
-                                      reg_1_threads[ 9 ] <= reg_2;
+                                  //   4'd9:
+                                  //       reg_1_threads[ 9 ] <= reg_2;
 
                                   default:
                                       ;
@@ -502,20 +503,20 @@ module core
                                   4'd4:
                                       reg_2_threads[ 4 ] <= sign_bit;
 
-                                  4'd5:
-                                      reg_2_threads[ 5 ] <= sign_bit;
+                                  //   4'd5:
+                                  //       reg_2_threads[ 5 ] <= sign_bit;
 
-                                  4'd6:
-                                      reg_2_threads[ 6 ] <= sign_bit;
+                                  //   4'd6:
+                                  //       reg_2_threads[ 6 ] <= sign_bit;
 
-                                  4'd7:
-                                      reg_2_threads[ 7 ] <= sign_bit;
+                                  //   4'd7:
+                                  //       reg_2_threads[ 7 ] <= sign_bit;
 
-                                  4'd8:
-                                      reg_2_threads[ 8 ] <= sign_bit;
+                                  //   4'd8:
+                                  //       reg_2_threads[ 8 ] <= sign_bit;
 
-                                  4'd9:
-                                      reg_2_threads[ 9 ] <= sign_bit;
+                                  //   4'd9:
+                                  //       reg_2_threads[ 9 ] <= sign_bit;
 
                                   default:
                                       ;

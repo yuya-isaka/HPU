@@ -1538,13 +1538,15 @@ int main(int argc, char **argv)
   printf("\n ====================================== 開始 ========================================= \n\n");
 
   const int NGRAM = 3;
+  // コア数可変
   const int CORENUM = 8;
-  const int THREADSNUM = 10;
+  // スレッド数可変
+  const int THREADSNUM = 5;
   int DEBUG = 0;
   int ADDRNUM = 0;
   // 次元数可変 (結果を何個出力するかに使う)
-  // const int DIM = 32 / 32;
-  const int DIM = 1024 / 32;
+  const int DIM = 32 / 32;
+  // const int DIM = 1024 / 32;
   const int MAJORITY_ADDR = 511;
 
   // const int SIMULATION_COUNT = 100;
