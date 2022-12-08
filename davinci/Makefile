@@ -28,6 +28,13 @@ omp64:
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
+intelomp64:
+	gcc -fopenmp -c -O3 -DDEBUG -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -fopenmp -c -O3 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.o davinci_ngram.c
+	gcc -fopenmp -lomp -O3 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
+	rm hyper_vector.o davinci_ngram.o
+	./davinci_ngram
+
 auto:
 	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -Ofast -DDEBUG -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
 	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -Ofast -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.o davinci_ngram.c
