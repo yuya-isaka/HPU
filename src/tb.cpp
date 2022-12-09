@@ -1550,7 +1550,7 @@ int main(int argc, char **argv)
 
   const int NGRAM = 3;
   // コア数可変
-  const int CORENUM = 16;
+  const int CORENUM = 14;
   // スレッド数可変
   const int THREADSNUM = 10;
   int DEBUG = 0;
@@ -1582,7 +1582,8 @@ int main(int argc, char **argv)
   //   printf(" -------------------\n\n");
   // }
 
-  ADDRNUM = 480;
+  // NGRAm * CORENUm * THREADSNUM =420
+  ADDRNUM = 420;
   DEBUG = 0;
   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");

@@ -39,7 +39,7 @@ module core
 
     // ハイパーベクトルを保持するメモリ
     (* ram_style = "block" *)
-    reg [ DIM:0 ]           item_memory [ 0:511 ];
+    reg [ DIM:0 ]           item_memory [ 0:1023 ];
 
     // アイテムメモリーからロードしたデータの格納場所
     reg [ DIM:0 ]           reg_0;

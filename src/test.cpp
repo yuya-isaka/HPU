@@ -295,7 +295,7 @@ int main(int argc, char **argv)
 	// 	printf(" -------------------\n\n");
 	// }
 
-	ADDRNUM = 480;
+	ADDRNUM = 420;
 	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
 	// xor128(1);
 	// printf(" --------\n\n");

@@ -59,7 +59,8 @@ module counter
 
     // コア数可変
     // 4bitあれば十分
-    reg signed [ 5:0 ]      box_1;
+    reg signed [ 4:0 ]      box_1;
+    // reg signed [ 5:0 ]      box_1;
     // reg signed [ 4:0 ]      box_2;
     // reg signed [ 3:0 ]      box_3;
 
@@ -109,9 +110,9 @@ module counter
                         + select[ 10 ]
                         + select[ 11 ]
                         + select[ 12 ]
-                        + select[ 13 ]
-                        + select[ 14 ]
-                        + select[ 15 ];
+                        + select[ 13 ];
+                  // + select[ 14 ]
+                  // + select[ 15 ];
                   // + select[ 16 ]
                   // + select[ 17 ]
                   // + select[ 18 ]
