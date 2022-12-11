@@ -13,6 +13,15 @@ check64:
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
+test-check64:
+	gcc -c -DDEBUG -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -c -DDEBUG -DHV64 -o davinci_ngram.o davinci_ngram.c
+	gcc -DDEBUG -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
+	rm hyper_vector.o davinci_ngram.o
+	./davinci_ngram
+
+# ////////////////////////////////////////////
+
 omp:
 	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -o hyper_vector.o hyper_vector.c
 	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -o davinci_ngram.o davinci_ngram.c
@@ -27,6 +36,15 @@ omp64:
 	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
+
+test-omp64:
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -DDEBUG -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.o davinci_ngram.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -DDEBUG -DOPENMP -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
+	rm hyper_vector.o davinci_ngram.o
+	./davinci_ngram
+
+# ////////////////////////////////////////////
 
 intelomp64:
 	gcc -fopenmp -c -O3 -DDEBUG -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
