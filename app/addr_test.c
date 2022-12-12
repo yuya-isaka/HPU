@@ -878,10 +878,10 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       printf("\n  Error %u %u\n", result_real, dst[j]);
       printf("  CORENUM=%d  ADDRNUM=%d\n\n", CORENUM, ADDRNUM);
     }
-    // else
-    // {
-    //   printf("  Success\n");
-    // }
+    else
+    {
+      printf("  Success\n");
+    }
 
     free(result_array);
   }
@@ -1020,28 +1020,28 @@ int main()
   int CORENUM = 0;
   int ADDRNUM = 0;
 
-  for (int j = 1; j <= CORENUM_MAX; j++)
-  {
-    CORENUM = j;
-    for (int i = 30; i <= RANNUM; i += 30)
-    {
-      ADDRNUM = i;
-
-      check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, MAJORITY_ADDR);
-      xor128(1);
-    }
-  }
-
-  // CORENUM = CORENUM_MAX;
-  // for (int i = 30; i <= RANNUM; i += 30)
+  // for (int j = 1; j <= CORENUM_MAX; j++)
   // {
-  //   ADDRNUM = i;
+  //   CORENUM = j;
+  //   for (int i = 30; i <= RANNUM; i += 30)
+  //   {
+  //     ADDRNUM = i;
 
-  //   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, MAJORITY_ADDR);
-  //   xor128(1);
+  //     check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, MAJORITY_ADDR);
+  //     xor128(1);
+  //   }
   // }
 
-  // check(NGRAM, 14, THREADSNUM, 420, MAJORITY_ADDR);
+  CORENUM = CORENUM_MAX;
+  for (int i = 30; i <= RANNUM; i += 30)
+  {
+    ADDRNUM = i;
+
+    check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, MAJORITY_ADDR);
+    xor128(1);
+  }
+
+  // check(NGRAM, 14, THREADSNUM, 510, MAJORITY_ADDR);
   // xor128(1);
 
   printf("\nOK!\n");
