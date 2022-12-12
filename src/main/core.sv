@@ -17,7 +17,7 @@ module core
          input wire                         run,
          input wire                         gen,
          input wire                         update_item,
-         input wire [ 9:0 ]                 item_a,
+         input wire [ 8:0 ]                 item_a,
          input wire [ DIM:0 ]               rand_num,
          input wire                         get_v,
          // 16bit命令
@@ -39,7 +39,7 @@ module core
 
     // ハイパーベクトルを保持するメモリ
     (* ram_style = "block" *)
-    reg [ DIM:0 ]           item_memory [ 0:1023 ];
+    reg [ DIM:0 ]           item_memory [ 0:511 ];
 
     // アイテムメモリーからロードしたデータの格納場所
     reg [ DIM:0 ]           reg_0;
@@ -69,7 +69,7 @@ module core
                   // 読み出し
                   // 常に垂れ流しで読み出しでOK
                   // (必要ない場合は使わない)
-                  reg_0 <= item_memory[ get_d[ 9:0 ] ];
+                  reg_0 <= item_memory[ get_d[ 8:0 ] ];
               end;
 
 
@@ -77,7 +77,7 @@ module core
     reg                         wb_flag;
 
     // 書き戻し先のアドレス
-    reg [ 9:0 ]                 wb_addr;
+    reg [ 8:0 ]                 wb_addr;
 
     // 命令
     reg [ 15:0 ]                inst;
@@ -108,7 +108,7 @@ module core
                           wb_flag <= 1'b1;
 
                           // 書き込み先アドレス格納
-                          wb_addr[ 9:0 ] <= get_d[ 9:0 ];
+                          wb_addr[ 8:0 ] <= get_d[ 8:0 ];
 
                           // 命令は発行しない (nop)
                           inst <= 0;

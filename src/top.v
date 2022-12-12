@@ -187,7 +187,7 @@ module top
     // counterの値(sign_bit)をM_AXIS_TDATAに格納するタイミングを知らせる役割
     wire                stream_v;
 
-    wire [ 1:0]          stream_i;
+    wire [ 1:0 ]          stream_i;
 
     // コア数可変
     stream_ctrl #( .CORENUM( 14 ) ) stream_ctrl
@@ -264,7 +264,7 @@ module top
 
     // 各コアのitem_memoryのアドレス
     // (現状最大で1024個なので、10bit指定)
-    reg [ 9:0 ]      item_a;
+    reg [ 8:0 ]      item_a;
 
     always @( posedge AXIS_ACLK ) begin
 
@@ -273,7 +273,7 @@ module top
         end
 
         else if ( update_item ) begin
-            item_a <= item_a + 10'd1;
+            item_a <= item_a + 9'd1;
         end
 
     end
@@ -475,7 +475,7 @@ module top
                      .run( run ),
                      .gen( gen ),
                      .update_item( update_item ),
-                     .item_a( item_a[ 9:0 ] ),
+                     .item_a( item_a[ 8:0 ] ),
                      .rand_num( rand_num[ DIM:0 ] ),
                      .get_v( get_v ),
                      // 16bit命令
@@ -688,7 +688,7 @@ module top
 
     // item_memoryに格納するハイパーベクトルの数
     // (現状の最大値は1023)
-    reg [ 9:0 ]         item_memory_num;
+    reg [ 8:0 ]         item_memory_num;
 
 
     //================================================================
@@ -701,7 +701,7 @@ module top
         if ( ~S_AXI_ARESETN ) begin
 
             { run, gen } <= 2'b00;
-            item_memory_num <= 10'd0;
+            item_memory_num <= 9'd0;
 
         end
 
@@ -718,7 +718,7 @@ module top
                 // アドレス４
                 10'd04:
                     // 最大1023
-                    item_memory_num[ 9:0 ] <= write_data[ 9:0 ];
+                    item_memory_num[ 8:0 ] <= write_data[ 8:0 ];
 
                 // 上記アドレス以外は何もしない
                 default:
@@ -758,7 +758,7 @@ module top
 
                 // アドレス４
                 10'd04:
-                    S_AXI_RDATA[ 9:0 ] <= item_memory_num[ 9:0 ];
+                    S_AXI_RDATA[ 8:0 ] <= item_memory_num[ 8:0 ];
 
                 // 上記アドレス以外は何もしない
                 default:
