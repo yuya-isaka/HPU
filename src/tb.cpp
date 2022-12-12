@@ -314,6 +314,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
 
   // 送信
   verilator_top->S_AXIS_TVALID = 1;
+  eval();
 
   int tmp = 0;
 
@@ -1553,16 +1554,16 @@ int main(int argc, char **argv)
   const int DIM = 1024 / 32;
   const int MAJORITY_ADDR = 511;
 
-  const int SIMULATION_COUNT = 100;
-  for (int i = 30; i < SIMULATION_COUNT; i += 30)
-  {
-    ADDRNUM = i;
+  // const int SIMULATION_COUNT = 100;
+  // for (int i = 30; i < SIMULATION_COUNT; i += 30)
+  // {
+  //   ADDRNUM = i;
 
-    DEBUG = 0;
-    check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  //   DEBUG = 1;
+  //   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
 
-    printf(" -------------------\n\n");
-  }
+  //   printf(" -------------------\n\n");
+  // }
 
   // const int SIMULATION_COUNT = 500;
   // for (int i = 120; i < SIMULATION_COUNT; i += 120)
@@ -1575,9 +1576,9 @@ int main(int argc, char **argv)
   //   printf(" -------------------\n\n");
   // }
 
-  // ADDRNUM = 210;
-  // DEBUG = 0;
-  // check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+  ADDRNUM = 390;
+  DEBUG = 1;
+  check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
   // ADDRNUM = 54;
   // DEBUG = 1;

@@ -273,16 +273,16 @@ int main(int argc, char **argv)
 	const int MAJORITY_ADDR = 511;
 	int ADDRNUM = 0;
 
-	const int SIMULATION_COUNT = 100;
-	for (int i = 30; i < SIMULATION_COUNT; i += 30)
-	{
-		ADDRNUM = i;
+	// const int SIMULATION_COUNT = 100;
+	// for (int i = 30; i < SIMULATION_COUNT; i += 30)
+	// {
+	// 	ADDRNUM = i;
 
-		check(NGRAM, ADDRNUM, MAJORITY_ADDR);
-		xor128(1);
+	// 	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
+	// 	xor128(1);
 
-		printf(" -------------------\n\n");
-	}
+	// 	printf(" -------------------\n\n");
+	// }
 
 	// const int SIMULATION_COUNT = 500;
 	// for (int i = 120; i < SIMULATION_COUNT; i += 120)
@@ -295,9 +295,9 @@ int main(int argc, char **argv)
 	// 	printf(" -------------------\n\n");
 	// }
 
-	// ADDRNUM = 210;
-	// check(NGRAM, ADDRNUM, MAJORITY_ADDR);
-	// xor128(1);
+	ADDRNUM = 390;
+	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
+	xor128(1);
 	// printf(" --------\n\n");
 	// ADDRNUM = 54;
 	// check(NGRAM, ADDRNUM, MAJORITY_ADDR);
