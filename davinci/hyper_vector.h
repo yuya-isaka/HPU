@@ -41,4 +41,6 @@ extern void hv_bound(hv_t encoded_hv[HV_NUM]);
 extern hv_t *hv_bound_result(void);
 extern hv_t *hv_bound_batch(hv_t **, const uint32_t);
 
+extern void hv_print(hv_t print_data[HV_NUM]);
+
 #endif
