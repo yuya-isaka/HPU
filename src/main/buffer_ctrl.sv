@@ -7,6 +7,7 @@ module buffer_ctrl
 
          // ハイパーベクトルの次元数
          parameter DIM = 1023,
+
          // コア数 (デバッグ用)
          parameter CORENUM = 16
 
@@ -25,12 +26,12 @@ module buffer_ctrl
          input wire [ DIM:0 ]                   core_result_6,
          input wire [ DIM:0 ]                   core_result_7,
          input wire [ DIM:0 ]                   core_result_8,
-         //  input wire [ DIM:0 ]                   core_result_9,
-         //  input wire [ DIM:0 ]                   core_result_10,
-         //  input wire [ DIM:0 ]                   core_result_11,
-         //  input wire [ DIM:0 ]                   core_result_12,
-         //  input wire [ DIM:0 ]                   core_result_13,
-         //  input wire [ DIM:0 ]                   core_result_14,
+         input wire [ DIM:0 ]                   core_result_9,
+         input wire [ DIM:0 ]                   core_result_10,
+         input wire [ DIM:0 ]                   core_result_11,
+         input wire [ DIM:0 ]                   core_result_12,
+         input wire [ DIM:0 ]                   core_result_13,
+         input wire [ DIM:0 ]                   core_result_14,
          //  input wire [ DIM:0 ]                   core_result_15,
          //  input wire [ DIM:0 ]                   core_result_16,
          //  input wire [ DIM:0 ]                   core_result_17,
@@ -53,11 +54,11 @@ module buffer_ctrl
          input wire [ CORENUM-1:0 ]             store,
          //  input wire                         store,
          input wire                             stream_v,
-         input wire                             last_stream,
+         input wire [ 1:0 ]                     stream_i,
 
 
          // out
-         output logic [ 511:0 ]                 stream_d,
+         output logic [ 255:0 ]                 stream_d,
          output wire  [ DIM:0 ]                 sign_bit
 
      );
@@ -75,7 +76,7 @@ module buffer_ctrl
 
             // コア数可変
             // 計算数可変 (現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分)
-            counter #( .W( 30 ), .CORENUM( 8 ) ) counter
+            counter #( .W( 26 ), .CORENUM( 14 ) ) counter
                     (
 
                         // in
@@ -106,12 +107,12 @@ module buffer_ctrl
                                 // core_result_17[ j ],
                                 // core_result_16[ j ],
                                 // core_result_15[ j ],
-                                // core_result_14[ j ],
-                                // core_result_13[ j ],
-                                // core_result_12[ j ],
-                                // core_result_11[ j ],
-                                // core_result_10[ j ],
-                                // core_result_9[ j ],
+                                core_result_14[ j ],
+                                core_result_13[ j ],
+                                core_result_12[ j ],
+                                core_result_11[ j ],
+                                core_result_10[ j ],
+                                core_result_9[ j ],
                                 core_result_8[ j ],
                                 core_result_7[ j ],
                                 core_result_6[ j ],
@@ -149,15 +150,36 @@ module buffer_ctrl
                   // stream_vがたった次のタイミングに値を更新
                   // stram_vの次にdst_validが立つ設計
                   if ( stream_v ) begin
-                      if ( last_stream ) begin
+
+                      if ( stream_i == 2'd0 ) begin
+
+                          stream_d[ 255:0 ] <= sign_bit[ 255:0 ];
                           //   stream_d[ 511:0 ] <= sign_bit[ 1023:512 ];
-                          stream_d[ 31:0 ] <= sign_bit[ 31:0 ];
-                          stream_d[ 511:32 ] <= 0;
+                          //   stream_d[ 31:0 ] <= sign_bit[ 31:0 ];
+                          //   stream_d[ 511:32 ] <= 0;
+
                       end
+
+                      else if ( stream_i == 2'd1 ) begin
+
+                          stream_d[ 255:0 ] <= sign_bit[ 511:256 ];
+
+                      end
+
+                      else if ( stream_i == 2'd2) begin
+
+                          stream_d[ 255:0 ] <= sign_bit[ 767:512 ];
+
+                      end
+
                       else begin
+
+                          stream_d[ 255:0 ] <= sign_bit[ 1023:768 ];
                           //   stream_d[ 511:0 ] <= sign_bit[ 511:0 ];
-                          stream_d[ 511:0 ] <= 0;
+                          //   stream_d[ 511:0 ] <= 0;
+
                       end
+
                   end
               end;
 

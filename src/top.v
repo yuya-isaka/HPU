@@ -43,20 +43,24 @@ module top
         output wire                     S_AXI_RVALID,
         // -----------------------------------------------
 
+
         // AXI Strem Interface ---------------------------
         input wire                      AXIS_ACLK,
         input wire                      AXIS_ARESETN,
+        // -----------------------------------------------
+
 
         // AXI Stream Master Interface -------------------
         input wire                      M_AXIS_TREADY,
-        output wire [ 511:0 ]          M_AXIS_TDATA,
+        output wire [ 255:0 ]           M_AXIS_TDATA,
         output wire                     M_AXIS_TVALID,
         output wire [ 7:0 ]             M_AXIS_TSTRB,
         output wire                     M_AXIS_TLAST,
         // -----------------------------------------------
 
+
         // AXI Stream Slave Interface --------------------
-        input wire [ 511:0 ]           S_AXIS_TDATA,
+        input wire [ 255:0 ]            S_AXIS_TDATA,
         input wire [ 7:0 ]              S_AXIS_TSTRB,
         input wire                      S_AXIS_TLAST,
         input wire                      S_AXIS_TVALID,
@@ -68,27 +72,27 @@ module top
 
     // 次元数可変
     // 32次元 -----------------
-    parameter DIM = 31;
+    // parameter DIM = 31;
     // -----------------------
 
     // 1024次元 ---------------
-    // parameter DIM = 1023;
+    parameter DIM = 1023;
     // -----------------------
 
 
     // 次元数可変
     // 32次元 -----------------
-    parameter WI = 0;
+    // parameter WI = 0;
     // -----------------------
 
     // 1024次元 ---------------
-    // parameter WI = 31;
+    parameter WI = 31;
     // -----------------------
 
 
     // コア数可変
     // 2コア -------------------
-    parameter CORENUM = 8;
+    parameter CORENUM = 14;
     // ------------------------
 
 
@@ -121,10 +125,8 @@ module top
 
     // コア数可変
     // 次元数可変
-    // buffer_ctrl #( .DIM( 31 ), .CORENUM( 16 ) ) buffer_ctrl
-    // buffer_ctrl #( .DIM( 1023 ), .CORENUM( 16 ) ) buffer_ctrl
-    // buffer_ctrl #( .DIM( 1023 ), .CORENUM( 32 ) ) buffer_ctrl
-    buffer_ctrl #( .DIM( 31 ), .CORENUM( 8 ) ) buffer_ctrl
+    // buffer_ctrl #( .DIM( 31 ), .CORENUM( 8 ) ) buffer_ctrl
+    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 14 ) ) buffer_ctrl
                 (
 
                     // in
@@ -141,12 +143,12 @@ module top
                     .core_result_6( core_result[ 5 ] ),
                     .core_result_7( core_result[ 6 ] ),
                     .core_result_8( core_result[ 7 ] ),
-                    // .core_result_9( core_result[ 8 ] ),
-                    // .core_result_10( core_result[ 9 ] ),
-                    // .core_result_11( core_result[ 10 ] ),
-                    // .core_result_12( core_result[ 11 ] ),
-                    // .core_result_13( core_result[ 12 ] ),
-                    // .core_result_14( core_result[ 13 ] ),
+                    .core_result_9( core_result[ 8 ] ),
+                    .core_result_10( core_result[ 9 ] ),
+                    .core_result_11( core_result[ 10 ] ),
+                    .core_result_12( core_result[ 11 ] ),
+                    .core_result_13( core_result[ 12 ] ),
+                    .core_result_14( core_result[ 13 ] ),
                     // .core_result_15( core_result[ 14 ] ),
                     // .core_result_16( core_result[ 15 ] ),
                     // .core_result_17( core_result[ 16 ] ),
@@ -169,12 +171,12 @@ module top
                     .store( store[ CORENUM-1:0 ] ),
                     // .store( store ),
                     .stream_v( stream_v ),
-                    .last_stream( last_stream ),
+                    .stream_i( stream_i[ 1:0 ] ),
 
 
                     // out
                     // バス幅可変
-                    .stream_d( M_AXIS_TDATA[ 511:0 ] ),
+                    .stream_d( M_AXIS_TDATA[ 255:0 ] ),
                     .sign_bit( sign_bit[ DIM:0 ] )
 
                 );
@@ -183,12 +185,12 @@ module top
 
     // 計算結果を送るタイミングの１クロック前に立つ
     // counterの値(sign_bit)をM_AXIS_TDATAに格納するタイミングを知らせる役割
-    wire              stream_v;
-    wire              last_stream;
+    wire                stream_v;
+
+    wire [ 1:0 ]          stream_i;
 
     // コア数可変
-    // stream_ctrl #( .CORENUM( 32 ) ) stream_ctrl
-    stream_ctrl #( .CORENUM( 8 ) ) stream_ctrl
+    stream_ctrl #( .CORENUM( 14 ) ) stream_ctrl
                 (
 
                     // in
@@ -205,7 +207,7 @@ module top
                     .dst_valid( M_AXIS_TVALID ),
                     .dst_last( M_AXIS_TLAST ),
                     .stream_v( stream_v ),
-                    .last_stream( last_stream )
+                    .stream_i( stream_i[ 1:0 ] )
 
                 );
 
@@ -227,7 +229,6 @@ module top
         end
 
         else begin
-
             if ( item_a_tmp == WI ) begin
                 item_a_tmp <= 5'd0;
             end
@@ -236,6 +237,7 @@ module top
                 item_a_tmp <= item_a_tmp + 5'd1;
             end
         end
+
     end
 
 
@@ -256,12 +258,13 @@ module top
         else begin
             update_item <= 0;
         end
+
     end
 
 
     // 各コアのitem_memoryのアドレス
     // (現状最大で1024個なので、10bit指定)
-    reg [ 9:0 ]      item_a;
+    reg [ 8:0 ]      item_a;
 
     always @( posedge AXIS_ACLK ) begin
 
@@ -270,8 +273,9 @@ module top
         end
 
         else if ( update_item ) begin
-            item_a <= item_a + 10'd1;
+            item_a <= item_a + 9'd1;
         end
+
     end
 
 
@@ -307,129 +311,130 @@ module top
             rand_num[ 31:0 ] <= rand_num_tmp;
         end
 
-        // else if ( item_a_tmp == 1 ) begin
-        //     rand_num[ 63:32 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 1 ) begin
+            rand_num[ 63:32 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 2 ) begin
-        //     rand_num[ 95:64 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 2 ) begin
+            rand_num[ 95:64 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 3 ) begin
-        //     rand_num[ 127:96 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 3 ) begin
+            rand_num[ 127:96 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 4 ) begin
-        //     rand_num[ 159:128 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 4 ) begin
+            rand_num[ 159:128 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 5 ) begin
-        //     rand_num[ 191:160 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 5 ) begin
+            rand_num[ 191:160 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 6 ) begin
-        //     rand_num[ 223:192 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 6 ) begin
+            rand_num[ 223:192 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 7 ) begin
-        //     rand_num[ 255:224 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 7 ) begin
+            rand_num[ 255:224 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 8 ) begin
-        //     rand_num[ 287:256 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 8 ) begin
+            rand_num[ 287:256 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 9 ) begin
-        //     rand_num[ 319:288 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 9 ) begin
+            rand_num[ 319:288 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 10 ) begin
-        //     rand_num[ 351:320 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 10 ) begin
+            rand_num[ 351:320 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 11 ) begin
-        //     rand_num[ 383:352 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 11 ) begin
+            rand_num[ 383:352 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 12 ) begin
-        //     rand_num[ 415:384 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 12 ) begin
+            rand_num[ 415:384 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 13 ) begin
-        //     rand_num[ 447:416 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 13 ) begin
+            rand_num[ 447:416 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 14 ) begin
-        //     rand_num[ 479:448 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 14 ) begin
+            rand_num[ 479:448 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 15 ) begin
-        //     rand_num[ 511:480 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 15 ) begin
+            rand_num[ 511:480 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 16 ) begin
-        //     rand_num[ 543:512 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 16 ) begin
+            rand_num[ 543:512 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 17 ) begin
-        //     rand_num[ 575:544 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 17 ) begin
+            rand_num[ 575:544 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 18 ) begin
-        //     rand_num[ 607:576 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 18 ) begin
+            rand_num[ 607:576 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 19 ) begin
-        //     rand_num[ 639:608 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 19 ) begin
+            rand_num[ 639:608 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 20 ) begin
-        //     rand_num[ 671:640 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 20 ) begin
+            rand_num[ 671:640 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 21 ) begin
-        //     rand_num[ 703:672 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 21 ) begin
+            rand_num[ 703:672 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 22 ) begin
-        //     rand_num[ 735:704 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 22 ) begin
+            rand_num[ 735:704 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 23 ) begin
-        //     rand_num[ 767:736 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 23 ) begin
+            rand_num[ 767:736 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 24 ) begin
-        //     rand_num[ 799:768 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 24 ) begin
+            rand_num[ 799:768 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 25 ) begin
-        //     rand_num[ 831:800 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 25 ) begin
+            rand_num[ 831:800 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 26 ) begin
-        //     rand_num[ 863:832 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 26 ) begin
+            rand_num[ 863:832 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 27 ) begin
-        //     rand_num[ 895:864 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 27 ) begin
+            rand_num[ 895:864 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 28 ) begin
-        //     rand_num[ 927:896 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 28 ) begin
+            rand_num[ 927:896 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 29 ) begin
-        //     rand_num[ 959:928 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 29 ) begin
+            rand_num[ 959:928 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 30 ) begin
-        //     rand_num[ 991:960 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 30 ) begin
+            rand_num[ 991:960 ] <= rand_num_tmp;
+        end
 
-        // else if ( item_a_tmp == 31 ) begin
-        //     rand_num[ 1023:992 ] <= rand_num_tmp;
-        // end
+        else if ( item_a_tmp == 31 ) begin
+            rand_num[ 1023:992 ] <= rand_num_tmp;
+        end
+
     end
 
 
@@ -449,7 +454,7 @@ module top
 
     // 各コアのラスト信号
     // 1コア
-    wire [ CORENUM-1:0]              last;
+    wire [ CORENUM-1:0 ]              last;
     // wire                            last;
 
     // 各コアでエンコーディング
@@ -460,8 +465,9 @@ module top
         for ( i = 0; i < CORENUM; i = i + 1 ) begin
 
             // 次元数可変
-            // core #( .DIM( 1023 ) ) core
-            core #( .DIM( 31 ) ) core
+            // スレッド数可変
+            // core #( .DIM( 31 ), .THREADS( 5 ) ) core
+            core #( .DIM( 1023 ), .THREADS( 10 ) ) core
                  (
 
                      // in
@@ -469,7 +475,7 @@ module top
                      .run( run ),
                      .gen( gen ),
                      .update_item( update_item ),
-                     .item_a( item_a[ 9:0 ] ),
+                     .item_a( item_a[ 8:0 ] ),
                      .rand_num( rand_num[ DIM:0 ] ),
                      .get_v( get_v ),
                      // 16bit命令
@@ -490,7 +496,9 @@ module top
                      //  .last( last)
 
                  );
+
         end
+
     endgenerate
 
 
@@ -556,38 +564,48 @@ module top
 
         // リセット
         if ( ~S_AXI_ARESETN ) begin
+
             state <= 4'b0000;
             write_addr <= 0;
             write_data <= 0;
             read_addr <= 0;
+
         end
 
         // INI
         else if ( INI ) begin
 
             if ( S_AXI_AWVALID & S_AXI_WVALID ) begin
+
                 // go AWW
                 state <= 4'b0011;
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
                 write_data <= S_AXI_WDATA;
+
             end
 
             else if ( S_AXI_AWVALID ) begin
+
                 // go AW
                 state <= 4'b0001;
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
+
             end
 
             else if ( S_AXI_WVALID ) begin
+
                 // go W
                 state <= 4'b0010;
                 write_data <= S_AXI_WDATA;
+
             end
 
             else if ( S_AXI_ARVALID ) begin
+
                 // go AR1
                 state <= 4'b0100;
                 read_addr[ 11:2 ] <= S_AXI_ARADDR[ 11:2 ];
+
             end
         end
 
@@ -595,9 +613,11 @@ module top
         else if ( AW ) begin
 
             if ( S_AXI_WVALID ) begin
+
                 // go AWW
                 state <= 4'b0011;
                 write_data <= S_AXI_WDATA;
+
             end
         end
 
@@ -605,9 +625,11 @@ module top
         else if ( W ) begin
 
             if ( S_AXI_AWVALID ) begin
+
                 // go AWW
                 state <= 4'b0011;
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
+
             end
         end
 
@@ -634,6 +656,7 @@ module top
                 state <= 4'b0000;
             end
         end
+
     end
 
 
@@ -641,13 +664,13 @@ module top
 
 
     // 書き込み可能フラグ
-    wire            register_wflag;
+    wire    register_wflag;
 
     assign register_wflag = AWW & ( write_addr[ 11:10 ] == 2'b00 );
 
 
     // 読み込み可能フラグ
-    wire            register_rflag;
+    wire    register_rflag;
 
     assign register_rflag = AR1 & ( read_addr[ 11:10 ] == 2'b00 );
 
@@ -661,11 +684,11 @@ module top
 
     // gen ... 書き込みモードで１を代入
     // run ... 書き込みモードで2を代入
-    reg             gen, run;
+    reg                 gen, run;
 
     // item_memoryに格納するハイパーベクトルの数
     // (現状の最大値は1023)
-    reg [ 9:0 ]       item_memory_num;
+    reg [ 8:0 ]         item_memory_num;
 
 
     //================================================================
@@ -676,8 +699,10 @@ module top
 
         // 初期化
         if ( ~S_AXI_ARESETN ) begin
+
             { run, gen } <= 2'b00;
-            item_memory_num <= 10'd0;
+            item_memory_num <= 9'd0;
+
         end
 
         // 書き込み
@@ -693,11 +718,12 @@ module top
                 // アドレス４
                 10'd04:
                     // 最大1023
-                    item_memory_num[ 9:0 ] <= write_data[ 9:0 ];
+                    item_memory_num[ 8:0 ] <= write_data[ 8:0 ];
 
                 // 上記アドレス以外は何もしない
                 default:
                     ;
+
             endcase
 
         end
@@ -706,8 +732,11 @@ module top
         // (item_memory_num数のハイパーベクトルを生成して終了)
         // (現状S_AXI_ACLK, S_AXIS_ACLKが同じ周波数を用いているため問題ない)
         else if ( gen & item_a == item_memory_num & update_item ) begin
+
             gen <= 1'b0;
+
         end
+
     end
 
 
@@ -729,14 +758,15 @@ module top
 
                 // アドレス４
                 10'd04:
-                    S_AXI_RDATA[ 9:0 ] <= item_memory_num[ 9:0 ];
+                    S_AXI_RDATA[ 8:0 ] <= item_memory_num[ 8:0 ];
 
                 // 上記アドレス以外は何もしない
                 default:
                     S_AXI_RDATA <= 0;
-            endcase
 
+            endcase
         end
+
     end
 
 

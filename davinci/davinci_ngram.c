@@ -10,11 +10,18 @@
 #include <omp.h>
 #endif
 
+// bindはSIMD化してもあんまり速くならなかった
+// permutationはvshrq_n_u64の挙動が変で使えない
+// そもそもpermutationは63までのシフトしかできないから、SIMD化するメリットがない
+// boundingはそもそもSIMDにするメリットがない
+
+#ifdef __MACH__
 #ifdef DEBUG
 __attribute__((destructor)) static void destructor()
 {
 	system("leaks -q davinci_ngram");
 }
+#endif
 #endif
 
 uint8_t **make_array_u8(const uint32_t y, const uint32_t x)
@@ -95,7 +102,7 @@ int main(int argc, char const *argv[])
 	// const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
 	const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
 
-	const uint32_t NGRAM = 100;
+	const uint32_t NGRAM = 3;
 	const uint32_t RAND_NUM = 27;
 	const uint32_t MAJORITY_ADDR = 26;
 

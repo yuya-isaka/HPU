@@ -372,6 +372,7 @@ ohashi_ngram
 davinci_ngram.s
 davinci_ngram_peta.s
 ohashi_ngram.s
+hyper_vector.s
 
 # app
 addr_test
@@ -435,3 +436,6 @@ bound2_peta.s
 
 
 .svlint.toml
+
+train-images-idx3-ubyte
+train-labels-idx1-ubyte

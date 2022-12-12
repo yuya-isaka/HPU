@@ -8,6 +8,7 @@ module counter
          // 現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分
          // counterで数える上限
          parameter W = 30,
+
          // コア数 (デバッグ用)
          parameter CORENUM = 32
 
@@ -35,18 +36,22 @@ module counter
 
 
     reg         store_n;
+
     reg         store_nn;
 
     always_ff @( posedge clk ) begin
+
                   //   if ( store != 0) begin
                   //       store_n <= 1'b1;
                   //   end
                   //   else begin
                   //       store_n <= 1'b0;
                   //   end
+
                   // 全コアが同じタイミングでストアすると仮定
                   store_n <= store[ 0 ];
                   store_nn <= store_n;
+
               end;
 
 
@@ -54,7 +59,8 @@ module counter
 
     // コア数可変
     // 4bitあれば十分
-    reg signed [ 5:0 ]      box_1;
+    reg signed [ 4:0 ]      box_1;
+    // reg signed [ 5:0 ]      box_1;
     // reg signed [ 4:0 ]      box_2;
     // reg signed [ 3:0 ]      box_3;
 
@@ -62,14 +68,17 @@ module counter
     always_ff @( posedge clk ) begin
 
                   if ( rst ) begin
+
                       // コア数可変
                       box <= 0;
                       box_1 <= 0;
                       //   box_2 <= 0;
+
                   end
 
                   // store_nと分離することで、storeが連続で実行されても対応可能にした
                   else if ( store_nn ) begin
+
                       // コア数可変
                       // 16コア
                       box <=
@@ -78,6 +87,7 @@ module counter
                       //   + box_2;
                       // 1-4コア
                       //   box <= box + box_1;
+
                   end
 
 
@@ -94,14 +104,14 @@ module counter
                         + select[ 4 ]
                         + select[ 5 ]
                         + select[ 6 ]
-                        + select[ 7 ];
-                  // + select[ 8 ]
-                  // + select[ 9 ]
-                  // + select[ 10 ]
-                  // + select[ 11 ];
-                  // + select[ 12 ]
-                  // + select[ 13 ]
-                  // + select[ 14 ]
+                        + select[ 7 ]
+                        + select[ 8 ]
+                        + select[ 9 ]
+                        + select[ 10 ]
+                        + select[ 11 ]
+                        + select[ 12 ]
+                        + select[ 13 ];
+                  // + select[ 14 ];
                   // + select[ 15 ];
                   // + select[ 16 ]
                   // + select[ 17 ]
@@ -144,9 +154,9 @@ module counter
 
             selector selector
                      (
+
                          // in
                          .clk( clk ),
-                         .rst( rst ),
                          // 1コア
                          .store_bit( store[ k ] ),
                          //  .store_bit( store ),
@@ -154,10 +164,12 @@ module counter
                          .core_result_bit( core_result[ k ] ),
                          //  .core_result_bit( core_result ),
 
+
                          // out
                          // 1コア
                          .sel_bit( select[ k ] )
                          //  .sel_bit( select)
+
                      );
 
         end

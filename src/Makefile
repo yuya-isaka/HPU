@@ -33,6 +33,7 @@ DESIGN_SRC = \
 ./kit/xorshift.sv \
 ./kit/selector.sv \
 ./kit/agu.sv \
+./kit/permute.sv \
 
 VERILATOR_TB = tb.cpp
 
