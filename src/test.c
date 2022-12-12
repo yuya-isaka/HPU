@@ -41,6 +41,8 @@ void putb(unsigned int v)
 void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR)
 {
 
+	hv_init();
+
 	hv_t **item_memory = hv_make_imem(RANNUM);
 
 	const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
@@ -50,8 +52,6 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR)
 	{
 		ARNUM++;
 	}
-
-	hv_init();
 
 	for (int i = 0; i < ADDRNUM; i += 3)
 	{
@@ -84,6 +84,20 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR)
 
 	return;
 }
+
+// hv_init
+// hv_make_imem
+
+// hv_make
+// hv_free
+// hv_print
+
+// hv_perm
+// hv_bind
+// hv_bound
+// hv_bound_result
+
+// hv_finish
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------
 

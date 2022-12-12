@@ -21,9 +21,16 @@
 
 // 追加されるランダムな値はRANNUM-1番目
 #define RANNUM 512
-#define BUSWIDTH 256
+
 unsigned int item_memory_array[DIM][RANNUM];
 unsigned int item_memory_array_new[DIM][RANNUM];
+
+volatile int *top;
+volatile int *dma;
+volatile uint16_t *src;
+volatile int *dst;
+unsigned long src_phys;
+unsigned long dst_phys;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -263,18 +270,140 @@ uint16_t assemble(const char inst_str[], uint16_t addr)
   }
 }
 
+int send_num = 0;
+int BUSWIDTH = 0;
+int THREADSNUM = 0;
+
+void hv_init(void)
+{
+  send_num = 0;
+  BUSWIDTH = 256;
+  THREADSNUM = 10;
+}
+
+void load_hv(uint16_t addr)
+{
+  src[send_num++] = assemble("load", addr);
+}
+
+void nop_hv(void)
+{
+  src[send_num++] = 0;
+}
+
+void nop_hv_core(void)
+{
+  for (int i = 0; i < (BUSWIDTH / 16); i++)
+  {
+    nop_hv();
+  }
+}
+
+void store_hv(void)
+{
+  src[send_num++] = assemble("store", 0);
+}
+
+void store_hv_core(uint16_t core_num)
+{
+  for (int i = 0; i < (BUSWIDTH / 16); i++)
+  {
+    if (i < core_num)
+    {
+      store_hv();
+    }
+    else
+    {
+      nop_hv();
+    }
+  }
+}
+
+void move_hv(void)
+{
+  src[send_num++] = assemble("move", 0);
+}
+
+void move_hv_core(uint16_t core_num)
+{
+  for (int i = 0; i < (BUSWIDTH / 16); i++)
+  {
+    if (i < core_num)
+    {
+      move_hv();
+    }
+    else
+    {
+      nop_hv();
+    }
+  }
+}
+
+void permute_hv(uint16_t permute_num)
+{
+  src[send_num++] = assemble("permute", permute_num);
+}
+
+void permute_hv_core(uint16_t core_num, uint16_t permute_num)
+{
+  for (int i = 0; i < (BUSWIDTH / 16); i++)
+  {
+    if (i < core_num)
+    {
+      permute_hv(permute_num);
+    }
+    else
+    {
+      nop_hv();
+    }
+  }
+}
+
+void pxor_hv(void)
+{
+  src[send_num++] = assemble("pxor", 0);
+}
+
+void pxor_hv_core(uint16_t core_num)
+{
+  for (int i = 0; i < (BUSWIDTH / 16); i++)
+  {
+    if (i < core_num)
+    {
+      pxor_hv();
+    }
+    else
+    {
+      nop_hv();
+    }
+  }
+}
+
+void last_hv(void)
+{
+  src[send_num++] = assemble("last", 0);
+}
+
+void last_hv_core(uint16_t core_num)
+{
+  for (int i = 0; i < (BUSWIDTH / 16); i++)
+  {
+    if (i < core_num)
+    {
+      last_hv();
+    }
+    else
+    {
+      nop_hv();
+    }
+  }
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-volatile int *top;
-volatile int *dma;
-volatile uint16_t *src;
-volatile int *dst;
-unsigned long src_phys;
-unsigned long dst_phys;
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int ADDRNUM, const int MAJORITY_ADDR)
+void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJORITY_ADDR)
 {
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -319,8 +448,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
   // run <- 1;
   top[0x00 / 4] = 2;
 
-  int send_num = 0;
-
   //////////////////////////////////////////////// Even //////////////////////////////////////////////
 
   if (EVEN)
@@ -335,23 +462,17 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           if (i == 0)
           {
             uint16_t addr = MAJORITY_ADDR;
-            uint16_t inst = assemble("load", addr);
-            src[send_num] = inst;
+            load_hv(addr);
           }
           else
           {
-            src[send_num] = 0;
+            nop_hv();
           }
-          send_num++;
         }
       }
       else
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          src[send_num] = 0;
-          send_num++;
-        }
+        nop_hv_core();
       }
     }
 
@@ -359,28 +480,11 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
     {
       if (k == 0)
       {
-        // store
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i == 0)
-          {
-            uint16_t inst = assemble("store", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
+        store_hv_core(1);
       }
       else
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          src[send_num] = 0;
-          send_num++;
-        }
+        nop_hv_core();
       }
     }
   }
@@ -399,14 +503,12 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           if (i < REMAINDAR_CORENUM)
           {
             uint16_t addr = NGRAM * i + j + (NGRAM * REMAINDAR_CORENUM * k);
-            uint16_t inst = assemble("load", addr);
-            src[send_num] = inst;
+            load_hv(addr);
           }
           else
           {
-            src[send_num] = 0;
+            nop_hv();
           }
-          send_num++;
         }
       }
       // ------------------------------------------------------
@@ -414,19 +516,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       // 1024bit ---------------------------------------------
       for (int k = 0; k < THREADSNUM; k++)
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            uint16_t inst = assemble("move", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
+        move_hv_core(REMAINDAR_CORENUM);
       }
       // ------------------------------------------------------
 
@@ -438,14 +528,12 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           if (i < REMAINDAR_CORENUM)
           {
             uint16_t addr = NGRAM * i + 1 + j + (NGRAM * REMAINDAR_CORENUM * k);
-            uint16_t inst = assemble("load", addr);
-            src[send_num] = inst;
+            load_hv(addr);
           }
           else
           {
-            src[send_num] = 0;
+            nop_hv();
           }
-          send_num++;
         }
       }
       // ------------------------------------------------------
@@ -453,57 +541,21 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       // 1024bit ---------------------------------------------
       for (int k = 0; k < THREADSNUM; k++)
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            uint16_t inst = assemble("permute", 1);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
+        permute_hv_core(REMAINDAR_CORENUM, 1);
       }
       // ------------------------------------------------------
 
       // 1024bit ---------------------------------------------
       for (int k = 0; k < THREADSNUM; k++)
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            uint16_t inst = assemble("pxor", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
+        pxor_hv_core(REMAINDAR_CORENUM);
       }
       // ------------------------------------------------------
 
       // 1024bit ---------------------------------------------
       for (int k = 0; k < THREADSNUM; k++)
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            uint16_t inst = assemble("move", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
+        move_hv_core(REMAINDAR_CORENUM);
       }
       // ------------------------------------------------------
 
@@ -515,14 +567,12 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           if (i < REMAINDAR_CORENUM)
           {
             uint16_t addr = NGRAM * i + 2 + j + (NGRAM * REMAINDAR_CORENUM * k);
-            uint16_t inst = assemble("load", addr);
-            src[send_num] = inst;
+            load_hv(addr);
           }
           else
           {
-            src[send_num] = 0;
+            nop_hv();
           }
-          send_num++;
         }
       }
       // ------------------------------------------------------
@@ -530,58 +580,21 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       // 1024bit ---------------------------------------------
       for (int k = 0; k < THREADSNUM; k++)
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            uint16_t inst = assemble("permute", 2);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
+        permute_hv_core(REMAINDAR_CORENUM, 2);
       }
       // ------------------------------------------------------
 
       // 1024bit ---------------------------------------------
       for (int k = 0; k < THREADSNUM; k++)
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            uint16_t inst = assemble("pxor", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
+        pxor_hv_core(REMAINDAR_CORENUM);
       }
       // ------------------------------------------------------
 
       // 1024bit ---------------------------------------------
       for (int k = 0; k < THREADSNUM; k++)
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            // LASTは確定済みなので９を代入
-            uint16_t inst = assemble("store", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
+        store_hv_core(REMAINDAR_CORENUM);
       }
       // ------------------------------------------------------
 
@@ -597,14 +610,12 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           if (i < CORENUM)
           {
             uint16_t addr = NGRAM * i + j + (NGRAM * CORENUM * k);
-            uint16_t inst = assemble("load", addr);
-            src[send_num] = inst;
+            load_hv(addr);
           }
           else
           {
-            src[send_num] = 0;
+            nop_hv();
           }
-          send_num++;
         }
       }
       // ------------------------------------------------------
@@ -612,19 +623,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       // 1024bit ---------------------------------------------
       for (int k = 0; k < THREADSNUM; k++)
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t inst = assemble("move", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
+        move_hv_core(CORENUM);
       }
       // ------------------------------------------------------
 
@@ -636,14 +635,12 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           if (i < CORENUM)
           {
             uint16_t addr = NGRAM * i + 1 + j + (NGRAM * CORENUM * k);
-            uint16_t inst = assemble("load", addr);
-            src[send_num] = inst;
+            load_hv(addr);
           }
           else
           {
-            src[send_num] = 0;
+            nop_hv();
           }
-          send_num++;
         }
       }
       // ------------------------------------------------------
@@ -651,57 +648,21 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       // 1024bit ---------------------------------------------
       for (int k = 0; k < THREADSNUM; k++)
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t inst = assemble("permute", 1);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
+        permute_hv_core(CORENUM, 1);
       }
       // ------------------------------------------------------
 
       // 1024bit ---------------------------------------------
       for (int k = 0; k < THREADSNUM; k++)
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t inst = assemble("pxor", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
+        pxor_hv_core(CORENUM);
       }
       // ------------------------------------------------------
 
       // 1024bit ---------------------------------------------
       for (int k = 0; k < THREADSNUM; k++)
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t inst = assemble("move", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
+        move_hv_core(CORENUM);
       }
       // ------------------------------------------------------
 
@@ -713,14 +674,12 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
           if (i < CORENUM)
           {
             uint16_t addr = NGRAM * i + 2 + j + (NGRAM * CORENUM * k);
-            uint16_t inst = assemble("load", addr);
-            src[send_num] = inst;
+            load_hv(addr);
           }
           else
           {
-            src[send_num] = 0;
+            nop_hv();
           }
-          send_num++;
         }
       }
       // ------------------------------------------------------
@@ -728,57 +687,21 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       // 1024bit ---------------------------------------------
       for (int k = 0; k < THREADSNUM; k++)
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t inst = assemble("permute", 2);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
+        permute_hv_core(CORENUM, 2);
       }
       // ------------------------------------------------------
 
       // 1024bit ---------------------------------------------
       for (int k = 0; k < THREADSNUM; k++)
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t inst = assemble("pxor", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
+        pxor_hv_core(CORENUM);
       }
       // ------------------------------------------------------
 
       // 1024bit ---------------------------------------------
       for (int k = 0; k < THREADSNUM; k++)
       {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t inst = assemble("store", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
+        store_hv_core(CORENUM);
       }
       // ------------------------------------------------------
 
@@ -788,20 +711,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
 
   // LAST命令
   // 1024bit ---------------------------------------------
-  for (int i = 0; i < (BUSWIDTH / 16); i++)
-  {
-    if (i == 0)
-    {
-      uint16_t inst = assemble("last", 0);
-      src[send_num] = inst;
-    }
-    else
-    {
-
-      src[send_num] = 0;
-    }
-    send_num++;
-  }
+  last_hv_core(1);
   // ------------------------------------------------------
 
   // AXI DMA 送信の設定（UIO経由）
@@ -1015,7 +925,6 @@ int main()
   const int NGRAM = 3;
   const int MAJORITY_ADDR = 511;
   const int CORENUM_MAX = 14;
-  const int THREADSNUM = 10;
 
   int CORENUM = 0;
   int ADDRNUM = 0;
@@ -1035,9 +944,11 @@ int main()
   CORENUM = CORENUM_MAX;
   for (int i = 30; i <= RANNUM; i += 30)
   {
+    hv_init();
+
     ADDRNUM = i;
 
-    check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, MAJORITY_ADDR);
+    check(NGRAM, CORENUM, ADDRNUM, MAJORITY_ADDR);
     xor128(1);
   }
 
