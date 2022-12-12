@@ -282,12 +282,12 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
   // 自動で決まるパラメータ
 
   const int REMAINDAR = (ADDRNUM / NGRAM) % (CORENUM * THREADSNUM);
-  printf("REMAINDAR: %d\n", REMAINDAR);
+  // printf("REMAINDAR: %d\n", REMAINDAR);
   const int REMAINDAR_CORENUM = REMAINDAR / THREADSNUM;
-  printf("REMAINDAR_CORENUM: %d\n", REMAINDAR_CORENUM);
+  // printf("REMAINDAR_CORENUM: %d\n", REMAINDAR_CORENUM);
 
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
-  printf("EVEN: %d\n", EVEN);
+  // printf("EVEN: %d\n", EVEN);
 
   int LAST = (ADDRNUM / NGRAM) / (CORENUM * THREADSNUM);
 
@@ -297,14 +297,14 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
   }
 
   LAST *= NGRAM * CORENUM * THREADSNUM;
-  printf("LAST: %d\n", LAST);
+  // printf("LAST: %d\n", LAST);
 
   int ARNUM = ADDRNUM / NGRAM;
   if (EVEN)
   {
     ARNUM++;
   }
-  printf("ARNUM: %d\n", LAST);
+  // printf("ARNUM: %d\n", LAST);
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1020,26 +1020,26 @@ int main()
   int CORENUM = 0;
   int ADDRNUM = 0;
 
-  // for (int j = 1; j <= CORENUM_MAX; j++)
-  // {
-  //   CORENUM = j;
-  //   for (int i = 30; i <= RANNUM; i += 30)
-  //   {
-  //     ADDRNUM = i;
-
-  //     check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, MAJORITY_ADDR);
-  //     xor128(1);
-  //   }
-  // }
-
-  CORENUM = CORENUM_MAX;
-  for (int i = 30; i <= RANNUM; i += 30)
+  for (int j = 1; j <= CORENUM_MAX; j++)
   {
-    ADDRNUM = i;
+    CORENUM = j;
+    for (int i = 30; i <= RANNUM; i += 30)
+    {
+      ADDRNUM = i;
 
-    check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, MAJORITY_ADDR);
-    xor128(1);
+      check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, MAJORITY_ADDR);
+      xor128(1);
+    }
   }
+
+  // CORENUM = CORENUM_MAX;
+  // for (int i = 30; i <= RANNUM; i += 30)
+  // {
+  //   ADDRNUM = i;
+
+  //   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, MAJORITY_ADDR);
+  //   xor128(1);
+  // }
 
   // check(NGRAM, 14, THREADSNUM, 420, MAJORITY_ADDR);
   // xor128(1);
