@@ -111,7 +111,7 @@ module counter
                         + select[ 11 ]
                         + select[ 12 ]
                         + select[ 13 ];
-                  // + select[ 14 ]
+                  // + select[ 14 ];
                   // + select[ 15 ];
                   // + select[ 16 ]
                   // + select[ 17 ]
@@ -157,7 +157,6 @@ module counter
 
                          // in
                          .clk( clk ),
-                         .rst( rst ),
                          // 1コア
                          .store_bit( store[ k ] ),
                          //  .store_bit( store ),

@@ -108,7 +108,7 @@ module core
                           wb_flag <= 1'b1;
 
                           // 書き込み先アドレス格納
-                          wb_addr <= get_d[ 9:0 ];
+                          wb_addr[ 9:0 ] <= get_d[ 9:0 ];
 
                           // 命令は発行しない (nop)
                           inst <= 0;
@@ -229,28 +229,33 @@ module core
                   if ( exec ) begin
 
                       // アドレス必要
-                      if ( inst[ 15 ] & inst[ 13 ] ) begin
+                      if ( inst[ 15 ] ) begin
 
-                          reg_2_threads[ thread_count ] <= reg_0;
+                          if ( inst[ 13 ] ) begin
+
+                              reg_2_threads[ thread_count ] <= reg_0;
+
+                          end
 
                       end
 
                       // アドレスいらん
                       else begin
 
+                          // wb
+                          if ( inst[ 9 ] ) begin
+
+                              reg_2_threads[ thread_count ] <= sign_bit;
+
+                          end
+
                           // xor
-                          if ( inst[ 13 ] ) begin
+                          else if ( inst[ 13 ] ) begin
 
                               reg_2_threads[ thread_count ] <= reg_1 ^ reg_2_tmp;
 
                           end
 
-                          // wb
-                          else if ( inst[ 9 ] ) begin
-
-                              reg_2_threads[ thread_count ] <= sign_bit;
-
-                          end
 
                       end
 

@@ -7,7 +7,6 @@ module selector
 
         // in
         input wire                              clk,
-        input wire                              rst,
         input wire 				                store_bit,
         input wire 						        core_result_bit,
 
@@ -24,12 +23,8 @@ module selector
 
     always_ff @( posedge clk ) begin
 
-                  if ( rst ) begin
-                      sel_bit <= 0;
-                  end
-
                   // ストアする場合
-                  else if ( store_bit ) begin
+                  if ( store_bit ) begin
 
                       // 0の時は +1 (MSBを0に近づける)
                       if ( core_result_bit == 1'b0 ) begin
@@ -42,6 +37,7 @@ module selector
                           // -1
                           sel_bit <= $signed( 1'b1 );
                       end
+                      //   sel_bit <= ~( { 1'b0, core_result_bit } ) + 2'd1;
 
                   end
 
