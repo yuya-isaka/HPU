@@ -47,12 +47,6 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR)
 
 	const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 
-	int ARNUM = ADDRNUM / NGRAM;
-	if (EVEN)
-	{
-		ARNUM++;
-	}
-
 	for (int i = 0; i < ADDRNUM; i += 3)
 	{
 		hv_t *bound_tmp = hv_make();
