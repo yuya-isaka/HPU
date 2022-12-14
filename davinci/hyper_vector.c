@@ -384,25 +384,25 @@ static hv_t *perm_select(hv_t origin[HV_NUM], const uint32_t perm_num, hv_t *(*p
 		repeat_perm_num--;
 	}
 
-	hv_t *new = perm_func(origin, pre_perm_num);
+	hv_t *new_hv = perm_func(origin, pre_perm_num);
 
 	for (uint32_t i = 0; i < repeat_perm_num; i++)
 	{
-		hv_t *perm_result = perm_func(new, ELEMENT_SIZE - 1);
-		hv_copy(new, perm_result);
+		hv_t *perm_result = perm_func(new_hv, ELEMENT_SIZE - 1);
+		hv_copy(new_hv, perm_result);
 		hv_free(perm_result);
 	}
 
-	return new;
+	return new_hv;
 }
 
 hv_t *hv_perm(hv_t origin[HV_NUM], const uint32_t perm_num)
 {
 	if (perm_num == 0)
 	{
-		hv_t *new = hv_make();
-		memcpy(new, origin, sizeof(hv_t) * HV_NUM);
-		return new;
+		hv_t *new_hv = hv_make();
+		memcpy(new_hv, origin, sizeof(hv_t) * HV_NUM);
+		return new_hv;
 	}
 	else if (perm_num >= HV_DIM)
 	{
@@ -410,19 +410,19 @@ hv_t *hv_perm(hv_t origin[HV_NUM], const uint32_t perm_num)
 		exit(1);
 	}
 
-	hv_t *new = NULL;
+	hv_t *new_hv = NULL;
 
 	if (perm_num > (HV_DIM / 2))
 	{
 		const uint32_t perm_num_new = HV_DIM - perm_num;
-		new = perm_select(origin, perm_num_new, perm_left);
+		new_hv = perm_select(origin, perm_num_new, perm_left);
 	}
 	else
 	{
-		new = perm_select(origin, perm_num, perm_right);
+		new_hv = perm_select(origin, perm_num, perm_right);
 	}
 
-	return new;
+	return new_hv;
 }
 
 // SIMD化むずい
@@ -575,4 +575,27 @@ hv_t *hv_bound_batch(hv_t **batch_data, const uint32_t batch_size)
 #endif
 
 	return hv_result;
+}
+
+void hv_print(hv_t print_data[HV_NUM])
+{
+	for (uint32_t j = 0; j < HV_NUM; j++)
+	{
+#ifdef HV64
+		union
+		{
+			struct
+			{
+				uint32_t data_0;
+				uint32_t data_1;
+			};
+			hv_t data;
+		} conv;
+		conv.data = print_data[j];
+		printf("  %u\n", conv.data_0);
+		printf("  %u\n", conv.data_1);
+#else
+		printf("  %u\n", print_data[j]);
+#endif
+	}
 }

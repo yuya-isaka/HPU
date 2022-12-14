@@ -29,11 +29,13 @@ omp:
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
+# -mcpu=apple-m1つけても特に変わらん
+
 # 結論　これが一番速い
 omp64:
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.o davinci_ngram.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DDEBUG -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.o davinci_ngram.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
@@ -92,8 +94,8 @@ neon2:
 # gcc -Wall -O2 -S -o davinci_ngram.s davinci_ngram.c -lm
 
 asm:
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -S -Ofast -DDEBUG -DOPENMP -DHV64 -o hyper_vector.s hyper_vector.c
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -S -Ofast -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.s davinci_ngram.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -S -O3 -mcpu=apple-m1 -DDEBUG -DOPENMP -DHV64 -o hyper_vector.s hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -S -O3 -mcpu=apple-m1 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.s davinci_ngram.c
 
 
 

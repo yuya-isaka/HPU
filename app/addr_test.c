@@ -1,29 +1,21 @@
 // include
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h> // uint16_t
+#include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
-#include <string.h> // strcomp
+#include <string.h>
+#include "hyper_vector.h"
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 可変パラメータ
-
-// 次元数可変 (理想の計算に必要)
-// #define DIM 32 / 32
 #define DIM 1024 / 32
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 変わらん
-
-// 追加されるランダムな値はRANNUM-1番目
-#define RANNUM 512
-#define BUSWIDTH 256
-unsigned int item_memory_array[DIM][RANNUM];
-unsigned int item_memory_array_new[DIM][RANNUM];
+volatile int *top;
+volatile int *dma;
+volatile uint16_t *src;
+volatile int *dst;
+unsigned long src_phys;
+unsigned long dst_phys;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -41,122 +33,6 @@ void putb(unsigned int v)
 {
   putchar('0'), putchar('b'), printb(v), putchar('\n');
 }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-unsigned int shifter_32(unsigned int *v, unsigned int num)
-{
-  // num回 論理右シフト
-  unsigned int tmp_v = *v >> num;
-
-  // 右にシフトしたやつを取り出して、左に(32-num)回 論理左シフト
-  unsigned int tmp_num = (1 << num) - 1;
-  *v = (*v & tmp_num) << (32 - num);
-
-  return tmp_v;
-}
-
-void shifter_ngram(const int NGRAM)
-{
-  int num = 0;
-  for (int i = 0; i < RANNUM; i++)
-  {
-    // ちゃんと初期化したら上手くいった
-    unsigned int result_tmp[DIM];
-    for (int j = 0; j < DIM; j++)
-    {
-      result_tmp[j] = 0;
-    }
-    for (int j = 0; j < DIM; j++)
-    {
-      unsigned int tmp = item_memory_array[j][i];
-      unsigned int tmp_v = shifter_32(&tmp, num);
-      result_tmp[j] |= tmp_v;
-      if (j == 0)
-      {
-        result_tmp[DIM - 1] |= tmp;
-      }
-      else
-      {
-        result_tmp[j - 1] |= tmp;
-      }
-    }
-
-    for (int j = 0; j < DIM; j++)
-    {
-      item_memory_array_new[j][i] = result_tmp[j];
-    }
-
-    num++;
-    if (num == NGRAM)
-    {
-      num = 0;
-    }
-  }
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-unsigned int bounding(unsigned int result_array[], size_t size)
-{
-  unsigned int result = 0;
-
-  unsigned int mask = (int)1 << (32 - 1);
-  while (mask)
-  {
-    int tmp = 0;
-    for (int i = 0; i < size; i++)
-    {
-      tmp += (mask & result_array[i] ? 1 : 0);
-    }
-    if (tmp > (size / 2))
-    {
-      result += mask;
-    }
-    mask >>= 1;
-  }
-  return result;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-unsigned int xor128(int reset)
-{
-  // 内部で値を保持（seed） パターン１
-  // static unsigned int x = 2380889285;
-  // static unsigned int y = 1631889387;
-  // static unsigned int z = 1698655726;
-  // static unsigned int w = 2336862850;
-
-  // 内部で値を保持（seed） パターン２
-  static unsigned int x = 123456789;
-  static unsigned int y = 362436069;
-  static unsigned int z = 521288629;
-  static unsigned int w = 88675123;
-
-  if (reset)
-  {
-    x = 123456789;
-    y = 362436069;
-    z = 521288629;
-    w = 88675123;
-    return 0;
-  }
-  else
-  {
-
-    // 前回のxを使う
-    unsigned int t = x ^ (x << 11);
-    // 更新
-    x = y;
-    y = z;
-    z = w;
-
-    return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
-  }
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 簡易アセンブラ
 // 10種類の命令
@@ -237,13 +113,13 @@ uint16_t assemble(const char inst_str[], uint16_t addr)
     }
 
     // last
-    else if (strcmp(inst_str, "last") == 0)
+    else if (strcmp(inst_str, "wb") == 0)
     {
       inst = 1024;
     }
 
     // wb
-    else if (strcmp(inst_str, "wb") == 0)
+    else if (strcmp(inst_str, "last") == 0)
     {
       inst = 512;
     }
@@ -263,547 +139,343 @@ uint16_t assemble(const char inst_str[], uint16_t addr)
   }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-volatile int *top;
-volatile int *dma;
-volatile uint16_t *src;
-volatile int *dst;
-unsigned long src_phys;
-unsigned long dst_phys;
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int ADDRNUM, const int MAJORITY_ADDR)
+void hdc_init(void)
 {
+  int fd0, fd1, dmaf, topf;
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  // 自動で決まるパラメータ
-
-  const int REMAINDAR = (ADDRNUM / NGRAM) % (CORENUM * THREADSNUM);
-  // printf("REMAINDAR: %d\n", REMAINDAR);
-  const int REMAINDAR_CORENUM = REMAINDAR / THREADSNUM;
-  // printf("REMAINDAR_CORENUM: %d\n", REMAINDAR_CORENUM);
-
-  const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
-  // printf("EVEN: %d\n", EVEN);
-
-  int LAST = (ADDRNUM / NGRAM) / (CORENUM * THREADSNUM);
-
-  if (REMAINDAR == 0)
+  if ((fd0 = open("/sys/class/u-dma-buf/udmabuf0/phys_addr", O_RDONLY)) != -1)
   {
-    LAST--;
+    char attr[1024];
+    ssize_t done = read(fd0, attr, 1024);
+    if (done < 0)
+    {
+      perror("Failed: read /sys/class/u-dma-buf/udmabuf0/phys_addr");
+    }
+    sscanf(attr, "%lx", &src_phys);
+    close(fd0);
   }
 
-  LAST *= NGRAM * CORENUM * THREADSNUM;
-  // printf("LAST: %d\n", LAST);
-
-  int ARNUM = ADDRNUM / NGRAM;
-  if (EVEN)
+  if ((fd0 = open("/sys/class/u-dma-buf/udmabuf1/phys_addr", O_RDONLY)) != -1)
   {
-    ARNUM++;
+    char attr[1024];
+    ssize_t done = read(fd0, attr, 1024);
+    if (done < 0)
+    {
+      perror("Failed: read /sys/class/u-dma-buf/udmabuf1/phys_addr");
+    }
+    sscanf(attr, "%lx", &dst_phys);
+    close(fd0);
   }
-  // printf("ARNUM: %d\n", LAST);
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
+  {
+    perror("Failed: open /dev/udmabuf0");
+    return;
+  }
+  if ((fd1 = open("/dev/udmabuf1", O_RDWR)) < 0)
+  {
+    perror("Failed: open /dev/udmabuf1");
+    return;
+  }
+  if ((dmaf = open("/dev/uio0", O_RDWR | O_SYNC)) < 0)
+  {
+    perror("Falied: open /dev/uio0");
+    return;
+  }
+  if ((topf = open("/dev/uio1", O_RDWR | O_SYNC)) < 0)
+  {
+    perror("Failed: open /dev/uio1");
+    return;
+  }
+
+  top = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, topf, 0);
+  if (top == MAP_FAILED)
+  {
+    perror("mmap top");
+    close(topf);
+    return;
+  }
+
+  dma = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, dmaf, 0);
+  if (dma == MAP_FAILED)
+  {
+    perror("mmap dma");
+    close(dmaf);
+    return;
+  }
+
+  src = (uint16_t *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
+  if (src == MAP_FAILED)
+  {
+    perror("mmap src");
+    close(fd0);
+    return;
+  }
+
+  dst = (int *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd1, 0);
+  if (dst == MAP_FAILED)
+  {
+    perror("mmap dst");
+    close(fd1);
+    return;
+  }
+}
+
+void make_imem(const int RANNUM)
+{
+  // item_memory_num (乱数の数)
+  top[0x04 / 4] = RANNUM - 1;
+
+  // gen <- 1;
+  top[0x00 / 4] = 1;
+
+  // 乱数生成終了を待つ
+  while (top[0x00 / 4] & 0x1)
+    ;
+}
+
+int send_num = 0;
+int BUSWIDTH = 0;
+int THREADSNUM = 0;
+
+void init(void)
+{
+  send_num = 0;
+  BUSWIDTH = 256;
+  THREADSNUM = 10;
 
   // dma reset
   dma[0x30 / 4] = 4;
   dma[0x00 / 4] = 4;
   while (dma[0x00 / 4] & 0x4)
     ;
+}
 
-  //////////////////////////////////////////////////////////////////////////////////////// run ///////////////////////////////////////////////////////////////////////////////////////////////
+void nop_hv(void)
+{
+  src[send_num++] = 0;
+}
 
-  // run <- 1;
-  top[0x00 / 4] = 2;
-
-  int send_num = 0;
-
-  //////////////////////////////////////////////// Even //////////////////////////////////////////////
-
-  if (EVEN)
-  {
-    for (int k = 0; k < THREADSNUM; k++)
-    {
-      if (k == 0)
-      {
-        // load
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i == 0)
-          {
-            uint16_t addr = MAJORITY_ADDR;
-            uint16_t inst = assemble("load", addr);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      else
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          src[send_num] = 0;
-          send_num++;
-        }
-      }
-    }
-
-    for (int k = 0; k < THREADSNUM; k++)
-    {
-      if (k == 0)
-      {
-        // store
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i == 0)
-          {
-            uint16_t inst = assemble("store", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      else
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          src[send_num] = 0;
-          send_num++;
-        }
-      }
-    }
-  }
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  for (int j = 0; j < ADDRNUM; j++)
-  {
-    if (REMAINDAR != 0 && j == LAST)
-    {
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            uint16_t addr = NGRAM * i + j + (NGRAM * REMAINDAR_CORENUM * k);
-            uint16_t inst = assemble("load", addr);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            uint16_t inst = assemble("move", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            uint16_t addr = NGRAM * i + 1 + j + (NGRAM * REMAINDAR_CORENUM * k);
-            uint16_t inst = assemble("load", addr);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            uint16_t inst = assemble("permute", 1);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            uint16_t inst = assemble("pxor", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            uint16_t inst = assemble("move", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            uint16_t addr = NGRAM * i + 2 + j + (NGRAM * REMAINDAR_CORENUM * k);
-            uint16_t inst = assemble("load", addr);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            uint16_t inst = assemble("permute", 2);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            uint16_t inst = assemble("pxor", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < REMAINDAR_CORENUM)
-          {
-            // LASTは確定済みなので９を代入
-            uint16_t inst = assemble("store", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      j += NGRAM * CORENUM * THREADSNUM - 1;
-    }
-    else // =========================================================================================
-    {
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t addr = NGRAM * i + j + (NGRAM * CORENUM * k);
-            uint16_t inst = assemble("load", addr);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t inst = assemble("move", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t addr = NGRAM * i + 1 + j + (NGRAM * CORENUM * k);
-            uint16_t inst = assemble("load", addr);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t inst = assemble("permute", 1);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t inst = assemble("pxor", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t inst = assemble("move", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t addr = NGRAM * i + 2 + j + (NGRAM * CORENUM * k);
-            uint16_t inst = assemble("load", addr);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t inst = assemble("permute", 2);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t inst = assemble("pxor", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      // 1024bit ---------------------------------------------
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        for (int i = 0; i < (BUSWIDTH / 16); i++)
-        {
-          if (i < CORENUM)
-          {
-            uint16_t inst = assemble("store", 0);
-            src[send_num] = inst;
-          }
-          else
-          {
-            src[send_num] = 0;
-          }
-          send_num++;
-        }
-      }
-      // ------------------------------------------------------
-
-      j += NGRAM * CORENUM * THREADSNUM - 1;
-    }
-  }
-
-  // LAST命令
-  // 1024bit ---------------------------------------------
+void nop_hv_core(void)
+{
   for (int i = 0; i < (BUSWIDTH / 16); i++)
   {
-    if (i == 0)
+    nop_hv();
+  }
+}
+
+void load_hv(uint16_t addr)
+{
+  src[send_num++] = assemble("load", addr);
+}
+
+void load_hv_core(uint16_t core_num, uint16_t addr_array[core_num])
+{
+  for (int i = 0; i < core_num; i++)
+  {
+    load_hv(addr_array[i]);
+  }
+  for (int i = core_num; i < (BUSWIDTH / 16); i++)
+  {
+    nop_hv();
+  }
+}
+
+void load_hv_thread(uint16_t thread_num, uint16_t core_num, uint16_t addr_array[thread_num][core_num])
+{
+  for (int k = 0; k < thread_num; k++)
+  {
+    load_hv_core(core_num, addr_array[k]);
+  }
+  for (int k = thread_num; k < THREADSNUM; k++)
+  {
+    nop_hv_core();
+  }
+}
+
+void store_hv(void)
+{
+  src[send_num++] = assemble("store", 0);
+}
+
+void store_hv_core(uint16_t core_num)
+{
+  for (int i = 0; i < (BUSWIDTH / 16); i++)
+  {
+    if (i < core_num)
     {
-      uint16_t inst = assemble("last", 0);
-      src[send_num] = inst;
+      store_hv();
     }
     else
     {
-
-      src[send_num] = 0;
+      nop_hv();
     }
-    send_num++;
   }
-  // ------------------------------------------------------
+}
 
+void store_hv_thread(uint16_t thread_num, uint16_t core_num)
+{
+  for (int k = 0; k < THREADSNUM; k++)
+  {
+    if (k < thread_num)
+    {
+      store_hv_core(core_num);
+    }
+    else
+    {
+      nop_hv_core();
+    }
+  }
+}
+
+void move_hv(void)
+{
+  src[send_num++] = assemble("move", 0);
+}
+
+void move_hv_core(uint16_t core_num)
+{
+  for (int i = 0; i < (BUSWIDTH / 16); i++)
+  {
+    if (i < core_num)
+    {
+      move_hv();
+    }
+    else
+    {
+      nop_hv();
+    }
+  }
+}
+
+void move_hv_thread(uint16_t thread_num, uint16_t core_num)
+{
+  for (int k = 0; k < THREADSNUM; k++)
+  {
+    if (k < thread_num)
+    {
+      move_hv_core(core_num);
+    }
+    else
+    {
+      nop_hv_core();
+    }
+  }
+}
+
+void permute_hv(uint16_t permute_num)
+{
+  src[send_num++] = assemble("permute", permute_num);
+}
+
+void permute_hv_core(uint16_t core_num, uint16_t permute_num)
+{
+  for (int i = 0; i < (BUSWIDTH / 16); i++)
+  {
+    if (i < core_num)
+    {
+      permute_hv(permute_num);
+    }
+    else
+    {
+      nop_hv();
+    }
+  }
+}
+
+void permute_hv_thread(uint16_t thread_num, uint16_t core_num, uint16_t permute_num)
+{
+  for (int k = 0; k < THREADSNUM; k++)
+  {
+    if (k < thread_num)
+    {
+      permute_hv_core(core_num, permute_num);
+    }
+    else
+    {
+      nop_hv_core();
+    }
+  }
+}
+
+void pxor_hv(void)
+{
+  src[send_num++] = assemble("pxor", 0);
+}
+
+void pxor_hv_core(uint16_t core_num)
+{
+  for (int i = 0; i < (BUSWIDTH / 16); i++)
+  {
+    if (i < core_num)
+    {
+      pxor_hv();
+    }
+    else
+    {
+      nop_hv();
+    }
+  }
+}
+
+void pxor_hv_thread(uint16_t thread_num, uint16_t core_num)
+{
+  for (int k = 0; k < THREADSNUM; k++)
+  {
+    if (k < thread_num)
+    {
+      pxor_hv_core(core_num);
+    }
+    else
+    {
+      nop_hv_core();
+    }
+  }
+}
+
+void last_hv(void)
+{
+  src[send_num++] = assemble("last", 0);
+}
+
+void last_hv_core(uint16_t core_num)
+{
+  for (int i = 0; i < (BUSWIDTH / 16); i++)
+  {
+    if (i < core_num)
+    {
+      last_hv();
+    }
+    else
+    {
+      nop_hv();
+    }
+  }
+}
+
+void last_hv_thread(uint16_t thread_num, uint16_t core_num)
+{
+  for (int k = 0; k < THREADSNUM; k++)
+  {
+    if (k < thread_num)
+    {
+      last_hv_core(core_num);
+    }
+    else
+    {
+      nop_hv_core();
+    }
+  }
+}
+
+void hv_start(void)
+{
+  // run <- 1;
+  top[0x00 / 4] = 2;
+}
+
+void hv_send(void)
+{
   // AXI DMA 送信の設定（UIO経由）
   dma[0x00 / 4] = 1;
   dma[0x18 / 4] = src_phys;
@@ -818,234 +490,204 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
   // 演算終了を待つ
   while ((dma[0x34 / 4] & 0x1000) != 0x1000)
     ;
+}
 
-  /////////////////////////////////////////////////////////////////////////////////////// 結果確認 //////////////////////////////////////////////////////////////////////////////////
+void finish(void)
+{
+  // run <- 0;
+  top[0x00 / 4] = 0;
+}
 
-  // printf("\n ------------------------- Sample Output -------------------------- \n\n");
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  // 理想の計算
-  item_memory_array[0][0] = 88675123;
-  for (unsigned int j = 0; j < RANNUM; j++)
+void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJORITY_ADDR)
+{
+  init();
+
+  const int REMAINDAR = (ADDRNUM / NGRAM) % (CORENUM * THREADSNUM);
+  const int REMAINDAR_CORENUM = REMAINDAR / THREADSNUM;
+  const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
+
+  int LAST = (ADDRNUM / NGRAM) / (CORENUM * THREADSNUM);
+  if (REMAINDAR == 0)
   {
-    for (int i = 0; i < DIM; i++)
-    {
-      if (i == 0 && j == 0)
-        continue;
-      item_memory_array[i][j] = xor128(0);
-    }
+    LAST--;
+  }
+  LAST *= NGRAM * CORENUM * THREADSNUM;
+
+  hv_start();
+
+  if (EVEN)
+  {
+    uint16_t addr_array[1][1] = {{MAJORITY_ADDR}};
+    load_hv_thread(1, 1, addr_array);
+
+    store_hv_thread(1, 1);
   }
 
-  shifter_ngram(NGRAM);
-
-  for (int j = 0; j < DIM; j++)
+  for (int j = 0; j < ADDRNUM; j += NGRAM * CORENUM * THREADSNUM)
   {
-    unsigned int *result_array = (unsigned int *)malloc(sizeof(unsigned int) * ARNUM);
-    if (result_array == NULL)
+    uint16_t core_num;
+    if (REMAINDAR != 0 && j == LAST)
     {
-      exit(0);
+      core_num = REMAINDAR_CORENUM;
     }
-    unsigned int result = 0;
-    int tmp = 0;
-    int num = 0;
-    for (int i = 0; i < ADDRNUM; i++)
+    else
     {
-      result ^= item_memory_array_new[j][i];
-      // printf("%d:%u\n", i, item_memory_array_new[j][i]);
-      tmp += 1;
-      if (tmp == NGRAM)
+      core_num = CORENUM;
+    }
+
+    uint16_t addr_array[THREADSNUM][core_num];
+
+    for (int k = 0; k < THREADSNUM; k++)
+    {
+      for (int i = 0; i < core_num; i++)
       {
-        // printf("%u\n", result);
-        // putb(result);
-        result_array[num] = result;
-        tmp = 0;
-        result = 0;
-        num += 1;
+        addr_array[k][i] = NGRAM * i + j + (NGRAM * core_num * k);
       }
     }
-    // 多数決関数用
-    if (EVEN)
+
+    // load ---------------------------------------------
+    load_hv_thread(THREADSNUM, core_num, addr_array);
+    // ------------------------------------------------------
+
+    // move ---------------------------------------------
+    move_hv_thread(THREADSNUM, core_num);
+    // ------------------------------------------------------
+
+    for (int k = 0; k < THREADSNUM; k++)
     {
-      // RANNUM-1を追加するランダム値に使う
-      result_array[num] = item_memory_array[j][MAJORITY_ADDR];
-      // printf("ランダム：%u\n", result_array[num]);
-      // putb(result_array[num]);
+      for (int i = 0; i < core_num; i++)
+      {
+        addr_array[k][i]++;
+      }
     }
-    unsigned int result_real = bounding(result_array, ARNUM);
-    // printf("  %u\n", result_real);
-    // putb(result_real);
-    if (result_real != dst[j])
+
+    // load ---------------------------------------------
+    load_hv_thread(THREADSNUM, core_num, addr_array);
+    // ------------------------------------------------------
+
+    // permute ---------------------------------------------
+    permute_hv_thread(THREADSNUM, core_num, 1);
+    // ------------------------------------------------------
+
+    // pxor ---------------------------------------------
+    pxor_hv_thread(THREADSNUM, core_num);
+    // ------------------------------------------------------
+
+    // move ---------------------------------------------
+    move_hv_thread(THREADSNUM, core_num);
+    // ------------------------------------------------------
+
+    for (int k = 0; k < THREADSNUM; k++)
     {
-      printf("\n  Error %u %u\n", result_real, dst[j]);
+      for (int i = 0; i < core_num; i++)
+      {
+        addr_array[k][i]++;
+      }
+    }
+
+    // load ---------------------------------------------
+    load_hv_thread(THREADSNUM, core_num, addr_array);
+    // ------------------------------------------------------
+
+    // permute ---------------------------------------------
+    permute_hv_thread(THREADSNUM, core_num, 2);
+    // ------------------------------------------------------
+
+    // pxor ---------------------------------------------
+    pxor_hv_thread(THREADSNUM, core_num);
+    // ------------------------------------------------------
+
+    // store ---------------------------------------------
+    store_hv_thread(THREADSNUM, core_num);
+    // ------------------------------------------------------
+  }
+
+  // LAST命令
+  // 1024bit ---------------------------------------------
+  last_hv_core(1);
+  // ------------------------------------------------------
+
+  hv_send();
+
+  finish();
+
+  // =========================================================================================================================================
+
+  hv_init();
+
+  hv_t **item_memory = hv_make_imem(512);
+
+  for (int i = 0; i < ADDRNUM; i += 3)
+  {
+    hv_t *bound_tmp = hv_make();
+    for (int j = 0; j < NGRAM; j++)
+    {
+      hv_t *perm_result = hv_perm(item_memory[i + j], j);
+      hv_t *bind_result = hv_bind(bound_tmp, perm_result);
+      hv_copy(bound_tmp, bind_result);
+
+      hv_free(bind_result);
+      hv_free(perm_result);
+    }
+
+    hv_bound(bound_tmp);
+
+    hv_free(bound_tmp);
+  }
+
+  if (EVEN)
+  {
+    hv_bound(item_memory[MAJORITY_ADDR]);
+  }
+  hv_t *result = hv_bound_result();
+
+  // hv_print(result);
+
+  // ===========================================================================================================================================
+
+  for (int i = 0; i < DIM; i++)
+  {
+    if (result[i] != dst[i])
+    {
+      printf("\n  Error %u %u\n", result[i], dst[i]);
       printf("  CORENUM=%d  ADDRNUM=%d\n\n", CORENUM, ADDRNUM);
     }
     // else
     // {
     //   printf("  Success\n");
     // }
-
-    free(result_array);
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////////  終了 ////////////////////////////////////////////////////////////////////////////////////
-
-  // run <- 0;
-  top[0x00 / 4] = 0;
+  hv_free(result);
+  hv_finish();
 
   return;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 int main()
 {
-
   printf("\n ------------------------------ 開始 -------------------------------- \n\n");
 
-  int fd0, fd1, dmaf, topf;
+  hdc_init();
 
-  // DMAバッファの物理アドレスを取得 ------------------------------------------------------------
-
-  if ((fd0 = open("/sys/class/u-dma-buf/udmabuf0/phys_addr", O_RDONLY)) != -1)
-  {
-    char attr[1024];
-    ssize_t done = read(fd0, attr, 1024);
-    if (done < 0)
-    {
-      perror("Failed: read /sys/class/u-dma-buf/udmabuf0/phys_addr");
-    }
-    sscanf(attr, "%lx", &src_phys);
-    close(fd0);
-  }
-  // printf("src_phys: %lx\n", src_phys);
-
-  if ((fd0 = open("/sys/class/u-dma-buf/udmabuf1/phys_addr", O_RDONLY)) != -1)
-  {
-    char attr[1024];
-    ssize_t done = read(fd0, attr, 1024);
-    if (done < 0)
-    {
-      perror("Failed: read /sys/class/u-dma-buf/udmabuf1/phys_addr");
-    }
-    sscanf(attr, "%lx", &dst_phys);
-    close(fd0);
-  }
-  // printf("dst_phys: %lx\n", dst_phys);
-
-  // DMAバッファにユーザ空間から書き込む設定 -----------------------------------------------------
-
-  if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
-  {
-    perror("Failed: open /dev/udmabuf0");
-    return 0;
-  }
-  if ((fd1 = open("/dev/udmabuf1", O_RDWR)) < 0)
-  {
-    perror("Failed: open /dev/udmabuf1");
-    return 0;
-  }
-  if ((dmaf = open("/dev/uio0", O_RDWR | O_SYNC)) < 0)
-  {
-    perror("Falied: open /dev/uio0");
-    return 0;
-  }
-  if ((topf = open("/dev/uio1", O_RDWR | O_SYNC)) < 0)
-  {
-    perror("Failed: open /dev/uio1");
-    return 0;
-  }
-
-  // 対応表, 参考
-  // https://pknight.hatenablog.com/entry/20100427/1272396732
-
-  // uio1をユーザ空間にマッピング
-  // (int *)にキャスト (汎用ポインタがここでは返ってくるので，何かしらにキャストする必要がある)
-  // 0x1000 == 4096
-  // 40000_0000
-  top = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, topf, 0);
-  if (top == MAP_FAILED)
-  {
-    perror("mmap top");
-    close(topf);
-    return 0;
-  }
-  // uio0をユーザ空間にマッピング
-  // 4040_0000
-  dma = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, dmaf, 0);
-  if (dma == MAP_FAILED)
-  {
-    perror("mmap dma");
-    close(dmaf);
-    return 0;
-  }
-
-  // udmabuf0をユーザ空間にマッピング
-  // 0x00080000 == 524288
-  // 0000_0000
-  src = (uint16_t *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
-  if (src == MAP_FAILED)
-  {
-    perror("mmap src");
-    close(fd0);
-    return 0;
-  }
-  // udmabuf1をユーザ空間にマッピング
-  // 0000_0000
-  dst = (int *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd1, 0);
-  if (dst == MAP_FAILED)
-  {
-    perror("mmap dst");
-    close(fd1);
-    return 0;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////////////// gen ///////////////////////////////////////////////////////////////////////////////////////////////
-
-  // item_memory_num (乱数の数)
-  top[0x04 / 4] = RANNUM - 1;
-
-  // gen <- 1;
-  top[0x00 / 4] = 1;
-
-  // 乱数生成終了を待つ
-  while (top[0x00 / 4] & 0x1)
-    ;
-
-  ///////////////////////////////////////////////////////////////////////////////// initial, udmabuf, uio 設定 ///////////////////////////////////////////////////////////////////////////////////
+  make_imem(512);
 
   const int NGRAM = 3;
-  const int MAJORITY_ADDR = 511;
   const int CORENUM_MAX = 14;
-  const int THREADSNUM = 10;
+  const int MAJORITY_ADDR = 511;
 
-  int CORENUM = 0;
-  int ADDRNUM = 0;
-
-  for (int j = 1; j <= CORENUM_MAX; j++)
+  for (int i = 30; i <= 512; i += 30)
   {
-    CORENUM = j;
-    for (int i = 30; i <= RANNUM; i += 30)
-    {
-      ADDRNUM = i;
-
-      check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, MAJORITY_ADDR);
-      xor128(1);
-    }
+    int ADDRNUM = i;
+    check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR);
   }
 
-  // CORENUM = CORENUM_MAX;
-  // for (int i = 30; i <= RANNUM; i += 30)
-  // {
-  //   ADDRNUM = i;
-
-  //   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, MAJORITY_ADDR);
-  //   xor128(1);
-  // }
-
-  // check(NGRAM, 14, THREADSNUM, 420, MAJORITY_ADDR);
-  // xor128(1);
+  // int ADDRNUM = 30;
+  // check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR);
 
   printf("\nOK!\n");
-
   printf("\n ------------------------------ 終了 -------------------------------- \n\n");
 
   return 0;

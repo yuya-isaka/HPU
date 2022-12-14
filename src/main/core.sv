@@ -229,33 +229,26 @@ module core
                   if ( exec ) begin
 
                       // アドレス必要
-                      if ( inst[ 15 ] ) begin
+                      // wb
+                      if ( inst[ 9 ] ) begin
 
-                          if ( inst[ 13 ] ) begin
+                          reg_2_threads[ thread_count ] <= sign_bit;
+
+                      end
+
+                      else if ( inst[ 13 ] ) begin
+
+                          if ( inst[ 15 ] ) begin
 
                               reg_2_threads[ thread_count ] <= reg_0;
 
                           end
 
-                      end
-
-                      // アドレスいらん
-                      else begin
-
-                          // wb
-                          if ( inst[ 9 ] ) begin
-
-                              reg_2_threads[ thread_count ] <= sign_bit;
-
-                          end
-
-                          // xor
-                          else if ( inst[ 13 ] ) begin
+                          else begin
 
                               reg_2_threads[ thread_count ] <= reg_1 ^ reg_2_tmp;
 
                           end
-
 
                       end
 
@@ -307,7 +300,7 @@ module core
                           end
 
                           // last
-                          else if ( inst[ 10 ] ) begin
+                          else if ( inst[ 9 ] ) begin
 
                               last <= 1;
                               buff <= 0;
