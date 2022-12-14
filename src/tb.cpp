@@ -159,13 +159,13 @@ uint16_t assemble(const char inst_str[], uint16_t addr)
     }
 
     // last
-    else if (strcmp(inst_str, "last") == 0)
+    else if (strcmp(inst_str, "wb") == 0)
     {
       inst = 1024;
     }
 
     // wb
-    else if (strcmp(inst_str, "wb") == 0)
+    else if (strcmp(inst_str, "last") == 0)
     {
       inst = 512;
     }

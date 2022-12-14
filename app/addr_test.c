@@ -113,13 +113,13 @@ uint16_t assemble(const char inst_str[], uint16_t addr)
     }
 
     // last
-    else if (strcmp(inst_str, "last") == 0)
+    else if (strcmp(inst_str, "wb") == 0)
     {
       inst = 1024;
     }
 
     // wb
-    else if (strcmp(inst_str, "wb") == 0)
+    else if (strcmp(inst_str, "last") == 0)
     {
       inst = 512;
     }
@@ -271,33 +271,25 @@ void load_hv(uint16_t addr)
 
 void load_hv_core(uint16_t core_num, uint16_t addr_array[core_num])
 {
-  for (int i = 0; i < (BUSWIDTH / 16); i++)
+  for (int i = 0; i < core_num; i++)
   {
-    if (i < core_num)
-    {
-      load_hv(addr_array[i]);
-    }
-    else
-    {
-      nop_hv();
-    }
+    load_hv(addr_array[i]);
+  }
+  for (int i = core_num; i < (BUSWIDTH / 16); i++)
+  {
+    nop_hv();
   }
 }
 
 void load_hv_thread(uint16_t thread_num, uint16_t core_num, uint16_t addr_array[thread_num][core_num])
 {
-  for (int k = 0; k < THREADSNUM; k++)
+  for (int k = 0; k < thread_num; k++)
   {
-    if (k < thread_num)
-    {
-      uint16_t new_array[core_num];
-      memcpy(new_array, addr_array[k], sizeof(uint16_t) * core_num);
-      load_hv_core(core_num, new_array);
-    }
-    else
-    {
-      nop_hv_core();
-    }
+    load_hv_core(core_num, addr_array[k]);
+  }
+  for (int k = thread_num; k < THREADSNUM; k++)
+  {
+    nop_hv_core();
   }
 }
 
