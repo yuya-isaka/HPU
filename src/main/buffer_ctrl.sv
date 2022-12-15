@@ -53,6 +53,7 @@ module buffer_ctrl
          // 1コア
          input wire [ CORENUM-1:0 ]             store,
          //  input wire                         store,
+         input wire                             store_flag,
          input wire                             stream_v,
          input wire [ 1:0 ]                     stream_i,
 
@@ -85,6 +86,7 @@ module buffer_ctrl
                         // 1コア
                         // .store( store ),
                         .store( store[ CORENUM-1:0 ] ),
+                        .store_flag( store_flag ),
                         // コア数可変
                         // この順番で渡す必要がある
                         .core_result(

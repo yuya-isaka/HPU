@@ -170,6 +170,7 @@ module top
                     // 1コア
                     .store( store[ CORENUM-1:0 ] ),
                     // .store( store ),
+                    .store_flag( store_flag ),
                     .stream_v( stream_v ),
                     .stream_i( stream_i[ 1:0 ] ),
 
@@ -225,17 +226,25 @@ module top
     always @( posedge AXIS_ACLK ) begin
 
         if ( ~gen ) begin
+
             item_a_tmp <= 0;
+
         end
 
         else begin
+
             if ( item_a_tmp == WI ) begin
+
                 item_a_tmp <= 5'd0;
+
             end
 
             else begin
+
                 item_a_tmp <= item_a_tmp + 5'd1;
+
             end
+
         end
 
     end
@@ -288,6 +297,11 @@ module top
                  // in
                  .clk( AXIS_ACLK ),
                  .gen( gen ),
+                 .reset_item( reset_item ),
+                 //  .xor_x( xor_x[ 31:0 ] ),
+                 //  .xor_y( xor_y[ 31:0 ] ),
+                 //  .xor_z( xor_z[ 31:0 ] ),
+                 //  .xor_w( xor_w[ 31:0 ] ),
 
 
                  // out
@@ -444,8 +458,12 @@ module top
 
     // 各コアのストア信号
     // 1コア
-    wire [ CORENUM-1:0 ]              store;
-    // wire                            store;
+    wire [ CORENUM-1:0 ]            store;
+    // wire                                store;
+    wire                            store_flag;
+
+    assign store_flag = ( store != 0) ? 1'b1 : 1'b0;
+
 
     // 各コアの演算結果
     // 1コア
@@ -473,7 +491,6 @@ module top
                      // in
                      .clk( AXIS_ACLK ),
                      .run( run ),
-                     .gen( gen ),
                      .update_item( update_item ),
                      .item_a( item_a[ 8:0 ] ),
                      .rand_num( rand_num[ DIM:0 ] ),
@@ -607,6 +624,7 @@ module top
                 read_addr[ 11:2 ] <= S_AXI_ARADDR[ 11:2 ];
 
             end
+
         end
 
         // AW
@@ -619,6 +637,7 @@ module top
                 write_data <= S_AXI_WDATA;
 
             end
+
         end
 
         // W
@@ -631,6 +650,7 @@ module top
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
 
             end
+
         end
 
         // AWW
@@ -640,6 +660,7 @@ module top
                 // go INI
                 state <= 4'b0000;
             end
+
         end
 
         // AR1
@@ -655,6 +676,7 @@ module top
                 // go INI
                 state <= 4'b0000;
             end
+
         end
 
     end
@@ -679,17 +701,24 @@ module top
 
 
     // アクセラレータのモード
-    // gen ... アクセラレータ準備モード　（ランダムなハイパーベクトルをitem_memoryに格納）
     // run ... アクセラレータ実行モード
+    // gen ... アクセラレータ準備モード　（ランダムなハイパーベクトルをitem_memoryに格納）
 
-    // gen ... 書き込みモードで１を代入
     // run ... 書き込みモードで2を代入
-    reg                 gen, run;
+    // gen ... 書き込みモードで１を代入
+    reg                 run;
+    reg                 gen;
 
     // item_memoryに格納するハイパーベクトルの数
     // (現状の最大値は1023)
     reg [ 8:0 ]         item_memory_num;
 
+    reg                 reset_item;
+
+    // reg [ 31:0 ]        xor_x;
+    // reg [ 31:0 ]        xor_y;
+    // reg [ 31:0 ]        xor_z;
+    // reg [ 31:0 ]        xor_w;
 
     //================================================================
 
@@ -701,7 +730,15 @@ module top
         if ( ~S_AXI_ARESETN ) begin
 
             { run, gen } <= 2'b00;
+
             item_memory_num <= 9'd0;
+
+            reset_item <= 1'b0;
+
+            // xor_x <= 32'd0;
+            // xor_y <= 32'd0;
+            // xor_z <= 32'd0;
+            // xor_w <= 32'd0;
 
         end
 
@@ -717,8 +754,27 @@ module top
 
                 // アドレス４
                 10'd04:
-                    // 最大1023
+                    // 最大511
                     item_memory_num[ 8:0 ] <= write_data[ 8:0 ];
+
+                10'd08:
+                    reset_item <= write_data[ 0 ];
+
+                // // アドレス8
+                // 10'd08:
+                //     xor_x[ 31:0 ] <= write_data[ 31:0 ];
+
+                // // アドレス12
+                // 10'd12:
+                //     xor_y[ 31:0 ] <= write_data[ 31:0 ];
+
+                // // アドレス16
+                // 10'd16:
+                //     xor_z[ 31:0 ] <= write_data[ 31:0 ];
+
+                // // アドレス20
+                // 10'd20:
+                //     xor_w[ 31:0 ] <= write_data[ 31:0 ];
 
                 // 上記アドレス以外は何もしない
                 default:
@@ -756,15 +812,32 @@ module top
                 10'h00:
                     S_AXI_RDATA[ 1:0 ] <= { run, gen };
 
-                // アドレス４
-                10'd04:
-                    S_AXI_RDATA[ 8:0 ] <= item_memory_num[ 8:0 ];
+                // // アドレス４
+                // 10'd04:
+                //     S_AXI_RDATA[ 8:0 ] <= item_memory_num[ 8:0 ];
+
+                // // アドレス8
+                // 10'd08:
+                //     S_AXI_RDATA[ 31:0 ] <= xor_x[ 31:0 ];
+
+                // // アドレス12
+                // 10'd12:
+                //     S_AXI_RDATA[ 31:0 ] <= xor_y[ 31:0 ];
+
+                // // アドレス16
+                // 10'd16:
+                //     S_AXI_RDATA[ 31:0 ] <= xor_z[ 31:0 ];
+
+                // // アドレス20
+                // 10'd20:
+                //     S_AXI_RDATA[ 31:0 ] <= xor_w[ 31:0 ];
 
                 // 上記アドレス以外は何もしない
                 default:
                     S_AXI_RDATA <= 0;
 
             endcase
+
         end
 
     end

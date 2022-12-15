@@ -21,6 +21,7 @@ module counter
          // 1コア
          input wire [ CORENUM-1:0 ]             store,
          //  input wire                         store,
+         input wire                             store_flag,
          // 1コア
          input wire [ CORENUM-1:0 ]             core_result,
          //  input wire                         core_result,
@@ -33,6 +34,18 @@ module counter
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    reg         store_n;
+    reg         store_nn;
+
+    always_ff @( posedge clk ) begin
+
+                  if ( ~rst ) begin
+                      store_n <= store_flag;
+                      store_nn <= store_n;
+                  end
+
+              end;
 
 
     reg signed [ W-1:0 ]      box;
@@ -51,9 +64,11 @@ module counter
 
                   else begin
 
-                      box <=
-                          box
-                          + box_1;
+                      if ( store_nn ) begin
+                          box <=
+                              box
+                              + box_1;
+                      end
 
                       // コア数可変
                       box_1 <=

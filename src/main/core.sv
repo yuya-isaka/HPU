@@ -15,7 +15,6 @@ module core
          // in
          input wire                         clk,
          input wire                         run,
-         input wire                         gen,
          input wire                         update_item,
          input wire [ 8:0 ]                 item_a,
          input wire [ DIM:0 ]               rand_num,
@@ -49,7 +48,7 @@ module core
 
                   // 書き込み
                   // 書き戻し | ランダム生成
-                  if ( wb_flag | ( gen & update_item ) ) begin
+                  if ( wb_flag | update_item ) begin
 
                       // 書き戻し
                       if ( wb_flag ) begin
@@ -230,7 +229,7 @@ module core
 
                       // アドレス必要
                       // wb
-                      if ( inst[ 9 ] ) begin
+                      if ( inst[ 10 ] ) begin
 
                           reg_2_threads[ thread_count ] <= sign_bit;
 

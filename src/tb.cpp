@@ -278,6 +278,62 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
   verilator_top->S_AXI_WVALID = 0;
   eval();
 
+  // static uint32_t x = 123456789;
+  // static uint32_t y = 362436069;
+  // static uint32_t z = 521288629;
+  // static uint32_t w = 88675123;
+
+  // // xor_x <- 123456789
+  // verilator_top->S_AXI_AWADDR = 8;
+  // verilator_top->S_AXI_WDATA = 123456789;
+  // verilator_top->S_AXI_AWVALID = 1;
+  // verilator_top->S_AXI_WVALID = 1;
+  // eval();
+  // verilator_top->S_AXI_AWVALID = 0;
+  // verilator_top->S_AXI_WVALID = 0;
+  // eval();
+
+  // // xor_y <- 362436069
+  // verilator_top->S_AXI_AWADDR = 12;
+  // verilator_top->S_AXI_WDATA = 362436069;
+  // verilator_top->S_AXI_AWVALID = 1;
+  // verilator_top->S_AXI_WVALID = 1;
+  // eval();
+  // verilator_top->S_AXI_AWVALID = 0;
+  // verilator_top->S_AXI_WVALID = 0;
+  // eval();
+
+  // // xor_z <- 521288629;
+  // verilator_top->S_AXI_AWADDR = 16;
+  // verilator_top->S_AXI_WDATA = 521288629;
+  // verilator_top->S_AXI_AWVALID = 1;
+  // verilator_top->S_AXI_WVALID = 1;
+  // eval();
+  // verilator_top->S_AXI_AWVALID = 0;
+  // verilator_top->S_AXI_WVALID = 0;
+  // eval();
+
+  // // xor_w <- 88675123
+  // verilator_top->S_AXI_AWADDR = 20;
+  // verilator_top->S_AXI_WDATA = 88675123;
+  // verilator_top->S_AXI_AWVALID = 1;
+  // verilator_top->S_AXI_WVALID = 1;
+  // eval();
+  // verilator_top->S_AXI_AWVALID = 0;
+  // verilator_top->S_AXI_WVALID = 0;
+  // eval();
+
+  // reset <- 1;
+  // ランダムなハイパーベクトルを自動生成
+  verilator_top->S_AXI_AWADDR = 8;
+  verilator_top->S_AXI_WDATA = 1;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
+
   // gen <- 1;
   // ランダムなハイパーベクトルを自動生成
   verilator_top->S_AXI_AWADDR = 0;
