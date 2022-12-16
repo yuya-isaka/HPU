@@ -9,7 +9,6 @@
 
 int SEND_NUM = 0;
 
-
 // 簡易アセンブラ
 // 10種類の命令
 uint16_t hdc_assemble(const char inst_str[], uint16_t addr)
@@ -199,6 +198,9 @@ void hdc_setup(void)
 
 void hdc_make_imem(const int RANNUM)
 {
+	// reset_flag
+	top[0x08 / 4] = 1;
+
 	// item_memory_num (乱数の数)
 	top[0x04 / 4] = RANNUM - 1;
 
@@ -252,6 +254,9 @@ void hdc_finish(void)
 {
 	// run <- 0;
 	top[0x00 / 4] = 0;
+
+	// reset_flag
+	top[0x08 / 4] = 0;
 }
 
 // =========================================================================================

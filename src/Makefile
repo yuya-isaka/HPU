@@ -52,9 +52,9 @@ format :
 	iStyle --style=kr -n -s4 --pad=paren $(DESIGN_SRC)
 
 test:
-	gcc -fopenmp -c -O3 -DDEBUG -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
-	gcc -fopenmp -c -O3 -DDEBUG -DOPENMP -DHV64 -o test.o test.c
-	gcc -fopenmp -O3 -DDEBUG -DOPENMP -DHV64 -o test test.o hyper_vector.o
+	gcc -c -O3 -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -c -O3 -DHV64 -o test.o test.c
+	gcc -O3 -DHV64 -o test test.o hyper_vector.o
 	rm hyper_vector.o test.o
 	./test
 	rm test
