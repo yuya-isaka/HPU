@@ -13,105 +13,180 @@ int SEND_NUM = 0;
 // 10種類の命令
 uint16_t hdc_assemble(const char inst_str[], uint16_t addr)
 {
-	if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0 || strcmp(inst_str, "pwbitem") == 0 || strcmp(inst_str, "permute") == 0)
+	if (inst_str[0] == 'l')
 	{
-		uint16_t result = 0;
-		uint16_t inst = 0;
-
-		// load
-		if (strcmp(inst_str, "load") == 0)
+		if (inst_str[1] == 'o')
 		{
-			inst = 40960;
-			result = inst | addr;
+			uint16_t inst = 40960;
+			uint16_t result = inst | addr;
+			return result;
 		}
-
-		// wb.item
-		else if (strcmp(inst_str, "wbitem") == 0)
+		else if (inst_str[1] == 'a')
 		{
-			inst = 36864;
-			result = inst | addr;
+			return 512;
 		}
-
-		else if (strcmp(inst_str, "pwbitem") == 0)
+	}
+	else if (inst_str[0] == 'p')
+	{
+		if (inst_str[1] == 'e')
 		{
-			inst = 53248;
-			result = inst | addr;
+			uint16_t inst = 34816;
+			uint16_t result = inst | addr;
+			return result;
 		}
-
-		else if (strcmp(inst_str, "permute") == 0)
+		else if (inst_str[1] == 'w')
 		{
-			inst = 34816;
-			result = inst | addr;
+			uint16_t inst = 53248;
+			uint16_t result = inst | addr;
+			return result;
 		}
+		else if (inst_str[1] == 'x')
+		{
 
+			return 24576;
+		}
+		else if (inst_str[1] == 's')
+		{
+
+			return 20480;
+		}
+		else if (inst_str[1] == 'm')
+		{
+
+			return 18432;
+		}
+	}
+	else if (inst_str[0] == 'x')
+	{
+		return 8192;
+	}
+	else if (inst_str[0] == 's')
+	{
+		return 4096;
+	}
+	else if (inst_str[0] == 'm')
+	{
+		return 2048;
+	}
+	else if (strcmp(inst_str, "wb") == 0)
+	{
+		return 1024;
+	}
+	else if (strcmp(inst_str, "wbitem") == 0)
+	{
+
+		uint16_t inst = 36864;
+		uint16_t result = inst | addr;
 		return result;
 	}
-
+	else if (inst_str[0] == 'n')
+	{
+		return 0;
+	}
 	else
 	{
-		uint16_t inst = 0;
-
-		// xor
-		if (strcmp(inst_str, "xor") == 0)
-		{
-			inst = 8192;
-		}
-
-		// pxor
-		if (strcmp(inst_str, "pxor") == 0)
-		{
-			inst = 24576;
-		}
-
-		// store
-		else if (strcmp(inst_str, "store") == 0)
-		{
-			inst = 4096;
-		}
-
-		// pstore
-		else if (strcmp(inst_str, "pstore") == 0)
-		{
-			inst = 20480;
-		}
-
-		// move
-		else if (strcmp(inst_str, "move") == 0)
-		{
-			inst = 2048;
-		}
-
-		// pmove
-		else if (strcmp(inst_str, "pmove") == 0)
-		{
-			inst = 18432;
-		}
-
-		// wb
-		else if (strcmp(inst_str, "wb") == 0)
-		{
-			inst = 1024;
-		}
-
-		// last
-		else if (strcmp(inst_str, "last") == 0)
-		{
-			inst = 512;
-		}
-
-		// nop
-		else if (strcmp(inst_str, "nop") == 0)
-		{
-			inst = 0;
-		}
-
-		else
-		{
-			printf("error");
-		}
-
-		return inst;
+		printf("error");
 	}
+
+	// if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0 || strcmp(inst_str, "pwbitem") == 0 || strcmp(inst_str, "permute") == 0)
+	// {
+	// 	uint16_t result = 0;
+	// 	uint16_t inst = 0;
+
+	// 	// load
+	// 	if (strcmp(inst_str, "load") == 0)
+	// 	{
+	// 		inst = 40960;
+	// 		result = inst | addr;
+	// 	}
+
+	// 	// wb.item
+	// 	else if (strcmp(inst_str, "wbitem") == 0)
+	// 	{
+	// 		inst = 36864;
+	// 		result = inst | addr;
+	// 	}
+
+	// 	else if (strcmp(inst_str, "pwbitem") == 0)
+	// 	{
+	// 		inst = 53248;
+	// 		result = inst | addr;
+	// 	}
+
+	// 	else if (strcmp(inst_str, "permute") == 0)
+	// 	{
+	// 		inst = 34816;
+	// 		result = inst | addr;
+	// 	}
+
+	// 	return result;
+	// }
+
+	// else
+	// {
+	// 	uint16_t inst = 0;
+
+	// 	// xor
+	// 	if (strcmp(inst_str, "xor") == 0)
+	// 	{
+	// 		inst = 8192;
+	// 	}
+
+	// 	// pxor
+	// 	if (strcmp(inst_str, "pxor") == 0)
+	// 	{
+	// 		inst = 24576;
+	// 	}
+
+	// 	// store
+	// 	else if (strcmp(inst_str, "store") == 0)
+	// 	{
+	// 		inst = 4096;
+	// 	}
+
+	// 	// pstore
+	// 	else if (strcmp(inst_str, "pstore") == 0)
+	// 	{
+	// 		inst = 20480;
+	// 	}
+
+	// 	// move
+	// 	else if (strcmp(inst_str, "move") == 0)
+	// 	{
+	// 		inst = 2048;
+	// 	}
+
+	// 	// pmove
+	// 	else if (strcmp(inst_str, "pmove") == 0)
+	// 	{
+	// 		inst = 18432;
+	// 	}
+
+	// 	// wb
+	// 	else if (strcmp(inst_str, "wb") == 0)
+	// 	{
+	// 		inst = 1024;
+	// 	}
+
+	// 	// last
+	// 	else if (strcmp(inst_str, "last") == 0)
+	// 	{
+	// 		inst = 512;
+	// 	}
+
+	// 	// nop
+	// 	else if (strcmp(inst_str, "nop") == 0)
+	// 	{
+	// 		inst = 0;
+	// 	}
+
+	// 	else
+	// 	{
+	// 		printf("error");
+	// 	}
+
+	// 	return inst;
+	// }
 }
 
 void hdc_setup(void)
@@ -376,31 +451,25 @@ void hdc_store(void)
 
 void hdc_store_core(uint16_t core_num)
 {
-	for (int i = 0; i < (BUS_WIDTH / 16); i++)
+	for (int i = 0; i < core_num; i++)
 	{
-		if (i < core_num)
-		{
-			hdc_store();
-		}
-		else
-		{
-			hdc_nop();
-		}
+		hdc_store();
+	}
+	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	{
+		hdc_nop();
 	}
 }
 
 void hdc_store_thread(uint16_t thread_num, uint16_t core_num)
 {
-	for (int k = 0; k < THREADS_NUM; k++)
+	for (int k = 0; k < thread_num; k++)
 	{
-		if (k < thread_num)
-		{
-			hdc_store_core(core_num);
-		}
-		else
-		{
-			hdc_nop_core();
-		}
+		hdc_store_core(core_num);
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		hdc_nop_core();
 	}
 }
 
@@ -413,31 +482,25 @@ void hdc_pstore(void)
 
 void hdc_pstore_core(uint16_t core_num)
 {
-	for (int i = 0; i < (BUS_WIDTH / 16); i++)
+	for (int i = 0; i < core_num; i++)
 	{
-		if (i < core_num)
-		{
-			hdc_pstore();
-		}
-		else
-		{
-			hdc_nop();
-		}
+		hdc_pstore();
+	}
+	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	{
+		hdc_nop();
 	}
 }
 
 void hdc_pstore_thread(uint16_t thread_num, uint16_t core_num)
 {
-	for (int k = 0; k < THREADS_NUM; k++)
+	for (int k = 0; k < thread_num; k++)
 	{
-		if (k < thread_num)
-		{
-			hdc_pstore_core(core_num);
-		}
-		else
-		{
-			hdc_nop_core();
-		}
+		hdc_pstore_core(core_num);
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		hdc_nop_core();
 	}
 }
 
@@ -450,31 +513,25 @@ void hdc_move(void)
 
 void hdc_move_core(uint16_t core_num)
 {
-	for (int i = 0; i < (BUS_WIDTH / 16); i++)
+	for (int i = 0; i < core_num; i++)
 	{
-		if (i < core_num)
-		{
-			hdc_move();
-		}
-		else
-		{
-			hdc_nop();
-		}
+		hdc_move();
+	}
+	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	{
+		hdc_nop();
 	}
 }
 
 void hdc_move_thread(uint16_t thread_num, uint16_t core_num)
 {
-	for (int k = 0; k < THREADS_NUM; k++)
+	for (int k = 0; k < thread_num; k++)
 	{
-		if (k < thread_num)
-		{
-			hdc_move_core(core_num);
-		}
-		else
-		{
-			hdc_nop_core();
-		}
+		hdc_move_core(core_num);
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		hdc_nop_core();
 	}
 }
 
@@ -487,31 +544,25 @@ void hdc_pmove(void)
 
 void hdc_pmove_core(uint16_t core_num)
 {
-	for (int i = 0; i < (BUS_WIDTH / 16); i++)
+	for (int i = 0; i < core_num; i++)
 	{
-		if (i < core_num)
-		{
-			hdc_pmove();
-		}
-		else
-		{
-			hdc_nop();
-		}
+		hdc_pmove();
+	}
+	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	{
+		hdc_nop();
 	}
 }
 
 void hdc_pmove_thread(uint16_t thread_num, uint16_t core_num)
 {
-	for (int k = 0; k < THREADS_NUM; k++)
+	for (int k = 0; k < thread_num; k++)
 	{
-		if (k < thread_num)
-		{
-			hdc_pmove_core(core_num);
-		}
-		else
-		{
-			hdc_nop_core();
-		}
+		hdc_pmove_core(core_num);
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		hdc_nop_core();
 	}
 }
 
@@ -524,31 +575,25 @@ void hdc_permute(uint16_t permute_num)
 
 void hdc_permute_core(uint16_t core_num, uint16_t permute_num)
 {
-	for (int i = 0; i < (BUS_WIDTH / 16); i++)
+	for (int i = 0; i < core_num; i++)
 	{
-		if (i < core_num)
-		{
-			hdc_permute(permute_num);
-		}
-		else
-		{
-			hdc_nop();
-		}
+		hdc_permute(permute_num);
+	}
+	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	{
+		hdc_nop();
 	}
 }
 
 void hdc_permute_thread(uint16_t thread_num, uint16_t core_num, uint16_t permute_num)
 {
-	for (int k = 0; k < THREADS_NUM; k++)
+	for (int k = 0; k < thread_num; k++)
 	{
-		if (k < thread_num)
-		{
-			hdc_permute_core(core_num, permute_num);
-		}
-		else
-		{
-			hdc_nop_core();
-		}
+		hdc_permute_core(core_num, permute_num);
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		hdc_nop_core();
 	}
 }
 
@@ -561,31 +606,25 @@ void hdc_xor(void)
 
 void hdc_xor_core(uint16_t core_num)
 {
-	for (int i = 0; i < (BUS_WIDTH / 16); i++)
+	for (int i = 0; i < core_num; i++)
 	{
-		if (i < core_num)
-		{
-			hdc_xor();
-		}
-		else
-		{
-			hdc_nop();
-		}
+		hdc_xor();
+	}
+	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	{
+		hdc_nop();
 	}
 }
 
 void hdc_xor_thread(uint16_t thread_num, uint16_t core_num)
 {
-	for (int k = 0; k < THREADS_NUM; k++)
+	for (int k = 0; k < thread_num; k++)
 	{
-		if (k < thread_num)
-		{
-			hdc_xor_core(core_num);
-		}
-		else
-		{
-			hdc_nop_core();
-		}
+		hdc_xor_core(core_num);
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		hdc_nop_core();
 	}
 }
 
@@ -598,31 +637,25 @@ void hdc_pxor(void)
 
 void hdc_pxor_core(uint16_t core_num)
 {
-	for (int i = 0; i < (BUS_WIDTH / 16); i++)
+	for (int i = 0; i < core_num; i++)
 	{
-		if (i < core_num)
-		{
-			hdc_pxor();
-		}
-		else
-		{
-			hdc_nop();
-		}
+		hdc_pxor();
+	}
+	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	{
+		hdc_nop();
 	}
 }
 
 void hdc_pxor_thread(uint16_t thread_num, uint16_t core_num)
 {
-	for (int k = 0; k < THREADS_NUM; k++)
+	for (int k = 0; k < thread_num; k++)
 	{
-		if (k < thread_num)
-		{
-			hdc_pxor_core(core_num);
-		}
-		else
-		{
-			hdc_nop_core();
-		}
+		hdc_pxor_core(core_num);
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		hdc_nop_core();
 	}
 }
 
@@ -635,31 +668,25 @@ void hdc_wb(void)
 
 void hdc_wb_core(uint16_t core_num)
 {
-	for (int i = 0; i < (BUS_WIDTH / 16); i++)
+	for (int i = 0; i < core_num; i++)
 	{
-		if (i < core_num)
-		{
-			hdc_wb();
-		}
-		else
-		{
-			hdc_nop();
-		}
+		hdc_wb();
+	}
+	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	{
+		hdc_nop();
 	}
 }
 
 void hdc_wb_thread(uint16_t thread_num, uint16_t core_num)
 {
-	for (int k = 0; k < THREADS_NUM; k++)
+	for (int k = 0; k < thread_num; k++)
 	{
-		if (k < thread_num)
-		{
-			hdc_wb_core(core_num);
-		}
-		else
-		{
-			hdc_nop_core();
-		}
+		hdc_wb_core(core_num);
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		hdc_nop_core();
 	}
 }
 
@@ -672,15 +699,12 @@ void hdc_last(void)
 
 void hdc_last_core(uint16_t core_num)
 {
-	for (int i = 0; i < (BUS_WIDTH / 16); i++)
+	for (int i = 0; i < core_num; i++)
 	{
-		if (i < core_num)
-		{
-			hdc_last();
-		}
-		else
-		{
-			hdc_nop();
-		}
+		hdc_last();
+	}
+	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	{
+		hdc_nop();
 	}
 }
