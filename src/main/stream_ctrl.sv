@@ -14,7 +14,6 @@ module stream_ctrl
          // in
          input wire                             clk,
          input wire                             rst,
-         input wire                             get_v,
          // 1コア
          input wire [ CORENUM-1:0 ]             last,
          //   input wire                             last,

@@ -84,8 +84,8 @@ module counter
                             + select[ 9 ]
                             + select[ 10 ]
                             + select[ 11 ]
-                            + select[ 12 ]
-                            + select[ 13 ];
+                            + select[ 12 ];
+                      // + select[ 13 ];
                       // + select[ 14 ];
                       // + select[ 15 ];
                       // + select[ 16 ]

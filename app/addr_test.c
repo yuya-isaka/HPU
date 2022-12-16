@@ -184,7 +184,7 @@ int main()
   hdc_make_imem(512);
 
   const int NGRAM = 3;
-  const int CORENUM_MAX = 14;
+  const int CORENUM_MAX = 13;
   const int MAJORITY_ADDR = 511;
 
   for (int i = 30; i <= 512; i += 30)
