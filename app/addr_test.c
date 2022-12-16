@@ -13,6 +13,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
 {
 
   hdc_init(0);
+  hdc_dma_reset();
 
   const int REMAINDAR = (ADDRNUM / NGRAM) % (CORENUM * THREADS_NUM);
   const int REMAINDAR_CORENUM = REMAINDAR / THREADS_NUM;
@@ -191,6 +192,12 @@ int main()
     int ADDRNUM = i;
     check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR);
   }
+
+  // int ADDRNUM = 30;
+  // check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR);
+  // printf("\nOK!\n");
+  // ADDRNUM = 390;
+  // check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR);
 
   printf("\nOK!\n");
   printf("\n ------------------------------ 終了 -------------------------------- \n\n");
