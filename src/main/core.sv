@@ -76,7 +76,8 @@ module core
                   // データ受信時実行
                   else if ( get_v ) begin
 
-                      if ( thread_count == 4'd9 ) begin
+                      // スレッド数可変
+                      if ( thread_count == 4'd4 ) begin
                           thread_count <= 0;
                       end
 
@@ -135,26 +136,80 @@ module core
             );
 
 
-    // logic [ 3:0 ] thread_count_zure;
+    logic [ 3:0 ] thread_count_zure;
 
-    // always_comb begin
-    //                 thread_count_zure = thread_count + 4'd1;
+    always_comb begin
+                    thread_count_zure = thread_count + 4'd1;
 
-    //                 // スレッド数可変
-    //                 // if ( thread_count == 4'd4 ) begin
-    //                 if ( thread_count == 4'd9 ) begin
-    //                     thread_count_zure = 0;
-    //                 end
-    //             end;
+                    // スレッド数可変
+                    // if ( thread_count == 4'd9 ) begin
+                    if ( thread_count == 4'd4 ) begin
+                        thread_count_zure = 0;
+                    end
+                end;
 
     // reg_1_thread, reg_2_threadsは値を保持
     // reg_0はその度にロードされるから保持しなくていい
 
     // レジスタ1
-    logic [ DIM:0 ]         reg_1;
+    reg [ DIM:0 ]         reg_1;
 
-    // (* ram_style = "block" *)
+    // スレッド数可変
+    (* ram_style = "block" *)
     reg [ DIM:0 ]           reg_1_threads [ THREADS-1:0 ];
+    // reg [ DIM:0 ]           reg_1_threads_0;
+    // reg [ DIM:0 ]           reg_1_threads_1;
+    // reg [ DIM:0 ]           reg_1_threads_2;
+    // reg [ DIM:0 ]           reg_1_threads_3;
+    // reg [ DIM:0 ]           reg_1_threads_4;
+
+    always_ff @( posedge clk ) begin
+
+                  if ( exec & ~inst[ 15 ] & inst[ 11 ] ) begin
+
+                      reg_1_threads[ thread_count ] <= reg_2_tmp;
+
+                      //   if ( thread_count == 4'd0) begin
+                      //       reg_1_threads_0 <= reg_2_tmp;
+                      //   end
+                      //   else if ( thread_count == 4'd1) begin
+                      //       reg_1_threads_1 <= reg_2_tmp;
+                      //   end
+                      //   else if ( thread_count == 4'd2) begin
+                      //       reg_1_threads_2 <= reg_2_tmp;
+                      //   end
+                      //   else if ( thread_count == 4'd3) begin
+                      //       reg_1_threads_3 <= reg_2_tmp;
+                      //   end
+                      //   else if ( thread_count == 4'd4) begin
+                      //       reg_1_threads_4 <= reg_2_tmp;
+                      //   end
+
+                  end
+
+                  reg_1 <= reg_1_threads[ thread_count_zure ];
+
+              end;
+
+    // always_ff @( posedge clk ) begin
+
+    //               if ( thread_count == 4'd0) begin
+    //                   reg_1 <= reg_1_threads_1;
+    //               end
+    //               else if ( thread_count == 4'd1) begin
+    //                   reg_1 <= reg_1_threads_2;
+    //               end
+    //               else if ( thread_count == 4'd2) begin
+    //                   reg_1 <= reg_1_threads_3;
+    //               end
+    //               else if ( thread_count == 4'd3) begin
+    //                   reg_1 <= reg_1_threads_4;
+    //               end
+    //               else if ( thread_count == 4'd4) begin
+    //                   reg_1 <= reg_1_threads_0;
+    //               end
+
+    //           end;
 
     // always_ff @( posedge clk ) begin
 
@@ -164,28 +219,110 @@ module core
 
     //               end
 
-    //               reg_1 <= reg_1_threads[ thread_count_zure ];
-
     //           end;
+
+    // assign reg_1 = reg_1_threads[ thread_count ];
+
+
+
+    reg [ DIM:0 ]         reg_2;
+
+    // スレッド数可変
+    (* ram_style = "block" *)
+    reg [ DIM:0 ]           reg_2_threads [ THREADS-1:0 ];
+    // reg [ DIM:0 ]           reg_2_threads_0;
+    // reg [ DIM:0 ]           reg_2_threads_1;
+    // reg [ DIM:0 ]           reg_2_threads_2;
+    // reg [ DIM:0 ]           reg_2_threads_3;
+    // reg [ DIM:0 ]           reg_2_threads_4;
 
     always_ff @( posedge clk ) begin
 
-                  if ( exec & ~inst[ 15 ] & inst[ 11 ] ) begin
+                  if ( exec & inst[ 13] ) begin
 
-                      reg_1_threads[ thread_count ] <= reg_2_tmp;
+                      reg_2_threads[ thread_count] <= reg_for_inst_13;
+
+                      //   if ( thread_count == 4'd0) begin
+                      //       reg_2_threads_0 <= reg_for_inst_13;
+                      //   end
+                      //   else if ( thread_count == 4'd1) begin
+                      //       reg_2_threads_1 <= reg_for_inst_13;
+                      //   end
+                      //   else if ( thread_count == 4'd2) begin
+                      //       reg_2_threads_2 <= reg_for_inst_13;
+                      //   end
+                      //   else if ( thread_count == 4'd3) begin
+                      //       reg_2_threads_3 <= reg_for_inst_13;
+                      //   end
+                      //   else if ( thread_count == 4'd4) begin
+                      //       reg_2_threads_4 <= reg_for_inst_13;
+                      //   end
+                      //   else if ( thread_count == 4'd5) begin
+                      //       reg_2_threads_5 <= reg_for_inst_13;
+                      //   end
+                      //   else if ( thread_count == 4'd6) begin
+                      //       reg_2_threads_6 <= reg_for_inst_13;
+                      //   end
+                      //   else if ( thread_count == 4'd7) begin
+                      //       reg_2_threads_7 <= reg_for_inst_13;
+                      //   end
+                      //   else if ( thread_count == 4'd8) begin
+                      //       reg_2_threads_8 <= reg_for_inst_13;
+                      //   end
+                      //   else if ( thread_count == 4'd9) begin
+                      //       reg_2_threads_9 <= reg_for_inst_13;
+                      //   end
 
                   end
 
+                  reg_2 <= reg_2_threads[ thread_count_zure ];
               end;
 
-    assign reg_1 = reg_1_threads[ thread_count ];
+    // always_ff @( posedge clk ) begin
 
+    //               if ( thread_count == 4'd0) begin
+    //                   reg_2 <= reg_2_threads_1;
+    //               end
+    //               else if ( thread_count == 4'd1) begin
+    //                   reg_2 <= reg_2_threads_2;
+    //               end
+    //               else if ( thread_count == 4'd2) begin
+    //                   reg_2 <= reg_2_threads_3;
+    //               end
+    //               else if ( thread_count == 4'd3) begin
+    //                   reg_2 <= reg_2_threads_4;
+    //               end
+    //               else if ( thread_count == 4'd4) begin
+    //                   reg_2 <= reg_2_threads_0;
+    //               end
+    //               //   else if ( thread_count == 4'd5) begin
+    //               //       reg_2 <= reg_2_threads_6;
+    //               //   end
+    //               //   else if ( thread_count == 4'd6) begin
+    //               //       reg_2 <= reg_2_threads_7;
+    //               //   end
+    //               //   else if ( thread_count == 4'd7) begin
+    //               //       reg_2 <= reg_2_threads_8;
+    //               //   end
+    //               //   else if ( thread_count == 4'd8) begin
+    //               //       reg_2 <= reg_2_threads_9;
+    //               //   end
+    //               //   else if ( thread_count == 4'd9) begin
+    //               //       reg_2 <= reg_2_threads_0;
+    //               //   end
 
+    //           end;
 
-    logic [ DIM:0 ]         reg_2;
+    logic [ DIM:0 ] reg_for_inst_13;
 
-    // (* ram_style = "block" *)
-    reg [ DIM:0 ]           reg_2_threads [ THREADS-1:0 ];
+    always_comb begin
+                    if ( inst[ 15 ] ) begin
+                        reg_for_inst_13 = reg_0;
+                    end
+                    else begin
+                        reg_for_inst_13 = reg_1 ^ reg_2_tmp;
+                    end
+                end;
 
     // always_ff @( posedge clk ) begin
 
@@ -209,35 +346,9 @@ module core
 
     //               end
 
-    //               reg_2 <= reg_2_threads[ thread_count_zure ];
-
     //           end;
 
-    always_ff @( posedge clk ) begin
-
-                  if ( exec ) begin
-
-                      if ( inst[ 13 ] ) begin
-
-                          if ( inst[ 15 ] ) begin
-
-                              reg_2_threads[ thread_count ] <= reg_0;
-
-                          end
-
-                          else begin
-
-                              reg_2_threads[ thread_count ] <= reg_1 ^ reg_2_tmp;
-
-                          end
-
-                      end
-
-                  end
-
-              end;
-
-    assign reg_2 = reg_2_threads[ thread_count ];
+    // assign reg_2 = reg_2_threads[ thread_count ];
 
     // レジスタ2
 
@@ -258,7 +369,6 @@ module core
 
     always_ff @( posedge clk ) begin
 
-                  // スレッド数可変
                   // アクセラレータの動作終了と同時にリセット
                   // reg_1_threads　reg_2_threads は保持したいため、リセット時にしか0に戻さない
                   if ( ~run ) begin

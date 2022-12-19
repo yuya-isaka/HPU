@@ -240,7 +240,7 @@ module top
             // 次元数可変
             // スレッド数可変
             // core #( .DIM( 31 ), .THREADS( 5 ) ) core
-            core #( .DIM( 1023 ), .THREADS( 10 ), .WI( 31 ) ) core
+            core #( .DIM( 1023 ), .THREADS( 5 ), .WI( 31 ) ) core
                  (
 
                      // in

@@ -97,7 +97,9 @@ module central_core
                   // データ受信時実行
                   else if ( get_v ) begin
 
-                      if ( thread_count == 4'd9 ) begin
+                      // スレッド数可変
+                      //   if ( thread_count == 4'd9 ) begin
+                      if ( thread_count == 4'd4 ) begin
                           thread_count <= 0;
                       end
 
@@ -184,38 +186,26 @@ module central_core
             );
 
 
-    // logic [ 3:0 ] thread_count_zure;
+    logic [ 3:0 ] thread_count_zure;
 
-    // always_comb begin
-    //                 thread_count_zure = thread_count + 4'd1;
+    always_comb begin
+                    thread_count_zure = thread_count + 4'd1;
 
-    //                 // スレッド数可変
-    //                 // if ( thread_count == 4'd4 ) begin
-    //                 if ( thread_count == 4'd9 ) begin
-    //                     thread_count_zure = 0;
-    //                 end
-    //             end;
+                    // スレッド数可変
+                    // if ( thread_count == 4'd9 ) begin
+                    if ( thread_count == 4'd4 ) begin
+                        thread_count_zure = 0;
+                    end
+                end;
 
     // reg_1_thread, reg_2_threadsは値を保持
     // reg_0はその度にロードされるから保持しなくていい
 
     // レジスタ1
-    logic [ DIM:0 ]         reg_1;
+    reg [ DIM:0 ]         reg_1;
 
     // (* ram_style = "block" *)
     reg [ DIM:0 ]           reg_1_threads [ THREADS-1:0 ];
-
-    // always_ff @( posedge clk ) begin
-
-    //               if ( exec & ~inst[ 15 ] & inst[ 11 ] ) begin
-
-    //                   reg_1_threads[ thread_count ] <= reg_2_tmp;
-
-    //               end
-
-    //               reg_1 <= reg_1_threads[ thread_count_zure ];
-
-    //           end;
 
     always_ff @( posedge clk ) begin
 
@@ -225,16 +215,63 @@ module central_core
 
                   end
 
+                  reg_1 <= reg_1_threads[ thread_count_zure ];
+
               end;
 
-    assign reg_1 = reg_1_threads[ thread_count ];
+    // always_ff @( posedge clk ) begin
+
+    //               if ( exec & ~inst[ 15 ] & inst[ 11 ] ) begin
+
+    //                   reg_1_threads[ thread_count ] <= reg_2_tmp;
+
+    //               end
+
+    //           end;
+
+    // assign reg_1 = reg_1_threads[ thread_count ];
 
 
 
-    logic [ DIM:0 ]         reg_2;
+    reg [ DIM:0 ]         reg_2;
 
     (* ram_style = "block" *)
     reg [ DIM:0 ]           reg_2_threads [ THREADS-1:0 ];
+
+    always_ff @( posedge clk ) begin
+
+                  if ( exec ) begin
+
+                      // アドレス必要
+                      // wb
+                      if ( inst[ 10 ] ) begin
+
+                          reg_2_threads[ thread_count ] <= sign_bit;
+
+                      end
+
+                      else if ( inst[ 13 ] ) begin
+
+                          reg_2_threads[ thread_count ] <= reg_for_inst_13;
+
+                      end
+
+                  end
+
+                  reg_2 <= reg_2_threads[ thread_count_zure ];
+
+              end;
+
+    logic [ DIM:0 ] reg_for_inst_13;
+
+    always_comb begin
+                    if ( inst[ 15 ] ) begin
+                        reg_for_inst_13 = reg_0;
+                    end
+                    else begin
+                        reg_for_inst_13 = reg_1 ^ reg_2_tmp;
+                    end
+                end;
 
     // always_ff @( posedge clk ) begin
 
@@ -266,43 +303,9 @@ module central_core
 
     //               end
 
-    //               reg_2 <= reg_2_threads[ thread_count_zure ];
-
     //           end;
 
-    always_ff @( posedge clk ) begin
-
-                  if ( exec ) begin
-
-                      // アドレス必要
-                      // wb
-                      if ( inst[ 10 ] ) begin
-
-                          reg_2_threads[ thread_count ] <= sign_bit;
-
-                      end
-
-                      else if ( inst[ 13 ] ) begin
-
-                          if ( inst[ 15 ] ) begin
-
-                              reg_2_threads[ thread_count ] <= reg_0;
-
-                          end
-
-                          else begin
-
-                              reg_2_threads[ thread_count ] <= reg_1 ^ reg_2_tmp;
-
-                          end
-
-                      end
-
-                  end
-
-              end;
-
-    assign reg_2 = reg_2_threads[ thread_count ];
+    // assign reg_2 = reg_2_threads[ thread_count ];
 
     // レジスタ2
 

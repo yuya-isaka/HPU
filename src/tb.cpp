@@ -1603,7 +1603,7 @@ int main(int argc, char **argv)
   // コア数可変
   const int CORENUM = 14;
   // スレッド数可変
-  const int THREADSNUM = 10;
+  const int THREADSNUM = 5;
   int DEBUG = 0;
   int ADDRNUM = 0;
   // 次元数可変 (結果を何個出力するかに使う)
