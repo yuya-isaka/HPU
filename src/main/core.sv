@@ -97,7 +97,7 @@ module core
                   // データ受信時実行
                   else if ( get_v ) begin
 
-                      if ( thread_count == 4'd9 ) begin
+                      if ( thread_count == 4'd4 ) begin
                           thread_count <= 0;
                       end
 
@@ -184,14 +184,14 @@ module core
             );
 
 
-    logic [ 3:0 ] thread_count_zure;
+    logic [ 2:0 ] thread_count_zure;
 
     always_comb begin
                     thread_count_zure = thread_count + 4'd1;
 
                     // スレッド数可変
-                    // if ( thread_count == 4'd4 ) begin
-                    if ( thread_count == 4'd9 ) begin
+                    // if ( thread_count == 4'd9 ) begin
+                    if ( thread_count == 4'd4 ) begin
                         thread_count_zure = 0;
                     end
                 end;
@@ -238,17 +238,7 @@ module core
 
                       else if ( inst[ 13 ] ) begin
 
-                          if ( inst[ 15 ] ) begin
-
-                              reg_2_threads[ thread_count ] <= reg_0;
-
-                          end
-
-                          else begin
-
-                              reg_2_threads[ thread_count ] <= reg_1 ^ reg_2_tmp;
-
-                          end
+                          reg_2_threads[ thread_count ] <= reg_inst_for_13;
 
                       end
 
@@ -257,6 +247,17 @@ module core
                   reg_2 <= reg_2_threads[ thread_count_zure ];
 
               end;
+
+    logic [ DIM:0 ]     reg_inst_for_13;
+
+    always_comb begin
+                    if ( inst[ 15 ] ) begin
+                        reg_inst_for_13 = reg_0;
+                    end
+                    else begin
+                        reg_inst_for_13 = reg_1 ^ reg_2_tmp;
+                    end
+                end;
 
     // レジスタ2
 
@@ -277,7 +278,6 @@ module core
 
     always_ff @( posedge clk ) begin
 
-                  // スレッド数可変
                   // アクセラレータの動作終了と同時にリセット
                   // reg_1_threads　reg_2_threads は保持したいため、リセット時にしか0に戻さない
                   if ( ~run ) begin

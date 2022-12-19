@@ -92,7 +92,7 @@ module top
 
     // コア数可変
     // 2コア -------------------
-    parameter CORENUM = 13;
+    parameter CORENUM = 14;
     // ------------------------
 
 
@@ -126,7 +126,7 @@ module top
     // コア数可変
     // 次元数可変
     // buffer_ctrl #( .DIM( 31 ), .CORENUM( 8 ) ) buffer_ctrl
-    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 13 ) ) buffer_ctrl
+    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 14 ) ) buffer_ctrl
                 (
 
                     // in
@@ -148,7 +148,7 @@ module top
                     .core_result_11( core_result[ 10 ] ),
                     .core_result_12( core_result[ 11 ] ),
                     .core_result_13( core_result[ 12 ] ),
-                    // .core_result_14( core_result[ 13 ] ),
+                    .core_result_14( core_result[ 13 ] ),
                     // .core_result_15( core_result[ 14 ] ),
                     // .core_result_16( core_result[ 15 ] ),
                     // .core_result_17( core_result[ 16 ] ),
@@ -191,7 +191,7 @@ module top
     wire [ 1:0 ]          stream_i;
 
     // コア数可変
-    stream_ctrl #( .CORENUM( 13 ) ) stream_ctrl
+    stream_ctrl #( .CORENUM( 14 ) ) stream_ctrl
                 (
 
                     // in
@@ -244,7 +244,7 @@ module top
             // 次元数可変
             // スレッド数可変
             // core #( .DIM( 31 ), .THREADS( 5 ) ) core
-            core #( .DIM( 1023 ), .THREADS( 10 ), .WI( 31 ) ) core
+            core #( .DIM( 1023 ), .THREADS( 5 ), .WI( 31 ) ) core
                  (
 
                      // in
