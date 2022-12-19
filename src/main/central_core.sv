@@ -2,7 +2,7 @@
 `default_nettype none
 
 
-module core
+module central_core
     #(
 
          // ハイパーベクトルの次元数
@@ -23,12 +23,14 @@ module core
          // 16bit命令
          input wire [ 15:0 ]                get_d,
          input wire                         exec,
+         input wire [ DIM:0 ]               sign_bit,
 
 
          // out
          output logic                       finish_gen,
          output reg                         store,
-         output logic [ DIM:0 ]             core_result
+         output logic [ DIM:0 ]             core_result,
+         output reg                         last
 
      );
 
@@ -43,22 +45,41 @@ module core
     // アイテムメモリーからロードしたデータの格納場所
     reg [ DIM:0 ]           reg_0;
 
+    // 書き戻し命令が発行されたか否かのフラグ
+    reg                         wb_flag;
+
 
     always_ff @( posedge clk ) begin
 
-                  if ( update_item ) begin
+                  // 書き込み
+                  // 書き戻し | ランダム生成
+                  if ( wb_flag | update_item ) begin
 
-                      item_memory[ item_a ] <= rand_num;
+                      // 書き戻し
+                      if ( wb_flag ) begin
 
+                          item_memory[ wb_addr ] <= reg_2_tmp;
+
+                      end
+
+                      // ランダム生成
+                      else begin
+
+                          item_memory[ item_a ] <= rand_num;
+
+                      end
                   end
 
                   // 読み出し
                   // 常に垂れ流しで読み出しでOK
                   // (必要ない場合は使わない)
                   reg_0 <= item_memory[ get_d[ 9:0 ] ];
-
               end;
 
+
+
+    // 書き戻し先のアドレス
+    reg [ 8:0 ]                 wb_addr;
 
     // 命令
     reg [ 15:0 ]                inst;
@@ -94,6 +115,8 @@ module core
                   // thread_countは保持しておきたいので、実行終了時のみリセット
                   if ( ~run ) begin
 
+                      wb_flag <= 0;
+                      wb_addr <= 0;
                       inst <= 0;
 
                   end
@@ -101,7 +124,29 @@ module core
                   // データ受信時実行
                   else if ( get_v ) begin
 
-                      inst <= get_d[ 15:0 ];
+                      // wb.item命令 (特殊)
+                      if ( get_d[ 15 ] & get_d[ 12 ] ) begin
+
+                          // 書き込みフラグを立てる
+                          wb_flag <= 1'b1;
+
+                          // 書き込み先アドレス格納
+                          wb_addr[ 8:0 ] <= get_d[ 8:0 ];
+
+                          // 命令は発行しない (nop)
+                          inst <= 0;
+
+                      end
+
+                      // wb.item命令以外はinstを更新
+                      else begin
+
+                          inst <= get_d[ 15:0 ];
+                          wb_flag <= 0;
+                          wb_addr <= 0;
+
+                      end
+
 
                   end
 
@@ -109,7 +154,11 @@ module core
                   // (リセットも兼ねる)
                   else begin
 
+                      // instは保持しなくていい
+                      // (たとえ、instを更新した後にget_vが落ちても、execはまだ続いているので、次サイクルで使われる)
                       inst <= 0;
+                      wb_flag <= 0;
+                      wb_addr <= 0;
 
                   end
               end;
@@ -184,14 +233,22 @@ module core
 
     logic [ DIM:0 ]         reg_2;
 
-    // (* ram_style = "block" *)
+    (* ram_style = "block" *)
     reg [ DIM:0 ]           reg_2_threads [ THREADS-1:0 ];
 
     // always_ff @( posedge clk ) begin
 
     //               if ( exec ) begin
 
-    //                   if ( inst[ 13 ] ) begin
+    //                   // アドレス必要
+    //                   // wb
+    //                   if ( inst[ 10 ] ) begin
+
+    //                       reg_2_threads[ thread_count ] <= sign_bit;
+
+    //                   end
+
+    //                   else if ( inst[ 13 ] ) begin
 
     //                       if ( inst[ 15 ] ) begin
 
@@ -217,7 +274,15 @@ module core
 
                   if ( exec ) begin
 
-                      if ( inst[ 13 ] ) begin
+                      // アドレス必要
+                      // wb
+                      if ( inst[ 10 ] ) begin
+
+                          reg_2_threads[ thread_count ] <= sign_bit;
+
+                      end
+
+                      else if ( inst[ 13 ] ) begin
 
                           if ( inst[ 15 ] ) begin
 
@@ -265,6 +330,7 @@ module core
 
                       buff <= 0;
                       store <= 0;
+                      last <= 0;
 
                   end
 
@@ -277,6 +343,7 @@ module core
 
                           buff <= 0;
                           store <= 0;
+                          last <= 0;
 
                       end
 
@@ -288,6 +355,16 @@ module core
 
                               buff <= reg_2_tmp;
                               store <= 1;
+                              last <= 0;
+
+                          end
+
+                          // last
+                          else if ( inst[ 9 ] ) begin
+
+                              last <= 1;
+                              buff <= 0;
+                              store <= 0;
 
                           end
 
@@ -297,6 +374,7 @@ module core
 
                               buff <= 0;
                               store <= 0;
+                              last <= 0;
 
                           end
                       end
@@ -311,6 +389,7 @@ module core
 
                       buff <= 0;
                       store <= 0;
+                      last <= 0;
 
                   end
 

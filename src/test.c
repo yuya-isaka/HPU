@@ -15,7 +15,8 @@ const int DIM = 1024 / 32;
 
 // 変わらん
 // 追加されるランダムな値はRANNUM-1番目
-const int RANNUM = 512;
+// const int RANNUM = 512;
+const int RANNUM = 1024;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -100,7 +101,7 @@ int main(int argc, char **argv)
 	printf("\n ------------------------------- 開始 ------------------------------- \n\n\n");
 
 	const int NGRAM = 3;
-	const int MAJORITY_ADDR = 511;
+	const int MAJORITY_ADDR = 1023;
 	int ADDRNUM = 0;
 
 	// const int SIMULATION_COUNT = 100;
@@ -125,7 +126,7 @@ int main(int argc, char **argv)
 	// 	printf(" -------------------\n\n");
 	// }
 
-	ADDRNUM = 390;
+	ADDRNUM = 900;
 	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
 	// printf(" --------\n\n");
 	// ADDRNUM = 54;

@@ -92,7 +92,7 @@ module top
 
     // コア数可変
     // 2コア -------------------
-    parameter CORENUM = 13;
+    parameter CORENUM = 14;
     // ------------------------
 
 
@@ -126,7 +126,7 @@ module top
     // コア数可変
     // 次元数可変
     // buffer_ctrl #( .DIM( 31 ), .CORENUM( 8 ) ) buffer_ctrl
-    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 13 ) ) buffer_ctrl
+    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 14 ) ) buffer_ctrl
                 (
 
                     // in
@@ -148,7 +148,7 @@ module top
                     .core_result_11( core_result[ 10 ] ),
                     .core_result_12( core_result[ 11 ] ),
                     .core_result_13( core_result[ 12 ] ),
-                    // .core_result_14( core_result[ 13 ] ),
+                    .core_result_14( core_result[ 13 ] ),
                     // .core_result_15( core_result[ 14 ] ),
                     // .core_result_16( core_result[ 15 ] ),
                     // .core_result_17( core_result[ 16 ] ),
@@ -191,14 +191,14 @@ module top
     wire [ 1:0 ]          stream_i;
 
     // コア数可変
-    stream_ctrl #( .CORENUM( 13 ) ) stream_ctrl
+    stream_ctrl #( .CORENUM( 14 ) ) stream_ctrl
                 (
 
                     // in
                     .clk( AXIS_ACLK ),
                     .rst( ~run ),
                     // 1コア
-                    .last( last[ CORENUM-1:0 ] ),
+                    .last( last ),
                     // .last( last ),
                     .dst_ready( M_AXIS_TREADY ),
 
@@ -227,10 +227,6 @@ module top
     wire [ DIM:0 ]                    core_result [ 0:CORENUM-1 ];
     // wire [DIM:0]                    core_result;
 
-    // 各コアのラスト信号
-    // 1コア
-    wire [ CORENUM-1:0 ]              last;
-    // wire                            last;
 
     wire [ CORENUM-1:0 ]                finish_gen;
 
@@ -239,7 +235,7 @@ module top
 
         genvar      i;
 
-        for ( i = 0; i < CORENUM; i = i + 1 ) begin
+        for ( i = 1; i < CORENUM; i = i + 1 ) begin
 
             // 次元数可変
             // スレッド数可変
@@ -252,12 +248,11 @@ module top
                      .run( run ),
                      .gen( gen ),
                      .reset_item( reset_item ),
-                     .item_memory_num( item_memory_num[ 8:0 ] ),
+                     .item_memory_num( item_memory_num[ 9:0 ] ),
                      .get_v( get_v ),
                      // 16bit命令
                      .get_d( S_AXIS_TDATA[ 15+16*i:16*i ] ),
                      .exec( exec ),
-                     .sign_bit( sign_bit[ DIM:0] ),
 
 
                      // out
@@ -266,17 +261,48 @@ module top
                      .store( store[ i ] ),
                      //  .store( store ),
                      // 1コア
-                     .core_result( core_result[ i ] ),
+                     .core_result( core_result[ i ] )
                      //  .core_result( core_result ),
-                     // 1コア
-                     .last( last[ i ] )
-                     //  .last( last)
-
                  );
 
         end
 
     endgenerate
+
+    // 各コアのラスト信号
+    // 1コア
+    // wire [ CORENUM-1:0 ]              last;
+    wire                            last;
+
+    central_core #( .DIM( 1023 ), .THREADS( 10 ), .WI( 31 ) ) central_core
+                 (
+
+                     // in
+                     .clk( AXIS_ACLK ),
+                     .run( run ),
+                     .gen( gen ),
+                     .reset_item( reset_item ),
+                     .item_memory_num( item_memory_num[ 9:0 ] ),
+                     .get_v( get_v ),
+                     // 16bit命令
+                     .get_d( S_AXIS_TDATA[ 15:0 ] ),
+                     .exec( exec ),
+                     .sign_bit( sign_bit[ DIM:0] ),
+
+
+                     // out
+                     // 1コア
+                     .finish_gen( finish_gen[ 0 ] ),
+                     .store( store[ 0 ] ),
+                     //  .store( store ),
+                     // 1コア
+                     .core_result( core_result[ 0 ] ),
+                     //  .core_result( core_result ),
+                     // 1コア
+                     .last( last )
+                     //  .last( last)
+
+                 );
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -471,7 +497,7 @@ module top
 
     // item_memoryに格納するハイパーベクトルの数
     // (現状の最大値は1023)
-    reg [ 8:0 ]         item_memory_num;
+    reg [ 9:0 ]         item_memory_num;
 
     reg                 reset_item;
 
@@ -491,7 +517,7 @@ module top
 
             { run, gen } <= 2'b00;
 
-            item_memory_num <= 9'd0;
+            item_memory_num <= 10'd0;
 
             reset_item <= 1'b0;
 
@@ -514,8 +540,8 @@ module top
 
                 // アドレス４
                 10'd04:
-                    // 最大511
-                    item_memory_num[ 8:0 ] <= write_data[ 8:0 ];
+                    // 最大1023
+                    item_memory_num[ 9:0 ] <= write_data[ 9:0 ];
 
                 10'd08:
                     reset_item <= write_data[ 0 ];

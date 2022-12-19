@@ -14,9 +14,7 @@ module stream_ctrl
          // in
          input wire                             clk,
          input wire                             rst,
-         // 1コア
-         input wire [ CORENUM-1:0 ]             last,
-         //   input wire                             last,
+         input wire                             last,
          input wire                             dst_ready,
 
 
@@ -61,15 +59,9 @@ module stream_ctrl
 
                   else begin
 
-                      if ( last != 0 ) begin
-                          last_n <= 1'b1;
-                      end
-
-                      else begin
-                          last_n <= 1'b0;
-                      end
-
+                      last_n <= last;
                       last_nn <= last_n;
+
                   end
               end;
 

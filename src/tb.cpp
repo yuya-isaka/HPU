@@ -8,7 +8,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 追加されるランダムな値はRANNUM-1番目
-const int RANNUM = 512;
+// const int RANNUM = 512;
+const int RANNUM = 1024;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1600,7 +1601,7 @@ int main(int argc, char **argv)
 
   const int NGRAM = 3;
   // コア数可変
-  const int CORENUM = 13;
+  const int CORENUM = 14;
   // スレッド数可変
   const int THREADSNUM = 10;
   int DEBUG = 0;
@@ -1608,7 +1609,7 @@ int main(int argc, char **argv)
   // 次元数可変 (結果を何個出力するかに使う)
   // const int DIM = 32 / 32;
   const int DIM = 1024 / 32;
-  const int MAJORITY_ADDR = 511;
+  const int MAJORITY_ADDR = 1023;
 
   // const int SIMULATION_COUNT = 100;
   // for (int i = 30; i < SIMULATION_COUNT; i += 30)
@@ -1632,7 +1633,7 @@ int main(int argc, char **argv)
   //   printf(" -------------------\n\n");
   // }
 
-  ADDRNUM = 390;
+  ADDRNUM = 900;
   DEBUG = 1;
   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
