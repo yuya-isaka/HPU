@@ -186,6 +186,38 @@ module central_core
             );
 
 
+    pop_count #( .DIM( 1023 ) ) pop_count
+              (
+
+                  // in
+                  .clk( clk ),
+                  .exec( exec ),
+                  .data( reg_2[ DIM:0 ] ),
+
+
+                  // out
+                  .result( pop_count_result[ 10:0] )
+
+              );
+
+    reg [ 10:0]      min_data;
+    reg [ 3:0]       min_tag;
+
+    always @( posedge S_AXI_ACLK ) begin
+        if ( ~S_AXI_ARESETN ) begin
+            min_data <= 1025;
+        end
+        else begin
+            if ( min_data > pop_count_result ) begin
+                min_data <= pop_count_result;
+                min_tag <= tag;
+            end
+        end
+    end
+
+
+
+
     logic [ 3:0 ] thread_count_zure;
 
     always_comb begin

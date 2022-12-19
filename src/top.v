@@ -274,6 +274,9 @@ module top
     // wire [ CORENUM-1:0 ]              last;
     wire                            last;
 
+    wire [ 10:0]                     pop_count_result;
+    wire [ 3:0]                      tag;
+
     central_core #( .DIM( 1023 ), .THREADS( 10 ), .WI( 31 ) ) central_core
                  (
 
