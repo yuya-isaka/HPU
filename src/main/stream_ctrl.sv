@@ -24,7 +24,8 @@ module stream_ctrl
          output reg                             dst_valid,
          output reg                             dst_last,
          output logic                           stream_v,
-         output wire [ 1:0 ]                    stream_i
+         // 次元数可変
+         output wire [ 2:0 ]                    stream_i
 
      );
 
@@ -171,13 +172,14 @@ module stream_ctrl
     // 引き金: start
     wire                last_stream;
 
+    // 次元数可変
     // 各コアで違う結果を返したい時に使うかも？
-    agu #( .W( 2 ) ) agu_stream_i
+    agu #( .W( 3 ) ) agu_stream_i
         (
 
             // in
-            .ini( 2'd0 ),
-            .fin( 2'd3 ),
+            .ini( 3'd0 ),
+            .fin( 3'd7 ),
             .start( start ),
             .clk( clk ),
             .rst( rst ),

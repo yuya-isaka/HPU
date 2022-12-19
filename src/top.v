@@ -76,9 +76,10 @@ module top
     // -----------------------
 
     // 1024次元 ---------------
-    parameter DIM = 1023;
+    // parameter DIM = 1023;
     // -----------------------
 
+    parameter DIM = 2047;
 
     // 次元数可変
     // 32次元 -----------------
@@ -92,7 +93,7 @@ module top
 
     // コア数可変
     // 2コア -------------------
-    parameter CORENUM = 13;
+    parameter CORENUM = 6;
     // ------------------------
 
 
@@ -126,7 +127,7 @@ module top
     // コア数可変
     // 次元数可変
     // buffer_ctrl #( .DIM( 31 ), .CORENUM( 8 ) ) buffer_ctrl
-    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 13 ) ) buffer_ctrl
+    buffer_ctrl #( .DIM( 2047 ), .CORENUM( 6 ) ) buffer_ctrl
                 (
 
                     // in
@@ -141,13 +142,13 @@ module top
                     .core_result_4( core_result[ 3 ] ),
                     .core_result_5( core_result[ 4 ] ),
                     .core_result_6( core_result[ 5 ] ),
-                    .core_result_7( core_result[ 6 ] ),
-                    .core_result_8( core_result[ 7 ] ),
-                    .core_result_9( core_result[ 8 ] ),
-                    .core_result_10( core_result[ 9 ] ),
-                    .core_result_11( core_result[ 10 ] ),
-                    .core_result_12( core_result[ 11 ] ),
-                    .core_result_13( core_result[ 12 ] ),
+                    // .core_result_7( core_result[ 6 ] ),
+                    // .core_result_8( core_result[ 7 ] ),
+                    // .core_result_9( core_result[ 8 ] ),
+                    // .core_result_10( core_result[ 9 ] ),
+                    // .core_result_11( core_result[ 10 ] ),
+                    // .core_result_12( core_result[ 11 ] ),
+                    // .core_result_13( core_result[ 12 ] ),
                     // .core_result_14( core_result[ 13 ] ),
                     // .core_result_15( core_result[ 14 ] ),
                     // .core_result_16( core_result[ 15 ] ),
@@ -172,7 +173,8 @@ module top
                     // .store( store ),
                     .store_flag( store_flag ),
                     .stream_v( stream_v ),
-                    .stream_i( stream_i[ 1:0 ] ),
+                    // 次元数可変
+                    .stream_i( stream_i[ 2:0 ] ),
 
 
                     // out
@@ -188,10 +190,11 @@ module top
     // counterの値(sign_bit)をM_AXIS_TDATAに格納するタイミングを知らせる役割
     wire                stream_v;
 
-    wire [ 1:0 ]          stream_i;
+    // 次元数可変
+    wire [ 2:0 ]          stream_i;
 
     // コア数可変
-    stream_ctrl #( .CORENUM( 13 ) ) stream_ctrl
+    stream_ctrl #( .CORENUM( 6 ) ) stream_ctrl
                 (
 
                     // in
@@ -207,7 +210,8 @@ module top
                     .dst_valid( M_AXIS_TVALID ),
                     .dst_last( M_AXIS_TLAST ),
                     .stream_v( stream_v ),
-                    .stream_i( stream_i[ 1:0 ] )
+                    // 次元数可変
+                    .stream_i( stream_i[ 2:0 ] )
 
                 );
 
@@ -244,7 +248,8 @@ module top
             // 次元数可変
             // スレッド数可変
             // core #( .DIM( 31 ), .THREADS( 5 ) ) core
-            core #( .DIM( 1023 ), .THREADS( 10 ), .WI( 31 ) ) core
+            // core #( .DIM( 1023 ), .THREADS( 10 ), .WI( 31 ) ) core
+            core #( .DIM( 2047 ), .THREADS( 10 ), .WI( 63 ) ) core
                  (
 
                      // in

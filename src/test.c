@@ -5,20 +5,6 @@
 #include <stdint.h>
 #include "hyper_vector.h"
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 次元数可変
-// const int DIM = 32 / 32;
-const int DIM = 1024 / 32;
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 変わらん
-// 追加されるランダムな値はRANNUM-1番目
-const int RANNUM = 512;
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 // 渡された32ビットのvを、バイナリでコマンドライン出力
 void printb(unsigned int v)
 {
@@ -43,7 +29,7 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR)
 
 	hv_init();
 
-	hv_t **item_memory = hv_make_imem(RANNUM);
+	hv_t **item_memory = hv_make_imem(512);
 
 	const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 
@@ -125,7 +111,7 @@ int main(int argc, char **argv)
 	// 	printf(" -------------------\n\n");
 	// }
 
-	ADDRNUM = 390;
+	ADDRNUM = 420;
 	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
 	// printf(" --------\n\n");
 	// ADDRNUM = 54;

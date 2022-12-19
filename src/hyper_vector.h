@@ -2,7 +2,8 @@
 #ifndef HYPER_VECTOR_h_
 #define HYPER_VECTOR_h_
 
-#define HV_DIM 1024
+// 次元数可変
+#define HV_DIM 2048
 #define HV_NUM HV_DIM / ELEMENT_SIZE
 
 #ifdef HV64

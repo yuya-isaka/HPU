@@ -24,13 +24,13 @@ module buffer_ctrl
          input wire [ DIM:0 ]                   core_result_4,
          input wire [ DIM:0 ]                   core_result_5,
          input wire [ DIM:0 ]                   core_result_6,
-         input wire [ DIM:0 ]                   core_result_7,
-         input wire [ DIM:0 ]                   core_result_8,
-         input wire [ DIM:0 ]                   core_result_9,
-         input wire [ DIM:0 ]                   core_result_10,
-         input wire [ DIM:0 ]                   core_result_11,
-         input wire [ DIM:0 ]                   core_result_12,
-         input wire [ DIM:0 ]                   core_result_13,
+         //  input wire [ DIM:0 ]                   core_result_7,
+         //  input wire [ DIM:0 ]                   core_result_8,
+         //  input wire [ DIM:0 ]                   core_result_9,
+         //  input wire [ DIM:0 ]                   core_result_10,
+         //  input wire [ DIM:0 ]                   core_result_11,
+         //  input wire [ DIM:0 ]                   core_result_12,
+         //  input wire [ DIM:0 ]                   core_result_13,
          //  input wire [ DIM:0 ]                   core_result_14,
          //  input wire [ DIM:0 ]                   core_result_15,
          //  input wire [ DIM:0 ]                   core_result_16,
@@ -55,7 +55,8 @@ module buffer_ctrl
          //  input wire                         store,
          input wire                             store_flag,
          input wire                             stream_v,
-         input wire [ 1:0 ]                     stream_i,
+         // 次元数可変
+         input wire [ 2:0 ]                     stream_i,
 
 
          // out
@@ -77,7 +78,7 @@ module buffer_ctrl
 
             // コア数可変
             // 計算数可変 (現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分)
-            counter #( .W( 26 ), .CORENUM( 13 ) ) counter
+            counter #( .W( 26 ), .CORENUM( 6 ) ) counter
                     (
 
                         // in
@@ -110,13 +111,13 @@ module buffer_ctrl
                                 // core_result_16[ j ],
                                 // core_result_15[ j ],
                                 // core_result_14[ j ],
-                                core_result_13[ j ],
-                                core_result_12[ j ],
-                                core_result_11[ j ],
-                                core_result_10[ j ],
-                                core_result_9[ j ],
-                                core_result_8[ j ],
-                                core_result_7[ j ],
+                                // core_result_13[ j ],
+                                // core_result_12[ j ],
+                                // core_result_11[ j ],
+                                // core_result_10[ j ],
+                                // core_result_9[ j ],
+                                // core_result_8[ j ],
+                                // core_result_7[ j ],
                                 core_result_6[ j ],
                                 core_result_5[ j ],
                                 core_result_4[ j ],
@@ -153,7 +154,8 @@ module buffer_ctrl
                   // stram_vの次にdst_validが立つ設計
                   if ( stream_v ) begin
 
-                      if ( stream_i == 2'd0 ) begin
+                      //   if ( stream_i == 2'd0 ) begin
+                      if ( stream_i == 3'd0 ) begin
 
                           stream_d[ 255:0 ] <= sign_bit[ 255:0 ];
                           //   stream_d[ 511:0 ] <= sign_bit[ 1023:512 ];
@@ -162,23 +164,50 @@ module buffer_ctrl
 
                       end
 
-                      else if ( stream_i == 2'd1 ) begin
+                      //   else if ( stream_i == 2'd1 ) begin
+                      else if ( stream_i == 3'd1 ) begin
 
                           stream_d[ 255:0 ] <= sign_bit[ 511:256 ];
 
                       end
 
-                      else if ( stream_i == 2'd2) begin
+                      //   else if ( stream_i == 2'd2) begin
+                      else if ( stream_i == 3'd2) begin
 
                           stream_d[ 255:0 ] <= sign_bit[ 767:512 ];
 
                       end
 
-                      else begin
+                      //   else begin
+                      else if ( stream_i == 3'd3 ) begin
 
                           stream_d[ 255:0 ] <= sign_bit[ 1023:768 ];
                           //   stream_d[ 511:0 ] <= sign_bit[ 511:0 ];
                           //   stream_d[ 511:0 ] <= 0;
+
+                      end
+
+                      else if ( stream_i == 3'd4 ) begin
+
+                          stream_d[ 255:0 ] <= sign_bit[ 1279:1024 ];
+
+                      end
+
+                      else if ( stream_i == 3'd5 ) begin
+
+                          stream_d[ 255:0 ] <= sign_bit[ 1535:1280 ];
+
+                      end
+
+                      else if ( stream_i == 3'd6 ) begin
+
+                          stream_d[ 255:0 ] <= sign_bit[ 1791:1536 ];
+
+                      end
+
+                      else if ( stream_i == 3'd7 ) begin
+
+                          stream_d[ 255:0 ] <= sign_bit[ 2047:1792 ];
 
                       end
 

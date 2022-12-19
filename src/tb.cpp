@@ -1555,7 +1555,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
     //   }
     //   eval();
     // }
-    for (int i = 0; i < (32 / BUS); i++)
+    for (int i = 0; i < (64 / BUS); i++)
     {
       for (int j = 0; j < BUS; j++)
       {
@@ -1600,14 +1600,15 @@ int main(int argc, char **argv)
 
   const int NGRAM = 3;
   // コア数可変
-  const int CORENUM = 13;
+  const int CORENUM = 6;
   // スレッド数可変
   const int THREADSNUM = 10;
   int DEBUG = 0;
   int ADDRNUM = 0;
   // 次元数可変 (結果を何個出力するかに使う)
   // const int DIM = 32 / 32;
-  const int DIM = 1024 / 32;
+  // const int DIM = 1024 / 32;
+  const int DIM = 2048 / 32;
   const int MAJORITY_ADDR = 511;
 
   // const int SIMULATION_COUNT = 100;
@@ -1632,7 +1633,7 @@ int main(int argc, char **argv)
   //   printf(" -------------------\n\n");
   // }
 
-  ADDRNUM = 390;
+  ADDRNUM = 420;
   DEBUG = 1;
   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
   // printf(" --------\n\n");
