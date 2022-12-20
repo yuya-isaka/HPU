@@ -254,7 +254,7 @@ void hdc_setup(void)
 		return;
 	}
 
-	src = (uint16_t *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
+	src = (uint16_t *)mmap(NULL, 0x1DCD6500, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
 	if (src == MAP_FAILED)
 	{
 		perror("mmap src");
@@ -262,7 +262,7 @@ void hdc_setup(void)
 		return;
 	}
 
-	dst = (int *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd1, 0);
+	dst = (int *)mmap(NULL, 0x3D0900, PROT_READ | PROT_WRITE, MAP_SHARED, fd1, 0);
 	if (dst == MAP_FAILED)
 	{
 		perror("mmap dst");
