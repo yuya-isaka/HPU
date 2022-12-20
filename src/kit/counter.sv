@@ -25,11 +25,6 @@ module counter
          // 1コア
          input wire [ CORENUM-1:0 ]             core_result,
          //  input wire                         core_result,
-         input wire                             store_sub,
-         input wire                             box_store,
-         input wire [ 3:0]                       box_store_addr,
-         input wire                             box_load,
-         input wire [ 3:0]                       box_load_addr,
 
 
          // out
@@ -52,17 +47,6 @@ module counter
 
               end;
 
-    (* ram_style = "block" *)
-    reg signed [ W-1:0 ]    box_array[ 16 ];
-
-    reg signed [ W-1:0 ]      box_tmp;
-
-    always_ff @( posedge clk) begin
-                  if ( box_store) begin
-                      box_array[ box_store_addr] <= box;
-                  end
-                  box_tmp <= box_array[ box_load_addr ];
-              end;
 
     reg signed [ W-1:0 ]      box;
 
@@ -76,22 +60,6 @@ module counter
                       box <= 0;
                       box_1 <= 0;
 
-                  end
-
-                  else if ( box_load ) begin
-                      box <= box_tmp;
-                  end
-
-                  else if ( store_sub) begin
-                      if ( core_result[ 0] == 1'b0 ) begin
-                          // -1
-                          box <= box + $signed( 1'b1 );
-                      end
-
-                      else begin
-                          // 1
-                          box <= box + $signed( 1 );
-                      end
                   end
 
                   else begin

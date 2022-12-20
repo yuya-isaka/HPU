@@ -35,7 +35,6 @@ DESIGN_SRC = \
 ./kit/selector.sv \
 ./kit/agu.sv \
 ./kit/permute.sv \
-./kit/pop_count.sv \
 
 VERILATOR_TB = tb.cpp
 
