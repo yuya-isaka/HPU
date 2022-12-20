@@ -744,6 +744,7 @@ module pop_count
                   end
               end;
 
+
     assign result = stage_5_1;
 
 endmodule

@@ -56,6 +56,11 @@ module buffer_ctrl
          input wire                             store_flag,
          input wire                             stream_v,
          input wire [ 1:0 ]                     stream_i,
+         input wire                             store_sub,
+         input wire                             box_store,
+         input wire [ 3:0 ]                     box_store_addr,
+         input wire                             box_load,
+         input wire [ 3:0 ]                     box_load_addr,
 
 
          // out
@@ -125,6 +130,11 @@ module buffer_ctrl
                                 core_result_1[ j ]
                             }
                         ),
+                        .store_sub( store_sub ),
+                        .box_store( box_store ),
+                        .box_store_addr( box_store_addr[ 3:0 ] ),
+                        .box_load( box_load ),
+                        .box_load_addr( box_load_addr[ 3:0 ] ),
 
 
                         // out

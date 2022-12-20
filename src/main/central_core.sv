@@ -30,7 +30,12 @@ module central_core
          output logic                       finish_gen,
          output reg                         store,
          output logic [ DIM:0 ]             core_result,
-         output reg                         last
+         output reg                         store_sub,
+         output reg                         last,
+         output reg                         box_store,
+         output reg                         box_store_addr,
+         output reg                         box_load,
+         output reg                         box_load_addr
 
      );
 
@@ -120,6 +125,9 @@ module central_core
                       wb_flag <= 0;
                       wb_addr <= 0;
                       inst <= 0;
+                      box_store <= 0;
+                      box_store_addr <= 0;
+                      box_load_addr <= 0;
 
                   end
 
@@ -138,11 +146,38 @@ module central_core
                           // 命令は発行しない (nop)
                           inst <= 0;
 
+                          box_store <= 0;
+                          box_store_addr <= 0;
+                          box_load_addr <= 0;
+
+                      end
+
+                      else if ( ~get_d[ 15] & get_d[ 5 ] ) begin
+
+                          box_store <= 1;
+                          box_store_addr <= get_d[ 3:0 ];
+                          box_load_addr <= 0;
+                          inst <= 0;
+                          wb_flag <= 0;
+                          wb_addr <= 0;
+
+                      end
+
+                      else if ( ~get_d[ 15] &  get_d[ 4 ] ) begin
+                          box_load_addr <= get_d[ 3:0 ];
+                          box_store <= 0;
+                          box_store_addr <= 0;
+                          inst <= 0;
+                          wb_flag <= 0;
+                          wb_addr <= 0;
                       end
 
                       // wb.item命令以外はinstを更新
                       else begin
 
+                          box_load_addr <= 0;
+                          box_store <= 0;
+                          box_store_addr <= 0;
                           inst <= get_d[ 15:0 ];
                           wb_flag <= 0;
                           wb_addr <= 0;
@@ -161,6 +196,9 @@ module central_core
                       inst <= 0;
                       wb_flag <= 0;
                       wb_addr <= 0;
+                      box_store <= 0;
+                      box_store_addr <= 0;
+                      box_load_addr <= 0;
 
                   end
               end;
@@ -185,6 +223,7 @@ module central_core
 
             );
 
+    wire [ 10:0]             pop_count_result;
 
     pop_count #( .DIM( 1023 ) ) pop_count
               (
@@ -200,21 +239,22 @@ module central_core
 
               );
 
+
     reg [ 10:0]      min_data;
     reg [ 3:0]       min_tag;
 
-    always @( posedge S_AXI_ACLK ) begin
-        if ( ~S_AXI_ARESETN ) begin
-            min_data <= 1025;
-        end
-        else begin
-            if ( min_data > pop_count_result ) begin
-                min_data <= pop_count_result;
-                min_tag <= tag;
-            end
-        end
-    end
-
+    always_ff @( posedge clk ) begin
+                  if ( ~run ) begin
+                      min_data <= 1025;
+                      min_tag <= 15;
+                  end
+                  else if ( ~inst[ 15] & inst[ 7] & ~inst[ 6 ] ) begin
+                      if ( min_data > pop_count_result ) begin
+                          min_data <= pop_count_result;
+                          min_tag <= reg_2;
+                      end
+                  end
+              end;
 
 
 
@@ -286,6 +326,11 @@ module central_core
 
                           reg_2_threads[ thread_count ] <= reg_for_inst_13;
 
+                      end
+
+                      else if ( ~inst[ 15] & inst[ 8 ] ) begin
+                          // タグ保存
+                          reg_2_threads[ thread_count ] <= inst[ 3:0 ];
                       end
 
                   end
@@ -366,6 +411,8 @@ module central_core
                       buff <= 0;
                       store <= 0;
                       last <= 0;
+                      box_load <= 0;
+                      store_sub <= 0;
 
                   end
 
@@ -379,6 +426,8 @@ module central_core
                           buff <= 0;
                           store <= 0;
                           last <= 0;
+                          box_load <= 0;
+                          store_sub <= 0;
 
                       end
 
@@ -391,6 +440,8 @@ module central_core
                               buff <= reg_2_tmp;
                               store <= 1;
                               last <= 0;
+                              box_load <= 0;
+                              store_sub <= 0;
 
                           end
 
@@ -400,7 +451,45 @@ module central_core
                               last <= 1;
                               buff <= 0;
                               store <= 0;
+                              box_load <= 0;
+                              store_sub <= 0;
 
+                          end
+
+                          else if ( inst[ 7] & inst [ 6 ] ) begin
+                              if ( min_tag == inst[ 3:0 ] ) begin
+                                  store <= 0;
+                              end
+                              else begin
+                                  store <= 1;
+                              end
+                              buff <= reg_1;
+                              last <= 0;
+                              box_load <= 0;
+                              store_sub <= 0;
+
+                          end
+
+                          else if ( inst [ 6 ] ) begin
+                              if ( min_tag == inst[ 3:0 ] ) begin
+                                  store_sub <= 0;
+                              end
+                              else begin
+                                  store_sub <= 1;
+                              end
+                              store <= 0;
+                              buff <= reg_1;
+                              last <= 0;
+                              box_load <= 0;
+
+                          end
+
+                          else if ( inst [ 4 ] ) begin
+                              box_load <= 1;
+                              buff <= 0;
+                              store <= 0;
+                              last <= 0;
+                              store_sub <= 0;
                           end
 
                           // nop (すべて0のはず)
@@ -410,6 +499,8 @@ module central_core
                               buff <= 0;
                               store <= 0;
                               last <= 0;
+                              box_load <= 0;
+                              store_sub <= 0;
 
                           end
                       end
@@ -425,6 +516,8 @@ module central_core
                       buff <= 0;
                       store <= 0;
                       last <= 0;
+                      box_load <= 0;
+                      store_sub <= 0;
 
                   end
 

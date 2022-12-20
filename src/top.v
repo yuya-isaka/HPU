@@ -173,6 +173,11 @@ module top
                     .store_flag( store_flag ),
                     .stream_v( stream_v ),
                     .stream_i( stream_i[ 1:0 ] ),
+                    .store_sub( store_sub ),
+                    .box_store( box_store ),
+                    .box_store_addr( box_store_addr[ 3:0] ),
+                    .box_load( box_load ),
+                    .box_load_addr( box_load_addr[ 3:0] ),
 
 
                     // out
@@ -274,8 +279,12 @@ module top
     // wire [ CORENUM-1:0 ]              last;
     wire                            last;
 
-    wire [ 10:0]                     pop_count_result;
-    wire [ 3:0]                      tag;
+    wire                            store_sub;
+
+    wire                            box_store;
+    wire [ 3:0]                      box_store_addr;
+    wire                            box_load;
+    wire [ 3:0]                      box_load_addr;
 
     central_core #( .DIM( 1023 ), .THREADS( 10 ), .WI( 31 ) ) central_core
                  (
@@ -302,8 +311,13 @@ module top
                      .core_result( core_result[ 0 ] ),
                      //  .core_result( core_result ),
                      // 1コア
-                     .last( last )
+                     .last( last ),
                      //  .last( last)
+                     .store_sub( store_sub ),
+                     .box_store( box_store ),
+                     .box_store_addr( box_store_addr[ 3:0] ),
+                     .box_load( box_load ),
+                     .box_load_addr( box_load_addr[ 3:0] )
 
                  );
 
