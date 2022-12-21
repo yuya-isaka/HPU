@@ -1,6 +1,8 @@
 
 default:
-	gcc -O2 -o bind bind.c -lm
+	gcc -c -O2 -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -c -O2 -DHV64 -o bind.o bind.c
+	gcc -O2 -DHV64 -o bind bind.o hyper_vector.o
 	gcc -O2 -o bind_bound bind_bound.c -lm
 	gcc -O2 -o bind_and_bound bind_and_bound.c -lm
 	gcc -O2 -o random random.c -lm
@@ -10,6 +12,11 @@ default:
 	gcc -O2 -o perm_bound perm_bound.c -lm
 	gcc -O2 -o perm_and_bound perm_and_bound.c -lm
 	gcc -O2 -o write_test write_test.c -lm
+
+omp:
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O2 -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O2 -DOPENMP -DHV64 -o bind.o bind.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O2 -DOPENMP -DHV64 -o bind bind.o hyper_vector.o
 
 check:
 	gcc -Wall -o bind bind.c -lm

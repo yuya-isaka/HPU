@@ -5,37 +5,6 @@
 #include <stdint.h>
 #include "hyper_vector.h"
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 次元数可変
-// const int DIM = 32 / 32;
-const int DIM = 1024 / 32;
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 変わらん
-// 追加されるランダムな値はRANNUM-1番目
-const int RANNUM = 512;
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 渡された32ビットのvを、バイナリでコマンドライン出力
-void printb(unsigned int v)
-{
-	unsigned int mask = (int)1 << (sizeof(v) * 8 - 1);
-	do
-		putchar(mask & v ? '1' : '0');
-	while (mask >>= 1);
-}
-
-// printbを使いつつ整形して、バイナリをコマンドライン出力
-void putb(unsigned int v)
-{
-	printf("  0"), putchar('b'), printb(v), putchar('\n');
-}
-
-// N-gram専用check関数
-// 簡易アセンブラを使って、直接アセンブラを記述 (関数使ったやつに書き直す)
 //    NGRAM   = 1 ~
 //    ADDRNUM = NGRAMの倍数 (shifter_newを使ったテストをしているから。また、LASTが０のままになりtb.cppでは止まる。test.cppでは動くけどNGRAMの倍数以外は同じ値が出る)
 void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR)
@@ -43,7 +12,7 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR)
 
 	hv_init();
 
-	hv_t **item_memory = hv_make_imem(RANNUM);
+	hv_t **item_memory = hv_make_imem(512);
 
 	const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 
@@ -74,6 +43,7 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR)
 	hv_print(result);
 
 	hv_free(result);
+	hv_free_array(item_memory, 512);
 	hv_finish();
 
 	return;
