@@ -1,19 +1,51 @@
 
-default:
+gbind:
 	gcc -c -O2 -DHV64 -o hyper_vector.o hyper_vector.c
 	gcc -c -O2 -DHV64 -o bind.o bind.c
 	gcc -O2 -DHV64 -o bind bind.o hyper_vector.o
+	rm hyper_vector.o bind.o
+	./bind
+	rm bind
+
+gperm:
+	gcc -c -O2 -DHV64 -o hyper_vector.o hyper_vector.c
 	gcc -c -O2 -DHV64 -o perm.o perm.c
 	gcc -O2 -DHV64 -o perm perm.o hyper_vector.o
+	rm hyper_vector.o perm.o
+	./perm
+	rm perm
+
+gbound:
+	gcc -c -O2 -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -c -O2 -DHV64 -o bound.o bound.c
+	gcc -O2 -DHV64 -o bound bound.o hyper_vector.o
+	rm hyper_vector.o bound.o
+	./bound
+	rm bound
+
+grandom:
+	gcc -c -O2 -DHV64 -o hyper_vector.o hyper_vector.c
 	gcc -c -O2 -DHV64 -o random.o random.c
 	gcc -O2 -DHV64 -o random random.o hyper_vector.o
-	gcc -O2 -o bind_bound bind_bound.c -lm
-	gcc -O2 -o bind_and_bound bind_and_bound.c -lm
-	gcc -O2 -o bound bound.c -lm
-	gcc -O2 -o bound2 bound2.c -lm
-	gcc -O2 -o perm_bound perm_bound.c -lm
-	gcc -O2 -o perm_and_bound perm_and_bound.c -lm
-	gcc -O2 -o write_test write_test.c -lm
+	rm hyper_vector.o random.o
+	./random
+	rm random
+
+gbind_bound:
+	gcc -c -O2 -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -c -O2 -DHV64 -o bind_bound.o bind_bound.c
+	gcc -O2 -DHV64 -o bind_bound bind_bound.o hyper_vector.o
+	rm hyper_vector.o bind_bound.o
+	./bind_bound
+	rm bind_bound
+
+gperm_bound:
+	gcc -c -O2 -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -c -O2 -DHV64 -o perm_bound.o perm_bound.c
+	gcc -O2 -DHV64 -o perm_bound perm_bound.o hyper_vector.o
+	rm hyper_vector.o perm_bound.o
+	./perm_bound
+	rm perm_bound
 
 omp:
 	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O2 -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
