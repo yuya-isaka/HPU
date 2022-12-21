@@ -44,6 +44,7 @@ int main(int argc, char const *argv[])
 
 	hv_free_array(item_memory, 512);
 	hv_free_array(result, trial_num);
+	hv_finish();
 
 	end = clock();
 	double TIME = (double)(end - start) / CLOCKS_PER_SEC;
