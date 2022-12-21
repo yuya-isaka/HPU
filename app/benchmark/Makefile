@@ -5,9 +5,10 @@ default:
 	gcc -O2 -DHV64 -o bind bind.o hyper_vector.o
 	gcc -c -O2 -DHV64 -o perm.o perm.c
 	gcc -O2 -DHV64 -o perm perm.o hyper_vector.o
+	gcc -c -O2 -DHV64 -o random.o random.c
+	gcc -O2 -DHV64 -o random random.o hyper_vector.o
 	gcc -O2 -o bind_bound bind_bound.c -lm
 	gcc -O2 -o bind_and_bound bind_and_bound.c -lm
-	gcc -O2 -o random random.c -lm
 	gcc -O2 -o bound bound.c -lm
 	gcc -O2 -o bound2 bound2.c -lm
 	gcc -O2 -o perm_bound perm_bound.c -lm

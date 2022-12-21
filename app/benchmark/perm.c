@@ -14,15 +14,11 @@
 
 int main(int argc, char const *argv[])
 {
-	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
-
 	clock_t start, end;
 	start = clock();
 
 	// seed設定
 	srand(10);
-
-	hv_init();
 
 	hv_t **item_memory = hv_make_imem(512);
 
@@ -44,16 +40,13 @@ int main(int argc, char const *argv[])
 
 	hv_free_array(item_memory, 512);
 	hv_free_array(result, trial_num);
-	hv_finish();
 
 	end = clock();
 	double TIME = (double)(end - start) / CLOCKS_PER_SEC;
 #ifdef OPENMP
 	TIME = TIME / omp_get_max_threads();
 #endif
-	printf("  %.3lf秒\n", TIME);
-
-	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
+	printf("  %.5lf秒\n", TIME);
 
 	return 0;
 }
