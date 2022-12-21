@@ -244,7 +244,7 @@ module central_core
 
                       // アドレス必要
                       // wb
-                      if ( inst[ 10 ] ) begin
+                      if ( ~inst[ 15] & inst[ 9 ] ) begin
 
                           reg_2_threads[ thread_count ] <= sign_bit;
 
@@ -363,7 +363,7 @@ module central_core
                           end
 
                           // last
-                          else if ( inst[ 9 ] ) begin
+                          else if ( inst[ 8 ] ) begin
 
                               last <= 1;
                               buff <= 0;
