@@ -120,7 +120,6 @@ uint16_t assemble(const char inst_str[], uint16_t addr)
     {
       inst = 34816 + 1024;
       result = inst | addr;
-      result += 1024;
     }
 
     return result;
