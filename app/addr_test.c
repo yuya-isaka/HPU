@@ -9,7 +9,7 @@
 #include "hyper_vector.h"
 #include "hdc_processor.h"
 
-void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJORITY_ADDR)
+void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJORITY_ADDR, const int IMEM_SIZE)
 {
 
   hdc_init(0);
@@ -128,7 +128,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
 
   hv_init();
 
-  hv_t **item_memory = hv_make_imem(512);
+  hv_t **item_memory = hv_make_imem(IMEM_SIZE);
 
   for (int i = 0; i < ADDRNUM; i += 3)
   {
@@ -179,25 +179,24 @@ int main()
 {
   printf("\n ------------------------------ 開始 -------------------------------- \n\n");
 
+  const int IMEM_SIZE = 1024;
+
   hdc_setup();
 
-  hdc_make_imem(512);
+  hdc_make_imem(IMEM_SIZE);
 
   const int NGRAM = 3;
-  const int CORENUM_MAX = 13;
-  const int MAJORITY_ADDR = 511;
+  const int CORENUM_MAX = 14;
+  const int MAJORITY_ADDR = IMEM_SIZE - 1;
 
-  for (int i = 30; i <= 512; i += 30)
+  for (int i = 30; i <= IMEM_SIZE; i += 30)
   {
     int ADDRNUM = i;
-    check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR);
+    check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR, IMEM_SIZE);
   }
 
   // int ADDRNUM = 30;
-  // check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR);
-  // printf("\nOK!\n");
-  // ADDRNUM = 390;
-  // check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR);
+  // check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR, IMEM_SIZE);
 
   printf("\nOK!\n");
   printf("\n ------------------------------ 終了 -------------------------------- \n\n");
