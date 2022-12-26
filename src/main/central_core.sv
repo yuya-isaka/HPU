@@ -50,7 +50,7 @@ module central_core
                   // 書き戻し | ランダム生成
                   if ( update_item ) begin
 
-                          item_memory[ item_a ] <= rand_num;
+                      item_memory[ item_a ] <= rand_num;
 
                   end
 
@@ -111,7 +111,7 @@ module central_core
                   // データ受信時実行
                   else if ( get_v ) begin
 
-                          inst <= get_d[ 15:0 ];
+                      inst <= get_d[ 15:0 ];
 
                   end
 
@@ -205,10 +205,10 @@ module central_core
 
     always_ff @( posedge clk ) begin
 
-                  if ( exec & inst[13] ) begin
+                  if ( exec & inst[ 13] ) begin
 
 
-                          reg_2_threads[ thread_count ] <= reg_for_inst_13;
+                      reg_2_threads[ thread_count ] <= reg_for_inst_13;
 
                   end
 
