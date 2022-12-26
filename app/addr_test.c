@@ -15,16 +15,13 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
   hdc_init(0);
   hdc_dma_reset();
 
+  const int EPOCH = (ADDRNUM / NGRAM) / (CORENUM * THREADS_NUM);
+
   const int REMAINDAR = (ADDRNUM / NGRAM) % (CORENUM * THREADS_NUM);
   const int REMAINDAR_CORENUM = REMAINDAR / THREADS_NUM;
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 
-  int LAST = (ADDRNUM / NGRAM) / (CORENUM * THREADS_NUM);
-  if (REMAINDAR == 0)
-  {
-    LAST--;
-  }
-  LAST *= NGRAM * CORENUM * THREADS_NUM;
+  const int LAST = EPOCH * NGRAM * CORENUM * THREADS_NUM;
 
   hdc_start();
 
@@ -36,17 +33,9 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
     hdc_store_thread(1, 1);
   }
 
-  for (int j = 0; j < ADDRNUM; j += NGRAM * CORENUM * THREADS_NUM)
+  for (int j = 0; j < LAST; j += NGRAM * CORENUM * THREADS_NUM)
   {
-    uint16_t core_num;
-    if (REMAINDAR != 0 && j == LAST)
-    {
-      core_num = REMAINDAR_CORENUM;
-    }
-    else
-    {
-      core_num = CORENUM;
-    }
+    uint16_t core_num = CORENUM;
 
     uint16_t addr_array[THREADS_NUM][core_num];
 
@@ -55,6 +44,77 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
       for (int i = 0; i < core_num; i++)
       {
         addr_array[k][i] = NGRAM * i + j + (NGRAM * core_num * k);
+      }
+    }
+
+    // load ---------------------------------------------
+    hdc_load_thread(THREADS_NUM, core_num, addr_array);
+    // ------------------------------------------------------
+
+    // move ---------------------------------------------
+    hdc_simd_move_thread(THREADS_NUM, core_num);
+    // ------------------------------------------------------
+
+    for (int k = 0; k < THREADS_NUM; k++)
+    {
+      for (int i = 0; i < core_num; i++)
+      {
+        addr_array[k][i]++;
+      }
+    }
+
+    // load ---------------------------------------------
+    hdc_load_thread(THREADS_NUM, core_num, addr_array);
+    // ------------------------------------------------------
+
+    // permute ---------------------------------------------
+    hdc_permute_thread(THREADS_NUM, core_num, 1);
+    // ------------------------------------------------------
+
+    // pxor ---------------------------------------------
+    hdc_pxor_thread(THREADS_NUM, core_num);
+    // ------------------------------------------------------
+
+    // move ---------------------------------------------
+    hdc_simd_move_thread(THREADS_NUM, core_num);
+    // ------------------------------------------------------
+
+    for (int k = 0; k < THREADS_NUM; k++)
+    {
+      for (int i = 0; i < core_num; i++)
+      {
+        addr_array[k][i]++;
+      }
+    }
+
+    // load ---------------------------------------------
+    hdc_load_thread(THREADS_NUM, core_num, addr_array);
+    // ------------------------------------------------------
+
+    // permute ---------------------------------------------
+    hdc_permute_thread(THREADS_NUM, core_num, 2);
+    // ------------------------------------------------------
+
+    // pxor ---------------------------------------------
+    hdc_pxor_thread(THREADS_NUM, core_num);
+    // ------------------------------------------------------
+
+    // store ---------------------------------------------
+    hdc_store_thread(THREADS_NUM, core_num);
+    // ------------------------------------------------------
+  }
+
+  if (REMAINDAR != 0)
+  {
+    uint16_t core_num = REMAINDAR_CORENUM;
+
+    uint16_t addr_array[THREADS_NUM][core_num];
+
+    for (int k = 0; k < THREADS_NUM; k++)
+    {
+      for (int i = 0; i < core_num; i++)
+      {
+        addr_array[k][i] = NGRAM * i + LAST + (NGRAM * core_num * k);
       }
     }
 

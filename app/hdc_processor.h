@@ -41,6 +41,8 @@ extern void hdc_pstore_thread(uint16_t thread_num, uint16_t core_num);
 
 extern void hdc_move_thread(uint16_t thread_num, uint16_t core_num);
 
+extern void hdc_simd_move_thread(uint16_t thread_num, uint16_t core_num);
+
 extern void hdc_pmove_thread(uint16_t thread_num, uint16_t core_num);
 
 extern void hdc_permute_thread(uint16_t thread_num, uint16_t core_num, uint16_t permute_num);

@@ -612,6 +612,19 @@ void hdc_store_thread(uint16_t thread_num, uint16_t core_num)
 	}
 }
 
+void hdc_simd_store_thread(uint16_t thread_num, uint16_t core_num)
+{
+	for (int k = 0; k < thread_num; k++)
+	{
+		src[SEND_NUM] = hdc_assemble("simd_store", 0);
+		SEND_NUM += 16;
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		SEND_NUM += 16;
+	}
+}
+
 // =========================================================================================
 
 void hdc_pstore(void)
@@ -640,6 +653,19 @@ void hdc_pstore_thread(uint16_t thread_num, uint16_t core_num)
 	for (int k = thread_num; k < THREADS_NUM; k++)
 	{
 		hdc_nop_core();
+	}
+}
+
+void hdc_simd_pstore_thread(uint16_t thread_num, uint16_t core_num)
+{
+	for (int k = 0; k < thread_num; k++)
+	{
+		src[SEND_NUM] = hdc_assemble("simd_pstore", 0);
+		SEND_NUM += 16;
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		SEND_NUM += 16;
 	}
 }
 
@@ -674,6 +700,19 @@ void hdc_move_thread(uint16_t thread_num, uint16_t core_num)
 	}
 }
 
+void hdc_simd_move_thread(uint16_t thread_num, uint16_t core_num)
+{
+	for (int k = 0; k < thread_num; k++)
+	{
+		src[SEND_NUM] = hdc_assemble("simd_move", 0);
+		SEND_NUM += 16;
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		SEND_NUM += 16;
+	}
+}
+
 // =========================================================================================
 
 void hdc_pmove(void)
@@ -702,6 +741,19 @@ void hdc_pmove_thread(uint16_t thread_num, uint16_t core_num)
 	for (int k = thread_num; k < THREADS_NUM; k++)
 	{
 		hdc_nop_core();
+	}
+}
+
+void hdc_simd_pmove_thread(uint16_t thread_num, uint16_t core_num)
+{
+	for (int k = 0; k < thread_num; k++)
+	{
+		src[SEND_NUM] = hdc_assemble("simd_pmove", 0);
+		SEND_NUM += 16;
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		SEND_NUM += 16;
 	}
 }
 
@@ -736,6 +788,19 @@ void hdc_permute_thread(uint16_t thread_num, uint16_t core_num, uint16_t permute
 	}
 }
 
+void hdc_simd_permute_thread(uint16_t thread_num, uint16_t core_num)
+{
+	for (int k = 0; k < thread_num; k++)
+	{
+		src[SEND_NUM] = hdc_assemble("simd_permute", 0);
+		SEND_NUM += 16;
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		SEND_NUM += 16;
+	}
+}
+
 // =========================================================================================
 
 void hdc_xor(void)
@@ -764,6 +829,19 @@ void hdc_xor_thread(uint16_t thread_num, uint16_t core_num)
 	for (int k = thread_num; k < THREADS_NUM; k++)
 	{
 		hdc_nop_core();
+	}
+}
+
+void hdc_simd_xor_thread(uint16_t thread_num, uint16_t core_num)
+{
+	for (int k = 0; k < thread_num; k++)
+	{
+		src[SEND_NUM] = hdc_assemble("simd_xor", 0);
+		SEND_NUM += 16;
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		SEND_NUM += 16;
 	}
 }
 
@@ -798,6 +876,19 @@ void hdc_pxor_thread(uint16_t thread_num, uint16_t core_num)
 	}
 }
 
+void hdc_simd_pxor_thread(uint16_t thread_num, uint16_t core_num)
+{
+	for (int k = 0; k < thread_num; k++)
+	{
+		src[SEND_NUM] = hdc_assemble("simd_pxor", 0);
+		SEND_NUM += 16;
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		SEND_NUM += 16;
+	}
+}
+
 // =========================================================================================
 
 void hdc_wb(void)
@@ -814,18 +905,6 @@ void hdc_wb_core(uint16_t core_num)
 	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
 	{
 		hdc_nop();
-	}
-}
-
-void hdc_wb_thread(uint16_t thread_num, uint16_t core_num)
-{
-	for (int k = 0; k < thread_num; k++)
-	{
-		hdc_wb_core(core_num);
-	}
-	for (int k = thread_num; k < THREADS_NUM; k++)
-	{
-		hdc_nop_core();
 	}
 }
 
