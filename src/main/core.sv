@@ -23,7 +23,6 @@ module core
          // 16bit命令
          input wire [ 15:0 ]                get_d,
          input wire                         exec,
-         input wire [ DIM:0 ]               sign_bit,
 
 
          // out
@@ -45,29 +44,14 @@ module core
     // アイテムメモリーからロードしたデータの格納場所
     reg [ DIM:0 ]           reg_0;
 
-    // 書き戻し命令が発行されたか否かのフラグ
-    reg                         wb_flag;
-
 
     always_ff @( posedge clk ) begin
 
                   // 書き込み
                   // 書き戻し | ランダム生成
-                  if ( wb_flag | update_item ) begin
+                  if ( update_item ) begin
 
-                      // 書き戻し
-                      if ( wb_flag ) begin
-
-                          item_memory[ wb_addr ] <= reg_2_tmp;
-
-                      end
-
-                      // ランダム生成
-                      else begin
-
-                          item_memory[ item_a ] <= rand_num;
-
-                      end
+                      item_memory[ item_a ] <= rand_num;
                   end
 
                   // 読み出し
@@ -77,9 +61,6 @@ module core
               end;
 
 
-
-    // 書き戻し先のアドレス
-    reg [ 8:0 ]                 wb_addr;
 
     // 命令
     reg [ 15:0 ]                inst;
@@ -115,8 +96,6 @@ module core
                   // thread_countは保持しておきたいので、実行終了時のみリセット
                   if ( ~run ) begin
 
-                      wb_flag <= 0;
-                      wb_addr <= 0;
                       inst <= 0;
 
                   end
@@ -124,29 +103,7 @@ module core
                   // データ受信時実行
                   else if ( get_v ) begin
 
-                      // wb.item命令 (特殊)
-                      if ( get_d[ 15 ] & get_d[ 12 ] ) begin
-
-                          // 書き込みフラグを立てる
-                          wb_flag <= 1'b1;
-
-                          // 書き込み先アドレス格納
-                          wb_addr[ 8:0 ] <= get_d[ 8:0 ];
-
-                          // 命令は発行しない (nop)
-                          inst <= 0;
-
-                      end
-
-                      // wb.item命令以外はinstを更新
-                      else begin
-
-                          inst <= get_d[ 15:0 ];
-                          wb_flag <= 0;
-                          wb_addr <= 0;
-
-                      end
-
+                      inst <= get_d[ 15:0 ];
 
                   end
 
@@ -157,8 +114,6 @@ module core
                       // instは保持しなくていい
                       // (たとえ、instを更新した後にget_vが落ちても、execはまだ続いているので、次サイクルで使われる)
                       inst <= 0;
-                      wb_flag <= 0;
-                      wb_addr <= 0;
 
                   end
               end;
@@ -226,21 +181,9 @@ module core
 
     always_ff @( posedge clk ) begin
 
-                  if ( exec ) begin
+                  if ( exec & inst[ 13] ) begin
 
-                      // アドレス必要
-                      // wb
-                      if ( inst[ 10 ] ) begin
-
-                          reg_2_threads[ thread_count ] <= sign_bit;
-
-                      end
-
-                      else if ( inst[ 13 ] ) begin
-
-                          reg_2_threads[ thread_count ] <= reg_inst_for_13;
-
-                      end
+                      reg_2_threads[ thread_count ] <= reg_inst_for_13;
 
                   end
 
