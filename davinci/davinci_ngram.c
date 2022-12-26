@@ -99,8 +99,8 @@ int main(int argc, char const *argv[])
 	puts("\n  -------------------------------------- HDC Program START ------------------------------------\n");
 
 	const uint32_t TRAIN_NUM = 2;
-	// const char *TRAIN_PATH[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
+	const char *TRAIN_PATH[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
+	// const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
 	// const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
 
 	const uint32_t NGRAM = 3;

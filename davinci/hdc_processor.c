@@ -410,6 +410,11 @@ void hdc_setup(void)
 	}
 }
 
+void hdc_print(void)
+{
+	printf("%d\n", SEND_NUM);
+}
+
 void hdc_make_imem(const int RANNUM)
 {
 	// reset_flag

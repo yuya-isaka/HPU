@@ -14,6 +14,8 @@ int *dst;
 unsigned long src_phys;
 unsigned long dst_phys;
 
+extern void hdc_print(void);
+
 extern uint16_t hdc_assemble(const char inst_str[], uint16_t addr);
 
 extern void hdc_setup(void);
