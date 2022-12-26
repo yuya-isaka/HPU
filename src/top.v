@@ -288,7 +288,6 @@ module top
                      // 16bit命令
                      .get_d( S_AXIS_TDATA[ 15:0 ] ),
                      .exec( exec ),
-                     .sign_bit( sign_bit[ DIM:0] ),
 
 
                      // out

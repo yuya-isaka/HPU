@@ -85,7 +85,7 @@ void putb(unsigned int v)
 // 10種類の命令
 uint16_t assemble(const char inst_str[], uint16_t addr)
 {
-  if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0 || strcmp(inst_str, "pwbitem") == 0 || strcmp(inst_str, "permute") == 0 || strcmp(inst_str, "simd_permute") == 0)
+  if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "permute") == 0 || strcmp(inst_str, "simd_permute") == 0)
   {
     uint16_t result = 0;
     uint16_t inst = 0;
@@ -94,19 +94,6 @@ uint16_t assemble(const char inst_str[], uint16_t addr)
     if (strcmp(inst_str, "load") == 0)
     {
       inst = 40960;
-      result = inst | addr;
-    }
-
-    // wb.item
-    else if (strcmp(inst_str, "wbitem") == 0)
-    {
-      inst = 36864;
-      result = inst | addr;
-    }
-
-    else if (strcmp(inst_str, "pwbitem") == 0)
-    {
-      inst = 53248;
       result = inst | addr;
     }
 
@@ -193,12 +180,6 @@ uint16_t assemble(const char inst_str[], uint16_t addr)
     else if (strcmp(inst_str, "simd_pmove") == 0)
     {
       inst = 18432 + 1024;
-    }
-
-    // last
-    else if (strcmp(inst_str, "wb") == 0)
-    {
-      inst = 512;
     }
 
     // wb
