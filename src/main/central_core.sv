@@ -74,6 +74,7 @@ module central_core
                   // 常に垂れ流しで読み出しでOK
                   // (必要ない場合は使わない)
                   reg_0 <= item_memory[ get_d[ 9:0 ] ];
+
               end;
 
 
@@ -88,6 +89,7 @@ module central_core
     reg signed [ 3:0 ]          thread_count;
 
     always_ff @( posedge clk ) begin
+
                   if ( ~run ) begin
 
                       thread_count <= $signed( 1'b1 );
@@ -100,11 +102,15 @@ module central_core
                       // スレッド数可変
                       //   if ( thread_count == 4'd9 ) begin
                       if ( thread_count == 4'd4 ) begin
+
                           thread_count <= 0;
+
                       end
 
                       else begin
+
                           thread_count <= thread_count + 4'd1;
+
                       end
 
                   end
@@ -189,13 +195,17 @@ module central_core
     logic [ 3:0 ] thread_count_zure;
 
     always_comb begin
+
                     thread_count_zure = thread_count + 4'd1;
 
                     // スレッド数可変
                     // if ( thread_count == 4'd9 ) begin
                     if ( thread_count == 4'd4 ) begin
+
                         thread_count_zure = 0;
+
                     end
+
                 end;
 
     // reg_1_thread, reg_2_threadsは値を保持
@@ -204,7 +214,7 @@ module central_core
     // レジスタ1
     reg [ DIM:0 ]         reg_1;
 
-    // (* ram_style = "block" *)
+    (* ram_style = "block" *)
     reg [ DIM:0 ]           reg_1_threads [ THREADS-1:0 ];
 
     always_ff @( posedge clk ) begin
@@ -265,12 +275,19 @@ module central_core
     logic [ DIM:0 ] reg_for_inst_13;
 
     always_comb begin
+
                     if ( inst[ 15 ] ) begin
+
                         reg_for_inst_13 = reg_0;
+
                     end
+
                     else begin
+
                         reg_for_inst_13 = reg_1 ^ reg_2_tmp;
+
                     end
+
                 end;
 
     // always_ff @( posedge clk ) begin
@@ -312,12 +329,19 @@ module central_core
     logic [ DIM:0 ]      reg_2_tmp;
 
     always_comb begin
+
                     if ( inst[ 14 ] ) begin
+
                         reg_2_tmp = permute_reg_result;
+
                     end
+
                     else begin
+
                         reg_2_tmp = reg_2;
+
                     end
+
                 end;
 
 

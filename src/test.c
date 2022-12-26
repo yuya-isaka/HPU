@@ -128,10 +128,8 @@ int main(int argc, char **argv)
 
 	ADDRNUM = 900;
 	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
-	// printf(" --------\n\n");
-	// ADDRNUM = 54;
-	// check(NGRAM, ADDRNUM, MAJORITY_ADDR);
-	// xor128(1);
+	ADDRNUM = 300;
+	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
 
 	printf("\n ------------------------------- 終了 ------------------------------- \n");
 	return 0;

@@ -39,12 +39,19 @@ module core
     logic [ 15:0 ]      get_d;
 
     always_comb begin
+
                     if ( get_d_1[ 10 ] ) begin
+
                         get_d = get_d_1;
+
                     end
+
                     else begin
+
                         get_d = get_d_tmp;
+
                     end
+
                 end;
 
 
@@ -79,6 +86,7 @@ module core
     reg signed [ 3:0 ]          thread_count;
 
     always_ff @( posedge clk ) begin
+
                   if ( ~run ) begin
 
                       thread_count <= $signed( 1'b1 );
@@ -90,11 +98,15 @@ module core
 
                       // スレッド数可変
                       if ( thread_count == 4'd4 ) begin
+
                           thread_count <= 0;
+
                       end
 
                       else begin
+
                           thread_count <= thread_count + 4'd1;
+
                       end
 
                   end
@@ -151,13 +163,17 @@ module core
     logic [ 3:0 ] thread_count_zure;
 
     always_comb begin
+
                     thread_count_zure = thread_count + 4'd1;
 
                     // スレッド数可変
                     // if ( thread_count == 4'd9 ) begin
                     if ( thread_count == 4'd4 ) begin
+
                         thread_count_zure = 0;
+
                     end
+
                 end;
 
     // reg_1_thread, reg_2_threadsは値を保持
@@ -328,12 +344,19 @@ module core
     logic [ DIM:0 ] reg_for_inst_13;
 
     always_comb begin
+
                     if ( inst[ 15 ] ) begin
+
                         reg_for_inst_13 = reg_0;
+
                     end
+
                     else begin
+
                         reg_for_inst_13 = reg_1 ^ reg_2_tmp;
+
                     end
+
                 end;
 
     // always_ff @( posedge clk ) begin
@@ -367,12 +390,19 @@ module core
     logic [ DIM:0 ]      reg_2_tmp;
 
     always_comb begin
+
                     if ( inst[ 14 ] ) begin
+
                         reg_2_tmp = permute_reg_result;
+
                     end
+
                     else begin
+
                         reg_2_tmp = reg_2;
+
                     end
+
                 end;
 
 
@@ -448,8 +478,11 @@ module core
 
                     // storeが立っている間buffで更新
                     if ( store ) begin
+
                         core_result = buff;
+
                     end
+
                 end;
 
 

@@ -1783,10 +1783,9 @@ int main(int argc, char **argv)
   ADDRNUM = 900;
   DEBUG = 1;
   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
-  // printf(" --------\n\n");
-  // ADDRNUM = 54;
-  // DEBUG = 1;
-  // check(NGRAM, CORENUM, ADDRNUM, DIM,MAJORITY_ADDR, argc, argv, DEBUG);
+  ADDRNUM = 300;
+  DEBUG = 1;
+  check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
 
   printf("\n ======================================= 終了 ========================================= \n\n");
 

@@ -169,7 +169,6 @@ module top
                     // .core_result_32( core_result[ 31 ] ),
                     // 1コア
                     .store( store[ CORENUM-1:0 ] ),
-                    // .store( store ),
                     .store_flag( store_flag ),
                     .stream_v( stream_v ),
                     .stream_i( stream_i[ 1:0 ] ),
