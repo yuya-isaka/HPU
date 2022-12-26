@@ -187,14 +187,14 @@ int main()
   const int CORENUM_MAX = 13;
   const int MAJORITY_ADDR = 511;
 
-  for (int i = 30; i <= 512; i += 30)
-  {
-    int ADDRNUM = i;
-    check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR);
-  }
+  // for (int i = 30; i <= 512; i += 30)
+  // {
+  //   int ADDRNUM = i;
+  //   check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR);
+  // }
 
-  // int ADDRNUM = 30;
-  // check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR);
+  int ADDRNUM = 30;
+  check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR);
   // printf("\nOK!\n");
   // ADDRNUM = 390;
   // check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR);

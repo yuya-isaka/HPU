@@ -19,9 +19,9 @@ int main(int argc, char const *argv[])
 	hdc_make_imem(27);
 
 	const int train_num = 2;
-	// const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
+	const char *train_path[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
 	// const char *train_path[] = {"data/decorate/en", "data/decorate/fr"};
-	const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
+	// const char *train_path[] = {"data/decorate/enlong", "data/decorate/frlong"};
 
 	const int SEND_MAX = 33000000;
 	const int CORE_NUM = 13;

@@ -3,7 +3,7 @@
 #define HDC_PROCESSOR_h_
 
 #define BUS_WIDTH 256
-#define THREADS_NUM 5
+#define THREADS_NUM 10
 
 volatile int *top;
 volatile int *dma;
