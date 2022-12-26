@@ -7,8 +7,9 @@
 
 volatile int *top;
 volatile int *dma;
-volatile uint16_t *src;
-volatile int *dst;
+
+uint16_t *src;
+int *dst;
 
 unsigned long src_phys;
 unsigned long dst_phys;

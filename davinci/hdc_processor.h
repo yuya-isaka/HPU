@@ -3,12 +3,13 @@
 #define HDC_PROCESSOR_h_
 
 #define BUS_WIDTH 256
-#define THREADS_NUM 10
+#define THREADS_NUM 5
 
 volatile int *top;
 volatile int *dma;
-volatile uint16_t *src;
-volatile int *dst;
+
+uint16_t *src;
+int *dst;
 
 unsigned long src_phys;
 unsigned long dst_phys;
@@ -40,6 +41,8 @@ extern void hdc_store_thread(uint16_t thread_num, uint16_t core_num);
 extern void hdc_pstore_thread(uint16_t thread_num, uint16_t core_num);
 
 extern void hdc_move_thread(uint16_t thread_num, uint16_t core_num);
+
+extern void hdc_simd_move_thread(uint16_t thread_num, uint16_t core_num);
 
 extern void hdc_pmove_thread(uint16_t thread_num, uint16_t core_num);
 

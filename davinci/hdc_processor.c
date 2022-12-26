@@ -9,185 +9,324 @@
 
 int SEND_NUM = 0;
 
-// 簡易アセンブラ
-// 10種類の命令
 uint16_t hdc_assemble(const char inst_str[], uint16_t addr)
 {
-	if (inst_str[0] == 'l')
+	if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0 || strcmp(inst_str, "pwbitem") == 0 || strcmp(inst_str, "permute") == 0 || strcmp(inst_str, "simd_permute") == 0)
 	{
-		if (inst_str[1] == 'o')
-		{
-			uint16_t inst = 40960;
-			uint16_t result = inst | addr;
-			return result;
-		}
-		else if (inst_str[1] == 'a')
-		{
-			return 512;
-		}
-	}
-	else if (inst_str[0] == 'p')
-	{
-		if (inst_str[1] == 'e')
-		{
-			uint16_t inst = 34816;
-			uint16_t result = inst | addr;
-			return result;
-		}
-		else if (inst_str[1] == 'w')
-		{
-			uint16_t inst = 53248;
-			uint16_t result = inst | addr;
-			return result;
-		}
-		else if (inst_str[1] == 'x')
-		{
+		uint16_t result = 0;
+		uint16_t inst = 0;
 
-			return 24576;
-		}
-		else if (inst_str[1] == 's')
+		// load
+		if (strcmp(inst_str, "load") == 0)
 		{
-
-			return 20480;
+			inst = 40960;
+			result = inst | addr;
 		}
-		else if (inst_str[1] == 'm')
+
+		// wb.item
+		else if (strcmp(inst_str, "wbitem") == 0)
 		{
-
-			return 18432;
+			inst = 36864;
+			result = inst | addr;
 		}
-	}
-	else if (inst_str[0] == 'x')
-	{
-		return 8192;
-	}
-	else if (inst_str[0] == 's')
-	{
-		return 4096;
-	}
-	else if (inst_str[0] == 'm')
-	{
-		return 2048;
-	}
-	else if (strcmp(inst_str, "wb") == 0)
-	{
-		return 1024;
-	}
-	else if (strcmp(inst_str, "wbitem") == 0)
-	{
 
-		uint16_t inst = 36864;
-		uint16_t result = inst | addr;
+		else if (strcmp(inst_str, "pwbitem") == 0)
+		{
+			inst = 53248;
+			result = inst | addr;
+		}
+
+		else if (strcmp(inst_str, "permute") == 0)
+		{
+			inst = 34816;
+			result = inst | addr;
+		}
+
+		else if (strcmp(inst_str, "simd_permute") == 0)
+		{
+			inst = 34816 + 1024;
+			result = inst | addr;
+		}
+
 		return result;
 	}
-	else if (inst_str[0] == 'n')
-	{
-		return 0;
-	}
+
 	else
 	{
-		printf("error");
+		uint16_t inst = 0;
+
+		// xor
+		if (strcmp(inst_str, "xor") == 0)
+		{
+			inst = 8192;
+		}
+
+		else if (strcmp(inst_str, "simd_xor") == 0)
+		{
+			inst = 8192 + 1024;
+		}
+
+		// pxor
+		else if (strcmp(inst_str, "pxor") == 0)
+		{
+			inst = 24576;
+		}
+
+		else if (strcmp(inst_str, "simd_pxor") == 0)
+		{
+			inst = 24576 + 1024;
+		}
+
+		// store
+		else if (strcmp(inst_str, "store") == 0)
+		{
+			inst = 4096;
+		}
+
+		else if (strcmp(inst_str, "simd_store") == 0)
+		{
+			inst = 4096 + 1024;
+		}
+
+		// pstore
+		else if (strcmp(inst_str, "pstore") == 0)
+		{
+			inst = 20480;
+		}
+
+		else if (strcmp(inst_str, "simd_pstore") == 0)
+		{
+			inst = 20480 + 1024;
+		}
+
+		// move
+		else if (strcmp(inst_str, "move") == 0)
+		{
+			inst = 2048;
+		}
+
+		else if (strcmp(inst_str, "simd_move") == 0)
+		{
+			inst = 2048 + 1024;
+		}
+
+		// pmove
+		else if (strcmp(inst_str, "pmove") == 0)
+		{
+			inst = 18432;
+		}
+
+		else if (strcmp(inst_str, "simd_pmove") == 0)
+		{
+			inst = 18432 + 1024;
+		}
+
+		// last
+		else if (strcmp(inst_str, "wb") == 0)
+		{
+			inst = 512;
+		}
+
+		// wb
+		else if (strcmp(inst_str, "last") == 0)
+		{
+			inst = 256;
+		}
+
+		// nop
+		else if (strcmp(inst_str, "nop") == 0)
+		{
+			inst = 0;
+		}
+
+		else
+		{
+			printf("error");
+		}
+
+		return inst;
 	}
-
-	// if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0 || strcmp(inst_str, "pwbitem") == 0 || strcmp(inst_str, "permute") == 0)
-	// {
-	// 	uint16_t result = 0;
-	// 	uint16_t inst = 0;
-
-	// 	// load
-	// 	if (strcmp(inst_str, "load") == 0)
-	// 	{
-	// 		inst = 40960;
-	// 		result = inst | addr;
-	// 	}
-
-	// 	// wb.item
-	// 	else if (strcmp(inst_str, "wbitem") == 0)
-	// 	{
-	// 		inst = 36864;
-	// 		result = inst | addr;
-	// 	}
-
-	// 	else if (strcmp(inst_str, "pwbitem") == 0)
-	// 	{
-	// 		inst = 53248;
-	// 		result = inst | addr;
-	// 	}
-
-	// 	else if (strcmp(inst_str, "permute") == 0)
-	// 	{
-	// 		inst = 34816;
-	// 		result = inst | addr;
-	// 	}
-
-	// 	return result;
-	// }
-
-	// else
-	// {
-	// 	uint16_t inst = 0;
-
-	// 	// xor
-	// 	if (strcmp(inst_str, "xor") == 0)
-	// 	{
-	// 		inst = 8192;
-	// 	}
-
-	// 	// pxor
-	// 	if (strcmp(inst_str, "pxor") == 0)
-	// 	{
-	// 		inst = 24576;
-	// 	}
-
-	// 	// store
-	// 	else if (strcmp(inst_str, "store") == 0)
-	// 	{
-	// 		inst = 4096;
-	// 	}
-
-	// 	// pstore
-	// 	else if (strcmp(inst_str, "pstore") == 0)
-	// 	{
-	// 		inst = 20480;
-	// 	}
-
-	// 	// move
-	// 	else if (strcmp(inst_str, "move") == 0)
-	// 	{
-	// 		inst = 2048;
-	// 	}
-
-	// 	// pmove
-	// 	else if (strcmp(inst_str, "pmove") == 0)
-	// 	{
-	// 		inst = 18432;
-	// 	}
-
-	// 	// wb
-	// 	else if (strcmp(inst_str, "wb") == 0)
-	// 	{
-	// 		inst = 1024;
-	// 	}
-
-	// 	// last
-	// 	else if (strcmp(inst_str, "last") == 0)
-	// 	{
-	// 		inst = 512;
-	// 	}
-
-	// 	// nop
-	// 	else if (strcmp(inst_str, "nop") == 0)
-	// 	{
-	// 		inst = 0;
-	// 	}
-
-	// 	else
-	// 	{
-	// 		printf("error");
-	// 	}
-
-	// 	return inst;
-	// }
 }
+
+// // 簡易アセンブラ
+// // 10種類の命令
+// uint16_t hdc_assemble(const char inst_str[], uint16_t addr)
+// {
+// 	if (inst_str[0] == 'l')
+// 	{
+// 		if (inst_str[1] == 'o')
+// 		{
+// 			uint16_t inst = 40960;
+// 			uint16_t result = inst | addr;
+// 			return result;
+// 		}
+// 		else if (inst_str[1] == 'a')
+// 		{
+// 			return 512;
+// 		}
+// 	}
+// 	else if (inst_str[0] == 'p')
+// 	{
+// 		if (inst_str[1] == 'e')
+// 		{
+// 			uint16_t inst = 34816;
+// 			uint16_t result = inst | addr;
+// 			return result;
+// 		}
+// 		else if (inst_str[1] == 'w')
+// 		{
+// 			uint16_t inst = 53248;
+// 			uint16_t result = inst | addr;
+// 			return result;
+// 		}
+// 		else if (inst_str[1] == 'x')
+// 		{
+
+// 			return 24576;
+// 		}
+// 		else if (inst_str[1] == 's')
+// 		{
+
+// 			return 20480;
+// 		}
+// 		else if (inst_str[1] == 'm')
+// 		{
+
+// 			return 18432;
+// 		}
+// 	}
+// 	else if (inst_str[0] == 'x')
+// 	{
+// 		return 8192;
+// 	}
+// 	else if (inst_str[0] == 's')
+// 	{
+// 		return 4096;
+// 	}
+// 	else if (inst_str[0] == 'm')
+// 	{
+// 		return 2048;
+// 	}
+// 	else if (strcmp(inst_str, "wb") == 0)
+// 	{
+// 		return 1024;
+// 	}
+// 	else if (strcmp(inst_str, "wbitem") == 0)
+// 	{
+
+// 		uint16_t inst = 36864;
+// 		uint16_t result = inst | addr;
+// 		return result;
+// 	}
+// 	else if (inst_str[0] == 'n')
+// 	{
+// 		return 0;
+// 	}
+// 	else
+// 	{
+// 		printf("error");
+// 	}
+
+// 	// if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0 || strcmp(inst_str, "pwbitem") == 0 || strcmp(inst_str, "permute") == 0)
+// 	// {
+// 	// 	uint16_t result = 0;
+// 	// 	uint16_t inst = 0;
+
+// 	// 	// load
+// 	// 	if (strcmp(inst_str, "load") == 0)
+// 	// 	{
+// 	// 		inst = 40960;
+// 	// 		result = inst | addr;
+// 	// 	}
+
+// 	// 	// wb.item
+// 	// 	else if (strcmp(inst_str, "wbitem") == 0)
+// 	// 	{
+// 	// 		inst = 36864;
+// 	// 		result = inst | addr;
+// 	// 	}
+
+// 	// 	else if (strcmp(inst_str, "pwbitem") == 0)
+// 	// 	{
+// 	// 		inst = 53248;
+// 	// 		result = inst | addr;
+// 	// 	}
+
+// 	// 	else if (strcmp(inst_str, "permute") == 0)
+// 	// 	{
+// 	// 		inst = 34816;
+// 	// 		result = inst | addr;
+// 	// 	}
+
+// 	// 	return result;
+// 	// }
+
+// 	// else
+// 	// {
+// 	// 	uint16_t inst = 0;
+
+// 	// 	// xor
+// 	// 	if (strcmp(inst_str, "xor") == 0)
+// 	// 	{
+// 	// 		inst = 8192;
+// 	// 	}
+
+// 	// 	// pxor
+// 	// 	if (strcmp(inst_str, "pxor") == 0)
+// 	// 	{
+// 	// 		inst = 24576;
+// 	// 	}
+
+// 	// 	// store
+// 	// 	else if (strcmp(inst_str, "store") == 0)
+// 	// 	{
+// 	// 		inst = 4096;
+// 	// 	}
+
+// 	// 	// pstore
+// 	// 	else if (strcmp(inst_str, "pstore") == 0)
+// 	// 	{
+// 	// 		inst = 20480;
+// 	// 	}
+
+// 	// 	// move
+// 	// 	else if (strcmp(inst_str, "move") == 0)
+// 	// 	{
+// 	// 		inst = 2048;
+// 	// 	}
+
+// 	// 	// pmove
+// 	// 	else if (strcmp(inst_str, "pmove") == 0)
+// 	// 	{
+// 	// 		inst = 18432;
+// 	// 	}
+
+// 	// 	// wb
+// 	// 	else if (strcmp(inst_str, "wb") == 0)
+// 	// 	{
+// 	// 		inst = 1024;
+// 	// 	}
+
+// 	// 	// last
+// 	// 	else if (strcmp(inst_str, "last") == 0)
+// 	// 	{
+// 	// 		inst = 512;
+// 	// 	}
+
+// 	// 	// nop
+// 	// 	else if (strcmp(inst_str, "nop") == 0)
+// 	// 	{
+// 	// 		inst = 0;
+// 	// 	}
+
+// 	// 	else
+// 	// 	{
+// 	// 		printf("error");
+// 	// 	}
+
+// 	// 	return inst;
+// 	// }
+// }
 
 void hdc_setup(void)
 {
@@ -254,7 +393,7 @@ void hdc_setup(void)
 		return;
 	}
 
-	src = (uint16_t *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
+	src = (uint16_t *)mmap(NULL, 0x1DCD6500, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
 	if (src == MAP_FAILED)
 	{
 		perror("mmap src");
@@ -262,7 +401,7 @@ void hdc_setup(void)
 		return;
 	}
 
-	dst = (int *)mmap(NULL, 0x00080000, PROT_READ | PROT_WRITE, MAP_SHARED, fd1, 0);
+	dst = (int *)mmap(NULL, 0x3D0900, PROT_READ | PROT_WRITE, MAP_SHARED, fd1, 0);
 	if (dst == MAP_FAILED)
 	{
 		perror("mmap dst");
@@ -339,6 +478,7 @@ void hdc_finish(void)
 void hdc_nop(void)
 {
 	src[SEND_NUM++] = 0;
+	// SEND_NUM++;
 }
 
 void hdc_nop_core(void)
@@ -347,6 +487,7 @@ void hdc_nop_core(void)
 	{
 		hdc_nop();
 	}
+	// SEND_NUM += 16;
 }
 
 // =========================================================================================
@@ -473,6 +614,19 @@ void hdc_store_thread(uint16_t thread_num, uint16_t core_num)
 	}
 }
 
+void hdc_simd_store_thread(uint16_t thread_num, uint16_t core_num)
+{
+	for (int k = 0; k < thread_num; k++)
+	{
+		src[SEND_NUM] = hdc_assemble("simd_store", 0);
+		SEND_NUM += 16;
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		SEND_NUM += 16;
+	}
+}
+
 // =========================================================================================
 
 void hdc_pstore(void)
@@ -501,6 +655,19 @@ void hdc_pstore_thread(uint16_t thread_num, uint16_t core_num)
 	for (int k = thread_num; k < THREADS_NUM; k++)
 	{
 		hdc_nop_core();
+	}
+}
+
+void hdc_simd_pstore_thread(uint16_t thread_num, uint16_t core_num)
+{
+	for (int k = 0; k < thread_num; k++)
+	{
+		src[SEND_NUM] = hdc_assemble("simd_pstore", 0);
+		SEND_NUM += 16;
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		SEND_NUM += 16;
 	}
 }
 
@@ -535,6 +702,19 @@ void hdc_move_thread(uint16_t thread_num, uint16_t core_num)
 	}
 }
 
+void hdc_simd_move_thread(uint16_t thread_num, uint16_t core_num)
+{
+	for (int k = 0; k < thread_num; k++)
+	{
+		src[SEND_NUM] = hdc_assemble("simd_move", 0);
+		SEND_NUM += 16;
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		SEND_NUM += 16;
+	}
+}
+
 // =========================================================================================
 
 void hdc_pmove(void)
@@ -563,6 +743,19 @@ void hdc_pmove_thread(uint16_t thread_num, uint16_t core_num)
 	for (int k = thread_num; k < THREADS_NUM; k++)
 	{
 		hdc_nop_core();
+	}
+}
+
+void hdc_simd_pmove_thread(uint16_t thread_num, uint16_t core_num)
+{
+	for (int k = 0; k < thread_num; k++)
+	{
+		src[SEND_NUM] = hdc_assemble("simd_pmove", 0);
+		SEND_NUM += 16;
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		SEND_NUM += 16;
 	}
 }
 
@@ -597,6 +790,19 @@ void hdc_permute_thread(uint16_t thread_num, uint16_t core_num, uint16_t permute
 	}
 }
 
+void hdc_simd_permute_thread(uint16_t thread_num, uint16_t core_num)
+{
+	for (int k = 0; k < thread_num; k++)
+	{
+		src[SEND_NUM] = hdc_assemble("simd_permute", 0);
+		SEND_NUM += 16;
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		SEND_NUM += 16;
+	}
+}
+
 // =========================================================================================
 
 void hdc_xor(void)
@@ -625,6 +831,19 @@ void hdc_xor_thread(uint16_t thread_num, uint16_t core_num)
 	for (int k = thread_num; k < THREADS_NUM; k++)
 	{
 		hdc_nop_core();
+	}
+}
+
+void hdc_simd_xor_thread(uint16_t thread_num, uint16_t core_num)
+{
+	for (int k = 0; k < thread_num; k++)
+	{
+		src[SEND_NUM] = hdc_assemble("simd_xor", 0);
+		SEND_NUM += 16;
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		SEND_NUM += 16;
 	}
 }
 
@@ -659,6 +878,19 @@ void hdc_pxor_thread(uint16_t thread_num, uint16_t core_num)
 	}
 }
 
+void hdc_simd_pxor_thread(uint16_t thread_num, uint16_t core_num)
+{
+	for (int k = 0; k < thread_num; k++)
+	{
+		src[SEND_NUM] = hdc_assemble("simd_pxor", 0);
+		SEND_NUM += 16;
+	}
+	for (int k = thread_num; k < THREADS_NUM; k++)
+	{
+		SEND_NUM += 16;
+	}
+}
+
 // =========================================================================================
 
 void hdc_wb(void)
@@ -675,18 +907,6 @@ void hdc_wb_core(uint16_t core_num)
 	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
 	{
 		hdc_nop();
-	}
-}
-
-void hdc_wb_thread(uint16_t thread_num, uint16_t core_num)
-{
-	for (int k = 0; k < thread_num; k++)
-	{
-		hdc_wb_core(core_num);
-	}
-	for (int k = thread_num; k < THREADS_NUM; k++)
-	{
-		hdc_nop_core();
 	}
 }
 
