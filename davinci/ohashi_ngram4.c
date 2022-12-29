@@ -34,7 +34,6 @@ int main(int argc, char const *argv[])
 
 	hdc_setup();
 	hdc_make_imem(27);
-	hdc_dma_reset();
 
 	// 英語とフランス語の数だけ繰り返す
 	for (int l = 0; l < train_num; l++)
@@ -122,11 +121,13 @@ int main(int argc, char const *argv[])
 				// ------------------------------------------------------
 
 				// permute ---------------------------------------------
-				hdc_permute_thread(THREADS_NUM, core_num, 1);
+				// hdc_permute_thread(THREADS_NUM, core_num, 1);
+				hdc_simd_permute_thread(THREADS_NUM, core_num, 1);
 				// ------------------------------------------------------
 
 				// pxor ---------------------------------------------
-				hdc_pxor_thread(THREADS_NUM, core_num);
+				// hdc_pxor_thread(THREADS_NUM, core_num);
+				hdc_simd_pxor_thread(THREADS_NUM, core_num);
 				// ------------------------------------------------------
 
 				// move ---------------------------------------------
@@ -148,11 +149,13 @@ int main(int argc, char const *argv[])
 				// ------------------------------------------------------
 
 				// permute ---------------------------------------------
-				hdc_permute_thread(THREADS_NUM, core_num, 2);
+				// hdc_permute_thread(THREADS_NUM, core_num, 2);
+				hdc_simd_permute_thread(THREADS_NUM, core_num, 2);
 				// ------------------------------------------------------
 
 				// pxor ---------------------------------------------
-				hdc_pxor_thread(THREADS_NUM, core_num);
+				// hdc_pxor_thread(THREADS_NUM, core_num);
+				hdc_simd_pxor_thread(THREADS_NUM, core_num);
 				// ------------------------------------------------------
 
 				// move ---------------------------------------------
@@ -174,15 +177,18 @@ int main(int argc, char const *argv[])
 				// ------------------------------------------------------
 
 				// permute ---------------------------------------------
-				hdc_permute_thread(THREADS_NUM, core_num, 3);
+				// hdc_permute_thread(THREADS_NUM, core_num, 3);
+				hdc_simd_permute_thread(THREADS_NUM, core_num, 3);
 				// ------------------------------------------------------
 
 				// pxor ---------------------------------------------
-				hdc_pxor_thread(THREADS_NUM, core_num);
+				// hdc_pxor_thread(THREADS_NUM, core_num);
+				hdc_simd_pxor_thread(THREADS_NUM, core_num);
 				// ------------------------------------------------------
 
 				// store ---------------------------------------------
-				hdc_store_thread(THREADS_NUM, core_num);
+				// hdc_store_thread(THREADS_NUM, core_num);
+				hdc_simd_store_thread(THREADS_NUM, core_num);
 				// ------------------------------------------------------
 			}
 
@@ -230,11 +236,13 @@ int main(int argc, char const *argv[])
 			// ------------------------------------------------------
 
 			// permute ---------------------------------------------
-			hdc_permute_thread(THREADS_NUM, core_num, 1);
+			// hdc_permute_thread(THREADS_NUM, core_num, 1);
+			hdc_simd_permute_thread(THREADS_NUM, core_num, 1);
 			// ------------------------------------------------------
 
 			// pxor ---------------------------------------------
-			hdc_pxor_thread(THREADS_NUM, core_num);
+			// hdc_pxor_thread(THREADS_NUM, core_num);
+			hdc_simd_pxor_thread(THREADS_NUM, core_num);
 			// ------------------------------------------------------
 
 			// move ---------------------------------------------
@@ -256,11 +264,13 @@ int main(int argc, char const *argv[])
 			// ------------------------------------------------------
 
 			// permute ---------------------------------------------
-			hdc_permute_thread(THREADS_NUM, core_num, 2);
+			// hdc_permute_thread(THREADS_NUM, core_num, 2);
+			hdc_simd_permute_thread(THREADS_NUM, core_num, 2);
 			// ------------------------------------------------------
 
 			// pxor ---------------------------------------------
-			hdc_pxor_thread(THREADS_NUM, core_num);
+			// hdc_pxor_thread(THREADS_NUM, core_num);
+			hdc_simd_pxor_thread(THREADS_NUM, core_num);
 			// ------------------------------------------------------
 
 			// move ---------------------------------------------
@@ -282,15 +292,18 @@ int main(int argc, char const *argv[])
 			// ------------------------------------------------------
 
 			// permute ---------------------------------------------
-			hdc_permute_thread(THREADS_NUM, core_num, 3);
+			// hdc_permute_thread(THREADS_NUM, core_num, 3);
+			hdc_simd_permute_thread(THREADS_NUM, core_num, 3);
 			// ------------------------------------------------------
 
 			// pxor ---------------------------------------------
-			hdc_pxor_thread(THREADS_NUM, core_num);
+			// hdc_pxor_thread(THREADS_NUM, core_num);
+			hdc_simd_pxor_thread(THREADS_NUM, core_num);
 			// ------------------------------------------------------
 
 			// store ---------------------------------------------
-			hdc_store_thread(THREADS_NUM, core_num);
+			// hdc_store_thread(THREADS_NUM, core_num);
+			hdc_simd_store_thread(THREADS_NUM, core_num);
 			// ------------------------------------------------------
 		}
 

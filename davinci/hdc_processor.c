@@ -244,6 +244,7 @@ void hdc_dma_reset(void)
 void hdc_init(const int N)
 {
 	SEND_NUM = N;
+	hdc_dma_reset();
 }
 
 void hdc_start(void)
@@ -268,8 +269,6 @@ void hdc_compute(void)
 	// 演算終了を待つ
 	while ((dma[0xd] & 0x1000) != 0x1000)
 		;
-
-	hdc_dma_reset();
 }
 
 void hdc_finish(void)
