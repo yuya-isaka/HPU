@@ -105,7 +105,7 @@ linux:
 	arm-linux-gnueabihf-gcc -c -O3 -o davinci_ngram_peta.o davinci_ngram.c
 	arm-linux-gnueabihf-gcc -O3 -o davinci_ngram_peta hyper_vector.o davinci_ngram_peta.o
 	arm-linux-gnueabihf-gcc -c -O3 -o hdc_processor.o hdc_processor.c
-	arm-linux-gnueabihf-gcc -c -O3 -o ohashi_ngram.o ohashi_ngram3.c
+	arm-linux-gnueabihf-gcc -c -O3 -o ohashi_ngram.o ohashi_ngram4.c
 	arm-linux-gnueabihf-gcc -O3 -o ohashi_ngram hdc_processor.o ohashi_ngram.o
 	rm hdc_processor.o ohashi_ngram.o hyper_vector.o davinci_ngram_peta.o
 

@@ -327,7 +327,7 @@ static hv_t *perm_right(hv_t base_hv[HV_NUM], const uint32_t perm_num)
 	result_hv[HV_NUM - 1] |= origin_hv;
 
 	// SIMD化（新しいperm定義）
-	for (uint32_t i = 1; i < HV_NUM; i++)
+	for (int i = 1; i < HV_NUM; i++)
 	{
 		hv_t origin_hv = base_hv[i];
 		hv_t origin_hv_perm = perm_element_right(&origin_hv, perm_num);
@@ -357,7 +357,7 @@ static hv_t *perm_left(hv_t base_hv[HV_NUM], const uint32_t perm_num)
 	result_hv[0] |= origin_hv;
 
 	// SIMD化（新しいperm定義）
-	for (uint32_t i = HV_NUM - 2; i >= 0; i--)
+	for (int i = HV_NUM - 2; i >= 0; i--)
 	{
 		hv_t origin_hv = base_hv[i];
 		hv_t origin_hv_perm = perm_element_left(&origin_hv, perm_num);
