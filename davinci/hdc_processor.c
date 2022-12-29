@@ -11,7 +11,7 @@ int SEND_NUM = 0;
 
 uint16_t hdc_assemble(const char inst_str[], uint16_t addr)
 {
-	if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "pwbitem") == 0 || strcmp(inst_str, "permute") == 0 || strcmp(inst_str, "simd_permute") == 0)
+	if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "permute") == 0 || strcmp(inst_str, "simd_permute") == 0)
 	{
 		uint16_t result = 0;
 		uint16_t inst = 0;
@@ -108,7 +108,7 @@ uint16_t hdc_assemble(const char inst_str[], uint16_t addr)
 			inst = 18432 + 1024;
 		}
 
-		// wb
+		// last
 		else if (strcmp(inst_str, "last") == 0)
 		{
 			inst = 256;
@@ -128,186 +128,6 @@ uint16_t hdc_assemble(const char inst_str[], uint16_t addr)
 		return inst;
 	}
 }
-
-// // 簡易アセンブラ
-// // 10種類の命令
-// uint16_t hdc_assemble(const char inst_str[], uint16_t addr)
-// {
-// 	if (inst_str[0] == 'l')
-// 	{
-// 		if (inst_str[1] == 'o')
-// 		{
-// 			uint16_t inst = 40960;
-// 			uint16_t result = inst | addr;
-// 			return result;
-// 		}
-// 		else if (inst_str[1] == 'a')
-// 		{
-// 			return 512;
-// 		}
-// 	}
-// 	else if (inst_str[0] == 'p')
-// 	{
-// 		if (inst_str[1] == 'e')
-// 		{
-// 			uint16_t inst = 34816;
-// 			uint16_t result = inst | addr;
-// 			return result;
-// 		}
-// 		else if (inst_str[1] == 'w')
-// 		{
-// 			uint16_t inst = 53248;
-// 			uint16_t result = inst | addr;
-// 			return result;
-// 		}
-// 		else if (inst_str[1] == 'x')
-// 		{
-
-// 			return 24576;
-// 		}
-// 		else if (inst_str[1] == 's')
-// 		{
-
-// 			return 20480;
-// 		}
-// 		else if (inst_str[1] == 'm')
-// 		{
-
-// 			return 18432;
-// 		}
-// 	}
-// 	else if (inst_str[0] == 'x')
-// 	{
-// 		return 8192;
-// 	}
-// 	else if (inst_str[0] == 's')
-// 	{
-// 		return 4096;
-// 	}
-// 	else if (inst_str[0] == 'm')
-// 	{
-// 		return 2048;
-// 	}
-// 	else if (strcmp(inst_str, "wb") == 0)
-// 	{
-// 		return 1024;
-// 	}
-// 	else if (strcmp(inst_str, "wbitem") == 0)
-// 	{
-
-// 		uint16_t inst = 36864;
-// 		uint16_t result = inst | addr;
-// 		return result;
-// 	}
-// 	else if (inst_str[0] == 'n')
-// 	{
-// 		return 0;
-// 	}
-// 	else
-// 	{
-// 		printf("error");
-// 	}
-
-// 	// if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0 || strcmp(inst_str, "pwbitem") == 0 || strcmp(inst_str, "permute") == 0)
-// 	// {
-// 	// 	uint16_t result = 0;
-// 	// 	uint16_t inst = 0;
-
-// 	// 	// load
-// 	// 	if (strcmp(inst_str, "load") == 0)
-// 	// 	{
-// 	// 		inst = 40960;
-// 	// 		result = inst | addr;
-// 	// 	}
-
-// 	// 	// wb.item
-// 	// 	else if (strcmp(inst_str, "wbitem") == 0)
-// 	// 	{
-// 	// 		inst = 36864;
-// 	// 		result = inst | addr;
-// 	// 	}
-
-// 	// 	else if (strcmp(inst_str, "pwbitem") == 0)
-// 	// 	{
-// 	// 		inst = 53248;
-// 	// 		result = inst | addr;
-// 	// 	}
-
-// 	// 	else if (strcmp(inst_str, "permute") == 0)
-// 	// 	{
-// 	// 		inst = 34816;
-// 	// 		result = inst | addr;
-// 	// 	}
-
-// 	// 	return result;
-// 	// }
-
-// 	// else
-// 	// {
-// 	// 	uint16_t inst = 0;
-
-// 	// 	// xor
-// 	// 	if (strcmp(inst_str, "xor") == 0)
-// 	// 	{
-// 	// 		inst = 8192;
-// 	// 	}
-
-// 	// 	// pxor
-// 	// 	if (strcmp(inst_str, "pxor") == 0)
-// 	// 	{
-// 	// 		inst = 24576;
-// 	// 	}
-
-// 	// 	// store
-// 	// 	else if (strcmp(inst_str, "store") == 0)
-// 	// 	{
-// 	// 		inst = 4096;
-// 	// 	}
-
-// 	// 	// pstore
-// 	// 	else if (strcmp(inst_str, "pstore") == 0)
-// 	// 	{
-// 	// 		inst = 20480;
-// 	// 	}
-
-// 	// 	// move
-// 	// 	else if (strcmp(inst_str, "move") == 0)
-// 	// 	{
-// 	// 		inst = 2048;
-// 	// 	}
-
-// 	// 	// pmove
-// 	// 	else if (strcmp(inst_str, "pmove") == 0)
-// 	// 	{
-// 	// 		inst = 18432;
-// 	// 	}
-
-// 	// 	// wb
-// 	// 	else if (strcmp(inst_str, "wb") == 0)
-// 	// 	{
-// 	// 		inst = 1024;
-// 	// 	}
-
-// 	// 	// last
-// 	// 	else if (strcmp(inst_str, "last") == 0)
-// 	// 	{
-// 	// 		inst = 512;
-// 	// 	}
-
-// 	// 	// nop
-// 	// 	else if (strcmp(inst_str, "nop") == 0)
-// 	// 	{
-// 	// 		inst = 0;
-// 	// 	}
-
-// 	// 	else
-// 	// 	{
-// 	// 		printf("error");
-// 	// 	}
-
-// 	// 	return inst;
-// 	// }
-// }
 
 void hdc_setup(void)
 {
@@ -482,7 +302,7 @@ void hdc_nop_core(void)
 
 void hdc_load(uint16_t addr)
 {
-	src[SEND_NUM++] = hdc_assemble("load", addr);
+	src[SEND_NUM++] = 40960 | addr;
 }
 
 void hdc_load_core(uint16_t core_num, uint16_t addr_array[core_num])
@@ -511,71 +331,9 @@ void hdc_load_thread(uint16_t thread_num, uint16_t core_num, uint16_t addr_array
 
 // =========================================================================================
 
-void hdc_wbitem(uint16_t addr)
-{
-	src[SEND_NUM++] = hdc_assemble("wbitem", addr);
-}
-
-void hdc_wbitem_core(uint16_t core_num, uint16_t addr_array[core_num])
-{
-	for (int i = 0; i < core_num; i++)
-	{
-		hdc_wbitem(addr_array[i]);
-	}
-	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
-	{
-		hdc_nop();
-	}
-}
-
-void hdc_wbitem_thread(uint16_t thread_num, uint16_t core_num, uint16_t addr_array[thread_num][core_num])
-{
-	for (int k = 0; k < thread_num; k++)
-	{
-		hdc_wbitem_core(core_num, addr_array[k]);
-	}
-	for (int k = thread_num; k < THREADS_NUM; k++)
-	{
-		hdc_nop_core();
-	}
-}
-
-// =========================================================================================
-
-void hdc_pwbitem(uint16_t addr)
-{
-	src[SEND_NUM++] = hdc_assemble("pwbitem", addr);
-}
-
-void hdc_pwbitem_core(uint16_t core_num, uint16_t addr_array[core_num])
-{
-	for (int i = 0; i < core_num; i++)
-	{
-		hdc_pwbitem(addr_array[i]);
-	}
-	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
-	{
-		hdc_nop();
-	}
-}
-
-void hdc_pwbitem_thread(uint16_t thread_num, uint16_t core_num, uint16_t addr_array[thread_num][core_num])
-{
-	for (int k = 0; k < thread_num; k++)
-	{
-		hdc_pwbitem_core(core_num, addr_array[k]);
-	}
-	for (int k = thread_num; k < THREADS_NUM; k++)
-	{
-		hdc_nop_core();
-	}
-}
-
-// =========================================================================================
-
 void hdc_store(void)
 {
-	src[SEND_NUM++] = hdc_assemble("store", 0);
+	src[SEND_NUM++] = 4096;
 }
 
 void hdc_store_core(uint16_t core_num)
@@ -606,7 +364,7 @@ void hdc_simd_store_thread(uint16_t thread_num, uint16_t core_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
-		src[SEND_NUM] = hdc_assemble("simd_store", 0);
+		src[SEND_NUM] = 5120;
 		SEND_NUM += 16;
 	}
 	for (int k = thread_num; k < THREADS_NUM; k++)
@@ -619,7 +377,7 @@ void hdc_simd_store_thread(uint16_t thread_num, uint16_t core_num)
 
 void hdc_pstore(void)
 {
-	src[SEND_NUM++] = hdc_assemble("pstore", 0);
+	src[SEND_NUM++] = 20480;
 }
 
 void hdc_pstore_core(uint16_t core_num)
@@ -650,7 +408,7 @@ void hdc_simd_pstore_thread(uint16_t thread_num, uint16_t core_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
-		src[SEND_NUM] = hdc_assemble("simd_pstore", 0);
+		src[SEND_NUM] = 21504;
 		SEND_NUM += 16;
 	}
 	for (int k = thread_num; k < THREADS_NUM; k++)
@@ -663,7 +421,7 @@ void hdc_simd_pstore_thread(uint16_t thread_num, uint16_t core_num)
 
 void hdc_move(void)
 {
-	src[SEND_NUM++] = hdc_assemble("move", 0);
+	src[SEND_NUM++] = 2048;
 }
 
 void hdc_move_core(uint16_t core_num)
@@ -694,7 +452,7 @@ void hdc_simd_move_thread(uint16_t thread_num, uint16_t core_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
-		src[SEND_NUM] = hdc_assemble("simd_move", 0);
+		src[SEND_NUM] = 3072;
 		SEND_NUM += 16;
 	}
 	for (int k = thread_num; k < THREADS_NUM; k++)
@@ -707,7 +465,7 @@ void hdc_simd_move_thread(uint16_t thread_num, uint16_t core_num)
 
 void hdc_pmove(void)
 {
-	src[SEND_NUM++] = hdc_assemble("pmove", 0);
+	src[SEND_NUM++] = 18432;
 }
 
 void hdc_pmove_core(uint16_t core_num)
@@ -738,7 +496,7 @@ void hdc_simd_pmove_thread(uint16_t thread_num, uint16_t core_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
-		src[SEND_NUM] = hdc_assemble("simd_pmove", 0);
+		src[SEND_NUM] = 19456;
 		SEND_NUM += 16;
 	}
 	for (int k = thread_num; k < THREADS_NUM; k++)
@@ -751,7 +509,7 @@ void hdc_simd_pmove_thread(uint16_t thread_num, uint16_t core_num)
 
 void hdc_permute(uint16_t permute_num)
 {
-	src[SEND_NUM++] = hdc_assemble("permute", permute_num);
+	src[SEND_NUM++] = 34816 | permute_num;
 }
 
 void hdc_permute_core(uint16_t core_num, uint16_t permute_num)
@@ -778,11 +536,11 @@ void hdc_permute_thread(uint16_t thread_num, uint16_t core_num, uint16_t permute
 	}
 }
 
-void hdc_simd_permute_thread(uint16_t thread_num, uint16_t core_num)
+void hdc_simd_permute_thread(uint16_t thread_num, uint16_t core_num, uint16_t permute_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
-		src[SEND_NUM] = hdc_assemble("simd_permute", 0);
+		src[SEND_NUM] = 35840 | permute_num;
 		SEND_NUM += 16;
 	}
 	for (int k = thread_num; k < THREADS_NUM; k++)
@@ -795,7 +553,7 @@ void hdc_simd_permute_thread(uint16_t thread_num, uint16_t core_num)
 
 void hdc_xor(void)
 {
-	src[SEND_NUM++] = hdc_assemble("xor", 0);
+	src[SEND_NUM++] = 8192;
 }
 
 void hdc_xor_core(uint16_t core_num)
@@ -826,7 +584,7 @@ void hdc_simd_xor_thread(uint16_t thread_num, uint16_t core_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
-		src[SEND_NUM] = hdc_assemble("simd_xor", 0);
+		src[SEND_NUM] = 9216;
 		SEND_NUM += 16;
 	}
 	for (int k = thread_num; k < THREADS_NUM; k++)
@@ -839,7 +597,7 @@ void hdc_simd_xor_thread(uint16_t thread_num, uint16_t core_num)
 
 void hdc_pxor(void)
 {
-	src[SEND_NUM++] = hdc_assemble("pxor", 0);
+	src[SEND_NUM++] = 24576;
 }
 
 void hdc_pxor_core(uint16_t core_num)
@@ -870,7 +628,7 @@ void hdc_simd_pxor_thread(uint16_t thread_num, uint16_t core_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
-		src[SEND_NUM] = hdc_assemble("simd_pxor", 0);
+		src[SEND_NUM] = 25600;
 		SEND_NUM += 16;
 	}
 	for (int k = thread_num; k < THREADS_NUM; k++)
@@ -881,28 +639,9 @@ void hdc_simd_pxor_thread(uint16_t thread_num, uint16_t core_num)
 
 // =========================================================================================
 
-void hdc_wb(void)
-{
-	src[SEND_NUM++] = hdc_assemble("wb", 0);
-}
-
-void hdc_wb_core(uint16_t core_num)
-{
-	for (int i = 0; i < core_num; i++)
-	{
-		hdc_wb();
-	}
-	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
-	{
-		hdc_nop();
-	}
-}
-
-// =========================================================================================
-
 void hdc_last(void)
 {
-	src[SEND_NUM++] = hdc_assemble("last", 0);
+	src[SEND_NUM++] = 256;
 }
 
 void hdc_last_core(uint16_t core_num)

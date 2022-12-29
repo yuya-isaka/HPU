@@ -34,13 +34,13 @@ extern void hdc_finish(void);
 
 extern void hdc_load_thread(uint16_t thread_num, uint16_t core_num, uint16_t addr_array[thread_num][core_num]);
 
-extern void hdc_wbitem_thread(uint16_t thread_num, uint16_t core_num, uint16_t addr_array[thread_num][core_num]);
-
-extern void hdc_pwbitem_thread(uint16_t thread_num, uint16_t core_num, uint16_t addr_array[thread_num][core_num]);
-
 extern void hdc_store_thread(uint16_t thread_num, uint16_t core_num);
 
+extern void hdc_simd_store_thread(uint16_t thread_num, uint16_t core_num);
+
 extern void hdc_pstore_thread(uint16_t thread_num, uint16_t core_num);
+
+extern void hdc_simd_pstore_thread(uint16_t thread_num, uint16_t core_num);
 
 extern void hdc_move_thread(uint16_t thread_num, uint16_t core_num);
 
@@ -48,13 +48,19 @@ extern void hdc_simd_move_thread(uint16_t thread_num, uint16_t core_num);
 
 extern void hdc_pmove_thread(uint16_t thread_num, uint16_t core_num);
 
+extern void hdc_simd_pmove_thread(uint16_t thread_num, uint16_t core_num);
+
 extern void hdc_permute_thread(uint16_t thread_num, uint16_t core_num, uint16_t permute_num);
+
+extern void hdc_simd_permute_thread(uint16_t thread_num, uint16_t core_num, uint16_t permute_num);
 
 extern void hdc_xor_thread(uint16_t thread_num, uint16_t core_num);
 
+extern void hdc_simd_xor_thread(uint16_t thread_num, uint16_t core_num);
+
 extern void hdc_pxor_thread(uint16_t thread_num, uint16_t core_num);
 
-extern void hdc_wb_thread(uint16_t thread_num, uint16_t core_num);
+extern void hdc_simd_pxor_thread(uint16_t thread_num, uint16_t core_num);
 
 extern void hdc_last_core(uint16_t core_num);
 
