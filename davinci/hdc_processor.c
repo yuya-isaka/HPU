@@ -448,6 +448,8 @@ void hdc_compute(void)
 	// 演算終了を待つ
 	while ((dma[0x34 / 4] & 0x1000) != 0x1000)
 		;
+
+	hdc_dma_reset();
 }
 
 void hdc_finish(void)

@@ -34,13 +34,13 @@ int main(int argc, char const *argv[])
 
 	hdc_setup();
 	hdc_make_imem(27);
+	hdc_dma_reset();
 
 	// 英語とフランス語の数だけ繰り返す
 	for (int l = 0; l < train_num; l++)
 	{
 
 		hdc_init(0);
-		hdc_dma_reset();
 		hdc_start();
 
 		const char *path = train_path[l];
@@ -188,7 +188,6 @@ int main(int argc, char const *argv[])
 
 			hdc_last_core(1);
 			hdc_compute();
-			hdc_dma_reset();
 			hdc_init(0);
 		}
 
