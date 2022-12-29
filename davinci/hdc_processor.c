@@ -219,25 +219,25 @@ void hdc_print(void)
 void hdc_make_imem(const int RANNUM)
 {
 	// reset_flag
-	top[0x08 / 4] = 1;
+	top[0x02] = 1;
 
 	// item_memory_num (乱数の数)
-	top[0x04 / 4] = RANNUM - 1;
+	top[0x01] = RANNUM - 1;
 
 	// gen <- 1;
-	top[0x00 / 4] = 1;
+	top[0x00] = 1;
 
 	// 乱数生成終了を待つ
-	while (top[0x00 / 4] & 0x1)
+	while (top[0x00] & 0x1)
 		;
 }
 
 void hdc_dma_reset(void)
 {
 	// dma reset
-	dma[0x30 / 4] = 4;
-	dma[0x00 / 4] = 4;
-	while (dma[0x00 / 4] & 0x4)
+	dma[0xc] = 4;
+	dma[0x00] = 4;
+	while (dma[0x00] & 0x4)
 		;
 }
 
@@ -249,24 +249,24 @@ void hdc_init(const int N)
 void hdc_start(void)
 {
 	// run <- 1;
-	top[0x00 / 4] = 2;
+	top[0x00] = 2;
 }
 
 void hdc_compute(void)
 {
 	// AXI DMA 送信の設定（UIO経由）
-	dma[0x00 / 4] = 1;
-	dma[0x18 / 4] = src_phys;
-	dma[0x28 / 4] = SEND_NUM * 2; // 16ビットがsend_num個
+	dma[0x00] = 1;
+	dma[0x6] = src_phys;
+	dma[0xa] = SEND_NUM * 2; // 16ビットがsend_num個
 
 	// 受信設定
 	// 送信チャネルの設定前に受信チャネルを設定すると変になるっぽい
-	dma[0x30 / 4] = 1;
-	dma[0x48 / 4] = dst_phys;
-	dma[0x58 / 4] = 128; // 32個 * 4バイト = 128バイト = 1024ビット
+	dma[0xc] = 1;
+	dma[0x12] = dst_phys;
+	dma[0x16] = 128; // 32個 * 4バイト = 128バイト = 1024ビット
 
 	// 演算終了を待つ
-	while ((dma[0x34 / 4] & 0x1000) != 0x1000)
+	while ((dma[0xd] & 0x1000) != 0x1000)
 		;
 
 	hdc_dma_reset();
@@ -275,10 +275,10 @@ void hdc_compute(void)
 void hdc_finish(void)
 {
 	// run <- 0;
-	top[0x00 / 4] = 0;
+	top[0x00] = 0;
 
 	// reset_flag
-	top[0x08 / 4] = 0;
+	top[0x02] = 0;
 }
 
 // =========================================================================================
@@ -286,16 +286,14 @@ void hdc_finish(void)
 void hdc_nop(void)
 {
 	src[SEND_NUM++] = 0;
-	// SEND_NUM++;
 }
 
 void hdc_nop_core(void)
 {
-	for (int i = 0; i < (BUS_WIDTH / 16); i++)
+	for (int i = 0; i < 16; i++)
 	{
 		hdc_nop();
 	}
-	// SEND_NUM += 16;
 }
 
 // =========================================================================================
@@ -311,7 +309,7 @@ void hdc_load_core(uint16_t core_num, uint16_t addr_array[core_num])
 	{
 		hdc_load(addr_array[i]);
 	}
-	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	for (int i = core_num; i < 16; i++)
 	{
 		hdc_nop();
 	}
@@ -342,7 +340,7 @@ void hdc_store_core(uint16_t core_num)
 	{
 		hdc_store();
 	}
-	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	for (int i = core_num; i < 16; i++)
 	{
 		hdc_nop();
 	}
@@ -386,7 +384,7 @@ void hdc_pstore_core(uint16_t core_num)
 	{
 		hdc_pstore();
 	}
-	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	for (int i = core_num; i < 16; i++)
 	{
 		hdc_nop();
 	}
@@ -430,7 +428,7 @@ void hdc_move_core(uint16_t core_num)
 	{
 		hdc_move();
 	}
-	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	for (int i = core_num; i < 16; i++)
 	{
 		hdc_nop();
 	}
@@ -474,7 +472,7 @@ void hdc_pmove_core(uint16_t core_num)
 	{
 		hdc_pmove();
 	}
-	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	for (int i = core_num; i < 16; i++)
 	{
 		hdc_nop();
 	}
@@ -518,7 +516,7 @@ void hdc_permute_core(uint16_t core_num, uint16_t permute_num)
 	{
 		hdc_permute(permute_num);
 	}
-	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	for (int i = core_num; i < 16; i++)
 	{
 		hdc_nop();
 	}
@@ -562,7 +560,7 @@ void hdc_xor_core(uint16_t core_num)
 	{
 		hdc_xor();
 	}
-	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	for (int i = core_num; i < 16; i++)
 	{
 		hdc_nop();
 	}
@@ -606,7 +604,7 @@ void hdc_pxor_core(uint16_t core_num)
 	{
 		hdc_pxor();
 	}
-	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	for (int i = core_num; i < 16; i++)
 	{
 		hdc_nop();
 	}
@@ -650,7 +648,7 @@ void hdc_last_core(uint16_t core_num)
 	{
 		hdc_last();
 	}
-	for (int i = core_num; i < (BUS_WIDTH / 16); i++)
+	for (int i = core_num; i < 16; i++)
 	{
 		hdc_nop();
 	}
