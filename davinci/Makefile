@@ -1,125 +1,111 @@
+# 32bit実行
+check:
+	gcc -c -O3 -o hyper_vector.o hyper_vector.c
+	gcc -c -O3 -o davinci_ngram.o davinci_ngram.c
+	gcc -O3 -DDEBUG -o davinci_ngram davinci_ngram.o hyper_vector.o
+	rm hyper_vector.o davinci_ngram.o
+	./davinci_ngram
 
-default:
+# 32bit実行デバッグ
+debug-check:
 	gcc -c -O3 -DDEBUG -o hyper_vector.o hyper_vector.c
 	gcc -c -O3 -DDEBUG -o davinci_ngram.o davinci_ngram.c
 	gcc -O3 -DDEBUG -o davinci_ngram davinci_ngram.o hyper_vector.o
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
+# 64bit実行
 check64:
+	gcc -c -O3 -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -c -O3 -DHV64 -o davinci_ngram.o davinci_ngram.c
+	gcc -O3 -DDEBUG -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
+	rm hyper_vector.o davinci_ngram.o
+	./davinci_ngram
+
+# 64bit実行デバッグ
+debug-check64:
 	gcc -c -O3 -DDEBUG -DHV64 -o hyper_vector.o hyper_vector.c
 	gcc -c -O3 -DDEBUG -DHV64 -o davinci_ngram.o davinci_ngram.c
 	gcc -O3 -DDEBUG -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
-test-check64:
-	gcc -c -DDEBUG -DHV64 -o hyper_vector.o hyper_vector.c
-	gcc -c -DDEBUG -DHV64 -o davinci_ngram.o davinci_ngram.c
-	gcc -DDEBUG -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
+# 32bit並列処理
+mac-omp:
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o davinci_ngram.o davinci_ngram.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o davinci_ngram davinci_ngram.o hyper_vector.o
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
-# ////////////////////////////////////////////
-
-omp:
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -o hyper_vector.o hyper_vector.c
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -o davinci_ngram.o davinci_ngram.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -DDEBUG -DOPENMP -o davinci_ngram davinci_ngram.o hyper_vector.o
+# 64bit並列処理
+mac-omp64:
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -DHV64 -o davinci_ngram.o davinci_ngram.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
-# -mcpu=apple-m1つけても特に変わらん
-
-# 結論　これが一番速い
-omp64:
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DDEBUG -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.o davinci_ngram.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
-	rm hyper_vector.o davinci_ngram.o
-	./davinci_ngram
-
-test-omp64:
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -DDEBUG -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.o davinci_ngram.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -DDEBUG -DOPENMP -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
-	rm hyper_vector.o davinci_ngram.o
-	./davinci_ngram
-
-# ////////////////////////////////////////////
-
-intelomp64:
-	gcc -fopenmp -c -O3 -DDEBUG -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
-	gcc -fopenmp -c -O3 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.o davinci_ngram.c
+# Intel 32bit並列処理
+intel-omp:
+	gcc -fopenmp -c -O3 -DOPENMP -o hyper_vector.o hyper_vector.c
+	gcc -fopenmp -c -O3 -DOPENMP -o davinci_ngram.o davinci_ngram.c
 	gcc -fopenmp -O3 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
-auto:
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -Ofast -DDEBUG -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -Ofast -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.o davinci_ngram.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -Ofast -DDEBUG -DOPENMP -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
+# Intel 64bit並列処理
+intel-omp64:
+	gcc -fopenmp -c -O3 -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -fopenmp -c -O3 -DOPENMP -DHV64 -o davinci_ngram.o davinci_ngram.c
+	gcc -fopenmp -O3 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
-# -ftree-vectorizeをつけても-O3と変わらない
-# -O2と-O3では4秒ほど差がある
-
-neon:
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -DSIMD -o hyper_vector.o hyper_vector.c
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -DSIMD -o davinci_ngram.o davinci_ngram.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -DDEBUG -DOPENMP -DSIMD -o davinci_ngram davinci_ngram.o hyper_vector.o
+# Mac SIMD 32bit
+mac-neon:
+	gcc -c -O3 -DSIMD -o hyper_vector.o hyper_vector.c
+	gcc -c -O3 -DSIMD -o davinci_ngram.o davinci_ngram.c
+	gcc -O3 -DSIMD -o davinci_ngram davinci_ngram.o hyper_vector.o
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
-neon64:
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -DSIMD -DHV64 -o hyper_vector.o hyper_vector.c
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -DSIMD -DHV64 -o davinci_ngram.o davinci_ngram.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -DDEBUG -DOPENMP -DSIMD -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
+# Mac SIMD 64bit
+mac-neon64:
+	gcc -c -O3 -DSIMD -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -c -O3 -DSIMD -DHV64 -o davinci_ngram.o davinci_ngram.c
+	gcc -O3 -DSIMD -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
 	rm hyper_vector.o davinci_ngram.o
 	./davinci_ngram
 
-neon2:
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -DSIMD -o hyper_vector_neon.o hyper_vector_neon.c
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DDEBUG -DOPENMP -DSIMD -o davinci_ngram_neon.o davinci_ngram_neon.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -DDEBUG -DOPENMP -DSIMD -o davinci_ngram_neon davinci_ngram_neon.o hyper_vector_neon.o
-	rm hyper_vector_neon.o davinci_ngram_neon.o
-	./davinci_ngram_neon
+# Mac SIMD 32bit並列処理
+mac-neon-omp:
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DOPENMP -DSIMD -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DOPENMP -DSIMD -o davinci_ngram.o davinci_ngram.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -DOPENMP -DSIMD -o davinci_ngram davinci_ngram.o hyper_vector.o
+	rm hyper_vector.o davinci_ngram.o
+	./davinci_ngram
 
-# g++ -mavx2 -O2 -o davinci_ngram_intel davinci_ngram_intel.cpp -lm
+# Mac SIMD 64bit並列処理
+mac-neon64-omp64:
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DOPENMP -DSIMD -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -DOPENMP -DSIMD -DHV64 -o davinci_ngram.o davinci_ngram.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -DOPENMP -DSIMD -DHV64 -o davinci_ngram davinci_ngram.o hyper_vector.o
+	rm hyper_vector.o davinci_ngram.o
+	./davinci_ngram
 
-# check:
-# 	gcc -Wall -o davinci_ngram davinci_ngram.c -lm
-
-# gcc -Wall -O2 -S -o davinci_ngram.s davinci_ngram.c -lm
-
-asm:
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -S -O3 -mcpu=apple-m1 -DDEBUG -DOPENMP -DHV64 -o hyper_vector.s hyper_vector.c
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -S -O3 -mcpu=apple-m1 -DDEBUG -DOPENMP -DHV64 -o davinci_ngram.s davinci_ngram.c
-
-
-
-
+# Petalinux Armv7
 linux:
 	arm-linux-gnueabihf-gcc -c -O3 -o hyper_vector.o hyper_vector.c
 	arm-linux-gnueabihf-gcc -c -O3 -o davinci_ngram_peta.o davinci_ngram.c
 	arm-linux-gnueabihf-gcc -O3 -o davinci_ngram_peta hyper_vector.o davinci_ngram_peta.o
 	arm-linux-gnueabihf-gcc -c -O3 -o hdc_processor.o hdc_processor.c
-	arm-linux-gnueabihf-gcc -c -O3 -o ohashi_ngram.o ohashi_ngram4.c
+	arm-linux-gnueabihf-gcc -c -O3 -o ohashi_ngram.o ohashi_ngram.c
 	arm-linux-gnueabihf-gcc -O3 -o ohashi_ngram hdc_processor.o ohashi_ngram.o
 	rm hdc_processor.o ohashi_ngram.o hyper_vector.o davinci_ngram_peta.o
 
-linux-check:
-	arm-linux-gnueabihf-gcc -Wall -o davinci_ngram_peta davinci_ngram.c -lm
-	arm-linux-gnueabihf-gcc -Wall -o ohashi_ngram ohashi_ngram.c -lm
-
-linux-asm:
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o davinci_ngram_peta.s davinci_ngram.c -lm
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o ohashi_ngram.s ohashi_ngram.c -lm
-
-
-
+# remove バイナリ
 clean:
 	rm -f davinci_ngram davinci_ngram_peta ohashi_ngram
 
-.PHONY: default check asm linux linux-check linux-asm clean
+.PHONY: check debug-check check64 debug-check64 mac-omp mac-omp64 intel-omp intel-omp64 mac-neon mac-neon64 linux clean
