@@ -276,7 +276,7 @@ int main(void)
   hdc_make_imem(IMEM_SIZE);
 
   // テスト
-  for (int i = 3; i <= IMEM_SIZE; i += 3)
+  for (int i = 30; i <= IMEM_SIZE; i += 30)
   {
     int ADDRNUM = i;
     check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR, IMEM_SIZE);

@@ -5,129 +5,102 @@
 #include <stdint.h>
 #include "hyper_vector.h"
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 // 次元数可変
 // const int DIM = 32 / 32;
 const int DIM = 1024 / 32;
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 変わらん
-// 追加されるランダムな値はRANNUM-1番目
 // const int RANNUM = 512;
 const int RANNUM = 1024;
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// 渡された32ビットのvを、バイナリでコマンドライン出力
-void printb(unsigned int v)
-{
-	unsigned int mask = (int)1 << (sizeof(v) * 8 - 1);
-	do
-		putchar(mask & v ? '1' : '0');
-	while (mask >>= 1);
-}
-
-// printbを使いつつ整形して、バイナリをコマンドライン出力
-void putb(unsigned int v)
-{
-	printf("  0"), putchar('b'), printb(v), putchar('\n');
-}
-
-// N-gram専用check関数
-// 簡易アセンブラを使って、直接アセンブラを記述 (関数使ったやつに書き直す)
 //    NGRAM   = 1 ~
 //    ADDRNUM = NGRAMの倍数 (shifter_newを使ったテストをしているから。また、LASTが０のままになりtb.cppでは止まる。test.cppでは動くけどNGRAMの倍数以外は同じ値が出る)
+//    MAJORITY_ADDR = 偶数処理
 void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR)
 {
-
+	// HV初期化
 	hv_init();
 
+	// アイテムメモリ準備
 	hv_t **item_memory = hv_make_imem(RANNUM);
 
+	// 偶数処理
 	const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
 
 	for (int i = 0; i < ADDRNUM; i += 3)
 	{
+		// 格納場所
 		hv_t *bound_tmp = hv_make();
+
 		for (int j = 0; j < NGRAM; j++)
 		{
+			// Permutation
 			hv_t *perm_result = hv_perm(item_memory[i + j], j);
+
+			// Binding
 			hv_t *bind_result = hv_bind(bound_tmp, perm_result);
+
+			// Copy
 			hv_copy(bound_tmp, bind_result);
 
+			// Free
 			hv_free(bind_result);
 			hv_free(perm_result);
 		}
 
+		// Bounding
 		hv_bound(bound_tmp);
 
+		// Free
 		hv_free(bound_tmp);
 	}
 
+	// 偶数処理
 	if (EVEN)
 	{
 		hv_bound(item_memory[MAJORITY_ADDR]);
 	}
+
+	// Bounding結果取り出し
 	hv_t *result = hv_bound_result();
 
+	// 結果出力
 	hv_print(result);
 
+	// Free
 	hv_free(result);
+
+	// 終了処理
 	hv_finish();
 
 	return;
 }
 
-// hv_init
-// hv_make_imem
-
-// hv_make
-// hv_free
-// hv_print
-
-// hv_perm
-// hv_bind
-// hv_bound
-// hv_bound_result
-
-// hv_finish
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------
-
 int main(int argc, char **argv)
 {
 	printf("\n ------------------------------- 開始 ------------------------------- \n\n\n");
 
+	// NGRAM
 	const int NGRAM = 3;
+
+	// 偶数処理
 	const int MAJORITY_ADDR = 1023;
+
 	int ADDRNUM = 0;
 
+	// テスト
 	// const int SIMULATION_COUNT = 100;
 	// for (int i = 30; i < SIMULATION_COUNT; i += 30)
 	// {
 	// 	ADDRNUM = i;
-
 	// 	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
 	// 	xor128(1);
-
-	// 	printf(" -------------------\n\n");
 	// }
 
-	// const int SIMULATION_COUNT = 500;
-	// for (int i = 120; i < SIMULATION_COUNT; i += 120)
-	// {
-	// 	ADDRNUM = i;
-
-	// 	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
-	// 	xor128(1);
-
-	// 	printf(" -------------------\n\n");
-	// }
-
+	// 単体テスト1
 	ADDRNUM = 900;
 	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
+
+	// 単体テスト2
 	ADDRNUM = 300;
 	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
 
