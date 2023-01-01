@@ -94,6 +94,9 @@ int main(int argc, char const *argv[])
 
 		// printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
 
+		// 計算時間格納
+		double TIME = 0.0;
+
 		// SEND_NUMのエポック
 		for (int ll = 0; ll < ALL_SEND_EPOCH; ll += 1)
 		{
@@ -216,7 +219,12 @@ int main(int argc, char const *argv[])
 			}
 
 			hdc_last();
+
+			clock_t START_COMPUTE = clock();
 			hdc_compute();
+			clock_t END_COMPUTE = clock();
+			TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
+
 			hdc_init(0);
 		}
 
@@ -457,8 +465,12 @@ int main(int argc, char const *argv[])
 
 		// ラスト命令
 		hdc_last();
+
+		clock_t START_COMPUTE = clock();
 		// 計算開始
 		hdc_compute();
+		clock_t END_COMPUTE = clock();
+		TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
 
 		// 結果確認
 		printf("\n");
