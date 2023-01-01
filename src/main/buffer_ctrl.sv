@@ -34,25 +34,8 @@ module buffer_ctrl
          input wire [ DIM:0 ]                   core_result_14,
          //  input wire [ DIM:0 ]                   core_result_15,
          //  input wire [ DIM:0 ]                   core_result_16,
-         //  input wire [ DIM:0 ]                   core_result_17,
-         //  input wire [ DIM:0 ]                   core_result_18,
-         //  input wire [ DIM:0 ]                   core_result_19,
-         //  input wire [ DIM:0 ]                   core_result_20,
-         //  input wire [ DIM:0 ]                   core_result_21,
-         //  input wire [ DIM:0 ]                   core_result_22,
-         //  input wire [ DIM:0 ]                   core_result_23,
-         //  input wire [ DIM:0 ]                   core_result_24,
-         //  input wire [ DIM:0 ]                   core_result_25,
-         //  input wire [ DIM:0 ]                   core_result_26,
-         //  input wire [ DIM:0 ]                   core_result_27,
-         //  input wire [ DIM:0 ]                   core_result_28,
-         //  input wire [ DIM:0 ]                   core_result_29,
-         //  input wire [ DIM:0 ]                   core_result_30,
-         //  input wire [ DIM:0 ]                   core_result_31,
-         //  input wire [ DIM:0 ]                   core_result_32,
-         // 1コア
          input wire [ CORENUM-1:0 ]             store,
-         //  input wire                         store,
+         input wire                             store_flag,
          input wire                             stream_v,
          input wire [ 1:0 ]                     stream_i,
 
@@ -62,6 +45,11 @@ module buffer_ctrl
          output wire  [ DIM:0 ]                 sign_bit
 
      );
+
+
+    // 『stream_vが立つタイミングのsign_bitが求めてた値』
+    // last     ->   last_n      ->  last_nn    ->  stream_v
+    //          ->   select      ->  box_1 ...  ->  box (sign_bit)
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,6 +64,7 @@ module buffer_ctrl
 
             // コア数可変
             // 計算数可変 (現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分)
+
             counter #( .W( 26 ), .CORENUM( 14 ) ) counter
                     (
 
@@ -85,6 +74,7 @@ module buffer_ctrl
                         // 1コア
                         // .store( store ),
                         .store( store[ CORENUM-1:0 ] ),
+                        .store_flag( store_flag ),
                         // コア数可変
                         // この順番で渡す必要がある
                         .core_result(
@@ -131,16 +121,12 @@ module buffer_ctrl
                     );
 
         end
+
     endgenerate
 
 
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    // 16コア
-    // 『stream_vが立つタイミングのsign_bitが求めてた値』
-    // last     ->   last_n      ->  last_nn    ->  stream_v
-    //          ->   select      ->  box_1 ...  ->  box (sign_bit)
 
 
     // stream_d
@@ -154,9 +140,7 @@ module buffer_ctrl
                       if ( stream_i == 2'd0 ) begin
 
                           stream_d[ 255:0 ] <= sign_bit[ 255:0 ];
-                          //   stream_d[ 511:0 ] <= sign_bit[ 1023:512 ];
                           //   stream_d[ 31:0 ] <= sign_bit[ 31:0 ];
-                          //   stream_d[ 511:32 ] <= 0;
 
                       end
 
@@ -175,16 +159,12 @@ module buffer_ctrl
                       else begin
 
                           stream_d[ 255:0 ] <= sign_bit[ 1023:768 ];
-                          //   stream_d[ 511:0 ] <= sign_bit[ 511:0 ];
-                          //   stream_d[ 511:0 ] <= 0;
 
                       end
 
                   end
+
               end;
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 endmodule

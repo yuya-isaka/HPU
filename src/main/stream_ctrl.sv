@@ -14,10 +14,7 @@ module stream_ctrl
          // in
          input wire                             clk,
          input wire                             rst,
-         input wire                             get_v,
-         // 1コア
-         input wire [ CORENUM-1:0 ]             last,
-         //   input wire                             last,
+         input wire                             last,
          input wire                             dst_ready,
 
 
@@ -30,20 +27,14 @@ module stream_ctrl
      );
 
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    // 現状の流れ
-    // last -> last_n -> last_nn ->  stream_ok_keep (stream_ok保持) -> dst_valid (stream_active引き金)
-    //                   stream_ok   last_stream (last_nn引き金)       dst_last (stream_active & last_stream引き金)
-    //                               stream_active (sream_ok引き金)
-    //                               stream_v (stream_active引き金)
-
     //// last -> last_n -> last_nn ->  stream_ok_keep (stream_ok保持) -> dst_valid (stream_active引き金)
     ////                               start (stream_ok_keep引き金)       dst_last (stream_active & last_stream引き金)
     ////                               stream_active (sream_ok引き金)
     ////                               stream_v (stream_active引き金)
     ////                               last_stream (start引き金)
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     // ラスト命令 (9命令) が実行された時、同時に他のコアでstore命令が実行されていることを考慮
@@ -62,17 +53,13 @@ module stream_ctrl
 
                   else begin
 
-                      if ( last != 0 ) begin
-                          last_n <= 1'b1;
-                      end
-
-                      else begin
-                          last_n <= 1'b0;
-                      end
-
+                      last_n <= last;
                       last_nn <= last_n;
+
                   end
+
               end;
+
 
 
     // ラスト命令が発行された後に、dst_readyが落ちている場合を考慮
@@ -82,19 +69,46 @@ module stream_ctrl
     always_ff @( posedge clk ) begin
 
                   if ( rst ) begin
+
                       last_keep <= 1'b0;
+
                   end
 
                   // 問題なく発行できそうなら、keepはしない
                   // stream_okを先に評価する
                   else if ( stream_ok ) begin
+
                       last_keep <= 1'b0;
+
                   end
 
                   else if ( last_nn ) begin
+
                       last_keep <= 1'b1;
+
                   end
+
               end;
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    // 引き金: last_nn か last_keep
+    logic       stream_ok;
+
+    always_comb begin
+
+                    stream_ok = 1'b0;
+
+                    if ( ( last_nn | last_keep) & dst_ready ) begin
+
+                        stream_ok = 1'b1;
+
+                    end
+
+                end;
+
 
 
     // stream_okが立った事実を保持
@@ -103,46 +117,21 @@ module stream_ctrl
     always_ff @( posedge clk ) begin
 
                   if ( rst ) begin
+
                       stream_ok_keep <= 1'b0;
+
                   end
 
                   else if ( dst_ready ) begin
+
                       stream_ok_keep <= stream_ok;
+
                   end
+
               end;
-
-
-    //================================================================
-
-
-    // 引き金: last_nn か last_keep
-    logic       stream_ok;
-
-    always_comb begin
-                    stream_ok = 1'b0;
-
-                    if ( ( last_nn | last_keep) & dst_ready ) begin
-                        stream_ok = 1'b1;
-                    end
-                end;
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    // 引き金: stream_active
-    // streamが続く限り1のまま
-    // dst_valid(M_AXIS_TVALIDが立ったタイミングのstream_d(M_AXIS_TDATA)のデータが送信される
-    always_ff @( posedge clk ) begin
-
-                  if ( rst ) begin
-                      dst_valid <= 1'b0;
-                  end
-
-                  else if ( dst_ready ) begin
-                      dst_valid <= stream_active;
-                  end
-              end;
 
 
     // 引き金: stream_ok
@@ -152,21 +141,73 @@ module stream_ctrl
     always_ff @( posedge clk ) begin
 
                   if ( rst ) begin
+
                       stream_active <= 1'b0;
+
                   end
 
                   // 最後のストリームの時に落とす
                   // 最後のストリームが立っている時、再びstream_okが経つのは未定義動作（こっちが先に評価されるため）
                   else if ( last_stream ) begin
+
                       stream_active <= 1'b0;
+
                   end
 
                   // stream_active <= stream_okはだめ
                   // 一度stream_okが立ったら、stream_activeの値は保持する （last_streamが立った時に落とす）
                   else if ( dst_ready & stream_ok ) begin
+
                       stream_active <= 1'b1;
+
                   end
+
               end;
+
+
+
+    // 引き金: stream_active
+    // streamが続く限り1のまま
+    // dst_valid(M_AXIS_TVALIDが立ったタイミングのstream_d(M_AXIS_TDATA)のデータが送信される
+    always_ff @( posedge clk ) begin
+
+                  if ( rst ) begin
+
+                      dst_valid <= 1'b0;
+
+                  end
+
+                  else if ( dst_ready ) begin
+
+                      dst_valid <= stream_active;
+
+                  end
+
+              end;
+
+
+    // 引き金: stream_active
+    assign stream_v = dst_ready & stream_active;
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    // 引き金： stream_ok_keep
+    logic       start;
+
+    always_comb begin
+
+                    start = 1'b0;
+
+                    if ( dst_ready & stream_ok_keep ) begin
+
+                        start = 1'b1;
+
+                    end
+
+                end;
+
 
 
     // 引き金: start
@@ -192,25 +233,6 @@ module stream_ctrl
         );
 
 
-    //================================================================
-
-
-    // 引き金： stream_ok_keep
-    logic       start;
-
-    always_comb begin
-                    start = 1'b0;
-
-                    if ( dst_ready & stream_ok_keep ) begin
-                        start = 1'b1;
-                    end
-                end;
-
-
-    // 引き金: stream_active
-    assign stream_v = dst_ready & stream_active;
-
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -219,16 +241,18 @@ module stream_ctrl
     always_ff @( posedge clk ) begin
 
                   if ( rst ) begin
+
                       dst_last <= 1'b0;
+
                   end
 
                   else if ( dst_ready ) begin
+
                       dst_last <= stream_active & last_stream;
+
                   end
+
               end;
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 endmodule

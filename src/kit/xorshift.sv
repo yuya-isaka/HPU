@@ -7,6 +7,7 @@ module xorshift
         // in
         input wire                          clk,
         input wire                          gen,
+        input wire                          reset_item,
 
 
         // out
@@ -20,27 +21,17 @@ module xorshift
 
     // レジスタ４つ
     reg [ 31:0 ]      x;
-
     reg [ 31:0 ]      y;
-
     reg [ 31:0 ]      z;
-
     reg [ 31:0 ]      w;
 
+
+    // RNG回路
     always_ff @( posedge clk ) begin
 
                   // ランダム生成のフラグが立ったら、再び初期値を設定
-                  if ( ~gen ) begin
+                  if ( ~reset_item ) begin
 
-                      // ランダム生成する際の初期値
-                      // パターン１
-                      // x <= 2380889285;
-                      // y <= 1631889387;
-                      // z <= 1698655726;
-                      // w <= 2336862850;
-
-                      // ランダム生成する際の初期値
-                      // パターン２
                       x <= 123456789;
                       y <= 362436069;
                       z <= 521288629;
@@ -48,7 +39,7 @@ module xorshift
 
                   end
 
-                  else begin
+                  else if ( gen ) begin
 
                       x <= y;
                       y <= z;
@@ -60,14 +51,11 @@ module xorshift
               end;
 
 
-    //================================================================
-
-
-    // wがランダムな32ビット
-    assign rand_num = w;
-
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    // 結果出力
+    assign rand_num = w;
 
 
 endmodule

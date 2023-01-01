@@ -70,6 +70,9 @@ module top
     );
 
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     // 次元数可変
     // 32次元 -----------------
     // parameter DIM = 31;
@@ -86,7 +89,7 @@ module top
     // -----------------------
 
     // 1024次元 ---------------
-    parameter WI = 31;
+    // parameter WI = 31;
     // -----------------------
 
 
@@ -118,6 +121,9 @@ module top
                    .exec( exec )
 
                );
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     // 現時点のcounterの値
@@ -169,7 +175,7 @@ module top
                     // .core_result_32( core_result[ 31 ] ),
                     // 1コア
                     .store( store[ CORENUM-1:0 ] ),
-                    // .store( store ),
+                    .store_flag( store_flag ),
                     .stream_v( stream_v ),
                     .stream_i( stream_i[ 1:0 ] ),
 
@@ -180,6 +186,10 @@ module top
                     .sign_bit( sign_bit[ DIM:0 ] )
 
                 );
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -197,9 +207,8 @@ module top
                     .clk( AXIS_ACLK ),
                     .rst( ~run ),
                     // 1コア
-                    .last( last[ CORENUM-1:0 ] ),
+                    .last( last ),
                     // .last( last ),
-                    .get_v( get_v ),
                     .dst_ready( M_AXIS_TREADY ),
 
 
@@ -212,294 +221,100 @@ module top
                 );
 
 
-    // ================================================== ランダム関連 ==============================================================
-    // ランダム関連はgen信号によって駆動
-    // ============================================================================================================================
-
-
-    // 32bitのランダム値の生成数
-    // (1024bitのハイパーベクトルが生成される場合、32個生成）
-    // (現状最大で32個なので、5bit幅)
-    reg [ 4:0 ]       item_a_tmp;
-
-    always @( posedge AXIS_ACLK ) begin
-
-        if ( ~gen ) begin
-            item_a_tmp <= 0;
-        end
-
-        else begin
-            if ( item_a_tmp == WI ) begin
-                item_a_tmp <= 5'd0;
-            end
-
-            else begin
-                item_a_tmp <= item_a_tmp + 5'd1;
-            end
-        end
-
-    end
-
-
-    // 各コアのitem_memoryにランダム値を格納するタイミング
-    // item_a_tmpの値から、更新タイミングを決定
-    reg             update_item;
-
-    always @( posedge AXIS_ACLK ) begin
-
-        if ( ~gen ) begin
-            update_item <= 0;
-        end
-
-        else if ( item_a_tmp == WI ) begin
-            update_item <= 1'd1;
-        end
-
-        else begin
-            update_item <= 0;
-        end
-
-    end
-
-
-    // 各コアのitem_memoryのアドレス
-    // (現状最大で1024個なので、10bit指定)
-    reg [ 8:0 ]      item_a;
-
-    always @( posedge AXIS_ACLK ) begin
-
-        if ( ~gen ) begin
-            item_a <= 0;
-        end
-
-        else if ( update_item ) begin
-            item_a <= item_a + 9'd1;
-        end
-
-    end
-
-
-    // xorshiftモジュールから生成される32bitのランダム値
-    wire [ 31:0 ]         rand_num_tmp;
-
-    xorshift prng
-             (
-
-                 // in
-                 .clk( AXIS_ACLK ),
-                 .gen( gen ),
-
-
-                 // out
-                 .rand_num( rand_num_tmp[ 31:0 ] )
-
-             );
-
-
-    // xorshiftから生成されたランダム値(rand_num_tmp)の格納先
-    // (ハイパーベクトル次元数が1024なら、31回別々に格納する)
-    reg [ DIM:0 ]       rand_num;
-
-    always @( posedge AXIS_ACLK ) begin
-
-        if ( ~gen ) begin
-            rand_num <= 0;
-        end
-
-        // 次元数可変
-        else if ( item_a_tmp == 0 ) begin
-            rand_num[ 31:0 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 1 ) begin
-            rand_num[ 63:32 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 2 ) begin
-            rand_num[ 95:64 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 3 ) begin
-            rand_num[ 127:96 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 4 ) begin
-            rand_num[ 159:128 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 5 ) begin
-            rand_num[ 191:160 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 6 ) begin
-            rand_num[ 223:192 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 7 ) begin
-            rand_num[ 255:224 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 8 ) begin
-            rand_num[ 287:256 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 9 ) begin
-            rand_num[ 319:288 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 10 ) begin
-            rand_num[ 351:320 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 11 ) begin
-            rand_num[ 383:352 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 12 ) begin
-            rand_num[ 415:384 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 13 ) begin
-            rand_num[ 447:416 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 14 ) begin
-            rand_num[ 479:448 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 15 ) begin
-            rand_num[ 511:480 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 16 ) begin
-            rand_num[ 543:512 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 17 ) begin
-            rand_num[ 575:544 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 18 ) begin
-            rand_num[ 607:576 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 19 ) begin
-            rand_num[ 639:608 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 20 ) begin
-            rand_num[ 671:640 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 21 ) begin
-            rand_num[ 703:672 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 22 ) begin
-            rand_num[ 735:704 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 23 ) begin
-            rand_num[ 767:736 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 24 ) begin
-            rand_num[ 799:768 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 25 ) begin
-            rand_num[ 831:800 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 26 ) begin
-            rand_num[ 863:832 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 27 ) begin
-            rand_num[ 895:864 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 28 ) begin
-            rand_num[ 927:896 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 29 ) begin
-            rand_num[ 959:928 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 30 ) begin
-            rand_num[ 991:960 ] <= rand_num_tmp;
-        end
-
-        else if ( item_a_tmp == 31 ) begin
-            rand_num[ 1023:992 ] <= rand_num_tmp;
-        end
-
-    end
-
-
-    // ============================================================================================================================
-    // ============================================================================================================================
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     // 各コアのストア信号
-    // 1コア
-    wire [ CORENUM-1:0 ]              store;
-    // wire                            store;
+    wire [ CORENUM-1:0 ]            store;
+    wire                            store_flag;
+
+    assign store_flag = ( store != 0 ) ? 1'b1 : 1'b0;
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     // 各コアの演算結果
-    // 1コア
-    wire [ DIM:0 ]                    core_result [ 0:CORENUM-1 ];
-    // wire [DIM:0]                    core_result;
+    wire [ DIM:0 ]                      core_result [ 0:CORENUM-1 ];
 
-    // 各コアのラスト信号
-    // 1コア
-    wire [ CORENUM-1:0 ]              last;
-    // wire                            last;
+    wire [ CORENUM-1:0 ]                finish_gen;
 
     // 各コアでエンコーディング
     generate
 
         genvar      i;
 
-        for ( i = 0; i < CORENUM; i = i + 1 ) begin
+        for ( i = 1; i < CORENUM; i = i + 1 ) begin
 
             // 次元数可変
             // スレッド数可変
             // core #( .DIM( 31 ), .THREADS( 5 ) ) core
-            core #( .DIM( 1023 ), .THREADS( 10 ) ) core
+            core #( .DIM( 1023 ), .THREADS( 5 ), .WI( 31 ) ) core
                  (
 
                      // in
                      .clk( AXIS_ACLK ),
                      .run( run ),
                      .gen( gen ),
-                     .update_item( update_item ),
-                     .item_a( item_a[ 8:0 ] ),
-                     .rand_num( rand_num[ DIM:0 ] ),
+                     .reset_item( reset_item ),
+                     .item_memory_num( item_memory_num[ 9:0 ] ),
                      .get_v( get_v ),
                      // 16bit命令
-                     .get_d( S_AXIS_TDATA[ 15+16*i:16*i ] ),
+                     .get_d_tmp( S_AXIS_TDATA[ 15+16*i:16*i ] ),
+                     .get_d_1( S_AXIS_TDATA[ 15:0 ] ),
                      .exec( exec ),
-                     .sign_bit( sign_bit[ DIM:0] ),
 
 
                      // out
                      // 1コア
+                     .finish_gen( finish_gen[ i ] ),
                      .store( store[ i ] ),
                      //  .store( store ),
                      // 1コア
-                     .core_result( core_result[ i ] ),
+                     .core_result( core_result[ i ] )
                      //  .core_result( core_result ),
-                     // 1コア
-                     .last( last[ i ] )
-                     //  .last( last)
-
                  );
 
         end
 
     endgenerate
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    // 各コアのラスト信号
+    wire                            last;
+
+
+    central_core #( .DIM( 1023 ), .THREADS( 10 ), .WI( 31 ) ) central_core
+                 (
+
+                     // in
+                     .clk( AXIS_ACLK ),
+                     .run( run ),
+                     .gen( gen ),
+                     .reset_item( reset_item ),
+                     .item_memory_num( item_memory_num[ 9:0 ] ),
+                     .get_v( get_v ),
+                     // 16bit命令
+                     .get_d( S_AXIS_TDATA[ 15:0 ] ),
+                     .exec( exec ),
+
+
+                     // out
+                     // 1コア
+                     .finish_gen( finish_gen[ 0 ] ),
+                     .store( store[ 0 ] ),
+                     //  .store( store ),
+                     // 1コア
+                     .core_result( core_result[ 0 ] ),
+                     //  .core_result( core_result ),
+                     // 1コア
+                     .last( last )
+                     //  .last( last)
+
+                 );
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -607,6 +422,7 @@ module top
                 read_addr[ 11:2 ] <= S_AXI_ARADDR[ 11:2 ];
 
             end
+
         end
 
         // AW
@@ -619,6 +435,7 @@ module top
                 write_data <= S_AXI_WDATA;
 
             end
+
         end
 
         // W
@@ -631,30 +448,39 @@ module top
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
 
             end
+
         end
 
         // AWW
         else if ( AWW ) begin
 
             if ( S_AXI_BREADY ) begin
+
                 // go INI
                 state <= 4'b0000;
+
             end
+
         end
 
         // AR1
         else if ( AR1 ) begin
+
             // go AR2
             state <= 4'b1000;
+
         end
 
         // AR2
         else if ( AR2 ) begin
 
             if ( S_AXI_RREADY ) begin
+
                 // go INI
                 state <= 4'b0000;
+
             end
+
         end
 
     end
@@ -679,17 +505,24 @@ module top
 
 
     // アクセラレータのモード
-    // gen ... アクセラレータ準備モード　（ランダムなハイパーベクトルをitem_memoryに格納）
     // run ... アクセラレータ実行モード
+    // gen ... アクセラレータ準備モード　（ランダムなハイパーベクトルをitem_memoryに格納）
 
-    // gen ... 書き込みモードで１を代入
     // run ... 書き込みモードで2を代入
-    reg                 gen, run;
+    // gen ... 書き込みモードで１を代入
+    reg                 run;
+    reg                 gen;
 
     // item_memoryに格納するハイパーベクトルの数
     // (現状の最大値は1023)
-    reg [ 8:0 ]         item_memory_num;
+    reg [ 9:0 ]         item_memory_num;
 
+    reg                 reset_item;
+
+    // reg [ 31:0 ]        xor_x;
+    // reg [ 31:0 ]        xor_y;
+    // reg [ 31:0 ]        xor_z;
+    // reg [ 31:0 ]        xor_w;
 
     //================================================================
 
@@ -701,7 +534,15 @@ module top
         if ( ~S_AXI_ARESETN ) begin
 
             { run, gen } <= 2'b00;
-            item_memory_num <= 9'd0;
+
+            item_memory_num <= 10'd0;
+
+            reset_item <= 1'b0;
+
+            // xor_x <= 32'd0;
+            // xor_y <= 32'd0;
+            // xor_z <= 32'd0;
+            // xor_w <= 32'd0;
 
         end
 
@@ -718,7 +559,26 @@ module top
                 // アドレス４
                 10'd04:
                     // 最大1023
-                    item_memory_num[ 8:0 ] <= write_data[ 8:0 ];
+                    item_memory_num[ 9:0 ] <= write_data[ 9:0 ];
+
+                10'd08:
+                    reset_item <= write_data[ 0 ];
+
+                // // アドレス8
+                // 10'd08:
+                //     xor_x[ 31:0 ] <= write_data[ 31:0 ];
+
+                // // アドレス12
+                // 10'd12:
+                //     xor_y[ 31:0 ] <= write_data[ 31:0 ];
+
+                // // アドレス16
+                // 10'd16:
+                //     xor_z[ 31:0 ] <= write_data[ 31:0 ];
+
+                // // アドレス20
+                // 10'd20:
+                //     xor_w[ 31:0 ] <= write_data[ 31:0 ];
 
                 // 上記アドレス以外は何もしない
                 default:
@@ -731,7 +591,7 @@ module top
         // アクセラレータ準備モード終了
         // (item_memory_num数のハイパーベクトルを生成して終了)
         // (現状S_AXI_ACLK, S_AXIS_ACLKが同じ周波数を用いているため問題ない)
-        else if ( gen & item_a == item_memory_num & update_item ) begin
+        else if ( gen &  ( finish_gen != 0) ) begin
 
             gen <= 1'b0;
 
@@ -756,15 +616,32 @@ module top
                 10'h00:
                     S_AXI_RDATA[ 1:0 ] <= { run, gen };
 
-                // アドレス４
-                10'd04:
-                    S_AXI_RDATA[ 8:0 ] <= item_memory_num[ 8:0 ];
+                // // アドレス４
+                // 10'd04:
+                //     S_AXI_RDATA[ 8:0 ] <= item_memory_num[ 8:0 ];
+
+                // // アドレス8
+                // 10'd08:
+                //     S_AXI_RDATA[ 31:0 ] <= xor_x[ 31:0 ];
+
+                // // アドレス12
+                // 10'd12:
+                //     S_AXI_RDATA[ 31:0 ] <= xor_y[ 31:0 ];
+
+                // // アドレス16
+                // 10'd16:
+                //     S_AXI_RDATA[ 31:0 ] <= xor_z[ 31:0 ];
+
+                // // アドレス20
+                // 10'd20:
+                //     S_AXI_RDATA[ 31:0 ] <= xor_w[ 31:0 ];
 
                 // 上記アドレス以外は何もしない
                 default:
                     S_AXI_RDATA <= 0;
 
             endcase
+
         end
 
     end
