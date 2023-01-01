@@ -18,16 +18,16 @@ module counter
          // in
          input wire			                    clk,
          input wire                             rst,
-         // 1コア
+         // 各コアのストア信号
          input wire [ CORENUM-1:0 ]             store,
-         //  input wire                         store,
+         // ストアフラグ信号（どこかのコアがstoreならON）
          input wire                             store_flag,
-         // 1コア
+         // 各コアの結果
          input wire [ CORENUM-1:0 ]             core_result,
-         //  input wire                         core_result,
 
 
          // out
+         // 対応する次元のビット（符号ビットで判断）
          output wire 		                    sign_bit
 
      );
@@ -35,26 +35,66 @@ module counter
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+    // 0, 1, -1を格納
+    wire signed [ 1:0 ]      select [ 0:CORENUM-1 ];
+
+
+    // 各コアの結果をselectに格納（0, 1, -1）
+    generate
+
+        genvar      k;
+
+        for ( k = 0; k < CORENUM; k = k + 1 ) begin
+
+            selector selector
+                     (
+
+                         // in
+                         .clk( clk ),
+                         // ストア信号
+                         .store_bit( store[ k ] ),
+                         // 各コアの結果ビット
+                         .core_result_bit( core_result[ k ] ),
+
+
+                         // out
+                         // 各コアの結果ビットから、0,1,-1を選択
+                         .sel_bit( select[ k ] )
+
+                     );
+
+        end
+
+    endgenerate
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     reg         store_n;
     reg         store_nn;
 
     always_ff @( posedge clk ) begin
 
                   if ( ~rst ) begin
+
                       store_n <= store_flag;
                       store_nn <= store_n;
+
                   end
 
               end;
 
 
+
     reg signed [ W-1:0 ]      box;
+    reg signed [ 4:0 ]      box_1; // コア数可変
 
-    // コア数可変
-    reg signed [ 4:0 ]      box_1;
-
+    // TODO: 分けた方がいい？
     always_ff @( posedge clk ) begin
 
+                  // 初期化
                   if ( rst ) begin
 
                       box <= 0;
@@ -62,15 +102,21 @@ module counter
 
                   end
 
+                  // HDCプロセッサ起動中
                   else begin
 
+                      // box更新
                       if ( store_nn ) begin
+
                           box <=
                               box
                               + box_1;
+
                       end
 
+                      // box_1更新
                       if ( store_n ) begin
+
                           // コア数可変
                           box_1 <=
                                 select[ 0 ]
@@ -87,80 +133,22 @@ module counter
                                 + select[ 11 ]
                                 + select[ 12 ]
                                 + select[ 13 ];
+                          // + select[ 14 ];
+                          // + select[ 15 ];
+
                       end
-                      // + select[ 14 ];
-                      // + select[ 15 ];
-                      // + select[ 16 ]
-                      // + select[ 17 ]
-                      // + select[ 18 ]
-                      // + select[ 19 ]
-                      // + select[ 20 ]
-                      // + select[ 21 ]
-                      // + select[ 22 ]
-                      // + select[ 23 ]
-                      // + select[ 24 ]
-                      // + select[ 25 ]
-                      // + select[ 26 ]
-                      // + select[ 27 ]
-                      // + select[ 28 ]
-                      // + select[ 29 ]
-                      // + select[ 30 ]
-                      // + select[ 31 ];
-                      //   box_2 <=
-                      //   box_3 <=
-                      //   box_4 <=
-                      // box_4 <=
 
                   end
 
               end;
 
 
-    //================================================================
-
-
-    // 0, 1, -1を格納
-    // 1コア
-    wire signed [ 1:0 ]      select [ 0:CORENUM-1 ];
-    // wire signed [ 1:0 ]      select;
-
-    // 各コアの結果をselectに格納　（0, 1, -1）
-    generate
-
-        genvar      k;
-
-        for ( k = 0; k < CORENUM; k = k + 1 ) begin
-
-            selector selector
-                     (
-
-                         // in
-                         .clk( clk ),
-                         // 1コア
-                         .store_bit( store[ k ] ),
-                         //  .store_bit( store ),
-                         // 1コア
-                         .core_result_bit( core_result[ k ] ),
-                         //  .core_result_bit( core_result ),
-
-
-                         // out
-                         // 1コア
-                         .sel_bit( select[ k ] )
-                         //  .sel_bit( select)
-
-                     );
-
-        end
-    endgenerate
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     // 符号ビット
     // 非同期読み出し
     assign sign_bit = box[ W-1 ];
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 endmodule
