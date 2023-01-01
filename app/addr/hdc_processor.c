@@ -163,6 +163,13 @@ void hdc_finish(void)
 	top[0x02] = 0;
 }
 
+// Nop =========================================================================================
+
+void hdc_nop(void)
+{
+	src[SEND_NUM++] = 0;
+}
+
 // Load =========================================================================================
 
 void hdc_load_thread(uint16_t thread_num, uint16_t core_num, uint16_t addr_array[thread_num][core_num])
@@ -320,6 +327,11 @@ void hdc_simd_pmove_thread(void)
 }
 
 // permute =========================================================================================
+
+void hdc_permute(uint16_t permute_num)
+{
+	src[SEND_NUM++] = 34816 | permute_num;
+}
 
 void hdc_permute_thread(uint16_t thread_num, uint16_t core_num, uint16_t permute_num)
 {

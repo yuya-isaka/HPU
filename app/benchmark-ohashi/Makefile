@@ -1,4 +1,3 @@
-
 default:
 	arm-linux-gnueabihf-gcc -O2 -o ohashi_random ohashi_random.c -lm
 	arm-linux-gnueabihf-gcc -O2 -o ohashi_perm ohashi_perm.c -lm

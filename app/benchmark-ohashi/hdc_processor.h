@@ -27,6 +27,8 @@ extern void hdc_compute(void);
 
 extern void hdc_finish(void);
 
+extern void hdc_nop(void);
+
 extern void hdc_load_thread(uint16_t thread_num, uint16_t core_num, uint16_t addr_array[thread_num][core_num]);
 
 extern void hdc_store_thread(uint16_t thread_num, uint16_t core_num);
@@ -44,6 +46,8 @@ extern void hdc_simd_move_thread(void);
 extern void hdc_pmove_thread(uint16_t thread_num, uint16_t core_num);
 
 extern void hdc_simd_pmove_thread(void);
+
+extern void hdc_permute(uint16_t permute_num);
 
 extern void hdc_permute_thread(uint16_t thread_num, uint16_t core_num, uint16_t permute_num);
 
