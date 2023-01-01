@@ -6,6 +6,14 @@ bind:
 	./bind_bin
 	rm bind_bin
 
+bind-omp:
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o bind.o bind.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o bind bind.o hyper_vector.o
+	rm hyper_vector.o bind.o
+	./bind
+	rm bind
+
 perm:
 	gcc -c -O3 -DHV64 -o hyper_vector.o hyper_vector.c
 	gcc -c -O3 -DHV64 -o perm.o perm.c
@@ -14,6 +22,14 @@ perm:
 	./perm_bin
 	rm perm_bin
 
+perm-omp:
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o perm.o perm.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o perm perm.o hyper_vector.o
+	rm hyper_vector.o perm.o
+	./perm
+	rm perm
+
 bound:
 	gcc -c -O3 -DHV64 -o hyper_vector.o hyper_vector.c
 	gcc -c -O3 -DHV64 -o bound.o bound.c
@@ -21,6 +37,14 @@ bound:
 	rm hyper_vector.o bound.o
 	./bound_bin
 	rm bound_bin
+
+bound-omp:
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o bound.o bound.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o bound bound.o hyper_vector.o
+	rm hyper_vector.o bound.o
+	./bound
+	rm bound
 
 random:
 	gcc -c -O3 -DHV64 -o hyper_vector.o hyper_vector.c

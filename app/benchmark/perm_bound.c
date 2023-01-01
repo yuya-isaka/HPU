@@ -1,4 +1,3 @@
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,15 +13,12 @@
 
 int main(int argc, char const *argv[])
 {
-	clock_t start, end;
-	start = clock();
-
 	hv_init();
 
 	// seed設定
 	srand(10);
 
-	hv_t **item_memory = hv_make_imem(512);
+	hv_t **item_memory = hv_make_imem(1024);
 
 	// 試行回数
 	const int trial_num = 50000000;
@@ -33,7 +29,7 @@ int main(int argc, char const *argv[])
 #endif
 	for (int i = 0; i < trial_num; i++)
 	{
-		int addr = rand() % 512;
+		int addr = rand() % 1024;
 		int perm_num = rand() % 1024;
 		hv_bound(hv_perm(item_memory[addr], perm_num));
 	}
@@ -43,15 +39,8 @@ int main(int argc, char const *argv[])
 
 	hv_free(result);
 
-	hv_free_array(item_memory, 512);
+	hv_free_array(item_memory, 1024);
 	hv_finish();
-
-	end = clock();
-	double TIME = (double)(end - start) / CLOCKS_PER_SEC;
-#ifdef OPENMP
-	TIME = TIME / omp_get_max_threads();
-#endif
-	printf("  %.5lf秒\n", TIME);
 
 	return 0;
 }
