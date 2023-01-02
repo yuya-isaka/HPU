@@ -1,79 +1,92 @@
+bind:
+	gcc -c -O3 -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -c -O3 -DHV64 -o bind.o bind.c
+	gcc -O3 -DHV64 -o bind_bin bind.o hyper_vector.o
+	rm hyper_vector.o bind.o
+	./bind_bin
+	rm bind_bin
 
-default:
-	gcc -O2 -o bind bind.c -lm
-	gcc -O2 -o bind_bound bind_bound.c -lm
-	gcc -O2 -o bind_and_bound bind_and_bound.c -lm
-	gcc -O2 -o random random.c -lm
-	gcc -O2 -o bound bound.c -lm
-	gcc -O2 -o bound2 bound2.c -lm
-	gcc -O2 -o perm perm.c -lm
-	gcc -O2 -o perm_bound perm_bound.c -lm
-	gcc -O2 -o perm_and_bound perm_and_bound.c -lm
-	gcc -O2 -o write_test write_test.c -lm
+bind-omp:
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o bind.o bind.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o bind bind.o hyper_vector.o
+	rm hyper_vector.o bind.o
+	./bind
+	rm bind
 
-check:
-	gcc -Wall -o bind bind.c -lm
-	gcc -Wall -o bind_bound bind_bound.c -lm
-	gcc -Wall -o bind_and_bound bind_and_bound.c -lm
-	gcc -Wall -o random random.c -lm
-	gcc -Wall -o bound bound.c -lm
-	gcc -Wall -o bound2 bound2.c -lm
-	gcc -Wall -o perm perm.c -lm
-	gcc -Wall -o perm_bound perm_bound.c -lm
-	gcc -Wall -o perm_and_bound perm_and_bound.c -lm
-	gcc -Wall -o write_test write_test.c -lm
+perm:
+	gcc -c -O3 -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -c -O3 -DHV64 -o perm.o perm.c
+	gcc -O3 -DHV64 -o perm_bin perm.o hyper_vector.o
+	rm hyper_vector.o perm.o
+	./perm_bin
+	rm perm_bin
 
-asm:
-	gcc -Wall -O2 -S -o bind.s bind.c -lm
-	gcc -Wall -O2 -S -o bind_bound bind_bound.c -lm
-	gcc -Wall -O2 -S -o bind_and_bound bind_and_bound.c -lm
-	gcc -Wall -O2 -S -o random.s random.c -lm
-	gcc -Wall -O2 -S -o bound.s bound.c -lm
-	gcc -Wall -O2 -S -o bound2.s bound2.c -lm
-	gcc -Wall -O2 -S -o perm.s perm.c -lm
-	gcc -Wall -O2 -S -o perm_bound.s perm_bound.c -lm
-	gcc -Wall -O2 -S -o perm_and_bound.s perm_and_bound.c -lm
-	gcc -Wall -O2 -S -o write_test write_test.c -lm
+perm-omp:
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o perm.o perm.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o perm perm.o hyper_vector.o
+	rm hyper_vector.o perm.o
+	./perm
+	rm perm
 
+bound:
+	gcc -c -O3 -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -c -O3 -DHV64 -o bound.o bound.c
+	gcc -O3 -DHV64 -o bound_bin bound.o hyper_vector.o
+	rm hyper_vector.o bound.o
+	./bound_bin
+	rm bound_bin
+
+bound-omp:
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o bound.o bound.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o bound bound.o hyper_vector.o
+	rm hyper_vector.o bound.o
+	./bound
+	rm bound
+
+random:
+	gcc -c -O3 -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -c -O3 -DHV64 -o random.o random.c
+	gcc -O3 -DHV64 -o random_bin random.o hyper_vector.o
+	rm hyper_vector.o random.o
+	./random_bin
+	rm random_bin
+
+bind_bound:
+	gcc -c -O3 -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -c -O3 -DHV64 -o bind_bound.o bind_bound.c
+	gcc -O3 -DHV64 -o bind_bound_bin bind_bound.o hyper_vector.o
+	rm hyper_vector.o bind_bound.o
+	./bind_bound_bin
+	rm bind_bound_bin
+
+perm_bound:
+	gcc -c -O3 -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -c -O3 -DHV64 -o perm_bound.o perm_bound.c
+	gcc -O3 -DHV64 -o perm_bound_bin perm_bound.o hyper_vector.o
+	rm hyper_vector.o perm_bound.o
+	./perm_bound_bin
+	rm perm_bound_bin
 
 linux:
-	arm-linux-gnueabihf-gcc -O2 -o bind_peta bind.c -lm
-	arm-linux-gnueabihf-gcc -O2 -o bind_bound_peta bind_bound.c -lm
-	arm-linux-gnueabihf-gcc -O2 -o bind_and_bound_peta bind_and_bound.c -lm
-	arm-linux-gnueabihf-gcc -O2 -o random random.c -lm
-	arm-linux-gnueabihf-gcc -O2 -o bound_peta bound.c -lm
-	arm-linux-gnueabihf-gcc -O2 -o bound2_peta bound2.c -lm
-	arm-linux-gnueabihf-gcc -O2 -o perm_peta perm.c -lm
-	arm-linux-gnueabihf-gcc -O2 -o perm_bound_peta perm_bound.c -lm
-	arm-linux-gnueabihf-gcc -O2 -o perm_and_bound_peta perm_and_bound.c -lm
-	arm-linux-gnueabihf-gcc -O2 -o write_test_peta write_test.c -lm
-
-linux-check:
-	arm-linux-gnueabihf-gcc -Wall -o bind_peta bind.c -lm
-	arm-linux-gnueabihf-gcc -Wall -o bind_bound_peta bind_bound.c -lm
-	arm-linux-gnueabihf-gcc -Wall -o bind_and_bound_peta bind_and_bound.c -lm
-	arm-linux-gnueabihf-gcc -Wall -o random_peta random.c -lm
-	arm-linux-gnueabihf-gcc -Wall -o bound_peta bound.c -lm
-	arm-linux-gnueabihf-gcc -Wall -o bound2_peta bound2.c -lm
-	arm-linux-gnueabihf-gcc -Wall -o perm_peta perm.c -lm
-	arm-linux-gnueabihf-gcc -Wall -o perm_bound_peta perm_bound.c -lm
-	arm-linux-gnueabihf-gcc -Wall -o perm_and_bound_peta perm_and_bound.c -lm
-	arm-linux-gnueabihf-gcc -Wall -o write_test_peta write_test.c -lm
-
-linux-asm:
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o bind_peta.s bind.c -lm
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o bind_bound_peta.s bind_bound.c -lm
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o bind_and_bound_peta.s bind_and_bound.c -lm
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o random_peta.s random.c -lm
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o bound_peta.s bound.c -lm
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o bound2_peta.s bound2.c -lm
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o perm_peta.s perm.c -lm
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o perm_bound_peta.s perm_bound.c -lm
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o perm_and_bound_peta.s perm_and_bound.c -lm
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o write_test_peta write_test.c -lm
-
+	arm-linux-gnueabihf-gcc -c -O3 -DHV64 -o hyper_vector.o hyper_vector.c
+	arm-linux-gnueabihf-gcc -c -O3 -DHV64 -o bind.o bind.c
+	arm-linux-gnueabihf-gcc -O3 -DHV64 -o bind_peta bind.o hyper_vector.o
+	arm-linux-gnueabihf-gcc -c -O3 -DHV64 -o perm.o perm.c
+	arm-linux-gnueabihf-gcc -O3 -DHV64 -o perm_peta perm.o hyper_vector.o
+	arm-linux-gnueabihf-gcc -c -O3 -DHV64 -o bound.o bound.c
+	arm-linux-gnueabihf-gcc -O3 -DHV64 -o bound_peta bound.o hyper_vector.o
+	arm-linux-gnueabihf-gcc -c -O3 -DHV64 -o random.o random.c
+	arm-linux-gnueabihf-gcc -O3 -DHV64 -o random_peta random.o hyper_vector.o
+	arm-linux-gnueabihf-gcc -c -O3 -DHV64 -o bind_bound.o bind_bound.c
+	arm-linux-gnueabihf-gcc -O3 -DHV64 -o bind_bound_peta bind_bound.o hyper_vector.o
+	arm-linux-gnueabihf-gcc -c -O3 -DHV64 -o perm_bound.o perm_bound.c
+	arm-linux-gnueabihf-gcc -O3 -DHV64 -o perm_bound_peta perm_bound.o hyper_vector.o
+	rm hyper_vector.o bind.o perm.o bound.o random.o bind_bound.o perm_bound.o
 
 clean:
-	rm -f random perm bind bind_bound bind_and_bound bound bound2 random_peta perm_peta bind_peta bind_bound_peta bind_and_bound_peat bound_peta bound2_peta
+	rm -f bind_peta perm_peta bound_peta random_peta bind_bound_peta perm_bound_peta
 
-.PHONY: default check asm linux linux-check linux-asm clean
+.PHONY: bind perm bound random bind_bound perm_bound linux clean

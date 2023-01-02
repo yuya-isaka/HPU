@@ -5,13 +5,6 @@
 #include <stdint.h>
 #include "hyper_vector.h"
 
-// 次元数可変
-// const int DIM = 32 / 32;
-const int DIM = 1024 / 32;
-
-// const int RANNUM = 512;
-const int RANNUM = 1024;
-
 //    NGRAM   = 1 ~
 //    ADDRNUM = NGRAMの倍数 (shifter_newを使ったテストをしているから。また、LASTが０のままになりtb.cppでは止まる。test.cppでは動くけどNGRAMの倍数以外は同じ値が出る)
 //    MAJORITY_ADDR = 偶数処理
@@ -21,7 +14,7 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR)
 	hv_init();
 
 	// アイテムメモリ準備
-	hv_t **item_memory = hv_make_imem(RANNUM);
+	hv_t **item_memory = hv_make_imem(1024);
 
 	// 偶数処理
 	const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;

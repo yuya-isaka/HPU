@@ -1,4 +1,4 @@
-
+// include
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h> // uint16_t
@@ -7,354 +7,190 @@
 #include <unistd.h>	  // read
 #include <sys/mman.h> // mmap
 #include <time.h>
-
-// ------------------------------------------------------------------------------------------------
-
-volatile int *top;
-volatile int *dma;
-volatile uint16_t *src;
-volatile int *dst;
-unsigned long src_phys;
-unsigned long dst_phys;
-
-// ------------------------------------------------------------------------------------------------
-
-// 簡易アセンブラ
-// 10種類の命令
-uint16_t assemble(const char inst_str[], uint16_t addr)
-{
-	if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "wbitem") == 0)
-	{
-		uint16_t result = 0;
-
-		// load
-		if (strcmp(inst_str, "load") == 0)
-		{
-			uint16_t inst = 49152;
-			result = inst | addr;
-		}
-
-		// wb.item
-		else if (strcmp(inst_str, "wbitem") == 0)
-		{
-			uint16_t inst = 40960;
-			result = inst | addr;
-		}
-
-		return result;
-	}
-
-	else
-	{
-		uint16_t inst = 0;
-
-		// rshift
-		if (strcmp(inst_str, "rshift") == 0)
-		{
-			inst = 16384;
-		}
-
-		// lshift
-		else if (strcmp(inst_str, "lshift") == 0)
-		{
-			inst = 8192;
-		}
-
-		// xor
-		else if (strcmp(inst_str, "xor") == 0)
-		{
-			inst = 4096;
-		}
-
-		// store
-		else if (strcmp(inst_str, "store") == 0)
-		{
-			inst = 2048;
-		}
-
-		// last
-		else if (strcmp(inst_str, "last") == 0)
-		{
-			inst = 1024;
-		}
-
-		// move
-		else if (strcmp(inst_str, "move") == 0)
-		{
-			inst = 512;
-		}
-
-		// wb
-		else if (strcmp(inst_str, "wb") == 0)
-		{
-			inst = 256;
-		}
-
-		else
-		{
-			printf("error");
-		}
-
-		return inst;
-	}
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------
+#include "hdc_processor.h"
 
 int main(int argc, char const *argv[])
 {
-	// プログラム全体の時間
-	clock_t start_program = clock();
-
 	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
 
-	// ----------------------------------------------------------------------------------------------------------------------------------------------
-
-	// 初期化の時間
-	clock_t start = clock();
-
-	int fd0, fd1, dmaf, topf;
-
-	if ((fd0 = open("/sys/class/u-dma-buf/udmabuf0/phys_addr", O_RDONLY)) != -1)
-	{
-		char attr[1024];
-		ssize_t done = read(fd0, attr, 1024);
-		if (done < 0)
-		{
-			perror("  Failed: read /sys/class/u-dma-buf/udmabuf0/phys_addr");
-			exit(1);
-		}
-		sscanf(attr, "%lx", &src_phys);
-		close(fd0);
-	}
-	// printf("src_phys: %lx\n", src_phys);
-
-	if ((fd0 = open("/sys/class/u-dma-buf/udmabuf1/phys_addr", O_RDONLY)) != -1)
-	{
-		char attr[1024];
-		ssize_t done = read(fd0, attr, 1024);
-		if (done < 0)
-		{
-			perror("  Failed: read /sys/class/u-dma-buf/udmabuf1/phys_addr");
-			exit(1);
-		}
-		sscanf(attr, "%lx", &dst_phys);
-		close(fd0);
-	}
-	// printf("dst_phys: %lx\n", dst_phys);
-
-	if ((topf = open("/dev/uio1", O_RDWR | O_SYNC)) < 0)
-	{
-		perror("  Failed: open /dev/uio1");
-		return 0;
-	}
-	top = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, topf, 0);
-	if (top == MAP_FAILED)
-	{
-		perror("  mmap top");
-		close(topf);
-		return 0;
-	}
-
-	if ((dmaf = open("/dev/uio0", O_RDWR | O_SYNC)) < 0)
-	{
-		perror("  Falied: open /dev/uio0");
-		return 0;
-	}
-	dma = (int *)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE, MAP_SHARED, dmaf, 0);
-	if (dma == MAP_FAILED)
-	{
-		perror("  mmap dma");
-		close(dmaf);
-		return 0;
-	}
-
-	if ((fd0 = open("/dev/udmabuf0", O_RDWR)) < 0)
-	{
-		perror("  Failed: open /dev/udmabuf0");
-		return 0;
-	}
-	// 500MB
-	// もしかしたら8MBでいいのか。。。
-	src = (uint16_t *)mmap(NULL, 0x1DCD6500, PROT_READ | PROT_WRITE, MAP_SHARED, fd0, 0);
-	if (src == MAP_FAILED)
-	{
-		perror("  mmap src");
-		close(fd0);
-		return 0;
-	}
-
-	if ((fd1 = open("/dev/udmabuf1", O_RDWR)) < 0)
-	{
-		perror("  Failed: open /dev/udmabuf1");
-		return 0;
-	}
-	// 4MB
-	dst = (int *)mmap(NULL, 0x3D0900, PROT_READ | PROT_WRITE, MAP_SHARED, fd1, 0);
-	if (dst == MAP_FAILED)
-	{
-		perror("  mmap dst");
-		close(fd1);
-		return 0;
-	}
-
-	// ----------------------------------------------------------------------------------------------------------------------------------------------
-
-	// ランダム生成
-	top[0x04 / 4] = 511;
-	top[0x00 / 4] = 1;
-	while (top[0x00 / 4] & 0x1)
-		;
-
-	// ----------------------------------------------------------------------------------------------------------------------------------------------
-
-	// DMAリセット
-	dma[0x30 / 4] = 4;
-	dma[0x00 / 4] = 4;
-	while (dma[0x00 / 4] & 0x4)
-		;
-
+	// seed設定
 	srand(10);
 
-	clock_t end = clock();
-	double time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("初期化時間（CPU）: %lf[ms]\n", time);
+	// 命令数
+	const int INSTRUCTION_NUM = 2;
 
-	// ----------------------------------------------------------------------------------------------------------------------------------------------
+	// DMA SEND_MAX
+	int SEND_MAX = 33000000;
+	const int SEND_TMP = SEND_MAX % (THREADS_NUM * 16 * INSTRUCTION_NUM);
+	SEND_MAX += SEND_TMP;
 
-	// データ準備時間
-	start = clock();
+	// コア数
+	const int CORENUM = 14;
 
-	const int core_num = 32;
-	// const int trial_num = 50000000;
-	const int trial_num = 10000000;
-	const int send_num_max = 33000000;
-	const int perm_num = 3;
+	// hv -----------------------------
+	// メモリセットアップ
+	hdc_setup();
 
-	// ----------------------------------------------------------------------------------------------------------------------------------------------
+	// アイテムメモリ生成
+	hdc_make_imem(1024);
+	// hv -----------------------------
 
-	int send_num = 0;
-	int send_num_array[100];
-	int send_num_count = 0;
-	int count = 0;
+	// hv -----------------------------
+	// SEND_NUM初期化
+	hdc_init(0);
+	hdc_start();
 
-	for (int i = 0; i < trial_num; i += core_num)
+	// 試行回数
+	const int TRIAL_NUM = 50000000;
+	// const int TRIAL_NUM = 10000000;
+
+	const int EPOCH = TRIAL_NUM / (CORENUM * THREADS_NUM);
+	const int REMAINDAR = TRIAL_NUM % (CORENUM * THREADS_NUM);
+	const int REMAINDAR_CORENUM = REMAINDAR / THREADS_NUM;
+	const int LAST = EPOCH * CORENUM * THREADS_NUM;
+
+	int ALL_SEND_NUM = SEND_MAX / (THREADS_NUM * 16 * INSTRUCTION_NUM) * 70;
+	const int ALL_SEND_EPOCH = LAST / ALL_SEND_NUM;
+	const int ALL_SEND_REMAIN = LAST % ALL_SEND_NUM;
+
+	// printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
+
+	// 計算時間格納
+	double TIME = 0.0;
+
+	// SEND_NUMのエポック
+	for (int ll = 0; ll < ALL_SEND_EPOCH; ll += 1)
 	{
-
-		// ----------------------------------------------------------------------------------------------------------------------------------------------
-
-		// ロード
-		for (int j = 0; j < core_num; j++)
+		// SEND_NUM繰り返す
+		for (int j = 0; j < ALL_SEND_NUM; j += CORENUM * THREADS_NUM)
 		{
-			src[send_num++] = assemble("load", rand() % 512);
-			count++;
-		}
+			uint16_t core_num = CORENUM;
 
-		// シフト
-		if (perm_num >= 512)
-		{
-			// 左シフト
-			for (int j = 0; j < (1024 - perm_num); j++)
+			uint16_t addr_array[THREADS_NUM][core_num];
+			uint16_t perm_num[THREADS_NUM][core_num];
+
+			for (int k = 0; k < THREADS_NUM; k++)
 			{
-				for (int k = 0; k < core_num; k++)
+				for (int i = 0; i < core_num; i++)
 				{
-					src[send_num++] = assemble("lshift", 0);
-					count++;
+					addr_array[k][i] = rand() % 1024;
+					perm_num[k][i] = rand() % 1024;
 				}
 			}
-		}
-		else
-		{
-			// 右シフト
-			for (int j = 0; j < perm_num; j++)
+
+			// load ---------------------------------------------
+			hdc_load_thread(THREADS_NUM, core_num, addr_array);
+			// ------------------------------------------------------
+
+			// perm ---------------------------------------------
+			for (int k = 0; k < THREADS_NUM; k++)
 			{
-				for (int k = 0; k < core_num; k++)
+				for (int i = 0; i < core_num; i++)
 				{
-					src[send_num++] = assemble("rshift", 0);
-					count++;
+					hdc_permute(perm_num[k][i]);
+				}
+				for (int i = core_num; i < 16; i++)
+				{
+					hdc_nop();
 				}
 			}
+			// ------------------------------------------------------
 		}
 
-		// ----------------------------------------------------------------------------------------------------------------------------------------------
+		hdc_last();
 
-		if (count >= send_num_max)
+		clock_t START_COMPUTE = clock();
+		hdc_compute();
+		clock_t END_COMPUTE = clock();
+		TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
+
+		hdc_init(0);
+	}
+
+	// SEND_NUMエポックのあまり
+	for (int j = 0; j < ALL_SEND_REMAIN; j += CORENUM * THREADS_NUM)
+	{
+		uint16_t core_num = CORENUM;
+
+		uint16_t addr_array[THREADS_NUM][core_num];
+		uint16_t perm_num[THREADS_NUM][core_num];
+
+		for (int k = 0; k < THREADS_NUM; k++)
 		{
-			// last命令
-			for (int j = 0; j < core_num; j++)
+			for (int i = 0; i < core_num; i++)
 			{
-				uint16_t inst = assemble("last", 0);
-				src[send_num++] = inst;
-				count++;
+				addr_array[k][i] = rand() % 1024;
+				perm_num[k][i] = rand() % 1024;
 			}
-			send_num_array[send_num_count++] = count;
-			count = 0;
 		}
+
+		// load ---------------------------------------------
+		hdc_load_thread(THREADS_NUM, core_num, addr_array);
+		// ------------------------------------------------------
+
+		// perm ---------------------------------------------
+		for (int k = 0; k < THREADS_NUM; k++)
+		{
+			for (int i = 0; i < core_num; i++)
+			{
+				hdc_permute(perm_num[k][i]);
+			}
+			for (int i = core_num; i < 16; i++)
+			{
+				hdc_nop();
+			}
+		}
+		// ------------------------------------------------------
 	}
 
-	// ----------------------------------------------------------------------------------------------------------------------------------------------
-
-	// last命令
-	for (int j = 0; j < core_num; j++)
+	// 最後の余り
+	if (REMAINDAR != 0)
 	{
-		uint16_t inst = assemble("last", 0);
-		src[send_num++] = inst;
-		count++;
-	}
-	send_num_array[send_num_count++] = count;
+		uint16_t core_num = REMAINDAR_CORENUM;
 
-	end = clock();
-	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("データ準備時間（CPU）: %lf[ms]\n", time);
+		uint16_t addr_array[THREADS_NUM][core_num];
+		uint16_t perm_num[THREADS_NUM][core_num];
 
-	// ----------------------------------------------------------------------------------------------------------------------------------------------
+		for (int k = 0; k < THREADS_NUM; k++)
+		{
+			for (int i = 0; i < core_num; i++)
+			{
+				addr_array[k][i] = rand() % 1024;
+				perm_num[k][i] = rand() % 1024;
+			}
+		}
 
-	// 計算時間（アクセラレータ）
-	start = clock();
+		// load ---------------------------------------------
+		hdc_load_thread(THREADS_NUM, core_num, addr_array);
+		// ------------------------------------------------------
 
-	top[0x00 / 4] = 2;
-
-	for (int i = 0; i < send_num_count; i++)
-	{
-		int send_num_tmp = send_num_array[i];
-
-		dma[0x00 / 4] = 1;
-		dma[0x18 / 4] = src_phys;
-		dma[0x28 / 4] = send_num_tmp * 2; // 16ビットがsend_num個
-
-		dma[0x30 / 4] = 1;
-		dma[0x48 / 4] = dst_phys;
-		dma[0x58 / 4] = 128; // 32個 * 4バイト = 128バイト = 1024ビット
-
-		while ((dma[0x34 / 4] & 0x1000) != 0x1000)
-			;
-
-		dma[0x30 / 4] = 4;
-		dma[0x00 / 4] = 4;
-		while (dma[0x00 / 4] & 0x4)
-			;
-
-		src_phys += send_num_tmp * 2;
+		// perm ---------------------------------------------
+		for (int k = 0; k < THREADS_NUM; k++)
+		{
+			for (int i = 0; i < core_num; i++)
+			{
+				hdc_permute(perm_num[k][i]);
+			}
+			for (int i = core_num; i < 16; i++)
+			{
+				hdc_nop();
+			}
+		}
+		// ------------------------------------------------------
 	}
 
-	top[0x00 / 4] = 0;
+	// ラスト命令
+	hdc_last();
 
-	end = clock();
-	time = ((double)(end - start)) / CLOCKS_PER_SEC * 1000.0;
-	printf("計算時間（アクセラレータ）: %lf[ms]\n", time);
+	clock_t START_COMPUTE = clock();
+	// 計算開始
+	hdc_compute();
+	clock_t END_COMPUTE = clock();
+	TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
 
-	for (int j = 0; j < 32; j++)
-	{
-		printf("%u\n", dst[j]);
-	}
-
-	// ----------------------------------------------------------------------------------------------------------------------------------------------
+	// 終了処理
+	hdc_finish();
 
 	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
-
-	end = clock();
-	time = ((double)(end - start_program)) / CLOCKS_PER_SEC * 1000.0;
-	printf("プログラム合計時間（CPU＋アクセラレータ）: %lf[ms]\n", time);
-
 	return 0;
 }
