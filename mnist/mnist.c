@@ -7,13 +7,10 @@
 #define TRAIN_LABEL "train-labels-idx1-ubyte"
 
 #define image_pos(a, b) (a->data + b * 784)
-#define label_pos(a, b) (a->data + b * 10)
 #define at(o, a, b) o->data[a * o->cols + b]
 
-#define max_(a, b) (((a) > (b)) ? (a) : (b))
-#define min_(a, b) (((a) < (b)) ? (a) : (b))
+#define label_pos(a, b) (a->data + b)
 
-// struct
 struct tensor
 {
 	float *data;
@@ -69,41 +66,42 @@ static int buf2int(char *buf_)
 static struct tensor *load_image_file(const char *fn)
 {
 	struct tensor *ret = NULL;
-	FILE *fp;
-	int sz, t, w, h, n, i, j;
 	char buf[4];
 
-	fp = fopen(fn, "rb");
+	FILE *fp = fopen(fn, "rb");
+
 	if (fp == NULL)
 		goto end;
 	fseek(fp, 0, SEEK_END);
-	sz = ftell(fp);
+
+	int sz = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
 	fread(buf, 1, 4, fp);
-	t = buf2int(buf);
+	int t = buf2int(buf);
 	if (t != 0x803)
 		goto end;
 
 	fread(buf, 1, 4, fp);
-	n = buf2int(buf);
+	int n = buf2int(buf);
 	fread(buf, 1, 4, fp);
-	w = buf2int(buf);
+	int w = buf2int(buf);
 	fread(buf, 1, 4, fp);
-	h = buf2int(buf);
+	int h = buf2int(buf);
 	if (h * w != 784)
 		goto end;
 
-	printf("%d\n", n);
+	// printf("%d\n", n); // 60000
 	ret = create_tensor(n, 784);
-	for (i = 0; i < n; i++)
+	for (int i = 0; i < n; i++)
 	{
-		for (j = 0; j < 784; j++)
+		for (int j = 0; j < 784; j++)
 		{
 			fread(buf, 1, 1, fp);
 			ret->data[i * 784 + j] = (float)(buf[0] & 255) / 255;
 		}
 	}
+
 end:
 	if (fp)
 		fclose(fp);
@@ -131,14 +129,11 @@ static struct tensor *load_label_file(const char *fn)
 
 	fread(buf, 1, 4, fp);
 	n = buf2int(buf);
-	ret = create_tensor(n, 10);
+	ret = create_tensor(n, 1);
 	for (i = 0; i < n; i++)
 	{
 		fread(buf, 1, 1, fp);
-		for (j = 0; j < 10; j++)
-		{
-			ret->data[i * 10 + j] = (float)((j == buf[0]) ? 1 : 0);
-		}
+		ret->data[i] = (float)buf[0];
 	}
 end:
 	if (fp)
@@ -148,11 +143,13 @@ end:
 
 static void print_image(float *a)
 {
-	int w = 28, h = 28, i, j;
-	for (j = 0; j < h; j++)
+	int w = 28;
+	int h = 28;
+	for (int j = 0; j < h; j++)
 	{
-		for (i = 0; i < w; i++)
+		for (int i = 0; i < w; i++)
 		{
+			// printf("%s", *a == 0 ? "0" : "1");
 			printf("%s", *a == 0 ? "--" : "11");
 			a++;
 		}
@@ -163,22 +160,22 @@ static void print_image(float *a)
 
 static void print_label(float *a)
 {
-	int i;
-	for (i = 0; i < 10; i++)
-	{
-		printf("%d: %f\n", i, a[i]);
-	}
+	printf("%d\n", (int)*a);
 	printf("\n");
 }
 
 int main()
 {
-	int input = 28 * 28;
+	struct tensor *a = load_image_file(TRAIN_IMAGE);
+	struct tensor *b = load_label_file(TRAIN_LABEL);
+	// printf("%d\n", a->cols); // 60000
+	// printf("%d\n", a->rows); // 784
 
-	struct tensor *a, *b;
-
-	a = load_image_file(TRAIN_IMAGE);
-	b = load_label_file(TRAIN_LABEL);
+	for (int i = 0; i < a->cols; i++)
+	{
+		print_image(image_pos(a, i));
+		print_label(label_pos(b, i));
+	}
 
 	free_tensor(a);
 	free_tensor(b);
