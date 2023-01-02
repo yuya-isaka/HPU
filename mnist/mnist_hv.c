@@ -4,6 +4,18 @@
 #include <math.h>
 #include "hyper_vector.h"
 
+// Mac
+#ifdef __MACH__
+// Debug
+#ifdef DEBUG
+// lead error
+__attribute__((destructor)) static void destructor()
+{
+	system("leaks -q mnist");
+}
+#endif
+#endif
+
 #define TRAIN_IMAGE "train-images-idx3-ubyte"
 #define TRAIN_LABEL "train-labels-idx1-ubyte"
 
@@ -180,6 +192,8 @@ static int get_label(float *a)
 	return (int)*a;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 int main()
 {
 	// load
@@ -225,14 +239,19 @@ int main()
 				hv_free(bound_tmp);
 			}
 		}
-		result[i] = hv_bound_result();
+
+		hv_t *result_tmp = hv_bound_result();
+		hv_copy(result[i], result_tmp);
+
+		hv_free(result_tmp);
 		hv_finish();
 	}
 
 	for (int i = 0; i < 10; i++)
 	{
-		printf("\n%d:\n", i);
+		printf("%d:\n", i);
 		hv_print(result[i]);
+		printf("\n");
 	}
 
 	hv_free_array(result, 10);

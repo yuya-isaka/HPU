@@ -3,6 +3,18 @@
 #include <stdlib.h>
 #include <math.h>
 
+// Mac
+#ifdef __MACH__
+// Debug
+#ifdef DEBUG
+// lead error
+__attribute__((destructor)) static void destructor()
+{
+	system("leaks -q mnist");
+}
+#endif
+#endif
+
 #define TRAIN_IMAGE "train-images-idx3-ubyte"
 #define TRAIN_LABEL "train-labels-idx1-ubyte"
 
