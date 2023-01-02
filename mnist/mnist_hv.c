@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include "hyper_vector.h"
 
 #define TRAIN_IMAGE "train-images-idx3-ubyte"
 #define TRAIN_LABEL "train-labels-idx1-ubyte"
@@ -111,26 +112,24 @@ end:
 static struct tensor *load_label_file(const char *fn)
 {
 	struct tensor *ret = NULL;
-	FILE *fp;
-	int sz, t, n, i, j;
 	char buf[4];
 
-	fp = fopen(fn, "rb");
+	FILE *fp = fopen(fn, "rb");
 	if (fp == NULL)
 		goto end;
 	fseek(fp, 0, SEEK_END);
-	sz = ftell(fp);
+	int sz = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
 	fread(buf, 1, 4, fp);
-	t = buf2int(buf);
+	int t = buf2int(buf);
 	if (t != 0x801)
 		goto end;
 
 	fread(buf, 1, 4, fp);
-	n = buf2int(buf);
+	int n = buf2int(buf);
 	ret = create_tensor(n, 1);
-	for (i = 0; i < n; i++)
+	for (int i = 0; i < n; i++)
 	{
 		fread(buf, 1, 1, fp);
 		ret->data[i] = (float)buf[0];
@@ -173,20 +172,26 @@ int main()
 {
 	struct tensor *a = load_image_file(TRAIN_IMAGE);
 	struct tensor *b = load_label_file(TRAIN_LABEL);
-	printf("%d\n", a->cols); // 784
-	printf("%d\n", a->rows); // 60000
+	// printf("%d\n", a->cols); // 784
+	// printf("%d\n", a->rows); // 60000
 
-	int tmp = 0;
-	for (int i = 0; i < a->rows; i++)
+	for (int j = 0; j < 10; j++)
 	{
-		// print_image(image_pos(a, i));
-		// print_label(label_pos(b, i));
-		if (get_label(label_pos(b, i)) == 1)
+		int tmp = 0;
+		for (int i = 0; i < a->rows; i++)
 		{
-			tmp++;
+			// print_image(image_pos(a, i));
+			// print_label(label_pos(b, i));
+			if (get_label(label_pos(b, i)) == 1)
+			{
+				tmp++;
+			}
 		}
 	}
-	printf("%d\n", tmp);
+
+	// 784個のハイパーベクトルを生成し格納
+	const uint32_t RAND_NUM = a->cols;
+	hv_t **item_memory = hv_make_imem(RAND_NUM);
 
 	free_tensor(a);
 	free_tensor(b);
