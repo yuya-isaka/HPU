@@ -157,6 +157,18 @@ static void print_image(float *a)
 	printf("\n");
 }
 
+static int get_perm_num(float *a)
+{
+	if (*a == 0)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
 static void print_label(float *a)
 {
 	printf("%d\n", (int)*a);
@@ -170,31 +182,64 @@ static int get_label(float *a)
 
 int main()
 {
-	struct tensor *a = load_image_file(TRAIN_IMAGE);
-	struct tensor *b = load_label_file(TRAIN_LABEL);
-	// printf("%d\n", a->cols); // 784
-	// printf("%d\n", a->rows); // 60000
-
-	for (int j = 0; j < 10; j++)
-	{
-		int tmp = 0;
-		for (int i = 0; i < a->rows; i++)
-		{
-			// print_image(image_pos(a, i));
-			// print_label(label_pos(b, i));
-			if (get_label(label_pos(b, i)) == 1)
-			{
-				tmp++;
-			}
-		}
-	}
+	// load
+	struct tensor *image = load_image_file(TRAIN_IMAGE);
+	struct tensor *label = load_label_file(TRAIN_LABEL);
 
 	// 784個のハイパーベクトルを生成し格納
-	const uint32_t RAND_NUM = a->cols;
+	const uint32_t RAND_NUM = image->cols;
 	hv_t **item_memory = hv_make_imem(RAND_NUM);
 
-	free_tensor(a);
-	free_tensor(b);
+	// 0-9の結果
+	hv_t **result = hv_make_array(10);
+
+	for (int i = 0; i < 10; i++)
+	{
+		hv_init();
+		for (int j = 0; j < image->rows; j++) // 60000
+		{
+			if (get_label(label_pos(label, j)) == i)
+			{
+				int pos = 0;
+				hv_t *bound_tmp = hv_make();
+				for (int k = 0; k < 28; k++)
+				{
+					for (int l = 0; l < 28; l++)
+					{
+						// k+lポジションが0なら0回perm, 1なら1回perm
+						hv_t *perm_result = hv_perm(item_memory[k + l], get_perm_num((image_pos(image, j) + pos)));
+						// pos更新
+						pos++;
+						// bind
+						hv_t *bind_result = hv_bind(bound_tmp, perm_result);
+
+						hv_copy(bound_tmp, bind_result);
+
+						hv_free(bind_result);
+						hv_free(perm_result);
+					}
+				}
+
+				hv_bound(bound_tmp);
+
+				hv_free(bound_tmp);
+			}
+		}
+		result[i] = hv_bound_result();
+		hv_finish();
+	}
+
+	for (int i = 0; i < 10; i++)
+	{
+		printf("\n%d:\n", i);
+		hv_print(result[i]);
+	}
+
+	hv_free_array(result, 10);
+	hv_free_array(item_memory, RAND_NUM);
+
+	free_tensor(image);
+	free_tensor(label);
 
 	return 0;
 }
