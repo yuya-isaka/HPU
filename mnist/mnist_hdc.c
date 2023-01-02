@@ -2,18 +2,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-
-// Mac
-#ifdef __MACH__
-// Debug
-#ifdef DEBUG
-// lead error
-__attribute__((destructor)) static void destructor()
-{
-	system("leaks -q mnist");
-}
-#endif
-#endif
+#include <stdint.h>
+#include <fcntl.h>	  // open
+#include <unistd.h>	  // read
+#include <sys/mman.h> // mmap
+#include <time.h>
+#include "hdc_processor.h"
 
 #define TRAIN_IMAGE "train-images-idx3-ubyte"
 #define TRAIN_LABEL "train-labels-idx1-ubyte"
@@ -91,35 +85,15 @@ static struct tensor *load_image_file(const char *fn)
 
 	size_t DONE;
 	DONE = fread(buf, 1, 4, fp);
-	if (DONE < num)
-	{
-		perror("  Failed: fread file");
-		exit(1);
-	}
 	int t = buf2int(buf);
 	if (t != 0x803)
 		goto end;
 
 	DONE = fread(buf, 1, 4, fp);
-	if (DONE < num)
-	{
-		perror("  Failed: fread file");
-		exit(1);
-	}
 	int n = buf2int(buf);
 	DONE = fread(buf, 1, 4, fp);
-	if (DONE < num)
-	{
-		perror("  Failed: fread file");
-		exit(1);
-	}
 	int w = buf2int(buf);
 	DONE = fread(buf, 1, 4, fp);
-	if (DONE < num)
-	{
-		perror("  Failed: fread file");
-		exit(1);
-	}
 	int h = buf2int(buf);
 	if (h * w != 784)
 		goto end;
@@ -131,11 +105,6 @@ static struct tensor *load_image_file(const char *fn)
 		for (int j = 0; j < 784; j++)
 		{
 			DONE = fread(buf, 1, 1, fp);
-			if (DONE < num)
-			{
-				perror("  Failed: fread file");
-				exit(1);
-			}
 			ret->data[i * 784 + j] = (float)(buf[0] & 255) / 255;
 		}
 	}
@@ -149,44 +118,27 @@ end:
 static struct tensor *load_label_file(const char *fn)
 {
 	struct tensor *ret = NULL;
-	FILE *fp;
-	int sz, t, n, i, j;
 	char buf[4];
 
-	fp = fopen(fn, "rb");
+	FILE *fp = fopen(fn, "rb");
 	if (fp == NULL)
 		goto end;
 	fseek(fp, 0, SEEK_END);
-	sz = ftell(fp);
+	int sz = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
 	size_t DONE;
 	DONE = fread(buf, 1, 4, fp);
-	if (DONE < num)
-	{
-		perror("  Failed: fread file");
-		exit(1);
-	}
-	t = buf2int(buf);
+	int t = buf2int(buf);
 	if (t != 0x801)
 		goto end;
 
 	DONE = fread(buf, 1, 4, fp);
-	if (DONE < num)
-	{
-		perror("  Failed: fread file");
-		exit(1);
-	}
-	n = buf2int(buf);
+	int n = buf2int(buf);
 	ret = create_tensor(n, 1);
-	for (i = 0; i < n; i++)
+	for (int i = 0; i < n; i++)
 	{
 		DONE = fread(buf, 1, 1, fp);
-		if (DONE < num)
-		{
-			perror("  Failed: fread file");
-			exit(1);
-		}
 		ret->data[i] = (float)buf[0];
 	}
 end:
@@ -212,27 +164,42 @@ static void print_image(float *a)
 	printf("\n");
 }
 
+static int get_perm_num(float *a)
+{
+	if (*a == 0)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+}
+
 static void print_label(float *a)
 {
 	printf("%d\n", (int)*a);
 	printf("\n");
 }
 
+static int get_label(float *a)
+{
+	return (int)*a;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 int main()
 {
-	struct tensor *a = load_image_file(TRAIN_IMAGE);
-	struct tensor *b = load_label_file(TRAIN_LABEL);
-	// printf("%d\n", a->cols); // 60000
-	// printf("%d\n", a->rows); // 784
+	// load
+	struct tensor *image = load_image_file(TRAIN_IMAGE);
+	struct tensor *label = load_label_file(TRAIN_LABEL);
 
-	for (int i = 0; i < a->cols; i++)
-	{
-		print_image(image_pos(a, i));
-		print_label(label_pos(b, i));
-	}
+	// 784個のハイパーベクトルを生成し格納
+	const uint32_t RAND_NUM = image->cols;
 
-	free_tensor(a);
-	free_tensor(b);
+	free_tensor(image);
+	free_tensor(label);
 
 	return 0;
 }

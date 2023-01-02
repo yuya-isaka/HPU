@@ -2,6 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stdint.h>
+#include <time.h>
 #include "hyper_vector.h"
 
 // Mac
@@ -90,16 +92,17 @@ static struct tensor *load_image_file(const char *fn)
 	int sz = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	fread(buf, 1, 4, fp);
+	size_t DONE;
+	DONE = fread(buf, 1, 4, fp);
 	int t = buf2int(buf);
 	if (t != 0x803)
 		goto end;
 
-	fread(buf, 1, 4, fp);
+	DONE = fread(buf, 1, 4, fp);
 	int n = buf2int(buf);
-	fread(buf, 1, 4, fp);
+	DONE = fread(buf, 1, 4, fp);
 	int w = buf2int(buf);
-	fread(buf, 1, 4, fp);
+	DONE = fread(buf, 1, 4, fp);
 	int h = buf2int(buf);
 	if (h * w != 784)
 		goto end;
@@ -110,7 +113,7 @@ static struct tensor *load_image_file(const char *fn)
 	{
 		for (int j = 0; j < 784; j++)
 		{
-			fread(buf, 1, 1, fp);
+			DONE = fread(buf, 1, 1, fp);
 			ret->data[i * 784 + j] = (float)(buf[0] & 255) / 255;
 		}
 	}
@@ -133,17 +136,18 @@ static struct tensor *load_label_file(const char *fn)
 	int sz = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	fread(buf, 1, 4, fp);
+	size_t DONE;
+	DONE = fread(buf, 1, 4, fp);
 	int t = buf2int(buf);
 	if (t != 0x801)
 		goto end;
 
-	fread(buf, 1, 4, fp);
+	DONE = fread(buf, 1, 4, fp);
 	int n = buf2int(buf);
 	ret = create_tensor(n, 1);
 	for (int i = 0; i < n; i++)
 	{
-		fread(buf, 1, 1, fp);
+		DONE = fread(buf, 1, 1, fp);
 		ret->data[i] = (float)buf[0];
 	}
 end:
