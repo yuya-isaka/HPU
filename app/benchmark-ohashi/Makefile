@@ -1,29 +1,20 @@
 default:
-	arm-linux-gnueabihf-gcc -O2 -o ohashi_random ohashi_random.c -lm
-	arm-linux-gnueabihf-gcc -O2 -o ohashi_perm ohashi_perm.c -lm
-	arm-linux-gnueabihf-gcc -O2 -o ohashi_perm_bound ohashi_perm_bound.c -lm
-	arm-linux-gnueabihf-gcc -O2 -o ohashi_bind ohashi_bind.c -lm
-	arm-linux-gnueabihf-gcc -O2 -o ohashi_bind_bound ohashi_bind_bound.c -lm
-	arm-linux-gnueabihf-gcc -O2 -o ohashi_bound ohashi_bound.c -lm
-
-check:
-	arm-linux-gnueabihf-gcc -Wall -o ohashi_random ohashi_random.c -lm
-	arm-linux-gnueabihf-gcc -Wall -o ohashi_perm ohashi_perm.c -lm
-	arm-linux-gnueabihf-gcc -Wall -o ohashi_perm_bound ohashi_perm_bound.c -lm
-	arm-linux-gnueabihf-gcc -Wall -o ohashi_bind ohashi_bind.c -lm
-	arm-linux-gnueabihf-gcc -Wall -o ohashi_bind_bound ohashi_bind_bound.c -lm
-	arm-linux-gnueabihf-gcc -Wall -o ohashi_bound ohashi_bound.c -lm
-
-asm:
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o ohashi_random.s ohashi_random.c -lm
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o ohashi_perm.s ohashi_perm.c -lm
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o ohashi_perm_bound.s ohashi_perm_bound.c -lm
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o ohashi_bind.s ohashi_bind.c -lm
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o ohashi_bind_bound.s ohashi_bind_bound.c -lm
-	arm-linux-gnueabihf-gcc -Wall -O2 -S -o ohashi_bound.s ohashi_bound.c -lm
-
+	arm-linux-gnueabihf-gcc -c -O3 -o hdc_processor.o hdc_processor.c
+	arm-linux-gnueabihf-gcc -c -O3 -o ohashi_bind.o ohashi_bind.c
+	arm-linux-gnueabihf-gcc -O3 -o ohashi_bind hdc_processor.o ohashi_bind.o
+	arm-linux-gnueabihf-gcc -c -O3 -o ohashi_perm.o ohashi_perm.c
+	arm-linux-gnueabihf-gcc -O3 -o ohashi_perm hdc_processor.o ohashi_perm.o
+	arm-linux-gnueabihf-gcc -c -O3 -o ohashi_bound.o ohashi_bound.c
+	arm-linux-gnueabihf-gcc -O3 -o ohashi_bound hdc_processor.o ohashi_bound.o
+	arm-linux-gnueabihf-gcc -c -O3 -o ohashi_perm_bound.o ohashi_perm_bound.c
+	arm-linux-gnueabihf-gcc -O3 -o ohashi_perm_bound hdc_processor.o ohashi_perm_bound.o
+	arm-linux-gnueabihf-gcc -c -O3 -o ohashi_bind_bound.o ohashi_bind_bound.c
+	arm-linux-gnueabihf-gcc -O3 -o ohashi_bind_bound hdc_processor.o ohashi_bind_bound.o
+	arm-linux-gnueabihf-gcc -c -O3 -o ohashi_random.o ohashi_random.c
+	arm-linux-gnueabihf-gcc -O3 -o ohashi_random hdc_processor.o ohashi_random.o
+	rm hdc_processor.o ohashi_bind.o ohashi_perm.o ohashi_bound.o ohashi_bind_bound.o ohashi_perm_bound.o ohashi_random.o
 
 clean:
 	rm -f ohashi_random ohashi_perm ohashi_perm_bound ohashi_bind ohashi_bind_bound ohashi_bound
 
-.PHONY: default check asm clean
+.PHONY: default clean
