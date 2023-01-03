@@ -250,8 +250,7 @@ module top
                      .item_memory_num( item_memory_num[ 9:0 ] ),
                      .get_v( get_v ),
                      // 16bit命令
-                     .get_d_tmp( S_AXIS_TDATA[ 15+16*i:16*i ] ),
-                     .get_d_1( S_AXIS_TDATA[ 15:0 ] ),
+                     .get_d( S_AXIS_TDATA[ 15+16*i:16*i ] ),
                      .exec( exec ),
 
 

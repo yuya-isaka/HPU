@@ -21,8 +21,7 @@ module core
          input wire [ 9:0 ]                 item_memory_num,
          input wire                         get_v,
          // 16bit命令
-         input wire [ 15:0 ]                get_d_tmp,
-         input wire [ 15:0 ]                get_d_1,
+         input wire [ 15:0 ]                get_d,
          input wire                         exec,
 
 
@@ -35,24 +34,6 @@ module core
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    logic [ 15:0 ]      get_d;
-
-    always_comb begin
-
-                    if ( get_d_1[ 10 ] ) begin
-
-                        get_d = get_d_1;
-
-                    end
-
-                    else begin
-
-                        get_d = get_d_tmp;
-
-                    end
-
-                end;
 
 
     // ハイパーベクトルを保持するメモリ
