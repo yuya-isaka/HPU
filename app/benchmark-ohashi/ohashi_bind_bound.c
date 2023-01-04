@@ -15,6 +15,7 @@ int main(int argc, char const *argv[])
 
 	// seed設定
 	srand(10);
+	const int RANNUM = 512;
 
 	// 命令数
 	const int INSTRUCTION_NUM = 5;
@@ -32,7 +33,7 @@ int main(int argc, char const *argv[])
 	hdc_setup();
 
 	// アイテムメモリ生成
-	hdc_make_imem(1024);
+	hdc_make_imem(RANNUM);
 	// hv -----------------------------
 
 	// hv -----------------------------
@@ -41,8 +42,8 @@ int main(int argc, char const *argv[])
 	hdc_start();
 
 	// 試行回数
-	const int TRIAL_NUM = 50000000;
-	// const int TRIAL_NUM = 10000000;
+	// const int TRIAL_NUM = 50000000;
+	const int TRIAL_NUM = 10000000;
 
 	const int EPOCH = TRIAL_NUM / (CORENUM * THREADS_NUM);
 	const int REMAINDAR = TRIAL_NUM % (CORENUM * THREADS_NUM);
@@ -74,8 +75,8 @@ int main(int argc, char const *argv[])
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					addr_array1[k][i] = rand() % 1024;
-					addr_array2[k][i] = rand() % 1024;
+					addr_array1[k][i] = rand() % RANNUM;
+					addr_array2[k][i] = rand() % RANNUM;
 				}
 			}
 
@@ -126,8 +127,8 @@ int main(int argc, char const *argv[])
 		{
 			for (int i = 0; i < core_num; i++)
 			{
-				addr_array1[k][i] = rand() % 1024;
-				addr_array2[k][i] = rand() % 1024;
+				addr_array1[k][i] = rand() % RANNUM;
+				addr_array2[k][i] = rand() % RANNUM;
 			}
 		}
 
@@ -168,8 +169,8 @@ int main(int argc, char const *argv[])
 		{
 			for (int i = 0; i < core_num; i++)
 			{
-				addr_array1[k][i] = rand() % 1024;
-				addr_array2[k][i] = rand() % 1024;
+				addr_array1[k][i] = rand() % RANNUM;
+				addr_array2[k][i] = rand() % RANNUM;
 			}
 		}
 
@@ -203,9 +204,15 @@ int main(int argc, char const *argv[])
 	clock_t END_COMPUTE = clock();
 	TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
 
+	// 結果確認
+	for (int j = 0; j < 32; j++)
+	{
+		printf("  %u\n", dst[j]);
+	}
+
 	// 終了処理
 	hdc_finish();
 
-	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
+	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n\n");
 	return 0;
 }

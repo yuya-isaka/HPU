@@ -15,6 +15,7 @@ int main(int argc, char const *argv[])
 
 	// seed設定
 	srand(10);
+	const int RANNUM = 512;
 
 	// 命令数
 	const int INSTRUCTION_NUM = 4;
@@ -32,7 +33,7 @@ int main(int argc, char const *argv[])
 	hdc_setup();
 
 	// アイテムメモリ生成
-	hdc_make_imem(1024);
+	hdc_make_imem(RANNUM);
 	// hv -----------------------------
 
 	// hv -----------------------------
@@ -41,8 +42,8 @@ int main(int argc, char const *argv[])
 	hdc_start();
 
 	// 試行回数
-	const int TRIAL_NUM = 50000000;
-	// const int TRIAL_NUM = 10000000;
+	// const int TRIAL_NUM = 50000000;
+	const int TRIAL_NUM = 10000000;
 
 	const int EPOCH = TRIAL_NUM / (CORENUM * THREADS_NUM);
 	const int REMAINDAR = TRIAL_NUM % (CORENUM * THREADS_NUM);
@@ -53,7 +54,11 @@ int main(int argc, char const *argv[])
 	const int ALL_SEND_EPOCH = LAST / ALL_SEND_NUM;
 	const int ALL_SEND_REMAIN = LAST % ALL_SEND_NUM;
 
-	// printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
+	printf("ALL_SEND_EPOCH: %d\n", ALL_SEND_EPOCH);
+	printf("ALL_SEND_NUM: %d\n", ALL_SEND_NUM);
+	printf("ALL_SEND_REMAIN: %d\n", ALL_SEND_REMAIN);
+	printf("REMAINDAR: %d\n", REMAINDAR);
+	printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
 
 	// 計算時間格納
 	double TIME = 0.0;
@@ -74,8 +79,8 @@ int main(int argc, char const *argv[])
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					addr_array1[k][i] = rand() % 1024;
-					addr_array2[k][i] = rand() % 1024;
+					addr_array1[k][i] = rand() % RANNUM;
+					addr_array2[k][i] = rand() % RANNUM;
 				}
 			}
 
@@ -121,8 +126,8 @@ int main(int argc, char const *argv[])
 		{
 			for (int i = 0; i < core_num; i++)
 			{
-				addr_array1[k][i] = rand() % 1024;
-				addr_array2[k][i] = rand() % 1024;
+				addr_array1[k][i] = rand() % RANNUM;
+				addr_array2[k][i] = rand() % RANNUM;
 			}
 		}
 
@@ -158,8 +163,8 @@ int main(int argc, char const *argv[])
 		{
 			for (int i = 0; i < core_num; i++)
 			{
-				addr_array1[k][i] = rand() % 1024;
-				addr_array2[k][i] = rand() % 1024;
+				addr_array1[k][i] = rand() % RANNUM;
+				addr_array2[k][i] = rand() % RANNUM;
 			}
 		}
 

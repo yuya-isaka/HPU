@@ -15,6 +15,7 @@ int main(int argc, char const *argv[])
 
 	// seed設定
 	srand(10);
+	const int RANNUM = 512;
 
 	// 命令数
 	const int INSTRUCTION_NUM = 3;
@@ -32,7 +33,7 @@ int main(int argc, char const *argv[])
 	hdc_setup();
 
 	// アイテムメモリ生成
-	hdc_make_imem(1024);
+	hdc_make_imem(RANNUM);
 	// hv -----------------------------
 
 	// hv -----------------------------
@@ -73,8 +74,8 @@ int main(int argc, char const *argv[])
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					addr_array[k][i] = rand() % 1024;
-					perm_num[k][i] = rand() % 1024;
+					addr_array[k][i] = rand() % RANNUM;
+					perm_num[k][i] = rand() % RANNUM;
 				}
 			}
 
@@ -124,8 +125,8 @@ int main(int argc, char const *argv[])
 		{
 			for (int i = 0; i < core_num; i++)
 			{
-				addr_array[k][i] = rand() % 1024;
-				perm_num[k][i] = rand() % 1024;
+				addr_array[k][i] = rand() % RANNUM;
+				perm_num[k][i] = rand() % RANNUM;
 			}
 		}
 
@@ -165,8 +166,8 @@ int main(int argc, char const *argv[])
 		{
 			for (int i = 0; i < core_num; i++)
 			{
-				addr_array[k][i] = rand() % 1024;
-				perm_num[k][i] = rand() % 1024;
+				addr_array[k][i] = rand() % RANNUM;
+				perm_num[k][i] = rand() % RANNUM;
 			}
 		}
 

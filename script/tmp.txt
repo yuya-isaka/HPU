@@ -12,5 +12,9 @@ cp output150.bin /lib/firmware/
 echo output150.bin > /sys/class/fpga_manager/fpga0/firmware
 
 // 512mem 150Mhz
-cp output512.bin /lib/firmware/
-echo output512.bin > /sys/class/fpga_manager/fpga0/firmware
+cp output512150.bin /lib/firmware/
+echo output512150.bin > /sys/class/fpga_manager/fpga0/firmware
+
+// 512mem 125Mhz
+cp output512125.bin /lib/firmware/
+echo output512125.bin > /sys/class/fpga_manager/fpga0/firmware

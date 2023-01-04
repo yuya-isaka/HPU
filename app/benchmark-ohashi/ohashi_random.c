@@ -18,7 +18,7 @@ int main(int argc, char const *argv[])
 	hdc_setup();
 
 	// アイテムメモリ生成
-	hdc_make_imem(1024);
+	hdc_make_imem(512);
 	// hv -----------------------------
 
 	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
