@@ -42,8 +42,8 @@ int main(int argc, char const *argv[])
 	hdc_start();
 
 	// 試行回数
-	const int TRIAL_NUM = 50000000;
-	// const int TRIAL_NUM = 10000000;
+	// const int TRIAL_NUM = 50000000;
+	const int TRIAL_NUM = 10000000;
 
 	const int EPOCH = TRIAL_NUM / (CORENUM * THREADS_NUM);
 	const int REMAINDAR = TRIAL_NUM % (CORENUM * THREADS_NUM);
@@ -55,6 +55,15 @@ int main(int argc, char const *argv[])
 	const int ALL_SEND_REMAIN = LAST % ALL_SEND_NUM;
 
 	// printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
+
+	uint16_t addr_trial[TRIAL_NUM];
+	uint16_t perm_trial[TRIAL_NUM];
+	for (int i = 0; i < TRIAL_NUM; i++)
+	{
+		addr_trial[i] = rand() % RANNUM;
+		perm_trial[i] = rand() % RANNUM;
+	}
+	int array_addr = 0;
 
 	// 計算時間格納
 	double TIME = 0.0;
@@ -74,8 +83,10 @@ int main(int argc, char const *argv[])
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					addr_array[k][i] = rand() % RANNUM;
-					perm_num[k][i] = rand() % RANNUM;
+					addr_array[k][i] = addr_trial[array_addr];
+					perm_num[k][i] = perm_trial[array_addr++];
+					// addr_array[k][i] = 3;
+					// perm_num[k][i] = 100;
 				}
 			}
 
@@ -120,8 +131,12 @@ int main(int argc, char const *argv[])
 		{
 			for (int i = 0; i < core_num; i++)
 			{
-				addr_array[k][i] = rand() % RANNUM;
-				perm_num[k][i] = rand() % RANNUM;
+				// addr_array[k][i] = rand() % RANNUM;
+				// perm_num[k][i] = rand() % RANNUM;
+				addr_array[k][i] = addr_trial[array_addr];
+				perm_num[k][i] = perm_trial[array_addr++];
+				// addr_array[k][i] = 3;
+				// perm_num[k][i] = 100;
 			}
 		}
 
@@ -156,8 +171,12 @@ int main(int argc, char const *argv[])
 		{
 			for (int i = 0; i < core_num; i++)
 			{
-				addr_array[k][i] = rand() % RANNUM;
-				perm_num[k][i] = rand() % RANNUM;
+				// addr_array[k][i] = rand() % RANNUM;
+				// perm_num[k][i] = rand() % RANNUM;
+				addr_array[k][i] = addr_trial[array_addr];
+				perm_num[k][i] = perm_trial[array_addr++];
+				// addr_array[k][i] = 3;
+				// perm_num[k][i] = 100;
 			}
 		}
 
