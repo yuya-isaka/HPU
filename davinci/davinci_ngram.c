@@ -257,9 +257,9 @@ int main(int argc, char const *argv[])
 	hv_free_array(item_memory, RAND_NUM);
 	// hv -------------------------------------------------
 
-	printf("  計算時間: %lf[ms]\n", TIME);
+	printf("\n  計算時間: %lf[ms]\n", TIME);
 
-	puts("\n  --------------------------------------- HDC Program END -------------------------------------\n");
+	puts("\n  --------------------------------------- HDC Program END -------------------------------------");
 
 	return 0;
 }

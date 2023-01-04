@@ -264,7 +264,7 @@ int main(void)
 {
   printf("\n ------------------------------ 開始 -------------------------------- \n\n");
 
-  const int IMEM_SIZE = 1024;
+  const int IMEM_SIZE = 512;
   const int NGRAM = 3;
   const int CORENUM_MAX = 14;
   const int MAJORITY_ADDR = IMEM_SIZE - 1;

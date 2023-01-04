@@ -46,6 +46,9 @@ int main(int argc, char const *argv[])
 	hdc_make_imem(27);
 	// hv -----------------------------
 
+	// 計算時間格納
+	double TIME = 0.0;
+
 	// 英語とフランス語
 	for (int l = 0; l < train_num; l++)
 	{
@@ -93,9 +96,6 @@ int main(int argc, char const *argv[])
 		const int ALL_SEND_REMAIN = LAST % ALL_SEND_NUM;
 
 		// printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
-
-		// 計算時間格納
-		double TIME = 0.0;
 
 		// SEND_NUMのエポック
 		for (int ll = 0; ll < ALL_SEND_EPOCH; ll += 1)
@@ -473,16 +473,16 @@ int main(int argc, char const *argv[])
 		TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
 
 		// 結果確認
-		printf("\n");
 		for (int j = 0; j < 32; j++)
 		{
 			printf("  %u\n", dst[j]);
 		}
-		printf("\n");
 
 		// 終了処理
 		hdc_finish();
 	}
+
+	printf("\n  計算時間: %lf[ms]\n", TIME);
 
 	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
 	return 0;
