@@ -17,8 +17,9 @@ int main(int argc, char const *argv[])
 
 	// seed設定
 	srand(10);
+	const int RANNUM = 512;
 
-	hv_t **item_memory = hv_make_imem(1024);
+	hv_t **item_memory = hv_make_imem(RANNUM);
 
 	// 試行回数
 	const int trial_num = 50000000;
@@ -29,7 +30,7 @@ int main(int argc, char const *argv[])
 #endif
 	for (int i = 0; i < trial_num; i++)
 	{
-		int addr = rand() % 1024;
+		int addr = atoi(argv[1]);
 		hv_bound(item_memory[addr]);
 	}
 
@@ -38,7 +39,7 @@ int main(int argc, char const *argv[])
 	hv_print(result);
 
 	hv_free(result);
-	hv_free_array(item_memory, 1024);
+	hv_free_array(item_memory, RANNUM);
 	hv_finish();
 
 	return 0;

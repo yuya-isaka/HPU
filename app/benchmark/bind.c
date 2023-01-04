@@ -17,25 +17,31 @@ int main(int argc, char const *argv[])
 	srand(10);
 	const int RANNUM = 512;
 
-	hv_t **item_memory = hv_make_imem(512);
+	hv_t **item_memory = hv_make_imem(RANNUM);
 
 	// 試行回数
-	// const int trial_num = 50000000;
-	const int trial_num = 10000000;
+	const int trial_num = 50000000;
+	// const int trial_num = 10000000;
 
 	hv_t **result = hv_make_array(trial_num);
+
+	clock_t START_COMPUTE = clock(); //////////////////////
 
 #ifdef OPENMP
 #pragma omp parallel for
 #endif
 	for (int i = 0; i < trial_num; i++)
 	{
-		int addr1 = rand() % 512;
-		int addr2 = rand() % 512;
+		int addr1 = atoi(argv[1]);
+		int addr2 = atoi(argv[2]);
 		result[i] = hv_bind(item_memory[addr1], item_memory[addr2]);
 	}
 
-	hv_free_array(item_memory, 512);
+	clock_t END_COMPUTE = clock(); ///////////////////////
+	double TIME = ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
+	printf("\n  計算時間: %lf[ms]\n", TIME);
+
+	hv_free_array(item_memory, RANNUM);
 	hv_free_array(result, trial_num);
 
 	return 0;

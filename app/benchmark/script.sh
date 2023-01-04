@@ -1,4 +1,4 @@
 #!/bin/bash
 
 echo "bashでこの行はコメントではありません"
-./bind_bin
+./bind_bound_bin 3 100

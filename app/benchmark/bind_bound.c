@@ -32,8 +32,8 @@ int main(int argc, char const *argv[])
 #endif
 	for (int i = 0; i < trial_num; i++)
 	{
-		int addr1 = rand() % RANNUM;
-		int addr2 = rand() % RANNUM;
+		int addr1 = atoi(argv[1]);
+		int addr2 = atoi(argv[2]);
 		hv_bound(hv_bind(item_memory[addr1], item_memory[addr2]));
 	}
 
