@@ -89,7 +89,7 @@ int main(int argc, char const *argv[])
 		// 1回70この命令を、SEND_MAX / 800 回回す必要がある
 		// 800 = THREADS_NUM * 16 * INSTRUCTION_NUM
 		// 70 = CORENUM * THREADS_NUM
-		int ALL_SEND_NUM = SEND_MAX / (THREADS_NUM * 16 * INSTRUCTION_NUM) * 70;
+		int ALL_SEND_NUM = SEND_MAX / (THREADS_NUM * 16 * INSTRUCTION_NUM) * (CORENUM * THREADS_NUM);
 		// ALL_SEND_EPOCHをLASTまで何回する必要があるか
 		const int ALL_SEND_EPOCH = LAST / ALL_SEND_NUM;
 		// ALL_SEND_EPOCHをLASTまで何回する必要があるか(あまり)
