@@ -257,7 +257,7 @@ module top
                      .run( run ),
                      .gen( gen ),
                      .reset_item( reset_item ),
-                     .item_memory_num( item_memory_num[ 9:0 ] ),
+                     .item_memory_num( item_memory_num[ 8:0 ] ),
                      .get_v( get_v ),
                      // 16bit命令
                      .get_d_tmp( S_AXIS_TDATA[ 15+16*i:16*i ] ),
@@ -295,7 +295,7 @@ module top
                      .run( run ),
                      .gen( gen ),
                      .reset_item( reset_item ),
-                     .item_memory_num( item_memory_num[ 9:0 ] ),
+                     .item_memory_num( item_memory_num[ 8:0 ] ),
                      .get_v( get_v ),
                      // 16bit命令
                      .get_d( S_AXIS_TDATA[ 15:0 ] ),
@@ -514,8 +514,8 @@ module top
     reg                 gen;
 
     // item_memoryに格納するハイパーベクトルの数
-    // (現状の最大値は1023)
-    reg [ 9:0 ]         item_memory_num;
+    // (現状の最大値は511)
+    reg [ 8:0 ]         item_memory_num;
 
     reg                 reset_item;
 
@@ -535,7 +535,7 @@ module top
 
             { run, gen } <= 2'b00;
 
-            item_memory_num <= 10'd0;
+            item_memory_num <= 9'd0;
 
             reset_item <= 1'b0;
 
@@ -559,7 +559,7 @@ module top
                 // アドレス４
                 10'd04:
                     // 最大1023
-                    item_memory_num[ 9:0 ] <= write_data[ 9:0 ];
+                    item_memory_num[ 8:0 ] <= write_data[ 8:0 ];
 
                 10'd08:
                     reset_item <= write_data[ 0 ];

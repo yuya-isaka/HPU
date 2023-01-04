@@ -5,8 +5,8 @@
 #include <string.h>
 #include <iostream>
 
-// const int RANNUM = 512;
-const int RANNUM = 1024;
+const int RANNUM = 512;
+// const int RANNUM = 1024;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1555,7 +1555,7 @@ int main(int argc, char **argv)
   const int THREADSNUM = 5;
 
   // 偶数処理
-  const int MAJORITY_ADDR = 1023;
+  const int MAJORITY_ADDR = RANNUM - 1;
 
   // 次元数可変
   // const int DIM = 32 / 32;
@@ -1571,12 +1571,12 @@ int main(int argc, char **argv)
   // }
 
   // 単体テスト1
-  ADDRNUM = 900;
+  ADDRNUM = 300;
   DEBUG = 1;
   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
 
   // 単体テスト2
-  ADDRNUM = 300;
+  ADDRNUM = 90;
   DEBUG = 1;
   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
 
