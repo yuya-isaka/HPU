@@ -42,8 +42,8 @@ int main(int argc, char const *argv[])
 	hdc_start();
 
 	// 試行回数
-	// const int TRIAL_NUM = 50000000;
-	const int TRIAL_NUM = 10000000;
+	const int TRIAL_NUM = 50000000;
+	// const int TRIAL_NUM = 10000000;
 
 	const int EPOCH = TRIAL_NUM / (CORENUM * THREADS_NUM);
 	const int REMAINDAR = TRIAL_NUM % (CORENUM * THREADS_NUM);
@@ -54,7 +54,11 @@ int main(int argc, char const *argv[])
 	const int ALL_SEND_EPOCH = LAST / ALL_SEND_NUM;
 	const int ALL_SEND_REMAIN = LAST % ALL_SEND_NUM;
 
-	// printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
+	printf("ALL_SEND_EPOCH: %d\n", ALL_SEND_EPOCH);
+	printf("ALL_SEND_NUM: %d\n", ALL_SEND_NUM);
+	printf("ALL_SEND_REMAIN: %d\n", ALL_SEND_REMAIN);
+	printf("REMAINDAR: %d\n", REMAINDAR);
+	printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
 
 	// 計算時間格納
 	double TIME = 0.0;

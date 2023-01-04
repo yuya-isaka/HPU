@@ -22,6 +22,7 @@ int main(int argc, char const *argv[])
 	// 試行回数
 	const int trial_num = 50000000;
 	// const int trial_num = 10000000;
+	// const int trial_num = 6000000;
 
 	hv_t **result = hv_make_array(trial_num);
 
