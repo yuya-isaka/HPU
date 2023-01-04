@@ -1,4 +1,5 @@
 #!/bin/bash
 
-echo "bashでこの行はコメントではありません"
-./bind_bound_bin 3 100
+echo "評価スクリプト"
+
+./$1 3 100

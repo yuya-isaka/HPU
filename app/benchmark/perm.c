@@ -25,8 +25,6 @@ int main(int argc, char const *argv[])
 
 	hv_t **result = hv_make_array(trial_num);
 
-	clock_t START_COMPUTE = clock(); //////////////////////
-
 #ifdef OPENMP
 #pragma omp parallel for
 #endif
@@ -36,10 +34,6 @@ int main(int argc, char const *argv[])
 		int perm_num = atoi(argv[2]);
 		result[i] = hv_perm(item_memory[addr], perm_num);
 	}
-
-	clock_t END_COMPUTE = clock(); ///////////////////////
-	double TIME = ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n  計算時間: %lf[ms]\n", TIME);
 
 	hv_free_array(item_memory, RANNUM);
 	hv_free_array(result, trial_num);

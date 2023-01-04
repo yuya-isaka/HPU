@@ -36,7 +36,7 @@ int main(int argc, char const *argv[])
 	}
 	hv_t *result = hv_bound_result();
 
-	hv_print(result);
+	// hv_print(result);
 
 	hv_free(result);
 
