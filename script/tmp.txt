@@ -1,5 +1,6 @@
 
 echo 0 > /sys/class/fpga_manager/fpga0/flags
+
 cp output.bin /lib/firmware/
 echo output.bin > /sys/class/fpga_manager/fpga0/firmware
 
@@ -18,3 +19,7 @@ echo output512150.bin > /sys/class/fpga_manager/fpga0/firmware
 // 512mem 125Mhz
 cp output512125.bin /lib/firmware/
 echo output512125.bin > /sys/class/fpga_manager/fpga0/firmware
+
+// 512mem 100Mhz
+cp output512100.bin /lib/firmware/
+echo output512100.bin > /sys/class/fpga_manager/fpga0/firmware
