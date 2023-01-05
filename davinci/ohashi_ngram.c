@@ -46,8 +46,9 @@ int main(int argc, char const *argv[])
 	hdc_make_imem(27);
 	// hv -----------------------------
 
-	// // 計算時間格納
-	// double TIME = 0.0;
+	double COM_TIME = 0.0;
+	clock_t START_COMPUTE;
+	clock_t END_COMPUTE;
 
 	// 英語とフランス語
 	for (int l = 0; l < train_num; l++)
@@ -95,11 +96,11 @@ int main(int argc, char const *argv[])
 		// ALL_SEND_EPOCHをLASTまで何回する必要があるか(あまり)
 		const int ALL_SEND_REMAIN = LAST % ALL_SEND_NUM;
 
-		// printf("ALL_SEND_EPOCH: %d\n", ALL_SEND_EPOCH);
-		// printf("ALL_SEND_NUM: %d\n", ALL_SEND_NUM);
-		// printf("ALL_SEND_REMAIN: %d\n", ALL_SEND_REMAIN);
-		// printf("REMAINDAR: %d\n", REMAINDAR);
-		// printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
+		printf("ALL_SEND_EPOCH: %d\n", ALL_SEND_EPOCH);
+		printf("ALL_SEND_NUM: %d\n", ALL_SEND_NUM);
+		printf("ALL_SEND_REMAIN: %d\n", ALL_SEND_REMAIN);
+		printf("REMAINDAR: %d\n", REMAINDAR);
+		printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
 
 		// SEND_NUMのエポック
 		for (int ll = 0; ll < ALL_SEND_EPOCH; ll += 1)
@@ -197,10 +198,10 @@ int main(int argc, char const *argv[])
 
 			hdc_last();
 
-			// clock_t START_COMPUTE = clock();
+			START_COMPUTE = clock();
 			hdc_compute();
-			// clock_t END_COMPUTE = clock();
-			// TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
+			END_COMPUTE = clock();
+			COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 			hdc_init(0);
 		}
@@ -392,10 +393,10 @@ int main(int argc, char const *argv[])
 		// ラスト命令
 		hdc_last();
 
-		// clock_t START_COMPUTE = clock();
+		START_COMPUTE = clock();
 		hdc_compute();
-		// clock_t END_COMPUTE = clock();
-		// TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
+		END_COMPUTE = clock();
+		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 		// // 結果確認
 		// for (int j = 0; j < 32; j++)
@@ -407,7 +408,7 @@ int main(int argc, char const *argv[])
 		hdc_finish();
 	}
 
-	// printf("\n  計算時間: %lf[ms]\n", TIME);
+	printf("\n  計算時間: %lf[ms]\n", COM_TIME);
 
 	// puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
 	return 0;
