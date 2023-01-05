@@ -22,18 +22,18 @@ int main(int argc, char const *argv[])
 	const int train_num = 2;
 
 	// NGRAM
-	const int NGRAM = 3;
+	const int NGRAM = 20;
 
 	// 命令数
 	const int INSTRUCTION_NUM = 2 + ((NGRAM - 2) * 4) + 4;
 
+	// コア数
+	const int CORENUM = 15;
+
 	// DMA SEND_MAX
 	int SEND_MAX = 33000000;
-	const int SEND_TMP = SEND_MAX % (THREADS_NUM * 16 * INSTRUCTION_NUM);
+	const int SEND_TMP = SEND_MAX % (THREADS_NUM * 16 * INSTRUCTION_NUM) * (CORENUM * THREADS_NUM);
 	SEND_MAX += SEND_TMP;
-
-	// コア数
-	const int CORENUM = 14;
 
 	// 偶数の時に使うアドレス
 	const int MAJORITY_ADDR = 26;
