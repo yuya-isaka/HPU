@@ -19,25 +19,33 @@ int main(int argc, char const *argv[])
 	// 試行回数
 	// const int trial_num = 50000000;
 	// const int trial_num = 10000000;
-	const int trial_num = 5000000;
+	// const int trial_num = 5000000;
+	const int trial_num = 1000000;
 
-	hv_t **result = hv_make_array(trial_num);
+	int EXP_NUM = 1000;
 
-	int tmp1 = atoi(argv[1]);
-	int tmp2 = atoi(argv[2]);
+	for (int nnn = 0; nnn < EXP_NUM; nnn++)
+	{
+		hv_t **result = hv_make_array(trial_num);
+
+		srand((unsigned int)time(NULL));
+		int tmp1 = rand() % 512;
+		int tmp2 = rand() % 512;
 
 #ifdef OPENMP
 #pragma omp parallel for
 #endif
-	for (int i = 0; i < trial_num; i++)
-	{
-		int addr1 = tmp1;
-		int addr2 = tmp2;
-		result[i] = hv_bind(item_memory[addr1], item_memory[addr2]);
+		for (int i = 0; i < trial_num; i++)
+		{
+			int addr1 = tmp1;
+			int addr2 = tmp2;
+			result[i] = hv_bind(item_memory[addr1], item_memory[addr2]);
+		}
+
+		hv_free_array(result, trial_num);
 	}
 
 	hv_free_array(item_memory, RANNUM);
-	hv_free_array(result, trial_num);
 
 	return 0;
 }
