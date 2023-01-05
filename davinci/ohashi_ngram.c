@@ -28,7 +28,7 @@ int main(int argc, char const *argv[])
 	const int INSTRUCTION_NUM = 2 + ((NGRAM - 2) * 4) + 4;
 
 	// コア数
-	const int CORENUM = 15;
+	const int CORENUM = 14;
 
 	// DMA SEND_MAX
 	int SEND_MAX = 33000000;
