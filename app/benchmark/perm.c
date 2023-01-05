@@ -56,7 +56,7 @@ int main(int argc, char const *argv[])
 
 	hv_free_array(item_memory, RANNUM);
 
-	printf("\n  ランダム生成時間: %lf[ms]\n", RAN_TIME);
+	printf("\n  ランダム生成時間: %lf[s]\n", RAN_TIME);
 
 	return 0;
 }
