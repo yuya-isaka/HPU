@@ -17,32 +17,46 @@ int main(int argc, char const *argv[])
 
 	// 試行回数
 	// 100万回
-	const int trial_num = 1000000;
+	const int TRIAL_NUM = 1000000;
 
-	// 実験回数
-	int EXP_NUM = 1000;
-	for (int nnn = 0; nnn < EXP_NUM; nnn++)
+	double RAN_TIME = 0.0;
+	clock_t START_COMPUTE;
+	clock_t END_COMPUTE;
+
+	srand(10);
+
+	for (int nnn = 0; nnn < 10; nnn++)
 	{
-		srand((unsigned int)time(NULL));
-		int tmp1 = rand() % RANNUM;
-		int tmp2 = rand() % 1024;
+		/////////////////////////////////////////////////////////////////////////////
+		START_COMPUTE = clock();
+		int rand_array[TRIAL_NUM * 2];
+		for (int i = 0; i < TRIAL_NUM * 2; i++)
+		{
+			rand_array[i] = rand() % RANNUM;
+		}
+		int rand_array_num = 0;
+		END_COMPUTE = clock();
+		RAN_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
+		/////////////////////////////////////////////////////////////////////////////
 
-		hv_t **result = hv_make_array(trial_num);
+		hv_t **result = hv_make_array(TRIAL_NUM);
 
 #ifdef OPENMP
 #pragma omp parallel for
 #endif
-		for (int i = 0; i < trial_num; i++)
+		for (int i = 0; i < TRIAL_NUM; i++)
 		{
-			int addr = tmp1;
-			int perm_num = tmp2;
+			int addr = rand_array[rand_array_num++];
+			int perm_num = rand_array[rand_array_num++];
 			result[i] = hv_perm(item_memory[addr], perm_num);
 		}
 
-		hv_free_array(result, trial_num);
+		hv_free_array(result, TRIAL_NUM);
 	}
 
 	hv_free_array(item_memory, RANNUM);
+
+	printf("\n  ランダム生成時間: %lf[ms]\n", RAN_TIME);
 
 	return 0;
 }

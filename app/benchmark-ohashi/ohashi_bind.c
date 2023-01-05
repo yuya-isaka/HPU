@@ -62,6 +62,7 @@ int main(int argc, char const *argv[])
 
 	for (int nnn = 0; nnn < 10; nnn++)
 	{
+		/////////////////////////////////////////////////////////////////////////////
 		START_COMPUTE = clock();
 		int rand_array[TRIAL_NUM * 2];
 		for (int i = 0; i < TRIAL_NUM * 2; i++)
@@ -71,6 +72,7 @@ int main(int argc, char const *argv[])
 		int rand_array_num = 0;
 		END_COMPUTE = clock();
 		RAN_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
+		/////////////////////////////////////////////////////////////////////////////
 
 		// hv -----------------------------
 		// SEND_NUM初期化

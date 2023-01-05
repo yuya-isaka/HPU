@@ -51,20 +51,31 @@ int main(int argc, char const *argv[])
 	// printf("REMAINDAR: %d\n", REMAINDAR);
 	// printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
 
-	// // 計算時間格納
-	// double TIME = 0.0;
+	double RAN_TIME = 0.0;
+	double COM_TIME = 0.0;
+	clock_t START_COMPUTE;
+	clock_t END_COMPUTE;
 
-	// 実験回数
-	const int EXP_NUM = 1000;
-	for (int nnn = 0; nnn < EXP_NUM; nnn++)
+	srand(10);
+
+	hdc_start();
+
+	for (int nnn = 0; nnn < 10; nnn++)
 	{
-		// ランダムな値生成
-		srand((unsigned int)time(NULL));
-		int tmp = rand() % RANNUM;
+		/////////////////////////////////////////////////////////////////////////////
+		START_COMPUTE = clock();
+		int rand_array[TRIAL_NUM];
+		for (int i = 0; i < TRIAL_NUM; i++)
+		{
+			rand_array[i] = rand() % RANNUM;
+		}
+		int rand_array_num = 0;
+		END_COMPUTE = clock();
+		RAN_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
+		/////////////////////////////////////////////////////////////////////////////
 
 		// SEND_NUM初期化
 		hdc_init(0);
-		hdc_start();
 
 		// SEND_NUMのエポック
 		for (int ll = 0; ll < ALL_SEND_EPOCH; ll += 1)
@@ -81,7 +92,7 @@ int main(int argc, char const *argv[])
 				{
 					for (int i = 0; i < core_num; i++)
 					{
-						addr_array[k][i] = tmp;
+						addr_array[k][i] = rand_array[rand_array_num++];
 					}
 				}
 
@@ -90,19 +101,9 @@ int main(int argc, char const *argv[])
 				// ------------------------------------------------------
 
 				// store ---------------------------------------------
-				// hdc_store_thread(THREADS_NUM, core_num);
 				hdc_simd_store_thread();
 				// ------------------------------------------------------
 			}
-
-			// hdc_last();
-
-			// clock_t START_COMPUTE = clock();
-			// hdc_compute();
-			// clock_t END_COMPUTE = clock();
-			// TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
-
-			// hdc_init(0);
 		}
 
 		// SEND_NUMエポックのあまり
@@ -117,7 +118,7 @@ int main(int argc, char const *argv[])
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					addr_array[k][i] = tmp;
+					addr_array[k][i] = rand_array[rand_array_num++];
 				}
 			}
 
@@ -126,7 +127,6 @@ int main(int argc, char const *argv[])
 			// ------------------------------------------------------
 
 			// store ---------------------------------------------
-			// hdc_store_thread(THREADS_NUM, core_num);
 			hdc_simd_store_thread();
 			// ------------------------------------------------------
 		}
@@ -143,7 +143,7 @@ int main(int argc, char const *argv[])
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					addr_array[k][i] = tmp;
+					addr_array[k][i] = rand_array[rand_array_num++];
 				}
 			}
 
@@ -159,14 +159,16 @@ int main(int argc, char const *argv[])
 		// ラスト命令
 		hdc_last();
 
-		// clock_t START_COMPUTE = clock();
+		START_COMPUTE = clock();
 		hdc_compute();
-		// clock_t END_COMPUTE = clock();
-		// TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
-
-		// 終了処理
-		hdc_finish();
+		END_COMPUTE = clock();
+		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 	}
+
+	hdc_finish();
+
+	printf("\n  ランダム生成時間: %lf[s]\n", RAN_TIME);
+	printf("\n  計算時間: %lf[s]\n", COM_TIME);
 
 	return 0;
 }
