@@ -109,7 +109,7 @@ int main(int argc, char const *argv[])
 	const uint32_t TRAIN_NUM = 2;
 
 	// NGRAMの数
-	const uint32_t NGRAM = 20;
+	const uint32_t NGRAM = 10;
 
 	// 生成するランダム数
 	const uint32_t RAND_NUM = 27;

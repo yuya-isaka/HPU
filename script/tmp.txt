@@ -17,3 +17,6 @@ echo output512150.bin > /sys/class/fpga_manager/fpga0/firmware
 cp output512125.bin /lib/firmware/
 echo output512125.bin > /sys/class/fpga_manager/fpga0/firmware
 
+// 512mem 142Mhz 15core
+cp output15142.bin /lib/firmware/
+echo output15142.bin > /sys/class/fpga_manager/fpga0/firmware

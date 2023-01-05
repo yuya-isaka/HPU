@@ -266,7 +266,7 @@ int main(void)
 
   const int IMEM_SIZE = 512;
   const int NGRAM = 3;
-  const int CORENUM_MAX = 14;
+  const int CORENUM_MAX = 15;
   const int MAJORITY_ADDR = IMEM_SIZE - 1;
 
   // HDCプロセッサメモリ準備

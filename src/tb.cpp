@@ -1549,7 +1549,7 @@ int main(int argc, char **argv)
   const int NGRAM = 3;
 
   // コア数可変
-  const int CORENUM = 14;
+  const int CORENUM = 15;
 
   // スレッド数可変
   const int THREADSNUM = 5;

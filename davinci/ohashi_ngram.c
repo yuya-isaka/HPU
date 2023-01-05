@@ -22,13 +22,13 @@ int main(int argc, char const *argv[])
 	const int train_num = 2;
 
 	// NGRAM
-	const int NGRAM = 20;
+	const int NGRAM = 10;
 
 	// 命令数
 	const int INSTRUCTION_NUM = 2 + ((NGRAM - 2) * 4) + 4;
 
 	// コア数
-	const int CORENUM = 14;
+	const int CORENUM = 15;
 
 	// DMA SEND_MAX
 	int SEND_MAX = 33000000;

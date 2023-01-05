@@ -32,7 +32,7 @@ module buffer_ctrl
          input wire [ DIM:0 ]                   core_result_12,
          input wire [ DIM:0 ]                   core_result_13,
          input wire [ DIM:0 ]                   core_result_14,
-         //  input wire [ DIM:0 ]                   core_result_15,
+         input wire [ DIM:0 ]                   core_result_15,
          //  input wire [ DIM:0 ]                   core_result_16,
          input wire [ CORENUM-1:0 ]             store,
          input wire                             store_flag,
@@ -65,7 +65,7 @@ module buffer_ctrl
             // コア数可変
             // 計算数可変 (現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分)
 
-            counter #( .W( 26 ), .CORENUM( 14 ) ) counter
+            counter #( .W( 26 ), .CORENUM( 15 ) ) counter
                     (
 
                         // in
@@ -96,7 +96,7 @@ module buffer_ctrl
                                 // core_result_18[ j ],
                                 // core_result_17[ j ],
                                 // core_result_16[ j ],
-                                // core_result_15[ j ],
+                                core_result_15[ j ],
                                 core_result_14[ j ],
                                 core_result_13[ j ],
                                 core_result_12[ j ],
