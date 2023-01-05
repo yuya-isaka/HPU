@@ -15,31 +15,31 @@ default:
 	rm hyper_vector.o bind.o perm.o bound.o random.o bind_bound.o perm_bound.o
 
 intel-omp:
-	gcc -fopenmp -DOPENMP -c -O3 -DHV64 -o hyper_vector.o hyper_vector.c
-	gcc -fopenmp -DOPENMP -c -O3 -DHV64 -o bind.o bind.c
-	gcc -fopenmp -DOPENMP -O3 -DHV64 -o bind bind.o hyper_vector.o
-	gcc -fopenmp -DOPENMP -c -O3 -DHV64 -o perm.o perm.c
-	gcc -fopenmp -DOPENMP -O3 -DHV64 -o perm perm.o hyper_vector.o
-	gcc -fopenmp -DOPENMP -c -O3 -DHV64 -o bound.o bound.c
-	gcc -fopenmp -DOPENMP -O3 -DHV64 -o bound bound.o hyper_vector.o
-	gcc -fopenmp -DOPENMP -c -O3 -DHV64 -o random.o random.c
-	gcc -fopenmp -DOPENMP -O3 -DHV64 -o random random.o hyper_vector.o
-	gcc -fopenmp -DOPENMP -c -O3 -DHV64 -o bind_bound.o bind_bound.c
-	gcc -fopenmp -DOPENMP -O3 -DHV64 -o bind_bound bind_bound.o hyper_vector.o
-	gcc -fopenmp -DOPENMP -c -O3 -DHV64 -o perm_bound.o perm_bound.c
-	gcc -fopenmp -DOPENMP -O3 -DHV64 -o perm_bound perm_bound.o hyper_vector.o
+	gcc -fopenmp -c -O3 -march=native -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -fopenmp -c -O3 -march=native -DOPENMP -DHV64 -o bind.o bind.c
+	gcc -fopenmp -O3 -march=native -DOPENMP -DHV64 -o bind bind.o hyper_vector.o
+	gcc -fopenmp -c -O3 -march=native -DOPENMP -DHV64 -o perm.o perm.c
+	gcc -fopenmp -O3 -march=native -DOPENMP -DHV64 -o perm perm.o hyper_vector.o
+	gcc -fopenmp -c -O3 -march=native -DOPENMP -DHV64 -o bound.o bound.c
+	gcc -fopenmp -O3 -march=native -DOPENMP -DHV64 -o bound bound.o hyper_vector.o
+	gcc -fopenmp -c -O3 -march=native -DOPENMP -DHV64 -o random.o random.c
+	gcc -fopenmp -O3 -march=native -DOPENMP -DHV64 -o random random.o hyper_vector.o
+	gcc -fopenmp -c -O3 -march=native -DOPENMP -DHV64 -o bind_bound.o bind_bound.c
+	gcc -fopenmp -O3 -march=native -DOPENMP -DHV64 -o bind_bound bind_bound.o hyper_vector.o
+	gcc -fopenmp -c -O3 -march=native -DOPENMP -DHV64 -o perm_bound.o perm_bound.c
+	gcc -fopenmp -O3 -march=native -DOPENMP -DHV64 -o perm_bound perm_bound.o hyper_vector.o
 	rm hyper_vector.o bind.o perm.o bound.o random.o bind_bound.o perm_bound.o
 
 omp:
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o hyper_vector.o hyper_vector.c
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o bind.o bind.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o bind bind.o hyper_vector.o
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o perm.o perm.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o perm perm.o hyper_vector.o
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o bound.o bound.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o bound bound.o hyper_vector.o
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o random.o random.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o random random.o hyper_vector.o
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -march=apple-m1 -DOPENMP -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -march=apple-m1 -DOPENMP -o bind.o bind.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -march=apple-m1 -DOPENMP -o bind bind.o hyper_vector.o
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -march=apple-m1 -DOPENMP -o perm.o perm.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -march=apple-m1 -DOPENMP -o perm perm.o hyper_vector.o
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -march=apple-m1 -DOPENMP -o bound.o bound.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -march=apple-m1 -DOPENMP -o bound bound.o hyper_vector.o
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -march=apple-m1 -DOPENMP -o random.o random.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -march=apple-m1 -DOPENMP -o random random.o hyper_vector.o
 	rm hyper_vector.o bind.o perm.o bound.o random.o
 
 linux:
