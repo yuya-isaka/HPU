@@ -33,10 +33,9 @@ int main(int argc, char const *argv[])
 	// hv -----------------------------
 
 	// 試行回数
-	// const int TRIAL_NUM = 50000000;
-	// const int TRIAL_NUM = 10000000;
+	const int TRIAL_NUM = 10000000;
 	// const int TRIAL_NUM = 5000000;
-	const int TRIAL_NUM = 1000000;
+	// const int TRIAL_NUM = 1000000;
 
 	const int EPOCH = TRIAL_NUM / (CORENUM * THREADS_NUM);
 	const int REMAINDAR = TRIAL_NUM % (CORENUM * THREADS_NUM);

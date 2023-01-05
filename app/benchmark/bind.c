@@ -25,6 +25,7 @@ int main(int argc, char const *argv[])
 
 	for (int nnn = 0; nnn < EXP_NUM; nnn++)
 	{
+		printf("%d\n", nnn);
 		hv_t **result = hv_make_array(trial_num);
 
 		srand((unsigned int)time(NULL));
