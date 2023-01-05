@@ -12,8 +12,6 @@
 
 int main(int argc, char const *argv[])
 {
-	hv_init();
-
 	const int RANNUM = 512;
 	hv_t **item_memory = hv_make_imem(RANNUM);
 
@@ -28,6 +26,8 @@ int main(int argc, char const *argv[])
 		srand((unsigned int)time(NULL));
 		int tmp1 = rand() % RANNUM;
 		int tmp2 = rand() % 1024;
+
+		hv_init();
 
 #ifdef OPENMP
 #pragma omp parallel for
