@@ -38,7 +38,9 @@ omp:
 	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o perm perm.o hyper_vector.o
 	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o bound.o bound.c
 	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o bound bound.o hyper_vector.o
-	rm hyper_vector.o bind.o perm.o bound.o
+	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o random.o random.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o random random.o hyper_vector.o
+	rm hyper_vector.o bind.o perm.o bound.o random.o
 
 linux:
 	arm-linux-gnueabihf-gcc -c -O3 -DHV64 -o hyper_vector.o hyper_vector.c

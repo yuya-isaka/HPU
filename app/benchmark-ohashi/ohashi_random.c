@@ -6,7 +6,6 @@
 #include <fcntl.h>	  // open
 #include <unistd.h>	  // read
 #include <sys/mman.h> // mmap
-#include <time.h>
 #include "hdc_processor.h"
 
 int main(int argc, char const *argv[])

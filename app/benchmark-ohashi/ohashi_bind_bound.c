@@ -11,8 +11,6 @@
 
 int main(int argc, char const *argv[])
 {
-	// seed設定
-	srand(10);
 	const int RANNUM = 512;
 
 	// 命令数
@@ -40,8 +38,9 @@ int main(int argc, char const *argv[])
 	hdc_start();
 
 	// 試行回数
-	const int TRIAL_NUM = 50000000;
+	// const int TRIAL_NUM = 50000000;
 	// const int TRIAL_NUM = 10000000;
+	const int TRIAL_NUM = 5000000;
 
 	const int EPOCH = TRIAL_NUM / (CORENUM * THREADS_NUM);
 	const int REMAINDAR = TRIAL_NUM % (CORENUM * THREADS_NUM);
@@ -61,6 +60,9 @@ int main(int argc, char const *argv[])
 	// // 計算時間格納
 	// double TIME = 0.0;
 
+	int tmp1 = atoi(argv[1]);
+	int tmp2 = atoi(argv[2]);
+
 	// SEND_NUMのエポック
 	for (int ll = 0; ll < ALL_SEND_EPOCH; ll += 1)
 	{
@@ -77,8 +79,8 @@ int main(int argc, char const *argv[])
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					addr_array1[k][i] = atoi(argv[1]);
-					addr_array2[k][i] = atoi(argv[2]);
+					addr_array1[k][i] = tmp1;
+					addr_array2[k][i] = tmp2;
 				}
 			}
 
@@ -129,8 +131,8 @@ int main(int argc, char const *argv[])
 		{
 			for (int i = 0; i < core_num; i++)
 			{
-				addr_array1[k][i] = atoi(argv[1]);
-				addr_array2[k][i] = atoi(argv[2]);
+				addr_array1[k][i] = tmp1;
+				addr_array2[k][i] = tmp2;
 			}
 		}
 
@@ -171,8 +173,8 @@ int main(int argc, char const *argv[])
 		{
 			for (int i = 0; i < core_num; i++)
 			{
-				addr_array1[k][i] = atoi(argv[1]);
-				addr_array2[k][i] = atoi(argv[2]);
+				addr_array1[k][i] = tmp1;
+				addr_array2[k][i] = tmp2;
 			}
 		}
 

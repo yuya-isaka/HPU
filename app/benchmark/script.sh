@@ -3,7 +3,7 @@
 echo "評価スクリプト"
 
 i=0
-while [ $i -lt 10 ]; do
+while [ $i -lt 1000 ]; do
 	if [ "$1" == "perm" ] || [ "$1" == "perm_bound" ]; then
 		j=$((RANDOM % 512))
 		k=$((RANDOM % 1024))

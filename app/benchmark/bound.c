@@ -4,7 +4,6 @@
 #include <time.h>
 #include <string.h>
 #include <math.h>
-#include <time.h>
 #include "hyper_vector.h"
 
 #ifdef OPENMP
@@ -15,22 +14,23 @@ int main(int argc, char const *argv[])
 {
 	hv_init();
 
-	// seed設定
-	srand(10);
 	const int RANNUM = 512;
 
 	hv_t **item_memory = hv_make_imem(RANNUM);
 
 	// 試行回数
 	// const int trial_num = 50000000;
-	const int trial_num = 10000000;
+	// const int trial_num = 10000000;
+	const int trial_num = 5000000;
+
+	int tmp = atoi(argv[1]);
 
 #ifdef OPENMP
 #pragma omp parallel for
 #endif
 	for (int i = 0; i < trial_num; i++)
 	{
-		int addr = atoi(argv[1]);
+		int addr = tmp;
 		hv_bound(item_memory[addr]);
 	}
 

@@ -4,7 +4,6 @@
 #include <time.h>
 #include <string.h>
 #include <math.h>
-#include <time.h>
 #include "hyper_vector.h"
 
 int main(int argc, char const *argv[])

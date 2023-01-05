@@ -11,8 +11,6 @@
 
 int main(int argc, char const *argv[])
 {
-	// seed設定
-	srand(10);
 	const int RANNUM = 512;
 
 	// 命令数

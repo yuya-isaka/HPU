@@ -23,5 +23,5 @@ echo output15142.bin > /sys/class/fpga_manager/fpga0/firmware
 
 // 512mem 150Mhz 14core 800mhzcpu
 cp output150800.bin /lib/firmware/
-echo output250800.bin > /sys/class/fpga_manager/fpga0/firmware
+echo output150800.bin > /sys/class/fpga_manager/fpga0/firmware
 
