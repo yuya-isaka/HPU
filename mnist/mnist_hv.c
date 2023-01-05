@@ -219,7 +219,6 @@ int main()
 			if (get_label(label_pos(label, j)) == i)
 			{
 				int pos = 0;
-				hv_t *bound_tmp = hv_make();
 				for (int k = 0; k < 28; k++)
 				{
 					for (int l = 0; l < 28; l++)
@@ -228,19 +227,13 @@ int main()
 						hv_t *perm_result = hv_perm(item_memory[k + l], get_perm_num((image_pos(image, j) + pos)));
 						// pos更新
 						pos++;
-						// bind
-						hv_t *bind_result = hv_bind(bound_tmp, perm_result);
 
-						hv_copy(bound_tmp, bind_result);
+						// bound
+						hv_bound(perm_result);
 
-						hv_free(bind_result);
 						hv_free(perm_result);
 					}
 				}
-
-				hv_bound(bound_tmp);
-
-				hv_free(bound_tmp);
 			}
 		}
 
