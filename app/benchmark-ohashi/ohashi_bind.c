@@ -64,7 +64,7 @@ int main(int argc, char const *argv[])
 	{
 		START_COMPUTE = clock();
 		int rand_array[TRIAL_NUM * 2];
-		for (int i = 0; i < TRIAL_NUM; i++)
+		for (int i = 0; i < TRIAL_NUM * 2; i++)
 		{
 			rand_array[i] = rand() % RANNUM;
 		}
