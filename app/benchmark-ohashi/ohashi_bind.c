@@ -61,7 +61,7 @@ int main(int argc, char const *argv[])
 	int rand_array_num = 0;
 	clock_t END_COMPUTE = clock();
 	double TIME = ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
-	printf("\n  ランダム生成時間: %lf[ms]\n", TIME);
+	printf("\n  ランダム生成時間: %lf[s]\n", TIME);
 
 	// hv -----------------------------
 	// SEND_NUM初期化
@@ -205,8 +205,8 @@ int main(int argc, char const *argv[])
 	START_COMPUTE = clock();
 	hdc_compute();
 	END_COMPUTE = clock();
-	TIME = ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
-	printf("\n  計算時間: %lf[ms]\n", TIME);
+	TIME = ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
+	printf("\n  計算時間: %lf[s]\n", TIME);
 
 	// 終了処理
 	hdc_finish();
