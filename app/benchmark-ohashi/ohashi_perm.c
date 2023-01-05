@@ -32,15 +32,9 @@ int main(int argc, char const *argv[])
 	hdc_make_imem(RANNUM);
 	// hv -----------------------------
 
-	// hv -----------------------------
-	// SEND_NUM初期化
-	hdc_init(0);
-	hdc_start();
-
 	// 試行回数
-	// const int TRIAL_NUM = 50000000;
-	// const int TRIAL_NUM = 10000000;
-	const int TRIAL_NUM = 5000000;
+	// 100万回
+	const int TRIAL_NUM = 1000000;
 
 	const int EPOCH = TRIAL_NUM / (CORENUM * THREADS_NUM);
 	const int REMAINDAR = TRIAL_NUM % (CORENUM * THREADS_NUM);
@@ -60,14 +54,58 @@ int main(int argc, char const *argv[])
 	// // 計算時間格納
 	// double TIME = 0.0;
 
-	int tmp = atoi(argv[1]);
-	uint16_t perm_num = atoi(argv[2]);
-
-	// SEND_NUMのエポック
-	for (int ll = 0; ll < ALL_SEND_EPOCH; ll += 1)
+	// 実験回数
+	const int EXP_NUM = 1000;
+	for (int nnn = 0; nnn < EXP_NUM; nnn++)
 	{
-		// SEND_NUM繰り返す
-		for (int j = 0; j < ALL_SEND_NUM; j += CORENUM * THREADS_NUM)
+		// ランダムな値生成
+		srand((unsigned int)time(NULL));
+		int tmp = rand() % RANNUM;
+		int perm_num = rand() % 1024;
+
+		// SEND_NUM初期化
+		hdc_init(0);
+		hdc_start();
+
+		// SEND_NUMのエポック
+		for (int ll = 0; ll < ALL_SEND_EPOCH; ll += 1)
+		{
+			// SEND_NUM繰り返す
+			for (int j = 0; j < ALL_SEND_NUM; j += CORENUM * THREADS_NUM)
+			{
+				uint16_t core_num = CORENUM;
+
+				uint16_t addr_array[THREADS_NUM][core_num];
+
+				for (int k = 0; k < THREADS_NUM; k++)
+				{
+					for (int i = 0; i < core_num; i++)
+					{
+						addr_array[k][i] = tmp;
+					}
+				}
+
+				// load ---------------------------------------------
+				hdc_load_thread(THREADS_NUM, core_num, addr_array);
+				// ------------------------------------------------------
+
+				// perm ---------------------------------------------
+				hdc_simd_permute_thread(perm_num);
+				// ------------------------------------------------------
+			}
+
+			// hdc_last();
+
+			// clock_t START_COMPUTE = clock();
+			// hdc_compute();
+			// clock_t END_COMPUTE = clock();
+			// TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
+
+			// hdc_init(0);
+		}
+
+		// SEND_NUMエポックのあまり
+		for (int j = 0; j < ALL_SEND_REMAIN; j += CORENUM * THREADS_NUM)
 		{
 			uint16_t core_num = CORENUM;
 
@@ -90,6 +128,31 @@ int main(int argc, char const *argv[])
 			// ------------------------------------------------------
 		}
 
+		// 最後の余り
+		if (REMAINDAR != 0)
+		{
+			uint16_t core_num = REMAINDAR_CORENUM;
+
+			uint16_t addr_array[THREADS_NUM][core_num];
+
+			for (int k = 0; k < THREADS_NUM; k++)
+			{
+				for (int i = 0; i < core_num; i++)
+				{
+					addr_array[k][i] = tmp;
+				}
+			}
+
+			// load ---------------------------------------------
+			hdc_load_thread(THREADS_NUM, core_num, addr_array);
+			// ------------------------------------------------------
+
+			// perm ---------------------------------------------
+			hdc_permute_thread(THREADS_NUM, core_num, perm_num);
+			// ------------------------------------------------------
+		}
+
+		// ラスト命令
 		hdc_last();
 
 		// clock_t START_COMPUTE = clock();
@@ -97,67 +160,9 @@ int main(int argc, char const *argv[])
 		// clock_t END_COMPUTE = clock();
 		// TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
 
-		hdc_init(0);
+		// 終了処理
+		hdc_finish();
 	}
-
-	// SEND_NUMエポックのあまり
-	for (int j = 0; j < ALL_SEND_REMAIN; j += CORENUM * THREADS_NUM)
-	{
-		uint16_t core_num = CORENUM;
-
-		uint16_t addr_array[THREADS_NUM][core_num];
-
-		for (int k = 0; k < THREADS_NUM; k++)
-		{
-			for (int i = 0; i < core_num; i++)
-			{
-				addr_array[k][i] = tmp;
-			}
-		}
-
-		// load ---------------------------------------------
-		hdc_load_thread(THREADS_NUM, core_num, addr_array);
-		// ------------------------------------------------------
-
-		// perm ---------------------------------------------
-		hdc_simd_permute_thread(perm_num);
-		// ------------------------------------------------------
-	}
-
-	// 最後の余り
-	if (REMAINDAR != 0)
-	{
-		uint16_t core_num = REMAINDAR_CORENUM;
-
-		uint16_t addr_array[THREADS_NUM][core_num];
-
-		for (int k = 0; k < THREADS_NUM; k++)
-		{
-			for (int i = 0; i < core_num; i++)
-			{
-				addr_array[k][i] = tmp;
-			}
-		}
-
-		// load ---------------------------------------------
-		hdc_load_thread(THREADS_NUM, core_num, addr_array);
-		// ------------------------------------------------------
-
-		// perm ---------------------------------------------
-		hdc_permute_thread(THREADS_NUM, core_num, perm_num);
-		// ------------------------------------------------------
-	}
-
-	// ラスト命令
-	hdc_last();
-
-	// clock_t START_COMPUTE = clock();
-	hdc_compute();
-	// clock_t END_COMPUTE = clock();
-	// TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
-
-	// 終了処理
-	hdc_finish();
 
 	return 0;
 }

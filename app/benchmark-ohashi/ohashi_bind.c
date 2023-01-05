@@ -33,9 +33,8 @@ int main(int argc, char const *argv[])
 	// hv -----------------------------
 
 	// 試行回数
-	const int TRIAL_NUM = 10000000;
-	// const int TRIAL_NUM = 5000000;
-	// const int TRIAL_NUM = 1000000;
+	// 100万回
+	const int TRIAL_NUM = 1000000;
 
 	const int EPOCH = TRIAL_NUM / (CORENUM * THREADS_NUM);
 	const int REMAINDAR = TRIAL_NUM % (CORENUM * THREADS_NUM);
@@ -52,14 +51,14 @@ int main(int argc, char const *argv[])
 	// printf("REMAINDAR: %d\n", REMAINDAR);
 	// printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
 
+	// 実験回数
 	const int EXP_NUM = 1000;
-
 	for (int nnn = 0; nnn < EXP_NUM; nnn++)
 	{
 		// ランダムな値生成
 		srand((unsigned int)time(NULL));
-		int tmp1 = rand() % 512;
-		int tmp2 = rand() % 512;
+		int tmp1 = rand() % RANNUM;
+		int tmp2 = rand() % RANNUM;
 
 		// hv -----------------------------
 		// SEND_NUM初期化
@@ -109,14 +108,14 @@ int main(int argc, char const *argv[])
 				// ------------------------------------------------------
 			}
 
-			hdc_last();
+			// hdc_last();
 
 			// clock_t START_COMPUTE = clock();
-			hdc_compute();
+			// hdc_compute();
 			// clock_t END_COMPUTE = clock();
 			// TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
 
-			hdc_init(0);
+			// hdc_init(0);
 		}
 
 		// SEND_NUMエポックのあまり

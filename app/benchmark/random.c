@@ -8,9 +8,11 @@
 
 int main(int argc, char const *argv[])
 {
-	hv_t **item_memory = hv_make_imem(512);
+	const int RANNUM = 512;
 
-	hv_free_array(item_memory, 512);
+	hv_t **item_memory = hv_make_imem(RANNUM);
+
+	hv_free_array(item_memory, RANNUM);
 
 	return 0;
 }

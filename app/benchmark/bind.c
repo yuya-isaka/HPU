@@ -13,24 +13,21 @@
 int main(int argc, char const *argv[])
 {
 	const int RANNUM = 512;
-
 	hv_t **item_memory = hv_make_imem(RANNUM);
 
 	// 試行回数
-	// const int trial_num = 50000000;
-	// const int trial_num = 10000000;
+	// 100万回
 	const int trial_num = 1000000;
 
+	// 実験回数
 	int EXP_NUM = 1000;
-
 	for (int nnn = 0; nnn < EXP_NUM; nnn++)
 	{
-		printf("%d\n", nnn);
-		hv_t **result = hv_make_array(trial_num);
-
 		srand((unsigned int)time(NULL));
-		int tmp1 = rand() % 512;
-		int tmp2 = rand() % 512;
+		int tmp1 = rand() % RANNUM;
+		int tmp2 = rand() % RANNUM;
+
+		hv_t **result = hv_make_array(trial_num);
 
 #ifdef OPENMP
 #pragma omp parallel for
