@@ -56,12 +56,13 @@ int main(int argc, char const *argv[])
 	clock_t START_COMPUTE;
 	clock_t END_COMPUTE;
 
+	srand(10);
+
 	hdc_start();
 
-	for (int nnn = 0; nnn < 10; nnn)
+	for (int nnn = 0; nnn < 10; nnn++)
 	{
 		START_COMPUTE = clock();
-		srand((unsigned int)time(NULL));
 		int rand_array[TRIAL_NUM * 2];
 		for (int i = 0; i < TRIAL_NUM; i++)
 		{
