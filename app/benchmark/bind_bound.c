@@ -22,8 +22,8 @@ int main(int argc, char const *argv[])
 	hv_t **item_memory = hv_make_imem(RANNUM);
 
 	// 試行回数
-	const int trial_num = 50000000;
-	// const int trial_num = 10000000;
+	// const int trial_num = 50000000;
+	const int trial_num = 10000000;
 
 #ifdef OPENMP
 #pragma omp parallel for
