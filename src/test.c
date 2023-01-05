@@ -5,6 +5,11 @@
 #include <stdint.h>
 #include "hyper_vector.h"
 
+const int RANNUM = 512;
+// const int RANNUM = 1024;
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //    NGRAM   = 1 ~
 //    ADDRNUM = NGRAMの倍数 (shifter_newを使ったテストをしているから。また、LASTが０のままになりtb.cppでは止まる。test.cppでは動くけどNGRAMの倍数以外は同じ値が出る)
 //    MAJORITY_ADDR = 偶数処理
@@ -14,7 +19,7 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR)
 	hv_init();
 
 	// アイテムメモリ準備
-	hv_t **item_memory = hv_make_imem(1024);
+	hv_t **item_memory = hv_make_imem(RANNUM);
 
 	// 偶数処理
 	const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
@@ -76,7 +81,7 @@ int main(int argc, char **argv)
 	const int NGRAM = 3;
 
 	// 偶数処理
-	const int MAJORITY_ADDR = 1023;
+	const int MAJORITY_ADDR = RANNUM - 1;
 
 	int ADDRNUM = 0;
 
@@ -90,11 +95,11 @@ int main(int argc, char **argv)
 	// }
 
 	// 単体テスト1
-	ADDRNUM = 900;
+	ADDRNUM = 300;
 	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
 
 	// 単体テスト2
-	ADDRNUM = 300;
+	ADDRNUM = 90;
 	check(NGRAM, ADDRNUM, MAJORITY_ADDR);
 
 	printf("\n ------------------------------- 終了 ------------------------------- \n");

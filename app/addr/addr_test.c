@@ -264,7 +264,7 @@ int main(void)
 {
   printf("\n ------------------------------ 開始 -------------------------------- \n\n");
 
-  const int IMEM_SIZE = 1024;
+  const int IMEM_SIZE = 512;
   const int NGRAM = 3;
   const int CORENUM_MAX = 14;
   const int MAJORITY_ADDR = IMEM_SIZE - 1;
@@ -276,10 +276,13 @@ int main(void)
   hdc_make_imem(IMEM_SIZE);
 
   // テスト
-  for (int i = 30; i <= IMEM_SIZE; i += 30)
+  for (int j = 0; j < 100; j++)
   {
-    int ADDRNUM = i;
-    check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR, IMEM_SIZE);
+    for (int i = (NGRAM * THREADS_NUM); i <= IMEM_SIZE; i += (NGRAM * THREADS_NUM))
+    {
+      int ADDRNUM = i;
+      check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR, IMEM_SIZE);
+    }
   }
 
   // // 単体テスト

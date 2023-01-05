@@ -20,7 +20,7 @@ module central_core
          input wire                         run,
          input wire                         gen,
          input wire                         reset_item,
-         input wire [ 9:0 ]                 item_memory_num,
+         input wire [ 8:0 ]                 item_memory_num,
          input wire                         get_v,
          // 16bit命令
          input wire [ 15:0 ]                get_d,
@@ -41,7 +41,7 @@ module central_core
 
     // アイテムメモリ
     (* ram_style = "block" *)
-    reg [ DIM:0 ]           item_memory [ 0:1023 ];
+    reg [ DIM:0 ]           item_memory [ 0:511 ];
 
 
     // アイテムメモリーからロードしたデータの一時格納場所
@@ -60,7 +60,7 @@ module central_core
                   // 読み出し
                   // 常に垂れ流しで読み出しでOK
                   // (必要ない場合は使わない)
-                  reg_0 <= item_memory[ get_d[ 9:0 ] ];
+                  reg_0 <= item_memory[ get_d[ 8:0 ] ];
 
               end;
 
@@ -402,7 +402,7 @@ module central_core
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    reg [ 9:0 ]                 item_a;
+    reg [ 8:0 ]                 item_a;
 
     always_ff @( posedge clk ) begin
 
@@ -414,7 +414,7 @@ module central_core
 
                   else if ( update_item ) begin
 
-                      item_a <= item_a + 10'd1;
+                      item_a <= item_a + 9'd1;
 
                   end
 

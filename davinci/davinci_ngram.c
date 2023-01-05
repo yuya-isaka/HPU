@@ -98,18 +98,18 @@ char *read_file(const char *PATH)
 
 int main(int argc, char const *argv[])
 {
-	puts("\n  -------------------------------------- HDC Program START ------------------------------------\n");
+	// puts("\n  -------------------------------------- HDC Program START ------------------------------------\n");
 
 	// 訓練パス
 	// const char *TRAIN_PATH[] = {"data/decorate/simple_en", "data/decorate/simple_fr"};
-	// const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
-	const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
+	const char *TRAIN_PATH[] = {"data/decorate/en", "data/decorate/fr"};
+	// const char *TRAIN_PATH[] = {"data/decorate/enlong", "data/decorate/frlong"};
 
 	// 訓練数
 	const uint32_t TRAIN_NUM = 2;
 
 	// NGRAMの数
-	const uint32_t NGRAM = 4;
+	const uint32_t NGRAM = 3;
 
 	// 生成するランダム数
 	const uint32_t RAND_NUM = 27;
@@ -122,8 +122,8 @@ int main(int argc, char const *argv[])
 	hv_t **item_memory = hv_make_imem(RAND_NUM);
 	// hv -------------------------------------------------
 
-	// 計算時間格納
-	double TIME = 0.0;
+	// // 計算時間格納
+	// double TIME = 0.0;
 
 	// 英語とフランス語
 	for (uint32_t i = 0; i < TRAIN_NUM; i++)
@@ -147,7 +147,7 @@ int main(int argc, char const *argv[])
 			}
 		}
 
-		clock_t START_COMPUTE = clock();
+		// clock_t START_COMPUTE = clock();
 
 		// hv -------------------------------------------------
 		// 初期化
@@ -227,17 +227,15 @@ int main(int argc, char const *argv[])
 		// hv_free_array(bound_buff, TRAIN_SIZE);
 		// hv -------------------------------------------------
 
-		clock_t END_COMPUTE = clock();
-
-		// 計算時間出力
-		TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
-#ifdef OPENMP
-		TIME += TIME / omp_get_max_threads();
-#endif
+		// 		clock_t END_COMPUTE = clock();
+		// 		TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
+		// #ifdef OPENMP
+		// 		TIME += TIME / omp_get_max_threads();
+		// #endif
 
 		// hv -------------------------------------------------
 		// 結果出力
-		hv_print(result);
+		// hv_print(result);
 
 		// Free
 		hv_free(result);
@@ -257,9 +255,8 @@ int main(int argc, char const *argv[])
 	hv_free_array(item_memory, RAND_NUM);
 	// hv -------------------------------------------------
 
-	printf("  計算時間: %lf[ms]\n", TIME);
+	// printf("\n  計算時間: %lf[ms]\n", TIME);
 
-	puts("\n  --------------------------------------- HDC Program END -------------------------------------\n");
-
+	// puts("\n  --------------------------------------- HDC Program END -------------------------------------");
 	return 0;
 }

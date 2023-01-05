@@ -11,10 +11,7 @@
 
 int main(int argc, char const *argv[])
 {
-	puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
-
-	// seed設定
-	srand(10);
+	const int RANNUM = 512;
 
 	// 命令数
 	const int INSTRUCTION_NUM = 5;
@@ -32,7 +29,7 @@ int main(int argc, char const *argv[])
 	hdc_setup();
 
 	// アイテムメモリ生成
-	hdc_make_imem(1024);
+	hdc_make_imem(RANNUM);
 	// hv -----------------------------
 
 	// hv -----------------------------
@@ -41,8 +38,9 @@ int main(int argc, char const *argv[])
 	hdc_start();
 
 	// 試行回数
-	const int TRIAL_NUM = 50000000;
+	// const int TRIAL_NUM = 50000000;
 	// const int TRIAL_NUM = 10000000;
+	const int TRIAL_NUM = 5000000;
 
 	const int EPOCH = TRIAL_NUM / (CORENUM * THREADS_NUM);
 	const int REMAINDAR = TRIAL_NUM % (CORENUM * THREADS_NUM);
@@ -53,10 +51,17 @@ int main(int argc, char const *argv[])
 	const int ALL_SEND_EPOCH = LAST / ALL_SEND_NUM;
 	const int ALL_SEND_REMAIN = LAST % ALL_SEND_NUM;
 
+	// printf("ALL_SEND_EPOCH: %d\n", ALL_SEND_EPOCH);
+	// printf("ALL_SEND_NUM: %d\n", ALL_SEND_NUM);
+	// printf("ALL_SEND_REMAIN: %d\n", ALL_SEND_REMAIN);
+	// printf("REMAINDAR: %d\n", REMAINDAR);
 	// printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
 
-	// 計算時間格納
-	double TIME = 0.0;
+	// // 計算時間格納
+	// double TIME = 0.0;
+
+	int tmp1 = atoi(argv[1]);
+	int tmp2 = atoi(argv[2]);
 
 	// SEND_NUMのエポック
 	for (int ll = 0; ll < ALL_SEND_EPOCH; ll += 1)
@@ -74,8 +79,8 @@ int main(int argc, char const *argv[])
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					addr_array1[k][i] = rand() % 1024;
-					addr_array2[k][i] = rand() % 1024;
+					addr_array1[k][i] = tmp1;
+					addr_array2[k][i] = tmp2;
 				}
 			}
 
@@ -105,10 +110,10 @@ int main(int argc, char const *argv[])
 
 		hdc_last();
 
-		clock_t START_COMPUTE = clock();
+		// clock_t START_COMPUTE = clock();
 		hdc_compute();
-		clock_t END_COMPUTE = clock();
-		TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
+		// clock_t END_COMPUTE = clock();
+		// TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
 
 		hdc_init(0);
 	}
@@ -126,8 +131,8 @@ int main(int argc, char const *argv[])
 		{
 			for (int i = 0; i < core_num; i++)
 			{
-				addr_array1[k][i] = rand() % 1024;
-				addr_array2[k][i] = rand() % 1024;
+				addr_array1[k][i] = tmp1;
+				addr_array2[k][i] = tmp2;
 			}
 		}
 
@@ -168,8 +173,8 @@ int main(int argc, char const *argv[])
 		{
 			for (int i = 0; i < core_num; i++)
 			{
-				addr_array1[k][i] = rand() % 1024;
-				addr_array2[k][i] = rand() % 1024;
+				addr_array1[k][i] = tmp1;
+				addr_array2[k][i] = tmp2;
 			}
 		}
 
@@ -197,15 +202,20 @@ int main(int argc, char const *argv[])
 	// ラスト命令
 	hdc_last();
 
-	clock_t START_COMPUTE = clock();
-	// 計算開始
+	// clock_t START_COMPUTE = clock();
+	// // 計算開始
 	hdc_compute();
-	clock_t END_COMPUTE = clock();
-	TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
+	// clock_t END_COMPUTE = clock();
+	// TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC * 1000.0;
+
+	// // 結果確認
+	// for (int j = 0; j < 32; j++)
+	// {
+	// 	printf("  %u\n", dst[j]);
+	// }
 
 	// 終了処理
 	hdc_finish();
 
-	puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
 	return 0;
 }
