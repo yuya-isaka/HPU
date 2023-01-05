@@ -96,11 +96,11 @@ int main(int argc, char const *argv[])
 		// ALL_SEND_EPOCHをLASTまで何回する必要があるか(あまり)
 		const int ALL_SEND_REMAIN = LAST % ALL_SEND_NUM;
 
-		printf("ALL_SEND_EPOCH: %d\n", ALL_SEND_EPOCH);
-		printf("ALL_SEND_NUM: %d\n", ALL_SEND_NUM);
-		printf("ALL_SEND_REMAIN: %d\n", ALL_SEND_REMAIN);
-		printf("REMAINDAR: %d\n", REMAINDAR);
-		printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
+		// printf("ALL_SEND_EPOCH: %d\n", ALL_SEND_EPOCH);
+		// printf("ALL_SEND_NUM: %d\n", ALL_SEND_NUM);
+		// printf("ALL_SEND_REMAIN: %d\n", ALL_SEND_REMAIN);
+		// printf("REMAINDAR: %d\n", REMAINDAR);
+		// printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
 
 		// SEND_NUMのエポック
 		for (int ll = 0; ll < ALL_SEND_EPOCH; ll += 1)
