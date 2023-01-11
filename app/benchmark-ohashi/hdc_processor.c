@@ -11,6 +11,11 @@
 // DMAで送るバイト数
 int SEND_NUM = 0;
 
+void hdc_print(void)
+{
+	printf("SEND_NUM: %d\n", SEND_NUM);
+}
+
 // UIO, DMA メモリマップドIO設定
 void hdc_setup(void)
 {
