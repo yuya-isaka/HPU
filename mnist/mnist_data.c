@@ -197,22 +197,30 @@ static int get_label(float *a)
 }
 
 // ファイル読み込み
-char *read_file(const char *PATH)
+void read_file(const char *PATH)
 {
 	FILE *file;
 	file = fopen(PATH, "r");
-	if (file == NULL)
+	// fopen_sはfopenのセキュリティ強化版
+
+	char Lines[10];
+	uint32_t num = 0;
+	//	NULLポインタの終端までファイルから文字を1行ずつ読み込む
+	while (fgets(Lines, 10, file) != NULL)
 	{
-		perror("  Failed: open file");
-		exit(1);
+		//	読み込んだ1行を画面に出力する
+		// printf("%s", Lines);
+		num++;
 	}
 
-	char Lines[10000][256];
+	printf("num: %d\n", num);
 
-	for (int i = 0; i < 10000 && fgets(Lines[i], sizeof(Lines[i]), file) != NULL; i++)
-	{
-		printf("Lines[%d]=%d", i, atoi(Lines[i]));
-	}
+	// char Lines[10000][256];
+
+	// for (int i = 0; i < 10000 && fgets(Lines[i], sizeof(Lines[i]), file) != NULL; i++)
+	// {
+	// 	printf("Lines[%d]=%d\n", i, atoi(Lines[i]));
+	// }
 
 	// uint32_t ch;
 	// uint32_t num = 0;
@@ -240,7 +248,7 @@ char *read_file(const char *PATH)
 
 	fclose(file);
 
-	return Lines[0];
+	// return Lines[0];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -252,12 +260,12 @@ int main()
 	FILE *fp;
 
 	// 784個のハイパーベクトルを生成し格納
-	const uint32_t RAND_NUM = image->cols;
+	// const uint32_t RAND_NUM = image->cols;
 
-	fp = fopen("label0.txt", "w");
+	fp = fopen("label9.txt", "w");
 	for (int j = 0; j < image->rows; j++) // 60000
 	{
-		if (get_label(label_pos(label, j)) == 0)
+		if (get_label(label_pos(label, j)) == 9)
 		{
 			fprintf(fp, "%d\n", j);
 		}
@@ -265,15 +273,15 @@ int main()
 
 	fclose(fp);
 
-	char *content = read_file("label0.txt");
+	// read_file("label0.txt");
 
 	// printf("%s\n", content);
 
 	// printf("%lu\n", strlen(content));
-	printf("%c\n", content[0]);
-	printf("%c\n", content[1]);
+	// printf("%c\n", content[0]);
+	// printf("%c\n", content[1]);
 
-	free(content);
+	// free(content);
 	free_tensor(image);
 	free_tensor(label);
 

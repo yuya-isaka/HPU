@@ -196,7 +196,7 @@ int main()
 	struct tensor *label = load_label_file(TRAIN_LABEL);
 
 	// 784個のハイパーベクトルを生成し格納
-	// const uint32_t RAND_NUM = image->cols;
+	const uint32_t RAND_NUM = image->cols;
 
 	// 512,272に分けて作る
 
