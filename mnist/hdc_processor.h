@@ -15,6 +15,8 @@ volatile int *dma;
 uint16_t *src;
 int *dst;
 
+extern void hdc_print(void);
+
 extern void hdc_setup(void);
 
 extern void hdc_make_imem(const int RANNUM);

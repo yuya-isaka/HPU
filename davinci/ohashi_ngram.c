@@ -195,15 +195,14 @@ int main(int argc, char const *argv[])
 				hdc_simd_store_thread();
 				// ------------------------------------------------------
 			}
+			// hdc_last();
 
-			hdc_last();
+			// START_COMPUTE = clock();
+			// hdc_compute();
+			// END_COMPUTE = clock();
+			// COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-			START_COMPUTE = clock();
-			hdc_compute();
-			END_COMPUTE = clock();
-			COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
-
-			hdc_init(0);
+			// hdc_init(0);
 		}
 
 		// SEND_NUMエポックのあまり
@@ -389,6 +388,8 @@ int main(int argc, char const *argv[])
 
 			hdc_store_thread(1, 1);
 		}
+
+		// hdc_print();
 
 		// ラスト命令
 		hdc_last();

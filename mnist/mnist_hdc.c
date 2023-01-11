@@ -171,7 +171,7 @@ int main()
 	// image->rows = 60000
 	// image->cols = 784
 	struct tensor *image = load_image_file(TRAIN_IMAGE);
-	struct tensor *label = load_label_file(TRAIN_LABEL);
+	// struct tensor *label = load_label_file(TRAIN_LABEL);
 
 	// 784個のハイパーベクトルを生成し格納
 	const uint32_t RAND_NUM = image->cols;
@@ -181,167 +181,175 @@ int main()
 	// コア数
 	const int CORENUM = 14;
 
-	// hv -----------------------------
 	// メモリセットアップ
 	hdc_setup();
+	hdc_make_imem(FIRST_RAND_NUM);
 
-	// アイテムメモリ生成
-	hdc_make_imem(RANNUM);
-	// hv -----------------------------
-
-	// 試行回数
-	// 100万回
-	const int TRIAL_NUM = 60000;
-
-	const int EPOCH = TRIAL_NUM / (CORENUM * THREADS_NUM);
-	const int REMAINDAR = TRIAL_NUM % (CORENUM * THREADS_NUM);
-	const int REMAINDAR_CORENUM = REMAINDAR / THREADS_NUM;
-	const int LAST = EPOCH * CORENUM * THREADS_NUM;
-
-	int ALL_SEND_NUM = SEND_MAX / (THREADS_NUM * 16 * INSTRUCTION_NUM) * 70;
-	const int ALL_SEND_EPOCH = LAST / ALL_SEND_NUM;
-	const int ALL_SEND_REMAIN = LAST % ALL_SEND_NUM;
-
-	// printf("ALL_SEND_EPOCH: %d\n", ALL_SEND_EPOCH);
-	// printf("ALL_SEND_NUM: %d\n", ALL_SEND_NUM);
-	// printf("ALL_SEND_REMAIN: %d\n", ALL_SEND_REMAIN);
-	// printf("REMAINDAR: %d\n", REMAINDAR);
-	// printf("合計命令: %d\n", ALL_SEND_EPOCH * ALL_SEND_NUM + ALL_SEND_REMAIN + REMAINDAR);
-
-	double COM_TIME = 0.0;
-	clock_t START_COMPUTE;
-	clock_t END_COMPUTE;
-
-	hdc_start();
-
-	hdc_init(0);
-
-	// SEND_NUMのエポック
-	for (int ll = 0; ll < ALL_SEND_EPOCH; ll += 1)
+	for (int ll = 0; ll < 10; ll++)
 	{
-		// SEND_NUM繰り返す
-		for (int j = 0; j < ALL_SEND_NUM; j += CORENUM * THREADS_NUM)
+		// 490
+		hdc_init(0);
+		hdc_start();
+
+		char PATH[12];
+		snprintf(PATH, 12, "label%d.txt", ll);
+		FILE *file;
+		file = fopen(PATH, "r");
+		char Lines[10];
+		while (fgets(Lines, 10, file) != NULL) // 6000回ぐらい？
 		{
-			int tmp = 0;
+			int *perm_num = image_pos(image, atoi(Lines));
+			int index_num = 0;
 
+			for (int j = 0; j < 7; j++)
+			{
+				uint16_t core_num = CORENUM;
+
+				uint16_t addr_array[THREADS_NUM][core_num];
+				for (int k = 0; k < THREADS_NUM; k++)
+				{
+					for (int i = 0; i < core_num; i++)
+					{
+						addr_array[k][i] = index_num;
+						index_num++;
+					}
+				}
+
+				// load ---------------------------------------------
+				hdc_load_thread(THREADS_NUM, core_num, addr_array);
+				// ------------------------------------------------------
+
+				// permute ---------------------------------------------
+				for (int k = 0; k < THREADS_NUM; k++)
+				{
+					for (int i = 0; i < core_num; i++)
+					{
+						hdc_permute(*perm_num);
+						perm_num++;
+					}
+					for (int i = 0; i < 2; i++)
+					{
+						hdc_nop();
+					}
+				}
+				// ------------------------------------------------------
+
+				// store ---------------------------------------------
+				hdc_simd_store_thread();
+				// ------------------------------------------------------
+			}
+		}
+		fclose(file);
+
+		// printf("\n  %d\n", ll);
+		// hdc_print();
+
+		hdc_last();
+		hdc_compute();
+
+		// 294
+		hdc_init(0);
+		hdc_make_imem(SECOND_RAND_NUM);
+		hdc_start();
+		snprintf(PATH, 12, "label%d.txt", ll);
+		file = fopen(PATH, "r");
+		while (fgets(Lines, 10, file) != NULL) // 6000回ぐらい？
+		{
+			int *perm_num = image_pos(image, atoi(Lines)) + 490;
+			int index_num = 0;
+
+			for (int j = 0; j < 4; j++)
+			{
+				uint16_t core_num = CORENUM;
+
+				uint16_t addr_array[THREADS_NUM][core_num];
+				for (int k = 0; k < THREADS_NUM; k++)
+				{
+					for (int i = 0; i < core_num; i++)
+					{
+						addr_array[k][i] = index_num;
+						index_num++;
+					}
+				}
+
+				// load ---------------------------------------------
+				hdc_load_thread(THREADS_NUM, core_num, addr_array);
+				// ------------------------------------------------------
+
+				// permute ---------------------------------------------
+				for (int k = 0; k < THREADS_NUM; k++)
+				{
+					for (int i = 0; i < core_num; i++)
+					{
+						hdc_permute(*perm_num);
+						perm_num++;
+					}
+					for (int i = 0; i < 2; i++)
+					{
+						hdc_nop();
+					}
+				}
+				// ------------------------------------------------------
+
+				// store ---------------------------------------------
+				hdc_simd_store_thread();
+				// ------------------------------------------------------
+			}
+
+			// 残り
 			uint16_t core_num = CORENUM;
+			uint16_t thread_num = 1;
 
-			uint16_t addr_array[THREADS_NUM][core_num];
-			for (int k = 0; k < THREADS_NUM; k++)
+			uint16_t addr_array[thread_num][core_num];
+			for (int k = 0; k < thread_num; k++)
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					addr_array[k][i] = tmp;
+					addr_array[k][i] = index_num;
+					index_num++;
 				}
 			}
-			tmp++;
 
 			// load ---------------------------------------------
-			hdc_load_thread(THREADS_NUM, core_num, addr_array);
+			hdc_load_thread(thread_num, core_num, addr_array);
 			// ------------------------------------------------------
 
-			// perm ---------------------------------------------
-			hdc__thread(THREADS_NUM, core_num, addr_array);
-			// ------------------------------------------------------
-
-			// move ---------------------------------------------
-			hdc_simd_move_thread();
-			// ------------------------------------------------------
-
-			// load ---------------------------------------------
-			hdc_load_thread(THREADS_NUM, core_num, addr_array2);
-			// ------------------------------------------------------
-
-			// xor ---------------------------------------------
-			hdc_simd_xor_thread();
-			// ------------------------------------------------------
-		}
-	}
-
-	// SEND_NUMエポックのあまり
-	for (int j = 0; j < ALL_SEND_REMAIN; j += CORENUM * THREADS_NUM)
-	{
-		uint16_t core_num = CORENUM;
-
-		uint16_t addr_array1[THREADS_NUM][core_num];
-		uint16_t addr_array2[THREADS_NUM][core_num];
-
-		// アドレス
-		for (int k = 0; k < THREADS_NUM; k++)
-		{
-			for (int i = 0; i < core_num; i++)
+			// permute ---------------------------------------------
+			for (int k = 0; k < thread_num; k++)
 			{
-				addr_array1[k][i] = rand_array[rand_array_num++];
-				addr_array2[k][i] = rand_array[rand_array_num++];
+				for (int i = 0; i < core_num; i++)
+				{
+					hdc_permute(*perm_num);
+					perm_num++;
+				}
+				for (int i = 0; i < 2; i++)
+				{
+					hdc_nop();
+				}
 			}
+			// ------------------------------------------------------
+
+			// store ---------------------------------------------
+			hdc_store_thread(thread_num, core_num);
+			// ------------------------------------------------------
 		}
+		fclose(file);
 
-		// load ---------------------------------------------
-		hdc_load_thread(THREADS_NUM, core_num, addr_array1);
-		// ------------------------------------------------------
+		hdc_last();
+		hdc_compute();
 
-		// move ---------------------------------------------
-		hdc_simd_move_thread();
-		// ------------------------------------------------------
-
-		// load ---------------------------------------------
-		hdc_load_thread(THREADS_NUM, core_num, addr_array2);
-		// ------------------------------------------------------
-
-		// xor ---------------------------------------------
-		hdc_simd_xor_thread();
-		// ------------------------------------------------------
-	}
-
-	// 最後の余り
-	if (REMAINDAR != 0)
-	{
-		uint16_t core_num = REMAINDAR_CORENUM;
-
-		uint16_t addr_array1[THREADS_NUM][core_num];
-		uint16_t addr_array2[THREADS_NUM][core_num];
-
-		// アドレス
-		for (int k = 0; k < THREADS_NUM; k++)
+		// 結果確認
+		printf("\n  %d\n", ll);
+		for (int j = 0; j < 32; j++)
 		{
-			for (int i = 0; i < core_num; i++)
-			{
-				addr_array1[k][i] = rand_array[rand_array_num++];
-				addr_array2[k][i] = rand_array[rand_array_num++];
-			}
+			printf("  %u\n", dst[j]);
 		}
 
-		// load ---------------------------------------------
-		hdc_load_thread(THREADS_NUM, core_num, addr_array1);
-		// ------------------------------------------------------
-
-		// move ---------------------------------------------
-		hdc_move_thread(THREADS_NUM, core_num);
-		// ------------------------------------------------------
-
-		// load ---------------------------------------------
-		hdc_load_thread(THREADS_NUM, core_num, addr_array2);
-		// ------------------------------------------------------
-
-		// xor ---------------------------------------------
-		hdc_xor_thread(THREADS_NUM, core_num);
-		// ------------------------------------------------------
+		hdc_finish();
 	}
-
-	// ラスト命令
-	hdc_last();
-
-	START_COMPUTE = clock();
-	hdc_compute();
-	END_COMPUTE = clock();
-	COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
-
-	hdc_finish();
-
-	printf("\n  計算時間: %lf[s]\n", COM_TIME);
 
 	free_tensor(image);
-	free_tensor(label);
+	// free_tensor(label);
 
 	return 0;
 }
