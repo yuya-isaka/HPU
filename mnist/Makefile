@@ -1,24 +1,18 @@
 test:
 	gcc -c -DDEBUG -O3 -o hyper_vector.o hyper_vector.c
 	gcc -c -DDEBUG -O3 -o mnist.o mnist_hv.c
-	gcc -DDEBUG -O3 -o mnist mnist.o hyper_vector.o
+	gcc -DDEBUG -O3 -o mnist_bin mnist.o hyper_vector.o
 	rm hyper_vector.o mnist.o
-	./mnist
-	rm mnist
-
-default:
-	gcc -DDEBUG -O3 -o mnist mnist.c
-	./mnist
-	rm mnist
+	./mnist_bin
+	rm mnist_bin
 
 generate:
 	gcc -c -DDEBUG -O3 -o hyper_vector.o hyper_vector.c
 	gcc -c -DDEBUG -O3 -o mnist.o mnist_data_generate.c
-	gcc -DDEBUG -O3 -o mnist mnist.o hyper_vector.o
+	gcc -DDEBUG -O3 -o mnist_bin mnist.o hyper_vector.o
 	rm hyper_vector.o mnist.o
-	./mnist
-	rm mnist
-
+	./mnist_bin
+	rm mnist_bin
 
 # Petalinux Armv7
 linux:
@@ -33,4 +27,4 @@ linux:
 clean:
 	rm mnist_hv_peta mnist_hdc
 
-.PHONY: test
+.PHONY: test generate linux clean
