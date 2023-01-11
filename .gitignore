@@ -433,12 +433,8 @@ perm_and_bound_peta.s
 bound_peta.s
 bound2_peta.s
 
-
-
 .svlint.toml
 
-train-images-idx3-ubyte
-train-labels-idx1-ubyte
 mnist
 
 *.digitaljs
