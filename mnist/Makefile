@@ -1,3 +1,8 @@
+ default:
+	gcc -O3 -o mnist_bin mnist.c
+	./mnist_bin
+	rm mnist_bin
+
 test:
 	gcc -c -DDEBUG -O3 -o hyper_vector.o hyper_vector.c
 	gcc -c -DDEBUG -O3 -o mnist.o mnist_hv.c

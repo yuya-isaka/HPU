@@ -28,7 +28,7 @@ __attribute__((destructor)) static void destructor()
 
 struct tensor
 {
-	float *data;
+	int *data;
 	int cols;
 	int rows;
 };
@@ -37,8 +37,8 @@ static struct tensor *create_tensor(int rows, int cols)
 {
 	struct tensor *ret;
 	ret = malloc(sizeof(struct tensor));
-	ret->data = malloc(sizeof(float) * rows * cols);
-	memset(ret->data, 0, sizeof(float) * rows * cols);
+	ret->data = malloc(sizeof(int) * rows * cols);
+	memset(ret->data, 0, sizeof(int) * rows * cols);
 	ret->cols = cols;
 	ret->rows = rows;
 	return ret;
@@ -56,8 +56,8 @@ static struct tensor *copy_tensor(struct tensor *a)
 {
 	struct tensor *ret;
 	ret = malloc(sizeof(struct tensor));
-	ret->data = malloc(sizeof(float) * a->rows * a->cols);
-	memcpy(ret->data, a->data, sizeof(float) * a->rows * a->cols);
+	ret->data = malloc(sizeof(int) * a->rows * a->cols);
+	memcpy(ret->data, a->data, sizeof(int) * a->rows * a->cols);
 	ret->cols = a->cols;
 	ret->rows = a->rows;
 	return ret;
@@ -85,8 +85,6 @@ static struct tensor *load_image_file(const char *fn)
 
 	FILE *fp = fopen(fn, "rb");
 
-	if (fp == NULL)
-		goto end;
 	fseek(fp, 0, SEEK_END);
 
 	int sz = ftell(fp);
@@ -95,8 +93,6 @@ static struct tensor *load_image_file(const char *fn)
 	size_t DONE;
 	DONE = fread(buf, 1, 4, fp);
 	int t = buf2int(buf);
-	if (t != 0x803)
-		goto end;
 
 	DONE = fread(buf, 1, 4, fp);
 	int n = buf2int(buf);
@@ -104,8 +100,6 @@ static struct tensor *load_image_file(const char *fn)
 	int w = buf2int(buf);
 	DONE = fread(buf, 1, 4, fp);
 	int h = buf2int(buf);
-	if (h * w != 784)
-		goto end;
 
 	// printf("%d\n", n); // 60000
 	ret = create_tensor(n, 784);
@@ -114,13 +108,19 @@ static struct tensor *load_image_file(const char *fn)
 		for (int j = 0; j < 784; j++)
 		{
 			DONE = fread(buf, 1, 1, fp);
-			ret->data[i * 784 + j] = (float)(buf[0] & 255) / 255;
+			if ((int)(buf[0]) == 0)
+			{
+				ret->data[i * 784 + j] = 0;
+			}
+			else
+			{
+				ret->data[i * 784 + j] = 1;
+			}
 		}
 	}
 
-end:
-	if (fp)
-		fclose(fp);
+	fclose(fp);
+
 	return ret;
 }
 
@@ -130,8 +130,7 @@ static struct tensor *load_label_file(const char *fn)
 	char buf[4];
 
 	FILE *fp = fopen(fn, "rb");
-	if (fp == NULL)
-		goto end;
+
 	fseek(fp, 0, SEEK_END);
 	int sz = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -139,8 +138,6 @@ static struct tensor *load_label_file(const char *fn)
 	size_t DONE;
 	DONE = fread(buf, 1, 4, fp);
 	int t = buf2int(buf);
-	if (t != 0x801)
-		goto end;
 
 	DONE = fread(buf, 1, 4, fp);
 	int n = buf2int(buf);
@@ -148,15 +145,14 @@ static struct tensor *load_label_file(const char *fn)
 	for (int i = 0; i < n; i++)
 	{
 		DONE = fread(buf, 1, 1, fp);
-		ret->data[i] = (float)buf[0];
+		ret->data[i] = (int)buf[0];
 	}
-end:
-	if (fp)
-		fclose(fp);
+
+	fclose(fp);
 	return ret;
 }
 
-static void print_image(float *a)
+static void print_image(int *a)
 {
 	int w = 28;
 	int h = 28;
@@ -165,7 +161,8 @@ static void print_image(float *a)
 		for (int i = 0; i < w; i++)
 		{
 			// printf("%s", *a == 0 ? "0" : "1");
-			printf("%s", *a == 0 ? "--" : "11");
+			// printf("%s", *a == 0 ? "--" : "11");
+			printf("%d", *a);
 			a++;
 		}
 		printf("\n");
@@ -173,27 +170,9 @@ static void print_image(float *a)
 	printf("\n");
 }
 
-static int get_perm_num(float *a)
+static void print_label(int *a)
 {
-	if (*a == 0)
-	{
-		return 0;
-	}
-	else
-	{
-		return 1;
-	}
-}
-
-static void print_label(float *a)
-{
-	printf("%d\n", (int)*a);
-	printf("\n");
-}
-
-static int get_label(float *a)
-{
-	return (int)*a;
+	printf("%d\n\n", *a);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -214,28 +193,32 @@ int main()
 	for (int i = 0; i < 10; i++)
 	{
 		hv_init();
-		for (int j = 0; j < image->rows; j++) // 60000
+
+		char PATH[12];
+		snprintf(PATH, 12, "label%d.txt", i);
+		FILE *file;
+		file = fopen(PATH, "r");
+		char Lines[10];
+		// ここで作業
+		while (fgets(Lines, 10, file) != NULL)
 		{
-			if (get_label(label_pos(label, j)) == i)
+			int *perm_num = image_pos(image, atoi(Lines));
+			for (int k = 0; k < 28; k++)
 			{
-				int pos = 0;
-				for (int k = 0; k < 28; k++)
+				for (int l = 0; l < 28; l++)
 				{
-					for (int l = 0; l < 28; l++)
-					{
-						// k+lポジションが0なら0回perm, 1なら1回perm
-						hv_t *perm_result = hv_perm(item_memory[k + l], get_perm_num((image_pos(image, j) + pos)));
-						// pos更新
-						pos++;
+					// printf("perm_num: %d\n", *perm_num);
+					hv_t *perm_result = hv_perm(item_memory[k + l], *perm_num);
+					perm_num++;
 
-						// bound
-						hv_bound(perm_result);
+					// bound
+					hv_bound(perm_result);
 
-						hv_free(perm_result);
-					}
+					hv_free(perm_result);
 				}
 			}
 		}
+		fclose(file);
 
 		hv_t *result_tmp = hv_bound_result();
 		hv_copy(result[i], result_tmp);

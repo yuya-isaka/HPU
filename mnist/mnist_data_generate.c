@@ -27,7 +27,7 @@ __attribute__((destructor)) static void destructor()
 
 struct tensor
 {
-	float *data;
+	int *data;
 	int cols;
 	int rows;
 };
@@ -36,8 +36,8 @@ static struct tensor *create_tensor(int rows, int cols)
 {
 	struct tensor *ret;
 	ret = malloc(sizeof(struct tensor));
-	ret->data = malloc(sizeof(float) * rows * cols);
-	memset(ret->data, 0, sizeof(float) * rows * cols);
+	ret->data = malloc(sizeof(int) * rows * cols);
+	memset(ret->data, 0, sizeof(int) * rows * cols);
 	ret->cols = cols;
 	ret->rows = rows;
 	return ret;
@@ -102,7 +102,7 @@ static struct tensor *load_image_file(const char *fn)
 		for (int j = 0; j < 784; j++)
 		{
 			DONE = fread(buf, 1, 1, fp);
-			ret->data[i * 784 + j] = (float)(buf[0] & 255) / 255;
+			ret->data[i * 784 + j] = (int)(buf[0] & 255) / 255;
 		}
 	}
 
@@ -136,17 +136,12 @@ static struct tensor *load_label_file(const char *fn)
 	for (int i = 0; i < n; i++)
 	{
 		DONE = fread(buf, 1, 1, fp);
-		ret->data[i] = (float)buf[0];
+		ret->data[i] = (int)buf[0];
 	}
 end:
 	if (fp)
 		fclose(fp);
 	return ret;
-}
-
-static int get_label(float *a)
-{
-	return (int)*a;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -188,7 +183,7 @@ int main()
 	// for (int j = 0; j < image->rows; j++) // 60000
 	// {
 	// 	// 0 - 10
-	// 	if (get_label(label_pos(label, j)) == 1)
+	// 	if (label_pos(label, j) == 1)
 	// 	{
 	// 		fprintf(fp, "%d\n", j);
 	// 	}
