@@ -23,6 +23,7 @@ __attribute__((destructor)) static void destructor()
 
 #define image_pos(a, b) (a->data + b * 784)
 #define at(o, a, b) o->data[a * o->cols + b]
+
 #define label_pos(a, b) (a->data + b)
 
 struct tensor
@@ -51,6 +52,17 @@ static void free_tensor(struct tensor *t)
 		free(t);
 }
 
+static struct tensor *copy_tensor(struct tensor *a)
+{
+	struct tensor *ret;
+	ret = malloc(sizeof(struct tensor));
+	ret->data = malloc(sizeof(int) * a->rows * a->cols);
+	memcpy(ret->data, a->data, sizeof(int) * a->rows * a->cols);
+	ret->cols = a->cols;
+	ret->rows = a->rows;
+	return ret;
+}
+
 static int buf2int(char *buf_)
 {
 	int ret;
@@ -73,8 +85,6 @@ static struct tensor *load_image_file(const char *fn)
 
 	FILE *fp = fopen(fn, "rb");
 
-	if (fp == NULL)
-		goto end;
 	fseek(fp, 0, SEEK_END);
 
 	int sz = ftell(fp);
@@ -83,8 +93,6 @@ static struct tensor *load_image_file(const char *fn)
 	size_t DONE;
 	DONE = fread(buf, 1, 4, fp);
 	int t = buf2int(buf);
-	if (t != 0x803)
-		goto end;
 
 	DONE = fread(buf, 1, 4, fp);
 	int n = buf2int(buf);
@@ -92,8 +100,6 @@ static struct tensor *load_image_file(const char *fn)
 	int w = buf2int(buf);
 	DONE = fread(buf, 1, 4, fp);
 	int h = buf2int(buf);
-	if (h * w != 784)
-		goto end;
 
 	// printf("%d\n", n); // 60000
 	ret = create_tensor(n, 784);
@@ -102,13 +108,19 @@ static struct tensor *load_image_file(const char *fn)
 		for (int j = 0; j < 784; j++)
 		{
 			DONE = fread(buf, 1, 1, fp);
-			ret->data[i * 784 + j] = (int)(buf[0] & 255) / 255;
+			if ((int)(buf[0]) == 0)
+			{
+				ret->data[i * 784 + j] = 0;
+			}
+			else
+			{
+				ret->data[i * 784 + j] = 1;
+			}
 		}
 	}
 
-end:
-	if (fp)
-		fclose(fp);
+	fclose(fp);
+
 	return ret;
 }
 
@@ -118,8 +130,7 @@ static struct tensor *load_label_file(const char *fn)
 	char buf[4];
 
 	FILE *fp = fopen(fn, "rb");
-	if (fp == NULL)
-		goto end;
+
 	fseek(fp, 0, SEEK_END);
 	int sz = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -127,8 +138,6 @@ static struct tensor *load_label_file(const char *fn)
 	size_t DONE;
 	DONE = fread(buf, 1, 4, fp);
 	int t = buf2int(buf);
-	if (t != 0x801)
-		goto end;
 
 	DONE = fread(buf, 1, 4, fp);
 	int n = buf2int(buf);
@@ -138,16 +147,34 @@ static struct tensor *load_label_file(const char *fn)
 		DONE = fread(buf, 1, 1, fp);
 		ret->data[i] = (int)buf[0];
 	}
-end:
-	if (fp)
-		fclose(fp);
+
+	fclose(fp);
 	return ret;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+static void print_image(int *a)
+{
+	int w = 28;
+	int h = 28;
+	for (int j = 0; j < h; j++)
+	{
+		for (int i = 0; i < w; i++)
+		{
+			// printf("%s", *a == 0 ? "0" : "1");
+			// printf("%s", *a == 0 ? "--" : "11");
+			printf("%d", *a);
+			a++;
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
 
-// ファイル読み込み
-// 読み込めているかチェック
+static void print_label(int *a)
+{
+	printf("%d\n\n", *a);
+}
+
 int read_file(const char *PATH)
 {
 	FILE *file;

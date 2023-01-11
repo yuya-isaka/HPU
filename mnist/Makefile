@@ -1,5 +1,5 @@
  default:
-	gcc -O3 -o mnist_bin mnist.c
+	gcc -O3 -o mnist_bin mnist_check.c
 	./mnist_bin
 	rm mnist_bin
 

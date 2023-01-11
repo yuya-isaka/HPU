@@ -160,8 +160,6 @@ static void print_image(int *a)
 	{
 		for (int i = 0; i < w; i++)
 		{
-			// printf("%s", *a == 0 ? "0" : "1");
-			// printf("%s", *a == 0 ? "--" : "11");
 			printf("%d", *a);
 			a++;
 		}
@@ -179,7 +177,8 @@ static void print_label(int *a)
 
 int main()
 {
-	// load
+	// image->rows = 60000
+	// image->cols = 784
 	struct tensor *image = load_image_file(TRAIN_IMAGE);
 	struct tensor *label = load_label_file(TRAIN_LABEL);
 

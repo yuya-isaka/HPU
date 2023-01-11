@@ -82,8 +82,6 @@ static struct tensor *load_image_file(const char *fn)
 
 	FILE *fp = fopen(fn, "rb");
 
-	if (fp == NULL)
-		goto end;
 	fseek(fp, 0, SEEK_END);
 
 	int sz = ftell(fp);
@@ -92,8 +90,6 @@ static struct tensor *load_image_file(const char *fn)
 	size_t DONE;
 	DONE = fread(buf, 1, 4, fp);
 	int t = buf2int(buf);
-	if (t != 0x803)
-		goto end;
 
 	DONE = fread(buf, 1, 4, fp);
 	int n = buf2int(buf);
@@ -101,8 +97,6 @@ static struct tensor *load_image_file(const char *fn)
 	int w = buf2int(buf);
 	DONE = fread(buf, 1, 4, fp);
 	int h = buf2int(buf);
-	if (h * w != 784)
-		goto end;
 
 	// printf("%d\n", n); // 60000
 	ret = create_tensor(n, 784);
@@ -119,13 +113,11 @@ static struct tensor *load_image_file(const char *fn)
 			{
 				ret->data[i * 784 + j] = 1;
 			}
-			// ret->data[i * 784 + j] = (float)(buf[0] & 255) / 255;
 		}
 	}
 
-end:
-	if (fp)
-		fclose(fp);
+	fclose(fp);
+
 	return ret;
 }
 
@@ -135,8 +127,7 @@ static struct tensor *load_label_file(const char *fn)
 	char buf[4];
 
 	FILE *fp = fopen(fn, "rb");
-	if (fp == NULL)
-		goto end;
+
 	fseek(fp, 0, SEEK_END);
 	int sz = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -144,8 +135,6 @@ static struct tensor *load_label_file(const char *fn)
 	size_t DONE;
 	DONE = fread(buf, 1, 4, fp);
 	int t = buf2int(buf);
-	if (t != 0x801)
-		goto end;
 
 	DONE = fread(buf, 1, 4, fp);
 	int n = buf2int(buf);
@@ -155,9 +144,8 @@ static struct tensor *load_label_file(const char *fn)
 		DONE = fread(buf, 1, 1, fp);
 		ret->data[i] = (int)buf[0];
 	}
-end:
-	if (fp)
-		fclose(fp);
+
+	fclose(fp);
 	return ret;
 }
 
