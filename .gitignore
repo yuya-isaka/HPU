@@ -436,3 +436,7 @@ bound2_peta.s
 .svlint.toml
 
 *.digitaljs
+
+mnist_bin
+mnist_hdc
+mnist_hv_peta
