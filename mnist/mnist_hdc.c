@@ -43,17 +43,6 @@ static void free_tensor(struct tensor *t)
 		free(t);
 }
 
-static struct tensor *copy_tensor(struct tensor *a)
-{
-	struct tensor *ret;
-	ret = malloc(sizeof(struct tensor));
-	ret->data = malloc(sizeof(int) * a->rows * a->cols);
-	memcpy(ret->data, a->data, sizeof(int) * a->rows * a->cols);
-	ret->cols = a->cols;
-	ret->rows = a->rows;
-	return ret;
-}
-
 static int buf2int(char *buf_)
 {
 	int ret;
@@ -291,6 +280,8 @@ int main()
 				hdc_simd_store_thread();
 				// ------------------------------------------------------
 			}
+			printf("perm_num: %d\n", *perm_num);
+			printf("index_num: %d\n", index_num);
 
 			// 残り
 			uint16_t core_num = CORENUM;

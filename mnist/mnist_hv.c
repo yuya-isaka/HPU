@@ -180,7 +180,7 @@ int main()
 	// image->rows = 60000
 	// image->cols = 784
 	struct tensor *image = load_image_file(TRAIN_IMAGE);
-	struct tensor *label = load_label_file(TRAIN_LABEL);
+	// struct tensor *label = load_label_file(TRAIN_LABEL);
 
 	// 784個のハイパーベクトルを生成し格納
 	const uint32_t RAND_NUM = image->cols;
@@ -203,28 +203,24 @@ int main()
 		{
 			int *perm_num = image_pos(image, atoi(Lines));
 			int index_num = 0;
-			for (int k = 0; k < 28; k++)
+			for (int k = 0; k < image->cols; k++)
 			{
-				for (int l = 0; l < 28; l++)
-				{
-					// printf("perm_num: %d\n", *perm_num);
-					hv_t *perm_result = hv_perm(item_memory[index_num], *perm_num);
-					index_num++;
-					perm_num++;
+				hv_t *perm_result = hv_perm(item_memory[index_num], *perm_num);
+				index_num++;
+				perm_num++;
 
-					// bound
-					hv_bound(perm_result);
+				// bound
+				hv_bound(perm_result);
 
-					hv_free(perm_result);
-				}
+				hv_free(perm_result);
 			}
 		}
 		fclose(file);
 
 		hv_t *result_tmp = hv_bound_result();
 		hv_copy(result[i], result_tmp);
-
 		hv_free(result_tmp);
+
 		hv_finish();
 	}
 
@@ -239,7 +235,7 @@ int main()
 	hv_free_array(item_memory, RAND_NUM);
 
 	free_tensor(image);
-	free_tensor(label);
+	// free_tensor(label);
 
 	return 0;
 }
