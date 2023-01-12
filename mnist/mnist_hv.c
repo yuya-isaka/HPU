@@ -203,6 +203,7 @@ int main()
 		{
 			int *perm_num = image_pos(image, atoi(Lines));
 			int index_num = 0;
+
 			for (int k = 0; k < image->cols; k++)
 			{
 				hv_t *perm_result = hv_perm(item_memory[index_num], *perm_num);
@@ -211,7 +212,6 @@ int main()
 
 				// bound
 				hv_bound(perm_result);
-
 				hv_free(perm_result);
 			}
 		}
