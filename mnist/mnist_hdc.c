@@ -335,7 +335,7 @@ int main()
 		hdc_compute();
 
 		// 結果確認
-		printf("\n  %d\n", ll);
+		printf("\n%d:\n", ll);
 		for (int j = 0; j < 32; j++)
 		{
 			printf("  %u\n", dst[j]);
@@ -347,5 +347,6 @@ int main()
 	free_tensor(image);
 	// free_tensor(label);
 
+	printf("\n\n\n");
 	return 0;
 }

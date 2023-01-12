@@ -202,12 +202,14 @@ int main()
 		while (fgets(Lines, 10, file) != NULL)
 		{
 			int *perm_num = image_pos(image, atoi(Lines));
+			int index_num = 0;
 			for (int k = 0; k < 28; k++)
 			{
 				for (int l = 0; l < 28; l++)
 				{
 					// printf("perm_num: %d\n", *perm_num);
-					hv_t *perm_result = hv_perm(item_memory[k + l], *perm_num);
+					hv_t *perm_result = hv_perm(item_memory[index_num], *perm_num);
+					index_num++;
 					perm_num++;
 
 					// bound
