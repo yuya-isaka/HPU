@@ -117,6 +117,20 @@ void hdc_make_imem(const int RANNUM)
 		;
 }
 
+void hdc_make_imem_2(const int RANNUM)
+{
+	// item_memory_num (乱数の数)
+	top[0x01] = RANNUM - 1;
+
+	// gen <- 1;
+	// run <- 1;
+	top[0x00] = 3;
+
+	// 乱数生成終了を待つ
+	while (top[0x00] == 0x3)
+		;
+}
+
 // DMAリセット
 void hdc_dma_reset(void)
 {

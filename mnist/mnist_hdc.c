@@ -183,11 +183,11 @@ int main()
 
 	// メモリセットアップ
 	hdc_setup();
-	hdc_make_imem(FIRST_RAND_NUM);
 
 	for (int ll = 0; ll < 10; ll++)
 	{
 		// 490
+		hdc_make_imem(FIRST_RAND_NUM);
 		hdc_init(0);
 		hdc_start();
 
@@ -241,16 +241,12 @@ int main()
 		}
 		fclose(file);
 
-		// printf("\n  %d\n", ll);
-		// hdc_print();
-
 		hdc_last();
 		hdc_compute();
 
 		// 294
+		hdc_make_imem_2(SECOND_RAND_NUM);
 		hdc_init(0);
-		hdc_make_imem(SECOND_RAND_NUM);
-		hdc_start();
 		snprintf(PATH, 12, "label%d.txt", ll);
 		file = fopen(PATH, "r");
 		while (fgets(Lines, 10, file) != NULL) // 6000回ぐらい？

@@ -21,6 +21,8 @@ extern void hdc_setup(void);
 
 extern void hdc_make_imem(const int RANNUM);
 
+extern void hdc_make_imem_2(const int RANNUM);
+
 extern void hdc_init(const int N);
 
 extern void hdc_start(void);
