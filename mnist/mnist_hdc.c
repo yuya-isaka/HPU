@@ -10,6 +10,7 @@
 #include "hdc_processor.h"
 
 #define TRAIN_IMAGE "train-images-idx3-ubyte"
+#define TRAIN_IMAGE_NEW "mnist_image.bin"
 #define TRAIN_LABEL "train-labels-idx1-ubyte"
 
 #define image_pos(a, b) (a->data + b * 784)
@@ -104,6 +105,29 @@ static struct tensor *load_image_file(const char *fn)
 	return ret;
 }
 
+static struct tensor *load_image_file_new(const char *fn)
+{
+	struct tensor *ret = NULL;
+	char buf;
+
+	FILE *fp = fopen(fn, "rb");
+
+	fseek(fp, 0, SEEK_SET);
+
+	ret = create_tensor(60000, 784);
+	for (int i = 0; i < 60000; i++)
+	{
+		for (int j = 0; j < 784; j++)
+		{
+			size_t DONE = fread(&buf, 1, 1, fp);
+			ret->data[i * 784 + j] = (int)(buf);
+		}
+	}
+
+	fclose(fp);
+	return ret;
+}
+
 static struct tensor *load_label_file(const char *fn)
 {
 	struct tensor *ret = NULL;
@@ -157,10 +181,19 @@ static void print_label(int *a)
 
 int main()
 {
+	double LOAD_TIME = 0.0;
+	double COM_TIME = 0.0;
+	clock_t START_COMPUTE;
+	clock_t END_COMPUTE;
+
+	START_COMPUTE = clock();
 	// image->rows = 60000
 	// image->cols = 784
-	struct tensor *image = load_image_file(TRAIN_IMAGE);
+	// struct tensor *image = load_image_file(TRAIN_IMAGE);
+	struct tensor *image = load_image_file_new(TRAIN_IMAGE_NEW);
 	// struct tensor *label = load_label_file(TRAIN_LABEL);
+	END_COMPUTE = clock();
+	LOAD_TIME = ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 	// 784個のハイパーベクトルを生成し格納
 	const uint32_t RAND_NUM = image->cols;
@@ -231,7 +264,10 @@ int main()
 		fclose(file);
 
 		hdc_last();
+		START_COMPUTE = clock();
 		hdc_compute();
+		END_COMPUTE = clock();
+		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 		// 294
 		hdc_make_imem_2(SECOND_RAND_NUM);
@@ -328,7 +364,10 @@ int main()
 		fclose(file);
 
 		hdc_last();
+		START_COMPUTE = clock();
 		hdc_compute();
+		END_COMPUTE = clock();
+		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 		// 結果確認
 		printf("\n%d:\n", ll);
@@ -342,6 +381,9 @@ int main()
 
 	free_tensor(image);
 	// free_tensor(label);
+
+	printf("  load時間: %lf[ms]\n", LOAD_TIME);
+	printf("  計算時間: %lf[ms]", COM_TIME);
 
 	printf("\n\n\n");
 	return 0;

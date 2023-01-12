@@ -19,6 +19,7 @@ __attribute__((destructor)) static void destructor()
 #endif
 
 #define TRAIN_IMAGE "train-images-idx3-ubyte"
+#define TRAIN_IMAGE_NEW "mnist_image.bin"
 #define TRAIN_LABEL "train-labels-idx1-ubyte"
 
 #define image_pos(a, b) (a->data + b * 784)
@@ -124,6 +125,29 @@ static struct tensor *load_image_file(const char *fn)
 	return ret;
 }
 
+static struct tensor *load_image_file_new(const char *fn)
+{
+	struct tensor *ret = NULL;
+	char buf;
+
+	FILE *fp = fopen(fn, "rb");
+
+	fseek(fp, 0, SEEK_SET);
+
+	ret = create_tensor(60000, 784);
+	for (int i = 0; i < 60000; i++)
+	{
+		for (int j = 0; j < 784; j++)
+		{
+			size_t DONE = fread(&buf, 1, 1, fp);
+			ret->data[i * 784 + j] = (int)(buf);
+		}
+	}
+
+	fclose(fp);
+	return ret;
+}
+
 static struct tensor *load_label_file(const char *fn)
 {
 	struct tensor *ret = NULL;
@@ -179,7 +203,7 @@ int main()
 {
 	// image->rows = 60000
 	// image->cols = 784
-	struct tensor *image = load_image_file(TRAIN_IMAGE);
+	struct tensor *image = load_image_file_new(TRAIN_IMAGE_NEW);
 	// struct tensor *label = load_label_file(TRAIN_LABEL);
 
 	// 784個のハイパーベクトルを生成し格納

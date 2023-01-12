@@ -101,6 +101,10 @@ static struct tensor *load_image_file(const char *fn)
 	DONE = fread(buf, 1, 4, fp);
 	int h = buf2int(buf);
 
+	FILE *file = fopen("mnist_image.bin", "wb");
+	int save_buf_zero = 0;
+	int save_buf_one = 1;
+
 	// printf("%d\n", n); // 60000
 	ret = create_tensor(n, 784);
 	for (int i = 0; i < n; i++)
@@ -111,15 +115,18 @@ static struct tensor *load_image_file(const char *fn)
 			if ((int)(buf[0]) == 0)
 			{
 				ret->data[i * 784 + j] = 0;
+				fwrite(&save_buf_zero, 1, 1, file);
 			}
 			else
 			{
 				ret->data[i * 784 + j] = 1;
+				fwrite(&save_buf_one, 1, 1, file);
 			}
 		}
 	}
 
 	fclose(fp);
+	fclose(file);
 
 	return ret;
 }
