@@ -12,12 +12,9 @@ test:
 	rm mnist_bin
 
 generate:
-	gcc -c -DDEBUG -O3 -o hyper_vector.o hyper_vector.c
-	gcc -c -DDEBUG -O3 -o mnist.o mnist_data_generate.c
-	gcc -DDEBUG -O3 -o mnist_bin mnist.o hyper_vector.o
-	rm hyper_vector.o mnist.o
-	./mnist_bin
-	rm mnist_bin
+	gcc -DDEBUG -O3 -o isolet_bin isolet_generate.c
+	./isolet_bin
+	rm isolet_bin
 
 # Petalinux Armv7
 linux:

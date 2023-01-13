@@ -209,10 +209,12 @@ int main()
 	// image->cols = 784
 	struct tensor *image = load_image_file(TRAIN_IMAGE);
 	struct tensor *label = load_label_file(TRAIN_LABEL);
-	FILE *fp;
+
+	//////////////////////////////////////////////////////////////////////////////////////////////
 
 	// // 生成
 	// // 0 - 10
+	// FILE *fp;
 	// fp = fopen("label1.txt", "w");
 	// for (int j = 0; j < image->rows; j++) // 60000
 	// {
@@ -224,18 +226,19 @@ int main()
 	// }
 	// fclose(fp);
 
-	int all_num = 0;
-	for (int i = 0; i < 10; i++)
-	{
-		char buf[12];
-		snprintf(buf, 12, "label%d.txt", i);
-		printf("%s\n", buf);
+	//////////////////////////////////////////////////////////////////////////////////////////////
 
-		int num = read_file(buf);
-		all_num += num;
-	}
+	// int all_num = 0;
+	// for (int i = 0; i < 10; i++)
+	// {
+	// 	char buf[12];
+	// 	snprintf(buf, 12, "label%d.txt", i);
+	// 	printf("%s\n", buf);
 
-	printf("\nall_num: %d\n\n", all_num);
+	// 	int num = read_file(buf);
+	// 	all_num += num;
+	// }
+	// printf("\nall_num: %d\n\n", all_num);
 
 	free_tensor(image);
 	free_tensor(label);

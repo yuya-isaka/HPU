@@ -201,10 +201,18 @@ static void print_label(int *a)
 
 int main()
 {
+	double LOAD_TIME = 0.0;
+	double COM_TIME = 0.0;
+	clock_t START_COMPUTE;
+	clock_t END_COMPUTE;
+
+	START_COMPUTE = clock();
 	// image->rows = 60000
 	// image->cols = 784
 	struct tensor *image = load_image_file_new(TRAIN_IMAGE_NEW);
+	END_COMPUTE = clock();
 	// struct tensor *label = load_label_file(TRAIN_LABEL);
+	LOAD_TIME = ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 	// 784個のハイパーベクトルを生成し格納
 	const uint32_t RAND_NUM = image->cols;
@@ -260,6 +268,8 @@ int main()
 
 	free_tensor(image);
 	// free_tensor(label);
+
+	printf("  load時間: %lf[ms]\n", LOAD_TIME);
 
 	return 0;
 }

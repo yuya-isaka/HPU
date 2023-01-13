@@ -29,8 +29,10 @@ int main(void)
 		return 1;
 	}
 
-	// ここにCSVデータの読み込み処理
-	char Lines[10000];
+	int train_data[26]
+
+		// ここにCSVデータの読み込み処理
+		char Lines[10000];
 	// ここで作業
 	while (fgets(Lines, 10000, file) != NULL)
 	{
