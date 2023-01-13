@@ -1,37 +1,17 @@
- default:
-	gcc -O3 -o mnist_bin mnist_check.c
-	./mnist_bin
-	rm mnist_bin
-
 test:
 	gcc -c -DHV64 -O3 -o hyper_vector.o hyper_vector.c
 	gcc -c -DHV64 -O3 -o mnist.o mnist_hv.c
 	gcc -DHV64 -O3 -o mnist_bin mnist.o hyper_vector.o
 	rm hyper_vector.o mnist.o
-	./mnist_bin
-	rm mnist_bin
 
-omp-mac:
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -DHV64 -o mnist.o mnist_hv.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -DHV64 -o mnist_bin mnist.o hyper_vector.o
-	rm hyper_vector.o mnist.o
-	./mnist_bin
-	rm mnist_bin
-
-omp-intel:
+omp:
 	gcc -fopenmp -DOPENMP -c -DHV64 -O3 -o hyper_vector.o hyper_vector.c
 	gcc -fopenmp -DOPENMP -c -DHV64 -O3 -o mnist.o mnist_hv.c
 	gcc -fopenmp -DOPENMP -DHV64 -O3 -o mnist_bin mnist.o hyper_vector.o
 	rm hyper_vector.o mnist.o
-	./mnist_bin
-	rm mnist_bin
 
 generate:
-	gcc -c -DDEBUG -O3 -o hyper_vector.o hyper_vector.c
-	gcc -c -DDEBUG -O3 -o mnist.o mnist_data_generate.c
-	gcc -DDEBUG -O3 -o mnist_bin mnist.o hyper_vector.o
-	rm hyper_vector.o mnist.o
+	gcc -DDEBUG -O3 -o mnist_bin mnist_data_generate.c
 	./mnist_bin
 	rm mnist_bin
 
@@ -48,4 +28,4 @@ linux:
 clean:
 	rm mnist_hv_peta mnist_hdc
 
-.PHONY: test generate linux clean
+.PHONY: test omp generate linux clean
