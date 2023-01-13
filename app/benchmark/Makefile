@@ -1,4 +1,4 @@
-default:
+test:
 	gcc -c -O3 -DHV64 -o hyper_vector.o hyper_vector.c
 	gcc -c -O3 -DHV64 -o bind.o bind.c
 	gcc -O3 -DHV64 -o bind bind.o hyper_vector.o
@@ -14,7 +14,7 @@ default:
 	gcc -O3 -DHV64 -o perm_bound perm_bound.o hyper_vector.o
 	rm hyper_vector.o bind.o perm.o bound.o random.o bind_bound.o perm_bound.o
 
-intel-omp:
+omp:
 	gcc -fopenmp -c -O3 -march=native -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
 	gcc -fopenmp -c -O3 -march=native -DOPENMP -DHV64 -o bind.o bind.c
 	gcc -fopenmp -O3 -march=native -DOPENMP -DHV64 -o bind bind.o hyper_vector.o
@@ -29,18 +29,6 @@ intel-omp:
 	gcc -fopenmp -c -O3 -march=native -DOPENMP -DHV64 -o perm_bound.o perm_bound.c
 	gcc -fopenmp -O3 -march=native -DOPENMP -DHV64 -o perm_bound perm_bound.o hyper_vector.o
 	rm hyper_vector.o bind.o perm.o bound.o random.o bind_bound.o perm_bound.o
-
-omp:
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o hyper_vector.o hyper_vector.c
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o bind.o bind.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o bind bind.o hyper_vector.o
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o perm.o perm.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o perm perm.o hyper_vector.o
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o bound.o bound.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o bound bound.o hyper_vector.o
-	gcc -I/opt/homebrew/include -Xpreprocessor -fopenmp -c -O3 -mcpu=apple-m1 -DOPENMP -o random.o random.c
-	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -O3 -mcpu=apple-m1 -DOPENMP -o random random.o hyper_vector.o
-	rm hyper_vector.o bind.o perm.o bound.o random.o
 
 linux:
 	arm-linux-gnueabihf-gcc -c -O3 -o hyper_vector.o hyper_vector.c
@@ -61,4 +49,4 @@ linux:
 clean:
 	rm -f bind_peta perm_peta bound_peta random_peta bind_bound_peta perm_bound_peta bind perm bound random bind_bound perm_bound
 
-.PHONY: default omp linux clean
+.PHONY: test omp linux clean
