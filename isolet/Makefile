@@ -6,7 +6,7 @@ test:
 	./isolet_bin
 	rm isolet_bin
 
-test:
+omp:
 	gcc -fopenmp -DOPENMP -c -DHV64 -O3 -o hyper_vector.o hyper_vector.c
 	gcc -fopenmp -DOPENMP -c -DHV64 -O3 -o isolet.o isolet_hv.c
 	gcc -fopenmp -DOPENMP -DHV64 -O3 -o isolet_bin isolet.o hyper_vector.o
