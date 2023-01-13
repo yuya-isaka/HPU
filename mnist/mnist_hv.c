@@ -243,7 +243,6 @@ int main()
 			data_lines[data_tmp_num++] = atoi(Lines);
 		}
 
-		// // ここで作業
 // OpenMP
 #ifdef OPENMP
 #pragma omp parallel for
