@@ -272,14 +272,19 @@ int main()
 {
 	// // image->rows = 60000
 	// // image->cols = 784
-	// struct tensor *image = load_image_file(TRAIN_IMAGE);
-	// struct tensor *label = load_label_file(TRAIN_LABEL);
-
-	load_image_file_2(TRAIN_IMAGE);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
-	// // 生成
+	// // mnist_image.bin生成
+	// struct tensor *image = load_image_file(TRAIN_IMAGE);
+	// struct tensor *label = load_label_file(TRAIN_LABEL);
+
+	// // image0 - image10.txt生成
+	// 	load_image_file_2(TRAIN_IMAGE);
+
+	//////////////////////////////////////////////////////////////////////////////////////////////
+
+	// // label0 - label10.txt生成
 	// // 0 - 10
 	// FILE *fp;
 	// fp = fopen("label1.txt", "w");
@@ -295,6 +300,7 @@ int main()
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
+	// // 読み込みチェック
 	// int all_num = 0;
 	// for (int i = 0; i < 10; i++)
 	// {
