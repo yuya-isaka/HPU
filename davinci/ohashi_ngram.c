@@ -46,6 +46,7 @@ int main(int argc, char const *argv[])
 	hdc_make_imem(27);
 	// hv -----------------------------
 
+	double LOAD_TIME = 0.0;
 	double COM_TIME = 0.0;
 	clock_t START_COMPUTE;
 	clock_t END_COMPUTE;
@@ -60,6 +61,7 @@ int main(int argc, char const *argv[])
 		hdc_init(0);
 		hdc_start();
 
+		START_COMPUTE = clock();
 		const char *path = train_path[l];
 		FILE *file;
 		file = fopen(path, "r");
@@ -74,6 +76,8 @@ int main(int argc, char const *argv[])
 		char *content = (char *)calloc(num, sizeof(char));
 		size_t done = fread(content, sizeof(char), num, file);
 		fclose(file);
+		END_COMPUTE = clock();
+		LOAD_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 		// NGRAMの数
 		const int ALL_NGRAM = num - NGRAM + 1;
@@ -410,6 +414,7 @@ int main(int argc, char const *argv[])
 	}
 
 	printf("\n  計算時間: %lf[ms]\n", COM_TIME);
+	printf("\n  ロード時間: %lf[ms]\n", LOAD_TIME);
 
 	// puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
 	return 0;
