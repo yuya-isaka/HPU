@@ -6,6 +6,11 @@
 #include <time.h>
 #include "hyper_vector.h"
 
+// OpenMP
+#ifdef OPENMP
+#include <omp.h>
+#endif
+
 // Mac
 #ifdef __MACH__
 // Debug
@@ -230,10 +235,22 @@ int main()
 		FILE *file;
 		file = fopen(PATH, "r");
 		char Lines[10];
-		// ここで作業
+
+		int data_tmp_num = 0;
+		int data_lines[10000];
 		while (fgets(Lines, 10, file) != NULL)
 		{
-			int *perm_num = image_pos(image, atoi(Lines));
+			data_lines[data_tmp_num++] = atoi(Lines);
+		}
+
+		// // ここで作業
+// OpenMP
+#ifdef OPENMP
+#pragma omp parallel for
+#endif
+		for (int j = 0; j < data_tmp_num; j++)
+		{
+			int *perm_num = image_pos(image, data_lines[j]);
 			int index_num = 0;
 
 			for (int k = 0; k < image->cols; k++)

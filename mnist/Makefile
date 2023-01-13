@@ -4,9 +4,25 @@
 	rm mnist_bin
 
 test:
-	gcc -c -DDEBUG -O3 -o hyper_vector.o hyper_vector.c
-	gcc -c -DDEBUG -O3 -o mnist.o mnist_hv.c
-	gcc -DDEBUG -O3 -o mnist_bin mnist.o hyper_vector.o
+	gcc -c -DHV64 -O3 -o hyper_vector.o hyper_vector.c
+	gcc -c -DHV64 -O3 -o mnist.o mnist_hv.c
+	gcc -DHV64 -O3 -o mnist_bin mnist.o hyper_vector.o
+	rm hyper_vector.o mnist.o
+	./mnist_bin
+	rm mnist_bin
+
+omp-mac:
+	gcc -I/opt/homebrew/include -Xpreprocessor -mcpu=apple-m1 -fopenmp -DOPENMP -c -DHV64 -O3 -o hyper_vector.o hyper_vector.c
+	gcc -I/opt/homebrew/include -Xpreprocessor -mcpu=apple-m1 -fopenmp -DOPENMP -c -DHV64 -O3 -o mnist.o mnist_hv.c
+	gcc -I/opt/homebrew/include -L/opt/homebrew/lib -Xpreprocessor -fopenmp -lomp -mcpu=apple-m1 -DOPENMP -DHV64 -O3 -o mnist_bin mnist.o hyper_vector.o
+	rm hyper_vector.o mnist.o
+	./mnist_bin
+	rm mnist_bin
+
+omp-intel:
+	gcc -fopenmp -DOPENMP -c -DHV64 -O3 -o hyper_vector.o hyper_vector.c
+	gcc -fopenmp -DOPENMP -c -DHV64 -O3 -o mnist.o mnist_hv.c
+	gcc -fopenmp -DOPENMP -DHV64 -O3 -o mnist_bin mnist.o hyper_vector.o
 	rm hyper_vector.o mnist.o
 	./mnist_bin
 	rm mnist_bin
