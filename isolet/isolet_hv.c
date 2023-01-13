@@ -2,58 +2,30 @@
 #include <string.h>
 #include <stdlib.h>
 
-void trim(char *text)
-{
-	int i = 0, j = 0;
-
-	while (*(text + i) != '\0')
-	{
-		if (*(text + i) != ' ')
-		{
-			*(text + j) = *(text + i);
-			j++;
-		}
-		i++;
-	}
-	*(text + j) = '\0';
-}
-
 int main(void)
 {
-	// CSVファイル（data.csv）を開く
-	FILE *file = fopen("isolet.data", "rt");
-	if (!file)
+	for (int i = 0; i < 10; i++)
 	{
-		// 開くのに失敗したらエラーを出力する
-		perror("fopen");
-		return 1;
-	}
+		char PATH[12];
+		snprintf(PATH, 12, "label%d.txt", i);
+		FILE *file;
+		file = fopen(PATH, "r");
+		char lines[3];
 
-	// ここにCSVデータの読み込み処理
-	char Lines[10000];
-	// ここで作業
-	while (fgets(Lines, 10000, file) != NULL)
-	{
-		/* 最初に見つかった区切り文字（","）に "\0" を挿入する */
-		trim(Lines);
-		char *tp = strtok(Lines, ",");
-		int tmp_num = 0;
-		while ((tp = strtok(NULL, ",")))
+		int data_tmp_num = 0;
+		int data_lines[150000];
+		while (fgets(lines, 3, file) != NULL)
 		{
-			tmp_num++;
-			if (tmp_num == 617)
-			{
-				printf("Number: %d\n", atoi(tp));
-			}
-			else
-			{
-				printf("%s\n", tp);
-			}
+			data_lines[data_tmp_num++] = atoi(lines);
 		}
-	}
+		fclose(file);
 
-	// 使い終わったらファイルを閉じる
-	fclose(file);
+		printf("%d\n", data_tmp_num);
+		// for (int j = 0; j < data_tmp_num; j++)
+		// {
+		// 	printf("%d", data_lines[j]);
+		// }
+	}
 
 	return 0;
 }
