@@ -131,6 +131,71 @@ static struct tensor *load_image_file(const char *fn)
 	return ret;
 }
 
+static void load_image_file_2(const char *fn)
+{
+	struct tensor *ret = NULL;
+	char buf[4];
+
+	FILE *fp = fopen(fn, "rb");
+
+	fseek(fp, 0, SEEK_END);
+
+	int sz = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	size_t DONE;
+	DONE = fread(buf, 1, 4, fp);
+	int t = buf2int(buf);
+
+	DONE = fread(buf, 1, 4, fp);
+	int n = buf2int(buf);
+	DONE = fread(buf, 1, 4, fp);
+	int w = buf2int(buf);
+	DONE = fread(buf, 1, 4, fp);
+	int h = buf2int(buf);
+
+	for (int ll = 0; ll < 10; ll++)
+	{
+		char PATH[12];
+		snprintf(PATH, 12, "label%d.txt", ll);
+		FILE *file;
+		file = fopen(PATH, "r");
+		char Lines[10];
+
+		char PATH_NEW[12];
+		snprintf(PATH_NEW, 12, "image%d.txt", ll);
+		FILE *file_new;
+		file_new = fopen(PATH_NEW, "w");
+
+		while (fgets(Lines, 10, file) != NULL) // 6000回ぐらい？
+		{
+			// printf("%d\n", n); // 60000
+			for (int i = 0; i < n; i++)
+			{
+				if (atoi(Lines) == i)
+				{
+					for (int j = 0; j < 784; j++)
+					{
+						DONE = fread(buf, 1, 1, fp);
+						if ((int)(buf[0]) == 0)
+						{
+							fprintf(file_new, "%d\n", 0);
+						}
+						else
+						{
+							fprintf(file_new, "%d\n", 1);
+						}
+					}
+				}
+			}
+		}
+		fclose(file);
+	}
+
+	fclose(fp);
+	return;
+}
+
 static struct tensor *load_label_file(const char *fn)
 {
 	struct tensor *ret = NULL;
@@ -205,10 +270,12 @@ int read_file(const char *PATH)
 
 int main()
 {
-	// image->rows = 60000
-	// image->cols = 784
-	struct tensor *image = load_image_file(TRAIN_IMAGE);
-	struct tensor *label = load_label_file(TRAIN_LABEL);
+	// // image->rows = 60000
+	// // image->cols = 784
+	// struct tensor *image = load_image_file(TRAIN_IMAGE);
+	// struct tensor *label = load_label_file(TRAIN_LABEL);
+
+	load_image_file_2(TRAIN_IMAGE);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -240,8 +307,8 @@ int main()
 	// }
 	// printf("\nall_num: %d\n\n", all_num);
 
-	free_tensor(image);
-	free_tensor(label);
+	// free_tensor(image);
+	// free_tensor(label);
 
 	return 0;
 }
