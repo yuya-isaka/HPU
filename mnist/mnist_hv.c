@@ -235,13 +235,14 @@ int main()
 		FILE *file;
 		file = fopen(PATH, "r");
 		char Lines[10];
-
+		// ↓
 		int data_tmp_num = 0;
 		int data_lines[10000];
 		while (fgets(Lines, 10, file) != NULL)
 		{
 			data_lines[data_tmp_num++] = atoi(Lines);
 		}
+		fclose(file);
 
 // OpenMP
 #ifdef OPENMP
@@ -263,7 +264,6 @@ int main()
 				hv_free(perm_result);
 			}
 		}
-		fclose(file);
 
 		hv_t *result_tmp = hv_bound_result();
 		hv_copy(result[i], result_tmp);

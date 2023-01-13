@@ -218,9 +218,18 @@ int main()
 		FILE *file;
 		file = fopen(PATH, "r");
 		char Lines[10];
-		while (fgets(Lines, 10, file) != NULL) // 6000回ぐらい？
+		// ↓
+		int data_tmp_num = 0;
+		int data_lines[10000];
+		while (fgets(Lines, 10, file) != NULL)
 		{
-			int *perm_num = image_pos(image, atoi(Lines));
+			data_lines[data_tmp_num++] = atoi(Lines);
+		}
+		fclose(file);
+
+		for (int dd = 0; dd < data_tmp_num; dd++)
+		{
+			int *perm_num = image_pos(image, data_lines[dd]);
 			int index_num = 0;
 
 			for (int j = 0; j < 7; j++)
@@ -261,7 +270,6 @@ int main()
 				// ------------------------------------------------------
 			}
 		}
-		fclose(file);
 
 		hdc_last();
 		START_COMPUTE = clock();
@@ -272,11 +280,9 @@ int main()
 		// 294
 		hdc_make_imem_2(SECOND_RAND_NUM);
 		hdc_init(0);
-		snprintf(PATH, 12, "label%d.txt", ll);
-		file = fopen(PATH, "r");
-		while (fgets(Lines, 10, file) != NULL) // 6000回ぐらい？
+		for (int dd = 0; dd < data_tmp_num; dd++)
 		{
-			int *perm_num = image_pos(image, atoi(Lines)) + 490;
+			int *perm_num = image_pos(image, data_lines[dd]) + 490;
 			int index_num = 0;
 
 			for (int j = 0; j < 4; j++)
@@ -361,7 +367,6 @@ int main()
 			hdc_pstore_thread(thread_num, core_num);
 			// ------------------------------------------------------
 		}
-		fclose(file);
 
 		hdc_last();
 		START_COMPUTE = clock();
