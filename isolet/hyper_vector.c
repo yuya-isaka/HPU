@@ -14,9 +14,9 @@
 // OpenMP
 #ifdef OPENMP
 #include <omp.h>
-extern hv_int_t **hv_bound_buff;
+static hv_int_t **hv_bound_buff;
 #else
-extern hv_int_t *hv_bound_buff;
+static hv_int_t *hv_bound_buff;
 #endif
 
 // hv_bound_buff初期化

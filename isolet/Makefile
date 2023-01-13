@@ -1,15 +1,18 @@
- default:
-	gcc -O3 -o isolet_bin isolet.c
+test:
+	gcc -c -DDEBUG -O3 -o hyper_vector.o hyper_vector.c
+	gcc -c -DDEBUG -O3 -o isolet.o isolet_hv.c
+	gcc -DDEBUG -O3 -o isolet_bin isolet.o hyper_vector.o
+	rm hyper_vector.o isolet.o
 	./isolet_bin
 	rm isolet_bin
 
 test:
-	gcc -c -DDEBUG -O3 -o hyper_vector.o hyper_vector.c
-	gcc -c -DDEBUG -O3 -o mnist.o mnist_hv.c
-	gcc -DDEBUG -O3 -o mnist_bin mnist.o hyper_vector.o
-	rm hyper_vector.o mnist.o
-	./mnist_bin
-	rm mnist_bin
+	gcc -fopenmp -DOPENMP -c -DDEBUG -O3 -o hyper_vector.o hyper_vector.c
+	gcc -fopenmp -DOPENMP -c -DDEBUG -O3 -o isolet.o isolet_hv.c
+	gcc -fopenmp -DOPENMP -DDEBUG -O3 -o isolet_bin isolet.o hyper_vector.o
+	rm hyper_vector.o isolet.o
+	./isolet_bin
+	rm isolet_bin
 
 generate:
 	gcc -DDEBUG -O3 -o isolet_bin isolet_generate.c
@@ -19,14 +22,14 @@ generate:
 # Petalinux Armv7
 linux:
 	arm-linux-gnueabihf-gcc -c -O3 -o hyper_vector.o hyper_vector.c
-	arm-linux-gnueabihf-gcc -c -O3 -o mnist_hv.o mnist_hv.c
-	arm-linux-gnueabihf-gcc -O3 -o mnist_hv_peta hyper_vector.o mnist_hv.o
+	arm-linux-gnueabihf-gcc -c -O3 -o isolet_hv.o isolet_hv.c
+	arm-linux-gnueabihf-gcc -O3 -o isolet_hv_peta hyper_vector.o isolet_hv.o
 	arm-linux-gnueabihf-gcc -c -O3 -o hdc_processor.o hdc_processor.c
-	arm-linux-gnueabihf-gcc -c -O3 -o mnist_hdc.o mnist_hdc.c
-	arm-linux-gnueabihf-gcc -O3 -o mnist_hdc hdc_processor.o mnist_hdc.o
-	rm hdc_processor.o mnist_hdc.o hyper_vector.o mnist_hv.o
+	arm-linux-gnueabihf-gcc -c -O3 -o isolet_hdc.o isolet_hdc.c
+	arm-linux-gnueabihf-gcc -O3 -o isolet_hdc hdc_processor.o isolet_hdc.o
+	rm hdc_processor.o mnist_hdc.o hyper_vector.o isolet_hv.o
 
 clean:
-	rm mnist_hv_peta mnist_hdc
+	rm isolet_bin isolet_hv_peta isolet_hdc
 
-.PHONY: test generate linux clean
+.PHONY: test omp generate linux clean

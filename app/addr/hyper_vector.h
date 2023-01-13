@@ -19,13 +19,6 @@ typedef uint32_t hv_t;
 
 typedef int32_t hv_int_t;
 
-// OpenMP
-#ifdef OPENMP
-hv_int_t **hv_bound_buff;
-#else
-hv_int_t *hv_bound_buff;
-#endif
-
 extern void hv_init(void);
 
 extern void hv_finish(void);
