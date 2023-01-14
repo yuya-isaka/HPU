@@ -3,6 +3,12 @@ test:
 	gcc -c -DHV64 -O3 -o isolet.o isolet_hv.c
 	gcc -DHV64 -O3 -o isolet_bin isolet.o hyper_vector.o
 	rm hyper_vector.o isolet.o
+
+check:
+	gcc -c -DHV64 -O3 -o hyper_vector.o hyper_vector.c
+	gcc -c -DHV64 -O3 -o isolet.o isolet_hv_check.c
+	gcc -DHV64 -O3 -o isolet_bin isolet.o hyper_vector.o
+	rm hyper_vector.o isolet.o
 	./isolet_bin
 	rm isolet_bin
 
@@ -11,8 +17,6 @@ omp:
 	gcc -fopenmp -DOPENMP -c -DHV64 -O3 -o isolet.o isolet_hv.c
 	gcc -fopenmp -DOPENMP -DHV64 -O3 -o isolet_bin isolet.o hyper_vector.o
 	rm hyper_vector.o isolet.o
-	./isolet_bin
-	rm isolet_bin
 
 generate:
 	gcc -DDEBUG -O3 -o isolet_bin isolet_generate.c
@@ -32,4 +36,4 @@ linux:
 clean:
 	rm isolet_bin isolet_hv_peta isolet_hdc
 
-.PHONY: test omp generate linux clean
+.PHONY: test check omp generate linux clean
