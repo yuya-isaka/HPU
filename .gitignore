@@ -440,3 +440,7 @@ bound2_peta.s
 mnist_bin
 mnist_hdc
 mnist_hv_peta
+
+isolet_bin
+isolet_hdc
+isolet_hv_peta
