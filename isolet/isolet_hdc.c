@@ -39,7 +39,7 @@ int main()
 		hdc_init(0);
 		hdc_start();
 
-		START_COMPUTE;
+		START_COMPUTE = clock();
 		char PATH[12];
 		snprintf(PATH, 12, "label%d.txt", ll);
 		FILE *file;
@@ -53,7 +53,7 @@ int main()
 			data_lines[data_tmp_num++] = atoi(Lines);
 		}
 		fclose(file);
-		END_COMPUTE;
+		END_COMPUTE = clock();
 		LOAD_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 		for (int dd = 0; dd < data_tmp_num;)

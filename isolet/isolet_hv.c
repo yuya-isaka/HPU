@@ -38,7 +38,7 @@ int main(void)
 
 	for (int i = 0; i < 10; i++)
 	{
-		START_COMPUTE;
+		START_COMPUTE = clock();
 		char PATH[12];
 		snprintf(PATH, 12, "label%d.txt", i);
 		FILE *file;
@@ -52,7 +52,7 @@ int main(void)
 			data_lines[data_tmp_num++] = atoi(lines);
 		}
 		fclose(file);
-		END_COMPUTE;
+		END_COMPUTE = clock();
 		LOAD_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 		// printf("%d\n", data_tmp_num);
