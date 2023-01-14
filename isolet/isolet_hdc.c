@@ -11,6 +11,47 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// ファイル読み込み
+char *read_file(const char *PATH, int *num)
+{
+	FILE *file;
+	file = fopen(PATH, "r");
+	if (file == NULL)
+	{
+		perror("  Failed: open file");
+		exit(1);
+	}
+
+	uint32_t ch;
+	// 与えられたファイルがひと続きの文字列と仮定 (2行になると｛10, 0x0a, LF(改行)｝ が入ってしまいズレる)
+	// printf("EOF: %d\n", EOF); // EOFは全て-1 (Mac, Linux, Petalinux)
+	while ((ch = fgetc(file)) != EOF)
+	{
+		(*num)++;
+	}
+
+	fseek(file, 0, SEEK_SET);
+	char *content = (char *)calloc(*num, sizeof(char));
+	if (content == NULL)
+	{
+		perror("  Failed: calloc");
+		exit(1);
+	}
+
+	const uint32_t DONE = (uint32_t)fread(content, sizeof(char), *num, file);
+	if (DONE < *num)
+	{
+		perror("  Failed: fread file");
+		exit(1);
+	}
+
+	fclose(file);
+
+	return content;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 int main()
 {
 	double LOAD_TIME = 0.0;
@@ -42,17 +83,8 @@ int main()
 		START_COMPUTE = clock();
 		char PATH[12];
 		snprintf(PATH, 12, "label%d.txt", ll);
-		FILE *file;
-		file = fopen(PATH, "r");
-		char Lines[3];
-		// ↓
 		int data_tmp_num = 0;
-		int data_lines[150000];
-		while (fgets(Lines, 3, file) != NULL)
-		{
-			data_lines[data_tmp_num++] = atoi(Lines);
-		}
-		fclose(file);
+		char *data_lines = read_file(PATH, &data_tmp_num);
 		END_COMPUTE = clock();
 		LOAD_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
@@ -87,7 +119,7 @@ int main()
 				{
 					for (int i = 0; i < core_num; i++)
 					{
-						addr_array[k][i] = data_lines[dd++] + 490;
+						addr_array[k][i] = (data_lines[dd++] - '0') + 490;
 					}
 				}
 
@@ -145,7 +177,7 @@ int main()
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					addr_array[k][i] = data_lines[dd++] + 127;
+					addr_array[k][i] = (data_lines[dd++] - '0') + 127;
 				}
 			}
 
@@ -188,7 +220,7 @@ int main()
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					addr_array[k][i] = data_lines[dd++] + 127;
+					addr_array[k][i] = (data_lines[dd++] - '0') + 127;
 				}
 			}
 
@@ -231,7 +263,7 @@ int main()
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					addr_array[k][i] = data_lines[dd++] + 127;
+					addr_array[k][i] = (data_lines[dd++] - '0') + 127;
 				}
 			}
 
@@ -254,19 +286,21 @@ int main()
 		END_COMPUTE = clock();
 		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-		// // 結果確認
-		// printf("\n%d:\n", ll);
-		// for (int j = 0; j < 32; j++)
-		// {
-		// 	printf("  %u\n", dst[j]);
-		// }
+		// 結果確認
+		printf("\n%d:\n", ll);
+		for (int j = 0; j < 32; j++)
+		{
+			printf("  %u\n", dst[j]);
+		}
 
 		hdc_finish();
+
+		free(data_lines);
 	}
 
 	printf("  load時間: %lf[ms]\n", LOAD_TIME);
 	printf("  計算時間: %lf[ms]", COM_TIME);
 
-	printf("\n\n\n");
+	printf("\n\n");
 	return 0;
 }

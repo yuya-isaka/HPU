@@ -90,9 +90,9 @@ int main(void)
 					{
 						for (int j = 0; j < 617; j++)
 						{
-							fprintf(fp, "%d\n", tmp_data[j]);
+							fprintf(fp, "%d", tmp_data[j]);
 						}
-						printf("Number: %d\n", atoi(tp));
+						// printf("Number: %d\n", atoi(tp));
 					}
 				}
 				else
