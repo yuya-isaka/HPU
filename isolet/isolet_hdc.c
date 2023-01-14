@@ -254,12 +254,12 @@ int main()
 		END_COMPUTE = clock();
 		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-		// 結果確認
-		printf("\n%d:\n", ll);
-		for (int j = 0; j < 32; j++)
-		{
-			printf("  %u\n", dst[j]);
-		}
+		// // 結果確認
+		// printf("\n%d:\n", ll);
+		// for (int j = 0; j < 32; j++)
+		// {
+		// 	printf("  %u\n", dst[j]);
+		// }
 
 		hdc_finish();
 	}
