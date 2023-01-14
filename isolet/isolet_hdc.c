@@ -301,6 +301,6 @@ int main()
 	printf("  load時間: %lf[ms]\n", LOAD_TIME);
 	printf("  計算時間: %lf[ms]", COM_TIME);
 
-	printf("\n\n");
+	printf("\n\n\n");
 	return 0;
 }

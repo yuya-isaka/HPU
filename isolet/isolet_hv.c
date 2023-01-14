@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include "hyper_vector.h"
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 // OpenMP
 #ifdef OPENMP
 #include <omp.h>
@@ -21,6 +23,49 @@ __attribute__((destructor)) static void destructor()
 }
 #endif
 #endif
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// ファイル読み込み
+char *read_file(const char *PATH, int *num)
+{
+	FILE *file;
+	file = fopen(PATH, "r");
+	if (file == NULL)
+	{
+		perror("  Failed: open file");
+		exit(1);
+	}
+
+	uint32_t ch;
+	// 与えられたファイルがひと続きの文字列と仮定 (2行になると｛10, 0x0a, LF(改行)｝ が入ってしまいズレる)
+	// printf("EOF: %d\n", EOF); // EOFは全て-1 (Mac, Linux, Petalinux)
+	while ((ch = fgetc(file)) != EOF)
+	{
+		(*num)++;
+	}
+
+	fseek(file, 0, SEEK_SET);
+	char *content = (char *)calloc(*num, sizeof(char));
+	if (content == NULL)
+	{
+		perror("  Failed: calloc");
+		exit(1);
+	}
+
+	const uint32_t DONE = (uint32_t)fread(content, sizeof(char), *num, file);
+	if (DONE < *num)
+	{
+		perror("  Failed: fread file");
+		exit(1);
+	}
+
+	fclose(file);
+
+	return content;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main(void)
 {
@@ -41,17 +86,8 @@ int main(void)
 		START_COMPUTE = clock();
 		char PATH[12];
 		snprintf(PATH, 12, "label%d.txt", i);
-		FILE *file;
-		file = fopen(PATH, "r");
-		char lines[3];
-
 		int data_tmp_num = 0;
-		int data_lines[150000];
-		while (fgets(lines, 3, file) != NULL)
-		{
-			data_lines[data_tmp_num++] = atoi(lines);
-		}
-		fclose(file);
+		char *data_lines = read_file(PATH, &data_tmp_num);
 		END_COMPUTE = clock();
 		LOAD_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
@@ -73,7 +109,7 @@ int main(void)
 		{
 			for (int k = 0; k < 617; k++)
 			{
-				hv_t *bind_result = hv_bind(item_memory[k], item_memory[data_lines[j] + 617]);
+				hv_t *bind_result = hv_bind(item_memory[k], item_memory[(data_lines[j] - '0') + 617]);
 				j++;
 
 				hv_bound(bind_result);
