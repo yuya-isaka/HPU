@@ -5,9 +5,9 @@ test:
 	rm hyper_vector.o isolet.o
 
 check:
-	gcc -c -DHV64 -O3 -o hyper_vector.o hyper_vector.c
-	gcc -c -DHV64 -O3 -o isolet.o isolet_hv_check.c
-	gcc -DHV64 -O3 -o isolet_bin isolet.o hyper_vector.o
+	gcc -fopenmp -DOPENMP -c -DHV64 -O3 -o hyper_vector.o hyper_vector.c
+	gcc -fopenmp -DOPENMP -c -DHV64 -O3 -o isolet.o isolet_hv_check.c
+	gcc -fopenmp -DOPENMP -DHV64 -O3 -o isolet_bin isolet.o hyper_vector.o
 	rm hyper_vector.o isolet.o
 	./isolet_bin
 	rm isolet_bin

@@ -82,11 +82,13 @@ int main()
 	{
 		hv_init();
 
+		START_COMPUTE = clock();
 		char PATH[12];
 		snprintf(PATH, 12, "image%d.txt", i);
 		int data_tmp_num = 0;
 		char *data_lines = read_file(PATH, &data_tmp_num);
-		printf("%d\n", data_tmp_num);
+		END_COMPUTE = clock();
+		LOAD_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 // OpenMP
 #ifdef OPENMP
@@ -116,12 +118,12 @@ int main()
 		free(data_lines);
 	}
 
-	for (int i = 0; i < 10; i++)
-	{
-		printf("%d:\n", i);
-		hv_print(result[i]);
-		printf("\n");
-	}
+	// for (int i = 0; i < 10; i++)
+	// {
+	// 	printf("%d:\n", i);
+	// 	hv_print(result[i]);
+	// 	printf("\n");
+	// }
 
 	hv_free_array(result, 10);
 	hv_free_array(item_memory, RAND_NUM);

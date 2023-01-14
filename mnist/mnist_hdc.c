@@ -57,15 +57,6 @@ int main()
 	clock_t START_COMPUTE;
 	clock_t END_COMPUTE;
 
-	// START_COMPUTE = clock();
-	// // image->rows = 60000
-	// // image->cols = 784
-	// // struct tensor *image = load_image_file(TRAIN_IMAGE);
-	// struct tensor *image = load_image_file_new(TRAIN_IMAGE_NEW);
-	// // struct tensor *label = load_label_file(TRAIN_LABEL);
-	// END_COMPUTE = clock();
-	// LOAD_TIME = ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
-
 	// 784個のハイパーベクトルを生成し格納
 	const uint32_t RAND_NUM = 784;
 	const uint32_t FIRST_RAND_NUM = 490;
@@ -233,12 +224,12 @@ int main()
 		END_COMPUTE = clock();
 		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-		// 結果確認
-		printf("\n%d:\n", ll);
-		for (int j = 0; j < 32; j++)
-		{
-			printf("  %u\n", dst[j]);
-		}
+		// // 結果確認
+		// printf("\n%d:\n", ll);
+		// for (int j = 0; j < 32; j++)
+		// {
+		// 	printf("  %u\n", dst[j]);
+		// }
 
 		hdc_finish();
 

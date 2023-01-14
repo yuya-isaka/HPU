@@ -105,17 +105,17 @@ int main(void)
 #ifdef OPENMP
 #pragma omp parallel for
 #endif
-		for (int j = 0; j < data_tmp_num; j++)
+		for (int j = 0; j < data_tmp_num; j += 617)
 		{
+			int addr_tmp = j;
+
 			for (int k = 0; k < 617; k++)
 			{
-				hv_t *bind_result = hv_bind(item_memory[k], item_memory[(data_lines[j] - '0') + 617]);
-				j++;
+				hv_t *bind_result = hv_bind(item_memory[k], item_memory[(data_lines[addr_tmp++] - '0') + 617]);
 
 				hv_bound(bind_result);
 				hv_free(bind_result);
 			}
-			j--;
 		}
 
 		hv_t *result_tmp = hv_bound_result();
