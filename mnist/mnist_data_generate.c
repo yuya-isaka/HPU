@@ -179,11 +179,11 @@ static void load_image_file_2(const char *fn)
 						DONE = fread(buf, 1, 1, fp);
 						if ((int)(buf[0]) == 0)
 						{
-							fprintf(file_new, "%d\n", 0);
+							fprintf(file_new, "%d", 0);
 						}
 						else
 						{
-							fprintf(file_new, "%d\n", 1);
+							fprintf(file_new, "%d", 1);
 						}
 					}
 				}
@@ -280,7 +280,7 @@ int main()
 	// struct tensor *label = load_label_file(TRAIN_LABEL);
 
 	// // image0 - image10.txt生成
-	// 	load_image_file_2(TRAIN_IMAGE);
+	load_image_file_2(TRAIN_IMAGE);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 

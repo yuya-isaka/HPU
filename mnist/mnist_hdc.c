@@ -9,172 +9,43 @@
 #include <time.h>
 #include "hdc_processor.h"
 
-#define TRAIN_IMAGE "train-images-idx3-ubyte"
-#define TRAIN_IMAGE_NEW "mnist_image.bin"
-#define TRAIN_LABEL "train-labels-idx1-ubyte"
-
-#define image_pos(a, b) (a->data + b * 784)
-#define at(o, a, b) o->data[a * o->cols + b]
-
-#define label_pos(a, b) (a->data + b)
-
-struct tensor
+// ファイル読み込み
+char *read_file(const char *PATH, int *num)
 {
-	int *data;
-	int cols;
-	int rows;
-};
-
-static struct tensor *create_tensor(int rows, int cols)
-{
-	struct tensor *ret;
-	ret = malloc(sizeof(struct tensor));
-	ret->data = malloc(sizeof(int) * rows * cols);
-	memset(ret->data, 0, sizeof(int) * rows * cols);
-	ret->cols = cols;
-	ret->rows = rows;
-	return ret;
-}
-
-static void free_tensor(struct tensor *t)
-{
-	if (t && t->data)
-		free(t->data);
-	if (t)
-		free(t);
-}
-
-static int buf2int(char *buf_)
-{
-	int ret;
-	unsigned char *buf = (unsigned char *)buf_;
-
-	ret = buf[0];
-	ret <<= 8;
-	ret |= buf[1];
-	ret <<= 8;
-	ret |= buf[2];
-	ret <<= 8;
-	ret |= buf[3];
-	return ret;
-}
-
-static struct tensor *load_image_file(const char *fn)
-{
-	struct tensor *ret = NULL;
-	char buf[4];
-
-	FILE *fp = fopen(fn, "rb");
-
-	fseek(fp, 0, SEEK_END);
-
-	int sz = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-
-	size_t DONE;
-	DONE = fread(buf, 1, 4, fp);
-	int t = buf2int(buf);
-
-	DONE = fread(buf, 1, 4, fp);
-	int n = buf2int(buf);
-	DONE = fread(buf, 1, 4, fp);
-	int w = buf2int(buf);
-	DONE = fread(buf, 1, 4, fp);
-	int h = buf2int(buf);
-
-	// printf("%d\n", n); // 60000
-	ret = create_tensor(n, 784);
-	for (int i = 0; i < n; i++)
+	FILE *file;
+	file = fopen(PATH, "r");
+	if (file == NULL)
 	{
-		for (int j = 0; j < 784; j++)
-		{
-			DONE = fread(buf, 1, 1, fp);
-			if ((int)(buf[0]) == 0)
-			{
-				ret->data[i * 784 + j] = 0;
-			}
-			else
-			{
-				ret->data[i * 784 + j] = 1;
-			}
-		}
+		perror("  Failed: open file");
+		exit(1);
 	}
 
-	fclose(fp);
-
-	return ret;
-}
-
-static struct tensor *load_image_file_new(const char *fn)
-{
-	struct tensor *ret = NULL;
-	char buf;
-
-	FILE *fp = fopen(fn, "rb");
-
-	fseek(fp, 0, SEEK_SET);
-
-	ret = create_tensor(60000, 784);
-	for (int i = 0; i < 60000; i++)
+	uint32_t ch;
+	// 与えられたファイルがひと続きの文字列と仮定 (2行になると｛10, 0x0a, LF(改行)｝ が入ってしまいズレる)
+	// printf("EOF: %d\n", EOF); // EOFは全て-1 (Mac, Linux, Petalinux)
+	while ((ch = fgetc(file)) != EOF)
 	{
-		for (int j = 0; j < 784; j++)
-		{
-			size_t DONE = fread(&buf, 1, 1, fp);
-			ret->data[i * 784 + j] = (int)(buf);
-		}
+		(*num)++;
 	}
 
-	fclose(fp);
-	return ret;
-}
-
-static struct tensor *load_label_file(const char *fn)
-{
-	struct tensor *ret = NULL;
-	char buf[4];
-
-	FILE *fp = fopen(fn, "rb");
-
-	fseek(fp, 0, SEEK_END);
-	int sz = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-
-	size_t DONE;
-	DONE = fread(buf, 1, 4, fp);
-	int t = buf2int(buf);
-
-	DONE = fread(buf, 1, 4, fp);
-	int n = buf2int(buf);
-	ret = create_tensor(n, 1);
-	for (int i = 0; i < n; i++)
+	fseek(file, 0, SEEK_SET);
+	char *content = (char *)calloc(*num, sizeof(char));
+	if (content == NULL)
 	{
-		DONE = fread(buf, 1, 1, fp);
-		ret->data[i] = (int)buf[0];
+		perror("  Failed: calloc");
+		exit(1);
 	}
 
-	fclose(fp);
-	return ret;
-}
-
-static void print_image(int *a)
-{
-	int w = 28;
-	int h = 28;
-	for (int j = 0; j < h; j++)
+	const uint32_t DONE = (uint32_t)fread(content, sizeof(char), *num, file);
+	if (DONE < *num)
 	{
-		for (int i = 0; i < w; i++)
-		{
-			printf("%d", *a);
-			a++;
-		}
-		printf("\n");
+		perror("  Failed: fread file");
+		exit(1);
 	}
-	printf("\n");
-}
 
-static void print_label(int *a)
-{
-	printf("%d\n\n", *a);
+	fclose(file);
+
+	return content;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,17 +57,17 @@ int main()
 	clock_t START_COMPUTE;
 	clock_t END_COMPUTE;
 
-	START_COMPUTE = clock();
-	// image->rows = 60000
-	// image->cols = 784
-	// struct tensor *image = load_image_file(TRAIN_IMAGE);
-	struct tensor *image = load_image_file_new(TRAIN_IMAGE_NEW);
-	// struct tensor *label = load_label_file(TRAIN_LABEL);
-	END_COMPUTE = clock();
-	LOAD_TIME = ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
+	// START_COMPUTE = clock();
+	// // image->rows = 60000
+	// // image->cols = 784
+	// // struct tensor *image = load_image_file(TRAIN_IMAGE);
+	// struct tensor *image = load_image_file_new(TRAIN_IMAGE_NEW);
+	// // struct tensor *label = load_label_file(TRAIN_LABEL);
+	// END_COMPUTE = clock();
+	// LOAD_TIME = ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 	// 784個のハイパーベクトルを生成し格納
-	const uint32_t RAND_NUM = image->cols;
+	const uint32_t RAND_NUM = 784;
 	const uint32_t FIRST_RAND_NUM = 490;
 	const uint32_t SECOND_RAND_NUM = RAND_NUM - FIRST_RAND_NUM;
 
@@ -213,23 +84,16 @@ int main()
 		hdc_init(0);
 		hdc_start();
 
+		START_COMPUTE = clock();
 		char PATH[12];
-		snprintf(PATH, 12, "label%d.txt", ll);
-		FILE *file;
-		file = fopen(PATH, "r");
-		char Lines[10];
-		// ↓
+		snprintf(PATH, 12, "image%d.txt", ll);
 		int data_tmp_num = 0;
-		int data_lines[10000];
-		while (fgets(Lines, 10, file) != NULL)
-		{
-			data_lines[data_tmp_num++] = atoi(Lines);
-		}
-		fclose(file);
+		char *data_lines = read_file(PATH, &data_tmp_num);
+		END_COMPUTE = clock();
+		LOAD_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-		for (int dd = 0; dd < data_tmp_num; dd++)
+		for (int dd = 0; dd < data_tmp_num;)
 		{
-			int *perm_num = image_pos(image, data_lines[dd]);
 			int index_num = 0;
 
 			for (int j = 0; j < 7; j++)
@@ -241,8 +105,7 @@ int main()
 				{
 					for (int i = 0; i < core_num; i++)
 					{
-						addr_array[k][i] = index_num;
-						index_num++;
+						addr_array[k][i] = index_num++;
 					}
 				}
 
@@ -255,8 +118,7 @@ int main()
 				{
 					for (int i = 0; i < core_num; i++)
 					{
-						hdc_permute(*perm_num);
-						perm_num++;
+						hdc_permute((data_lines[dd++] - '0'));
 					}
 					for (int i = 0; i < 2; i++)
 					{
@@ -269,6 +131,7 @@ int main()
 				hdc_simd_pstore_thread();
 				// ------------------------------------------------------
 			}
+			dd += SECOND_RAND_NUM;
 		}
 
 		hdc_last();
@@ -280,9 +143,9 @@ int main()
 		// 294
 		hdc_make_imem_2(SECOND_RAND_NUM);
 		hdc_init(0);
-		for (int dd = 0; dd < data_tmp_num; dd++)
+		for (int dd = 0; dd < data_tmp_num;)
 		{
-			int *perm_num = image_pos(image, data_lines[dd]) + 490;
+			dd += FIRST_RAND_NUM;
 			int index_num = 0;
 
 			for (int j = 0; j < 4; j++)
@@ -294,8 +157,7 @@ int main()
 				{
 					for (int i = 0; i < core_num; i++)
 					{
-						addr_array[k][i] = index_num;
-						index_num++;
+						addr_array[k][i] = index_num++;
 					}
 				}
 
@@ -308,8 +170,7 @@ int main()
 				{
 					for (int i = 0; i < core_num; i++)
 					{
-						hdc_permute(*perm_num);
-						perm_num++;
+						hdc_permute((data_lines[dd++] - '0'));
 					}
 					for (int i = 0; i < 2; i++)
 					{
@@ -332,8 +193,7 @@ int main()
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					addr_array[k][i] = index_num;
-					index_num++;
+					addr_array[k][i] = index_num++;
 				}
 			}
 
@@ -346,8 +206,7 @@ int main()
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					hdc_permute(*perm_num);
-					perm_num++;
+					hdc_permute((data_lines[dd++] - '0'));
 				}
 				for (int i = 0; i < 2; i++)
 				{
@@ -374,22 +233,21 @@ int main()
 		END_COMPUTE = clock();
 		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-		// // 結果確認
-		// printf("\n%d:\n", ll);
-		// for (int j = 0; j < 32; j++)
-		// {
-		// 	printf("  %u\n", dst[j]);
-		// }
+		// 結果確認
+		printf("\n%d:\n", ll);
+		for (int j = 0; j < 32; j++)
+		{
+			printf("  %u\n", dst[j]);
+		}
 
 		hdc_finish();
-	}
 
-	free_tensor(image);
-	// free_tensor(label);
+		free(data_lines);
+	}
 
 	printf("  load時間: %lf[ms]\n", LOAD_TIME);
 	printf("  計算時間: %lf[ms]", COM_TIME);
 
-	printf("\n\n\n");
+	printf("\n\n");
 	return 0;
 }
