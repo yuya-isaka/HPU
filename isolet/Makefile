@@ -27,7 +27,7 @@ linux:
 	arm-linux-gnueabihf-gcc -c -O3 -o hdc_processor.o hdc_processor.c
 	arm-linux-gnueabihf-gcc -c -O3 -o isolet_hdc.o isolet_hdc.c
 	arm-linux-gnueabihf-gcc -O3 -o isolet_hdc hdc_processor.o isolet_hdc.o
-	rm hdc_processor.o mnist_hdc.o hyper_vector.o isolet_hv.o
+	rm hdc_processor.o isolet_hdc.o hyper_vector.o isolet_hv.o
 
 clean:
 	rm isolet_bin isolet_hv_peta isolet_hdc
