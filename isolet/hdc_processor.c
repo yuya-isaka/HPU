@@ -8,6 +8,14 @@
 #include <stdint.h>
 #include "hdc_processor.h"
 
+unsigned long src_phys;
+unsigned long dst_phys;
+
+volatile int *top;
+volatile int *dma;
+uint16_t *src;
+int *dst;
+
 // DMAで送るバイト数
 int SEND_NUM = 0;
 
@@ -84,7 +92,7 @@ void hdc_setup(void)
 		close(uio1);
 		return;
 	}
-	src = (uint16_t *)mmap(NULL, 0x1DCD6500, PROT_READ | PROT_WRITE, MAP_SHARED, udmabuf0, 0);
+	src = (uint16_t *)mmap(NULL, 0x4000000, PROT_READ | PROT_WRITE, MAP_SHARED, udmabuf0, 0);
 	if (src == MAP_FAILED)
 	{
 		perror("mmap src");

@@ -33,7 +33,17 @@ linux:
 	arm-linux-gnueabihf-gcc -O2 -o isolet_hdc hdc_processor.o isolet_hdc.o
 	rm hdc_processor.o isolet_hdc.o hyper_vector.o isolet_hv.o
 
+# Petalinux Armv7
+peta:
+	gcc -c -O2 -o hyper_vector.o hyper_vector.c
+	gcc -c -O2 -o isolet_hv.o isolet_hv.c
+	gcc -O2 -o isolet_hv_peta hyper_vector.o isolet_hv.o
+	gcc -c -O2 -o hdc_processor.o hdc_processor.c
+	gcc -c -O2 -o isolet_hdc.o isolet_hdc.c
+	gcc -O2 -o isolet_hdc hdc_processor.o isolet_hdc.o
+	rm hdc_processor.o isolet_hdc.o hyper_vector.o isolet_hv.o
+
 clean:
 	rm isolet_bin isolet_hv_peta isolet_hdc
 
-.PHONY: test check omp generate linux clean
+.PHONY: test check omp generate linux clean peta

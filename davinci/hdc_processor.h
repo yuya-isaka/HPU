@@ -7,13 +7,7 @@
 // 最大スレッド数
 #define THREADS_NUM 5
 
-unsigned long src_phys;
-unsigned long dst_phys;
-
-volatile int *top;
-volatile int *dma;
-uint16_t *src;
-int *dst;
+extern int *dst;
 
 extern void hdc_print(void);
 
@@ -21,9 +15,9 @@ extern void hdc_setup(void);
 
 extern void hdc_make_imem(const int RANNUM);
 
-extern void hdc_init(const int N);
+extern void hdc_make_imem_2(const int RANNUM);
 
-extern void hdc_dma_reset(void);
+extern void hdc_init(const int N);
 
 extern void hdc_start(void);
 

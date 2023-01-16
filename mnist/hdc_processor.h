@@ -7,13 +7,7 @@
 // 最大スレッド数
 #define THREADS_NUM 5
 
-unsigned long src_phys;
-unsigned long dst_phys;
-
-volatile int *top;
-volatile int *dma;
-uint16_t *src;
-int *dst;
+extern int *dst;
 
 extern void hdc_print(void);
 

@@ -8,6 +8,14 @@
 #include <stdint.h>
 #include "hdc_processor.h"
 
+unsigned long src_phys;
+unsigned long dst_phys;
+
+volatile int *top;
+volatile int *dma;
+uint16_t *src;
+int *dst;
+
 // DMAで送るバイト数
 int SEND_NUM = 0;
 
@@ -84,7 +92,7 @@ void hdc_setup(void)
 		close(uio1);
 		return;
 	}
-	src = (uint16_t *)mmap(NULL, 0x1DCD6500, PROT_READ | PROT_WRITE, MAP_SHARED, udmabuf0, 0);
+	src = (uint16_t *)mmap(NULL, 0x4000000, PROT_READ | PROT_WRITE, MAP_SHARED, udmabuf0, 0);
 	if (src == MAP_FAILED)
 	{
 		perror("mmap src");
@@ -114,6 +122,20 @@ void hdc_make_imem(const int RANNUM)
 
 	// 乱数生成終了を待つ
 	while (top[0x00] & 0x1)
+		;
+}
+
+void hdc_make_imem_2(const int RANNUM)
+{
+	// item_memory_num (乱数の数)
+	top[0x01] = RANNUM - 1;
+
+	// gen <- 1;
+	// run <- 1;
+	top[0x00] = 3;
+
+	// 乱数生成終了を待つ
+	while (top[0x00] == 0x3)
 		;
 }
 

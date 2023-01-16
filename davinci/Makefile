@@ -29,8 +29,18 @@ linux:
 	arm-linux-gnueabihf-gcc -O2 -o ohashi_ngram hdc_processor.o ohashi_ngram.o
 	rm hdc_processor.o ohashi_ngram.o hyper_vector.o davinci_ngram_peta.o
 
+# Petalinux Armv7
+peta:
+	gcc -c -O2 -o hyper_vector.o hyper_vector.c
+	gcc -c -O2 -o davinci_ngram_peta.o davinci_ngram.c
+	gcc -O2 -o davinci_ngram_peta hyper_vector.o davinci_ngram_peta.o
+	gcc -c -O2 -o hdc_processor.o hdc_processor.c
+	gcc -c -O2 -o ohashi_ngram.o ohashi_ngram.c
+	gcc -O2 -o ohashi_ngram hdc_processor.o ohashi_ngram.o
+	rm hdc_processor.o ohashi_ngram.o hyper_vector.o davinci_ngram_peta.o
+
 # remove バイナリ
 clean:
 	rm -f davinci_ngram davinci_ngram_peta ohashi_ngram
 
-.PHONY: test debug-test omp linux clean
+.PHONY: test debug-test omp linux clean peta
