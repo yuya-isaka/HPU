@@ -21,7 +21,7 @@ VERILATOR_OPTION = \
 	--compiler clang \
 
 VERILATOR_MAKE_OPTION = \
-	OPT="-O3 -I ../../../" \
+	OPT="-O2 -I ../../../" \
 
 DESIGN_SRC = \
 ./top.v \
@@ -53,9 +53,9 @@ format :
 	iStyle --style=kr -n -s4 --pad=paren $(DESIGN_SRC)
 
 test:
-	gcc -c -O3 -o hyper_vector.o hyper_vector.c
-	gcc -c -O3 -o test.o test.c
-	gcc -O3 -o test test.o hyper_vector.o
+	gcc -c -O2 -o hyper_vector.o hyper_vector.c
+	gcc -c -O2 -o test.o test.c
+	gcc -O2 -o test test.o hyper_vector.o
 	rm hyper_vector.o test.o
 	./test
 	rm test
