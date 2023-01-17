@@ -15,19 +15,19 @@ test:
 	rm hyper_vector.o bind.o perm.o bound.o random.o bind_bound.o perm_bound.o
 
 omp:
-	gcc -fopenmp -c -O2 -march=native -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
-	gcc -fopenmp -c -O2 -march=native -DOPENMP -DHV64 -o bind.o bind.c
-	gcc -fopenmp -O2 -march=native -DOPENMP -DHV64 -o bind bind.o hyper_vector.o
-	gcc -fopenmp -c -O2 -march=native -DOPENMP -DHV64 -o perm.o perm.c
-	gcc -fopenmp -O2 -march=native -DOPENMP -DHV64 -o perm perm.o hyper_vector.o
-	gcc -fopenmp -c -O2 -march=native -DOPENMP -DHV64 -o bound.o bound.c
-	gcc -fopenmp -O2 -march=native -DOPENMP -DHV64 -o bound bound.o hyper_vector.o
-	gcc -fopenmp -c -O2 -march=native -DOPENMP -DHV64 -o random.o random.c
-	gcc -fopenmp -O2 -march=native -DOPENMP -DHV64 -o random random.o hyper_vector.o
-	gcc -fopenmp -c -O2 -march=native -DOPENMP -DHV64 -o bind_bound.o bind_bound.c
-	gcc -fopenmp -O2 -march=native -DOPENMP -DHV64 -o bind_bound bind_bound.o hyper_vector.o
-	gcc -fopenmp -c -O2 -march=native -DOPENMP -DHV64 -o perm_bound.o perm_bound.c
-	gcc -fopenmp -O2 -march=native -DOPENMP -DHV64 -o perm_bound perm_bound.o hyper_vector.o
+	gcc -fopenmp -c -O2 -DOPENMP -DHV64 -o hyper_vector.o hyper_vector.c
+	gcc -fopenmp -c -O2 -DOPENMP -DHV64 -o bind.o bind.c
+	gcc -fopenmp -O2 -DOPENMP -DHV64 -o bind bind.o hyper_vector.o
+	gcc -fopenmp -c -O2 -DOPENMP -DHV64 -o perm.o perm.c
+	gcc -fopenmp -O2 -DOPENMP -DHV64 -o perm perm.o hyper_vector.o
+	gcc -fopenmp -c -O2 -DOPENMP -DHV64 -o bound.o bound.c
+	gcc -fopenmp -O2 -DOPENMP -DHV64 -o bound bound.o hyper_vector.o
+	gcc -fopenmp -c -O2 -DOPENMP -DHV64 -o random.o random.c
+	gcc -fopenmp -O2 -DOPENMP -DHV64 -o random random.o hyper_vector.o
+	gcc -fopenmp -c -O2 -DOPENMP -DHV64 -o bind_bound.o bind_bound.c
+	gcc -fopenmp -O2 -DOPENMP -DHV64 -o bind_bound bind_bound.o hyper_vector.o
+	gcc -fopenmp -c -O2 -DOPENMP -DHV64 -o perm_bound.o perm_bound.c
+	gcc -fopenmp -O2 -DOPENMP -DHV64 -o perm_bound perm_bound.o hyper_vector.o
 	rm hyper_vector.o bind.o perm.o bound.o random.o bind_bound.o perm_bound.o
 
 linux:
