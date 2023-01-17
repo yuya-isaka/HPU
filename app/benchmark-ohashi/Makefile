@@ -1,3 +1,5 @@
+# こっちのほうが良かった
+# -O2のほうが良かった
 default:
 	arm-linux-gnueabihf-gcc -c -O2 -o hdc_processor.o hdc_processor.c
 	arm-linux-gnueabihf-gcc -c -O2 -o ohashi_bind.o ohashi_bind.c
