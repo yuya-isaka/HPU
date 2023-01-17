@@ -9,6 +9,10 @@
 #include <time.h>
 #include "hdc_processor.h"
 
+// 試行回数
+// 100万回
+#define TRIAL_NUM 1000000
+
 int main(int argc, char const *argv[])
 {
 	const int RANNUM = 512;
@@ -31,10 +35,6 @@ int main(int argc, char const *argv[])
 	// アイテムメモリ生成
 	hdc_make_imem(RANNUM);
 	// hv -----------------------------
-
-	// 試行回数
-	// 100万回
-	const int TRIAL_NUM = 1000000;
 
 	const int EPOCH = TRIAL_NUM / (CORENUM * THREADS_NUM);
 	const int REMAINDAR = TRIAL_NUM % (CORENUM * THREADS_NUM);
@@ -60,54 +60,26 @@ int main(int argc, char const *argv[])
 
 	hdc_start();
 
-	for (int nnn = 0; nnn < 10; nnn++)
+	/////////////////////////////////////////////////////////////////////////////
+	START_COMPUTE = clock();
+	int *rand_array = (int *)calloc(TRIAL_NUM, sizeof(int));
+	for (int i = 0; i < TRIAL_NUM; i++)
 	{
-		/////////////////////////////////////////////////////////////////////////////
-		START_COMPUTE = clock();
-		int rand_array[TRIAL_NUM];
-		for (int i = 0; i < TRIAL_NUM; i++)
-		{
-			rand_array[i] = rand() % RANNUM;
-		}
-		int rand_array_num = 0;
-		END_COMPUTE = clock();
-		RAN_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
-		/////////////////////////////////////////////////////////////////////////////
+		rand_array[i] = rand() % RANNUM;
+	}
+	int rand_array_num = 0;
+	END_COMPUTE = clock();
+	RAN_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
+	/////////////////////////////////////////////////////////////////////////////
 
-		// SEND_NUM初期化
-		hdc_init(0);
+	// SEND_NUM初期化
+	hdc_init(0);
 
-		// SEND_NUMのエポック
-		for (int ll = 0; ll < ALL_SEND_EPOCH; ll += 1)
-		{
-			// SEND_NUM繰り返す
-			for (int j = 0; j < ALL_SEND_NUM; j += CORENUM * THREADS_NUM)
-			{
-				uint16_t core_num = CORENUM;
-
-				uint16_t addr_array[THREADS_NUM][core_num];
-
-				// アドレス
-				for (int k = 0; k < THREADS_NUM; k++)
-				{
-					for (int i = 0; i < core_num; i++)
-					{
-						addr_array[k][i] = rand_array[rand_array_num++];
-					}
-				}
-
-				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, core_num, addr_array);
-				// ------------------------------------------------------
-
-				// store ---------------------------------------------
-				hdc_simd_store_thread();
-				// ------------------------------------------------------
-			}
-		}
-
-		// SEND_NUMエポックのあまり
-		for (int j = 0; j < ALL_SEND_REMAIN; j += CORENUM * THREADS_NUM)
+	// SEND_NUMのエポック
+	for (int ll = 0; ll < ALL_SEND_EPOCH; ll += 1)
+	{
+		// SEND_NUM繰り返す
+		for (int j = 0; j < ALL_SEND_NUM; j += CORENUM * THREADS_NUM)
 		{
 			uint16_t core_num = CORENUM;
 
@@ -130,40 +102,67 @@ int main(int argc, char const *argv[])
 			hdc_simd_store_thread();
 			// ------------------------------------------------------
 		}
+	}
 
-		// 最後の余り
-		if (REMAINDAR != 0)
+	// SEND_NUMエポックのあまり
+	for (int j = 0; j < ALL_SEND_REMAIN; j += CORENUM * THREADS_NUM)
+	{
+		uint16_t core_num = CORENUM;
+
+		uint16_t addr_array[THREADS_NUM][core_num];
+
+		// アドレス
+		for (int k = 0; k < THREADS_NUM; k++)
 		{
-			uint16_t core_num = REMAINDAR_CORENUM;
-
-			uint16_t addr_array[THREADS_NUM][core_num];
-
-			// アドレス
-			for (int k = 0; k < THREADS_NUM; k++)
+			for (int i = 0; i < core_num; i++)
 			{
-				for (int i = 0; i < core_num; i++)
-				{
-					addr_array[k][i] = rand_array[rand_array_num++];
-				}
+				addr_array[k][i] = rand_array[rand_array_num++];
 			}
-
-			// load ---------------------------------------------
-			hdc_load_thread(THREADS_NUM, core_num, addr_array);
-			// ------------------------------------------------------
-
-			// store ---------------------------------------------
-			hdc_store_thread(THREADS_NUM, core_num);
-			// ------------------------------------------------------
 		}
 
-		// ラスト命令
-		hdc_last();
+		// load ---------------------------------------------
+		hdc_load_thread(THREADS_NUM, core_num, addr_array);
+		// ------------------------------------------------------
 
-		START_COMPUTE = clock();
-		hdc_compute();
-		END_COMPUTE = clock();
-		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
+		// store ---------------------------------------------
+		hdc_simd_store_thread();
+		// ------------------------------------------------------
 	}
+
+	// 最後の余り
+	if (REMAINDAR != 0)
+	{
+		uint16_t core_num = REMAINDAR_CORENUM;
+
+		uint16_t addr_array[THREADS_NUM][core_num];
+
+		// アドレス
+		for (int k = 0; k < THREADS_NUM; k++)
+		{
+			for (int i = 0; i < core_num; i++)
+			{
+				addr_array[k][i] = rand_array[rand_array_num++];
+			}
+		}
+
+		// load ---------------------------------------------
+		hdc_load_thread(THREADS_NUM, core_num, addr_array);
+		// ------------------------------------------------------
+
+		// store ---------------------------------------------
+		hdc_store_thread(THREADS_NUM, core_num);
+		// ------------------------------------------------------
+	}
+
+	// ラスト命令
+	hdc_last();
+
+	START_COMPUTE = clock();
+	hdc_compute();
+	END_COMPUTE = clock();
+	COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
+
+	free(rand_array);
 
 	hdc_finish();
 
