@@ -73,7 +73,7 @@ int main()
 
 	hdc_setup();
 
-	for (int ll = 0; ll < 10; ll++)
+	for (int ll = 0; ll < 26; ll++)
 	{
 		// 490
 		hdc_make_imem(FIRST_RAND_NUM);

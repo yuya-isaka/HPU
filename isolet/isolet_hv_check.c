@@ -74,10 +74,12 @@ int main(void)
 	const uint32_t RAND_NUM = 637;
 	hv_t **item_memory = hv_make_imem(RAND_NUM);
 
-	// 0-9の結果
-	hv_t **result = hv_make_array(10);
+	const uint32_t ALL_TRAIN_NUM = 26;
 
-	for (int i = 0; i < 10; i++)
+	// 0-9の結果
+	hv_t **result = hv_make_array(ALL_TRAIN_NUM);
+
+	for (int i = 0; i < ALL_TRAIN_NUM; i++)
 	{
 		START_COMPUTE = clock();
 		char PATH[12];
@@ -131,14 +133,14 @@ int main(void)
 		//////////////////////////////////////////////////////////////////////
 	}
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < ALL_TRAIN_NUM; i++)
 	{
 		printf("%d:\n", i);
 		hv_print(result[i]);
 		printf("\n");
 	}
 
-	hv_free_array(result, 10);
+	hv_free_array(result, ALL_TRAIN_NUM);
 	hv_free_array(item_memory, 637);
 
 	printf("  load時間: %lf[ms]\n", LOAD_TIME);
