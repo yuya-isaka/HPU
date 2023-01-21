@@ -62,6 +62,22 @@ peta:
 	gcc -O2 -o perm_bound_peta perm_bound.o hyper_vector.o
 	rm hyper_vector.o bind.o perm.o bound.o random.o bind_bound.o perm_bound.o
 
+peta-omp:
+	gcc -fopenmp -DOPENMP -c -O2 -o hyper_vector.o hyper_vector.c
+	gcc -fopenmp -DOPENMP -c -O2 -o bind.o bind.c
+	gcc -fopenmp -DOPENMP -O2 -o bind_peta bind.o hyper_vector.o
+	gcc -fopenmp -DOPENMP -c -O2 -o perm.o perm.c
+	gcc -fopenmp -DOPENMP -O2 -o perm_peta perm.o hyper_vector.o
+	gcc -fopenmp -DOPENMP -c -O2 -o bound.o bound.c
+	gcc -fopenmp -DOPENMP -O2 -o bound_peta bound.o hyper_vector.o
+	gcc -fopenmp -DOPENMP -c -O2 -o random.o random.c
+	gcc -fopenmp -DOPENMP -O2 -o random_peta random.o hyper_vector.o
+	gcc -fopenmp -DOPENMP -c -O2 -o bind_bound.o bind_bound.c
+	gcc -fopenmp -DOPENMP -O2 -o bind_bound_peta bind_bound.o hyper_vector.o
+	gcc -fopenmp -DOPENMP -c -O2 -o perm_bound.o perm_bound.c
+	gcc -fopenmp -DOPENMP -O2 -o perm_bound_peta perm_bound.o hyper_vector.o
+	rm hyper_vector.o bind.o perm.o bound.o random.o bind_bound.o perm_bound.o
+
 clean:
 	rm -f bind_peta perm_peta bound_peta random_peta bind_bound_peta perm_bound_peta bind perm bound random bind_bound perm_bound
 

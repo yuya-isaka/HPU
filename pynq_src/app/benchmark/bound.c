@@ -34,7 +34,6 @@ int main(int argc, char const *argv[])
 	{
 		rand_array[i] = rand() % RANNUM;
 	}
-	int rand_array_num = 0;
 	END_COMPUTE = clock();
 	RAN_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 	/////////////////////////////////////////////////////////////////////////////
@@ -44,12 +43,12 @@ int main(int argc, char const *argv[])
 #endif
 	for (int i = 0; i < TRIAL_NUM; i++)
 	{
-		int addr = rand_array[rand_array_num++];
+		int addr = rand_array[i];
 		hv_bound(item_memory[addr]);
 	}
 
 	hv_t *result = hv_bound_result();
-	// hv_print(result);
+	hv_print(result);
 	hv_free(result);
 
 	hv_finish();
