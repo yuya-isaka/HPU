@@ -131,7 +131,7 @@ hv_t **hv_make_imem(const uint32_t size)
 	for (int i = 0; i < size; i++)
 	{
 		// mnist特別仕様
-		if (i == 490)
+		if (i == 500)
 		{
 			uint32_t tmp = xor128(0);
 		}

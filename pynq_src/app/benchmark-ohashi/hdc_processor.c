@@ -209,14 +209,14 @@ void hdc_load_thread(uint16_t thread_num, uint16_t core_num, uint16_t addr_array
 		{
 			src[SEND_NUM++] = 40960 | addr_array[k][i];
 		}
-		for (int i = core_num; i < 16; i++)
+		for (int i = core_num; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
 	}
 	for (int k = thread_num; k < THREADS_NUM; k++)
 	{
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
@@ -233,14 +233,14 @@ void hdc_store_thread(uint16_t thread_num, uint16_t core_num)
 		{
 			src[SEND_NUM++] = 4096;
 		}
-		for (int i = core_num; i < 16; i++)
+		for (int i = core_num; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
 	}
 	for (int k = thread_num; k < THREADS_NUM; k++)
 	{
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
@@ -252,7 +252,7 @@ void hdc_simd_store_thread(void)
 	for (int k = 0; k < THREADS_NUM; k++)
 	{
 		src[SEND_NUM] = 5120;
-		SEND_NUM += 16;
+		SEND_NUM += 2;
 	}
 }
 
@@ -266,14 +266,14 @@ void hdc_pstore_thread(uint16_t thread_num, uint16_t core_num)
 		{
 			src[SEND_NUM++] = 20480;
 		}
-		for (int i = core_num; i < 16; i++)
+		for (int i = core_num; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
 	}
 	for (int k = thread_num; k < THREADS_NUM; k++)
 	{
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
@@ -285,7 +285,7 @@ void hdc_simd_pstore_thread(void)
 	for (int k = 0; k < THREADS_NUM; k++)
 	{
 		src[SEND_NUM] = 21504;
-		SEND_NUM += 16;
+		SEND_NUM += 2;
 	}
 }
 
@@ -299,14 +299,14 @@ void hdc_move_thread(uint16_t thread_num, uint16_t core_num)
 		{
 			src[SEND_NUM++] = 2048;
 		}
-		for (int i = core_num; i < 16; i++)
+		for (int i = core_num; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
 	}
 	for (int k = thread_num; k < THREADS_NUM; k++)
 	{
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
@@ -318,7 +318,7 @@ void hdc_simd_move_thread(void)
 	for (int k = 0; k < THREADS_NUM; k++)
 	{
 		src[SEND_NUM] = 3072;
-		SEND_NUM += 16;
+		SEND_NUM += 2;
 	}
 }
 
@@ -332,14 +332,14 @@ void hdc_pmove_thread(uint16_t thread_num, uint16_t core_num)
 		{
 			src[SEND_NUM++] = 18432;
 		}
-		for (int i = core_num; i < 16; i++)
+		for (int i = core_num; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
 	}
 	for (int k = thread_num; k < THREADS_NUM; k++)
 	{
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
@@ -351,7 +351,7 @@ void hdc_simd_pmove_thread(void)
 	for (int k = 0; k < THREADS_NUM; k++)
 	{
 		src[SEND_NUM] = 19456;
-		SEND_NUM += 16;
+		SEND_NUM += 2;
 	}
 }
 
@@ -370,14 +370,14 @@ void hdc_permute_thread(uint16_t thread_num, uint16_t core_num, uint16_t permute
 		{
 			src[SEND_NUM++] = 34816 | permute_num;
 		}
-		for (int i = core_num; i < 16; i++)
+		for (int i = core_num; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
 	}
 	for (int k = thread_num; k < THREADS_NUM; k++)
 	{
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
@@ -389,7 +389,7 @@ void hdc_simd_permute_thread(uint16_t permute_num)
 	for (int k = 0; k < THREADS_NUM; k++)
 	{
 		src[SEND_NUM] = 35840 | permute_num;
-		SEND_NUM += 16;
+		SEND_NUM += 2;
 	}
 }
 
@@ -403,14 +403,14 @@ void hdc_xor_thread(uint16_t thread_num, uint16_t core_num)
 		{
 			src[SEND_NUM++] = 8192;
 		}
-		for (int i = core_num; i < 16; i++)
+		for (int i = core_num; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
 	}
 	for (int k = thread_num; k < THREADS_NUM; k++)
 	{
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
@@ -422,7 +422,7 @@ void hdc_simd_xor_thread(void)
 	for (int k = 0; k < THREADS_NUM; k++)
 	{
 		src[SEND_NUM] = 9216;
-		SEND_NUM += 16;
+		SEND_NUM += 2;
 	}
 }
 
@@ -436,14 +436,14 @@ void hdc_pxor_thread(uint16_t thread_num, uint16_t core_num)
 		{
 			src[SEND_NUM++] = 24576;
 		}
-		for (int i = core_num; i < 16; i++)
+		for (int i = core_num; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
 	}
 	for (int k = thread_num; k < THREADS_NUM; k++)
 	{
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			src[SEND_NUM++] = 0;
 		}
@@ -455,7 +455,7 @@ void hdc_simd_pxor_thread(void)
 	for (int k = 0; k < THREADS_NUM; k++)
 	{
 		src[SEND_NUM] = 25600;
-		SEND_NUM += 16;
+		SEND_NUM += 2;
 	}
 }
 
@@ -464,7 +464,7 @@ void hdc_simd_pxor_thread(void)
 void hdc_last(void)
 {
 	src[SEND_NUM++] = 256;
-	for (int i = 1; i < 16; i++)
+	for (int i = 1; i < 2; i++)
 	{
 		src[SEND_NUM++] = 0;
 	}

@@ -62,12 +62,12 @@ int main()
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// 784個のハイパーベクトルを生成し格納
-	const uint32_t RAND_NUM = 637;
-	const uint32_t FIRST_RAND_NUM = 500;
+	const uint32_t RAND_NUM = 637; // 617 + 10 + 10
+	const uint32_t FIRST_RAND_NUM = 510;
 	const uint32_t SECOND_RAND_NUM = RAND_NUM - FIRST_RAND_NUM;
 
 	// コア数
-	const int CORENUM = 14;
+	const int CORENUM = 2;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -75,7 +75,7 @@ int main()
 
 	for (int ll = 0; ll < 26; ll++)
 	{
-		// 490
+		// 500
 		hdc_make_imem(FIRST_RAND_NUM);
 		hdc_init(0);
 		hdc_start();
@@ -88,11 +88,12 @@ int main()
 		END_COMPUTE = clock();
 		LOAD_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
+		// 510
 		for (int dd = 0; dd < data_tmp_num;)
 		{
 			int index_tmp = 0;
 
-			for (int j = 0; j < 7; j++)
+			for (int j = 0; j < 50; j++)
 			{
 				uint16_t core_num = CORENUM;
 				uint16_t addr_array[THREADS_NUM][core_num];
@@ -119,7 +120,7 @@ int main()
 				{
 					for (int i = 0; i < core_num; i++)
 					{
-						addr_array[k][i] = (data_lines[dd++] - '0') + 490;
+						addr_array[k][i] = (data_lines[dd++] - '0') + 500;
 					}
 				}
 
@@ -135,7 +136,7 @@ int main()
 				hdc_simd_store_thread();
 				// ------------------------------------------------------
 			}
-			dd += 127;
+			dd += 117;
 		}
 
 		hdc_last();
@@ -144,60 +145,64 @@ int main()
 		END_COMPUTE = clock();
 		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-		// 137
+		// 127
 		hdc_make_imem_2(SECOND_RAND_NUM);
 		hdc_init(0);
 		for (int dd = 0; dd < data_tmp_num;)
 		{
-			dd += 490;
+			dd += 500;
 			int index_tmp = 0;
 
-			uint16_t core_num = CORENUM;
-			uint16_t addr_array[THREADS_NUM][core_num];
-
-			// 70
-			for (int k = 0; k < THREADS_NUM; k++)
+			for (int j = 0; j < 11; j++)
 			{
-				for (int i = 0; i < core_num; i++)
+				uint16_t core_num = CORENUM;
+				uint16_t addr_array[THREADS_NUM][core_num];
+
+				// 70
+				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					addr_array[k][i] = index_tmp++;
+					for (int i = 0; i < core_num; i++)
+					{
+						addr_array[k][i] = index_tmp++;
+					}
 				}
-			}
 
-			// load ---------------------------------------------
-			hdc_load_thread(THREADS_NUM, core_num, addr_array);
-			// ------------------------------------------------------
+				// load ---------------------------------------------
+				hdc_load_thread(THREADS_NUM, core_num, addr_array);
+				// ------------------------------------------------------
 
-			// move --------------------------------------------
-			hdc_simd_move_thread();
-			// ------------------------------------------------------
+				// move --------------------------------------------
+				hdc_simd_move_thread();
+				// ------------------------------------------------------
 
-			// 70
-			for (int k = 0; k < THREADS_NUM; k++)
-			{
-				for (int i = 0; i < core_num; i++)
+				// 70
+				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					addr_array[k][i] = (data_lines[dd++] - '0') + 127;
+					for (int i = 0; i < core_num; i++)
+					{
+						addr_array[k][i] = (data_lines[dd++] - '0') + 117;
+					}
 				}
+
+				// load ---------------------------------------------
+				hdc_load_thread(THREADS_NUM, core_num, addr_array);
+				// ------------------------------------------------------
+
+				// bind ----------------------------------------------
+				hdc_simd_xor_thread();
+				// ------------------------------------------------------
+
+				// store ---------------------------------------------
+				hdc_simd_store_thread();
+				// ------------------------------------------------------
 			}
-
-			// load ---------------------------------------------
-			hdc_load_thread(THREADS_NUM, core_num, addr_array);
-			// ------------------------------------------------------
-
-			// bind ----------------------------------------------
-			hdc_simd_xor_thread();
-			// ------------------------------------------------------
-
-			// store ---------------------------------------------
-			hdc_simd_store_thread();
-			// ------------------------------------------------------
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			// 残り
-			core_num = CORENUM;
-			uint16_t thread_num = 4;
+			uint16_t core_num = CORENUM;
+			uint16_t thread_num = 3;
+			uint16_t addr_array[THREADS_NUM][core_num];
 
 			for (int k = 0; k < thread_num; k++)
 			{
@@ -220,7 +225,7 @@ int main()
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					addr_array[k][i] = (data_lines[dd++] - '0') + 127;
+					addr_array[k][i] = (data_lines[dd++] - '0') + 117;
 				}
 			}
 
@@ -263,7 +268,7 @@ int main()
 			{
 				for (int i = 0; i < core_num; i++)
 				{
-					addr_array[k][i] = (data_lines[dd++] - '0') + 127;
+					addr_array[k][i] = (data_lines[dd++] - '0') + 117;
 				}
 			}
 

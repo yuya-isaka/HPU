@@ -28,11 +28,11 @@ int main(int argc, char const *argv[])
 	const int INSTRUCTION_NUM = 2 + ((NGRAM - 2) * 4) + 4;
 
 	// コア数
-	const int CORENUM = 14;
+	const int CORENUM = 2;
 
 	// DMA SEND_MAX
 	int SEND_MAX = 33000000;
-	const int SEND_TMP = SEND_MAX % (THREADS_NUM * 16 * INSTRUCTION_NUM) * (CORENUM * THREADS_NUM);
+	const int SEND_TMP = SEND_MAX % (THREADS_NUM * 2 * INSTRUCTION_NUM) * (CORENUM * THREADS_NUM);
 	SEND_MAX += SEND_TMP;
 
 	// 偶数の時に使うアドレス
@@ -94,7 +94,7 @@ int main(int argc, char const *argv[])
 		// 1回70この命令を、SEND_MAX / 800 回回す必要がある
 		// 800 = THREADS_NUM * 16 * INSTRUCTION_NUM
 		// 70 = CORENUM * THREADS_NUM
-		int ALL_SEND_NUM = SEND_MAX / (THREADS_NUM * 16 * INSTRUCTION_NUM) * (CORENUM * THREADS_NUM);
+		int ALL_SEND_NUM = SEND_MAX / (THREADS_NUM * 2 * INSTRUCTION_NUM) * (CORENUM * THREADS_NUM);
 		// ALL_SEND_EPOCHをLASTまで何回する必要があるか
 		const int ALL_SEND_EPOCH = LAST / ALL_SEND_NUM;
 		// ALL_SEND_EPOCHをLASTまで何回する必要があるか(あまり)
@@ -403,11 +403,11 @@ int main(int argc, char const *argv[])
 		END_COMPUTE = clock();
 		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-		// // 結果確認
-		// for (int j = 0; j < 32; j++)
-		// {
-		// 	printf("  %u\n", dst[j]);
-		// }
+		// 結果確認
+		for (int j = 0; j < 32; j++)
+		{
+			printf("  %u\n", dst[j]);
+		}
 
 		// 終了処理
 		hdc_finish();

@@ -110,9 +110,9 @@ int main(void)
 			for (int k = 0; k < 617; k++)
 			{
 				hv_t *bind_result;
-				if (k < 490)
+				if (k < 500)
 				{
-					bind_result = hv_bind(item_memory[k], item_memory[(data_lines[addr_tmp++] - '0') + 490]);
+					bind_result = hv_bind(item_memory[k], item_memory[(data_lines[addr_tmp++] - '0') + 500]);
 				}
 				else
 				{

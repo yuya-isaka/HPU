@@ -242,7 +242,7 @@ int main(int argc, char const *argv[])
 
 		// hv -------------------------------------------------
 		// 結果出力
-		// hv_print(result);
+		hv_print(result);
 
 		// Free
 		hv_free(result);
@@ -263,7 +263,7 @@ int main(int argc, char const *argv[])
 	// hv -------------------------------------------------
 
 	// printf("\n  計算時間: %lf[ms]\n", TIME);
-	printf("\n  ロード時間: %lf[ms]\n", LOAD_TIME);
+	printf("\n  ロード時間: %lf[ms]\n\n", LOAD_TIME);
 
 	// puts("\n  --------------------------------------- HDC Program END -------------------------------------");
 	return 0;

@@ -59,18 +59,18 @@ int main()
 
 	// 784個のハイパーベクトルを生成し格納
 	const uint32_t RAND_NUM = 784;
-	const uint32_t FIRST_RAND_NUM = 490;
+	const uint32_t FIRST_RAND_NUM = 500;
 	const uint32_t SECOND_RAND_NUM = RAND_NUM - FIRST_RAND_NUM;
 
 	// コア数
-	const int CORENUM = 14;
+	const int CORENUM = 2;
 
 	// メモリセットアップ
 	hdc_setup();
 
 	for (int ll = 0; ll < 10; ll++)
 	{
-		// 490
+		// 500
 		hdc_make_imem(FIRST_RAND_NUM);
 		hdc_init(0);
 		hdc_start();
@@ -87,7 +87,7 @@ int main()
 		{
 			int index_num = 0;
 
-			for (int j = 0; j < 7; j++)
+			for (int j = 0; j < 50; j++)
 			{
 				uint16_t core_num = CORENUM;
 
@@ -110,10 +110,6 @@ int main()
 					for (int i = 0; i < core_num; i++)
 					{
 						hdc_permute((data_lines[dd++] - '0'));
-					}
-					for (int i = 0; i < 2; i++)
-					{
-						hdc_nop();
 					}
 				}
 				// ------------------------------------------------------
@@ -131,7 +127,7 @@ int main()
 		END_COMPUTE = clock();
 		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-		// 294
+		// 284
 		hdc_make_imem_2(SECOND_RAND_NUM);
 		hdc_init(0);
 		for (int dd = 0; dd < data_tmp_num;)
@@ -139,7 +135,7 @@ int main()
 			dd += FIRST_RAND_NUM;
 			int index_num = 0;
 
-			for (int j = 0; j < 4; j++)
+			for (int j = 0; j < 28; j++)
 			{
 				uint16_t core_num = CORENUM;
 
@@ -163,10 +159,6 @@ int main()
 					{
 						hdc_permute((data_lines[dd++] - '0'));
 					}
-					for (int i = 0; i < 2; i++)
-					{
-						hdc_nop();
-					}
 				}
 				// ------------------------------------------------------
 
@@ -175,9 +167,9 @@ int main()
 				// ------------------------------------------------------
 			}
 
-			// 残り
+			// 残り 4
 			uint16_t core_num = CORENUM;
-			uint16_t thread_num = 1;
+			uint16_t thread_num = 2;
 
 			uint16_t addr_array[thread_num][core_num];
 			for (int k = 0; k < thread_num; k++)
@@ -199,14 +191,10 @@ int main()
 				{
 					hdc_permute((data_lines[dd++] - '0'));
 				}
-				for (int i = 0; i < 2; i++)
-				{
-					hdc_nop();
-				}
 			}
 			for (int k = thread_num; k < THREADS_NUM; k++)
 			{
-				for (int i = 0; i < 16; i++)
+				for (int i = 0; i < 2; i++)
 				{
 					hdc_nop();
 				}
