@@ -81,10 +81,10 @@ int main(int argc, char const *argv[])
 
 	hdc_compute();
 
-	for (int i = 0; i < 32; i++)
-	{
-		printf("  %u\n", dst[i]);
-	}
+	// for (int i = 0; i < 32; i++)
+	// {
+	// 	printf("  %u\n", dst[i]);
+	// }
 
 	hdc_finish();
 
