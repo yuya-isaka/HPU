@@ -33,11 +33,18 @@ f = open('test.txt', 'w')
 #     f.write('stage_4_%d <= stage_3_%d + stage_3_%d + stage_3_%d + stage_3_%d;\n' % (j, i, i+1, i+2, i+3))
 #     j += 1
 
-f.write('reg [11:0] stage_5_%d;\n' % 1)
+# f.write('reg [11:0] stage_5_%d;\n' % 1)
 
-j = 1;
-for i in range(1, 5, 4):
-    f.write('stage_5_%d <= stage_4_%d + stage_4_%d + stage_4_%d + stage_4_%d;\n' % (j, i, i+1, i+2, i+3))
-    j += 1
+# j = 1;
+# for i in range(1, 5, 4):
+#     f.write('stage_5_%d <= stage_4_%d + stage_4_%d + stage_4_%d + stage_4_%d;\n' % (j, i, i+1, i+2, i+3))
+#     j += 1
+
+j = 32
+for i in range(1, 32):
+    f.write('else if ( stream_i == 5\'d%d) begin\n' % i)
+    f.write('stream_d[31:0] <= sign_bit[%d:%d];\n' % (j+31, j))
+    f.write('end\n')
+    j+=32
 
 f.close()

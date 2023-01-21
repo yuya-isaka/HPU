@@ -92,6 +92,7 @@ void hdc_setup(void)
 		close(uio1);
 		return;
 	}
+	// 64MB
 	src = (uint16_t *)mmap(NULL, 0x4000000, PROT_READ | PROT_WRITE, MAP_SHARED, udmabuf0, 0);
 	if (src == MAP_FAILED)
 	{
@@ -99,7 +100,8 @@ void hdc_setup(void)
 		close(udmabuf0);
 		return;
 	}
-	dst = (int *)mmap(NULL, 0x3D0900, PROT_READ | PROT_WRITE, MAP_SHARED, udmabuf1, 0);
+	// 512KB
+	dst = (int *)mmap(NULL, 0x80000, PROT_READ | PROT_WRITE, MAP_SHARED, udmabuf1, 0);
 	if (dst == MAP_FAILED)
 	{
 		perror("mmap dst");
