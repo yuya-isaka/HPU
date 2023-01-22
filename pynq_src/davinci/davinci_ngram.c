@@ -135,7 +135,6 @@ int main(int argc, char const *argv[])
 		START_COMPUTE = clock();
 		char *content = read_file(TRAIN_PATH[i]);
 		END_COMPUTE = clock();
-		// struct tensor *label = load_label_file(TRAIN_LABEL);
 		LOAD_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 		// NGRAMの数
@@ -241,8 +240,8 @@ int main(int argc, char const *argv[])
 		// #endif
 
 		// hv -------------------------------------------------
-		// 結果出力
-		hv_print(result);
+		// // 結果出力
+		// hv_print(result);
 
 		// Free
 		hv_free(result);

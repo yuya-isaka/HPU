@@ -55,7 +55,7 @@ char *read_file(const char *PATH, int *num)
 int main()
 {
 	double LOAD_TIME = 0.0;
-	double COM_TIME = 0.0;
+	// double COM_TIME = 0.0;
 	clock_t START_COMPUTE;
 	clock_t END_COMPUTE;
 
@@ -140,10 +140,10 @@ int main()
 		}
 
 		hdc_last();
-		START_COMPUTE = clock();
+		// START_COMPUTE = clock();
 		hdc_compute();
-		END_COMPUTE = clock();
-		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
+		// END_COMPUTE = clock();
+		// COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 		// 127
 		hdc_make_imem_2(SECOND_RAND_NUM);
@@ -286,10 +286,10 @@ int main()
 		}
 
 		hdc_last();
-		START_COMPUTE = clock();
+		// START_COMPUTE = clock();
 		hdc_compute();
-		END_COMPUTE = clock();
-		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
+		// END_COMPUTE = clock();
+		// COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 		// // 結果確認
 		// printf("\n%d:\n", ll);
@@ -304,8 +304,8 @@ int main()
 	}
 
 	printf("  load時間: %lf[ms]\n", LOAD_TIME);
-	printf("  計算時間: %lf[ms]", COM_TIME);
+	// printf("  計算時間: %lf[ms]", COM_TIME);
 
-	printf("\n\n\n");
+	// printf("\n\n\n");
 	return 0;
 }

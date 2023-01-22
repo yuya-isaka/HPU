@@ -47,7 +47,7 @@ int main(int argc, char const *argv[])
 	// hv -----------------------------
 
 	double LOAD_TIME = 0.0;
-	double COM_TIME = 0.0;
+	// double COM_TIME = 0.0;
 	clock_t START_COMPUTE;
 	clock_t END_COMPUTE;
 
@@ -398,22 +398,22 @@ int main(int argc, char const *argv[])
 		// ラスト命令
 		hdc_last();
 
-		START_COMPUTE = clock();
+		// START_COMPUTE = clock();
 		hdc_compute();
-		END_COMPUTE = clock();
-		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
+		// END_COMPUTE = clock();
+		// COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-		// 結果確認
-		for (int j = 0; j < 32; j++)
-		{
-			printf("  %u\n", dst[j]);
-		}
+		// // 結果確認
+		// for (int j = 0; j < 32; j++)
+		// {
+		// 	printf("  %u\n", dst[j]);
+		// }
 
 		// 終了処理
 		hdc_finish();
 	}
 
-	printf("\n  計算時間: %lf[ms]\n", COM_TIME);
+	// printf("\n  計算時間: %lf[ms]\n", COM_TIME);
 	printf("\n  ロード時間: %lf[ms]\n", LOAD_TIME);
 
 	// puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");
