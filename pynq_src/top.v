@@ -104,6 +104,8 @@ module top
 
     wire        get_v;
     wire        exec;
+    wire        get_c;
+    wire        communicate;
 
     get_enable get_enable
                (
@@ -112,13 +114,16 @@ module top
                    .clk( AXIS_ACLK ),
                    .gen( gen ),
                    .run( run ),
+                   .com( com ),
                    .get_valid( S_AXIS_TVALID ),
 
 
                    // out
                    .get_ready( S_AXIS_TREADY ),
                    .get_v( get_v ),
-                   .exec( exec )
+                   .exec( exec ),
+                   .get_c( get_c ),
+                   .communicate( communicate )
 
                );
 
@@ -256,13 +261,16 @@ module top
                      .clk( AXIS_ACLK ),
                      .run( run ),
                      .gen( gen ),
+                     .com( com ),
                      .reset_item( reset_item ),
                      .item_memory_num( item_memory_num[ 8:0 ] ),
                      .get_v( get_v ),
+                     .get_c( get_c ),
                      // 16bit命令
                      .get_d_tmp( S_AXIS_TDATA[ 15+16*i:16*i ] ),
-                     .get_d_1( S_AXIS_TDATA[ 15:0 ] ),
+                     .get_d_all( S_AXIS_TDATA[ 31:0 ] ),
                      .exec( exec ),
+                     .communicate( communicate ),
 
 
                      // out
@@ -294,12 +302,16 @@ module top
                      .clk( AXIS_ACLK ),
                      .run( run ),
                      .gen( gen ),
+                     .com( com ),
                      .reset_item( reset_item ),
                      .item_memory_num( item_memory_num[ 8:0 ] ),
                      .get_v( get_v ),
+                     .get_c( get_c ),
                      // 16bit命令
                      .get_d( S_AXIS_TDATA[ 15:0 ] ),
+                     .get_d_all( S_AXIS_TDATA[ 31:0 ] ),
                      .exec( exec ),
+                     .communicate( communicate ),
 
 
                      // out
@@ -510,6 +522,7 @@ module top
 
     // run ... 書き込みモードで2を代入
     // gen ... 書き込みモードで１を代入
+    reg                 com;
     reg                 run;
     reg                 gen;
 
@@ -533,7 +546,7 @@ module top
         // 初期化
         if ( ~S_AXI_ARESETN ) begin
 
-            { run, gen } <= 2'b00;
+            { com, run, gen } <= 3'b000;
 
             item_memory_num <= 9'd0;
 
@@ -554,7 +567,7 @@ module top
 
                 // アドレス０
                 10'd00:
-                    { run, gen } <= write_data[ 1:0 ];
+                    { com, run, gen } <= write_data[ 2:0 ];
 
                 // アドレス４
                 10'd04:
@@ -614,7 +627,7 @@ module top
 
                 // アドレス０
                 10'h00:
-                    S_AXI_RDATA[ 1:0 ] <= { run, gen };
+                    S_AXI_RDATA[ 2:0 ] <= { com, run, gen };
 
                 // // アドレス４
                 // 10'd04:

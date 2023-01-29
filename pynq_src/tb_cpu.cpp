@@ -56,6 +56,35 @@ void eval()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+uint32_t xor128(int reset)
+{
+  // 初期値
+  static uint32_t x = 123456789;
+  static uint32_t y = 362436069;
+  static uint32_t z = 521288629;
+  static uint32_t w = 88675123;
+
+  // リセット信号
+  if (reset)
+  {
+    x = 123456789;
+    y = 362436069;
+    z = 521288629;
+    w = 88675123;
+    return 0;
+  }
+  else
+  {
+    uint32_t t = x ^ (x << 11);
+    x = y;
+    y = z;
+    z = w;
+    return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 // 簡易アセンブラ
 uint16_t assemble(const char inst_str[], uint16_t addr)
 {
@@ -261,6 +290,62 @@ void check(const int THREADSNUM, const int DIM, int argc, char **argv, const int
     eval();
   }
   verilator_top->S_AXI_ARVALID = 0;
+  eval();
+
+  // RNG生成信号 (ランダムなハイパーベクトルを自動生成)
+  // com <- 1;
+  verilator_top->S_AXI_AWADDR = 0;
+  verilator_top->S_AXI_WDATA = 4;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
+  eval();
+
+  // 送信処理
+  verilator_top->S_AXIS_TVALID = 1;
+  eval();
+
+  for (int k = 0; k < 13; k++)
+  {
+    conv.data_0 = 1;
+    conv.data_1 = 0;
+    verilator_top->S_AXIS_TDATA = conv.write_data;
+    eval();
+  }
+
+  if (DEBUG)
+  {
+    // 送信途中で止まる対策 -----------------------------
+    verilator_top->S_AXIS_TVALID = 0;
+    verilator_top->S_AXIS_TDATA = 0;
+    eval();
+    eval();
+    eval();
+    verilator_top->S_AXIS_TVALID = 1;
+    // ----------------------------------------------
+  }
+
+  for (int k = 0; k < 19; k++)
+  {
+    conv.data_0 = 1;
+    conv.data_1 = 0;
+    verilator_top->S_AXIS_TDATA = conv.write_data;
+    eval();
+  }
+
+  // 送信終了
+  verilator_top->S_AXIS_TVALID = 0;
+
+  // 終了処理
+  verilator_top->S_AXI_AWADDR = 0;
+  verilator_top->S_AXI_WDATA = 0;
+  verilator_top->S_AXI_AWVALID = 1;
+  verilator_top->S_AXI_WVALID = 1;
+  eval();
+  verilator_top->S_AXI_AWVALID = 0;
+  verilator_top->S_AXI_WVALID = 0;
   eval();
 
   ////////////////////////////////////////////////////////////////////////////// compute ///////////////////////////////////////////////////////////////////////////////

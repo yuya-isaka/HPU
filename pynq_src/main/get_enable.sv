@@ -9,13 +9,16 @@ module get_enable
         input wire                  clk,
         input wire                  gen,
         input wire                  run,
+        input wire                  com,
         input wire                  get_valid,
 
 
         // out
         output wire                 get_ready,
         output logic                get_v,
-        output logic                exec
+        output logic                exec,
+        output logic                get_c,
+        output logic                communicate
 
     );
 
@@ -41,6 +44,26 @@ module get_enable
               end;
 
 
+    // データ受信の次から演算を開始
+    always_ff @( posedge clk ) begin
+
+                  if ( ~com ) begin
+
+                      communicate <= 1'b0;
+
+                  end
+
+                  else begin
+
+                      communicate <= get_c_tmp;
+
+                  end
+
+              end;
+
+
+
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -48,17 +71,35 @@ module get_enable
     assign get_ready = 1'b1;
 
 
+    assign get_c = communicate & get_c_tmp;
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // 受信設定
+    // 受信設定 run
     always_comb begin
 
                     get_v = 1'b0;
 
-                    if ( get_valid & get_ready & run & ~gen ) begin
+                    if ( get_valid & get_ready & run & ~gen & ~com ) begin
 
                         get_v = 1'b1;
+
+                    end
+
+                end;
+
+
+    logic       get_c_tmp;
+
+    // 受信設定 com
+    always_comb begin
+
+                    get_c_tmp = 1'b0;
+
+                    if ( get_valid & get_ready & com & ~run & ~gen ) begin
+
+                        get_c_tmp = 1'b1;
 
                     end
 
