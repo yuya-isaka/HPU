@@ -56,6 +56,33 @@ void eval()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+uint32_t xor128(int reset)
+{
+  // 初期値
+  static uint32_t x = 123456789;
+  static uint32_t y = 362436069;
+  static uint32_t z = 521288629;
+  static uint32_t w = 88675123;
+
+  // リセット信号
+  if (reset)
+  {
+    x = 123456789;
+    y = 362436069;
+    z = 521288629;
+    w = 88675123;
+    return 0;
+  }
+  else
+  {
+    uint32_t t = x ^ (x << 11);
+    x = y;
+    y = z;
+    z = w;
+    return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+  }
+}
+
 // 簡易アセンブラ
 uint16_t assemble(const char inst_str[], uint16_t addr)
 {
@@ -252,31 +279,54 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
 
   //////////////////////////////////////////////////////////////////////////////// start /////////////////////////////////////////////////////////////////////////////
 
-  // アイテムメモリの設定
-  verilator_top->S_AXI_AWADDR = 4;
-  verilator_top->S_AXI_WDATA = RANNUM - 1; // 1023番目をランダムな値に使う
-  verilator_top->S_AXI_AWVALID = 1;
-  verilator_top->S_AXI_WVALID = 1;
-  eval();
-  verilator_top->S_AXI_AWVALID = 0;
-  verilator_top->S_AXI_WVALID = 0;
-  eval();
+  // // アイテムメモリの設定
+  // verilator_top->S_AXI_AWADDR = 4;
+  // verilator_top->S_AXI_WDATA = RANNUM - 1; // 1023番目をランダムな値に使う
+  // verilator_top->S_AXI_AWVALID = 1;
+  // verilator_top->S_AXI_WVALID = 1;
+  // eval();
+  // verilator_top->S_AXI_AWVALID = 0;
+  // verilator_top->S_AXI_WVALID = 0;
+  // eval();
 
-  // RNGリセット信号
-  // reset <- 1;
-  verilator_top->S_AXI_AWADDR = 8;
-  verilator_top->S_AXI_WDATA = 1;
-  verilator_top->S_AXI_AWVALID = 1;
-  verilator_top->S_AXI_WVALID = 1;
-  eval();
-  verilator_top->S_AXI_AWVALID = 0;
-  verilator_top->S_AXI_WVALID = 0;
-  eval();
+  // // RNGリセット信号
+  // // reset <- 1;
+  // verilator_top->S_AXI_AWADDR = 8;
+  // verilator_top->S_AXI_WDATA = 1;
+  // verilator_top->S_AXI_AWVALID = 1;
+  // verilator_top->S_AXI_WVALID = 1;
+  // eval();
+  // verilator_top->S_AXI_AWVALID = 0;
+  // verilator_top->S_AXI_WVALID = 0;
+  // eval();
 
+  // // RNG生成信号 (ランダムなハイパーベクトルを自動生成)
+  // // gen <- 1;
+  // verilator_top->S_AXI_AWADDR = 0;
+  // verilator_top->S_AXI_WDATA = 1;
+  // verilator_top->S_AXI_AWVALID = 1;
+  // verilator_top->S_AXI_WVALID = 1;
+  // eval();
+  // verilator_top->S_AXI_AWVALID = 0;
+  // verilator_top->S_AXI_WVALID = 0;
+  // eval();
+
+  // // RNG生成終了を待つ
+  // verilator_top->S_AXI_ARVALID = 1;
+  // eval();
+  // eval();
+  // while (0 != verilator_top->S_AXI_RDATA)
+  // {
+  //   eval();
+  // }
+  // verilator_top->S_AXI_ARVALID = 0;
+  // eval();
+
+  // comunicate ===============================================================================================
   // RNG生成信号 (ランダムなハイパーベクトルを自動生成)
-  // gen <- 1;
+  // com <- 1;
   verilator_top->S_AXI_AWADDR = 0;
-  verilator_top->S_AXI_WDATA = 1;
+  verilator_top->S_AXI_WDATA = 4;
   verilator_top->S_AXI_AWVALID = 1;
   verilator_top->S_AXI_WVALID = 1;
   eval();
@@ -284,16 +334,105 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
   verilator_top->S_AXI_WVALID = 0;
   eval();
 
-  // RNG生成終了を待つ
-  verilator_top->S_AXI_ARVALID = 1;
+  // 送信処理
+  verilator_top->S_AXIS_TVALID = 1;
+  // VALIDとDATAは同時に届くのでここのeval()はおかしい
+  // eval();
+
+  verilator_top->S_AXIS_TDATA = 88675123;
   eval();
-  eval();
-  while (0 != verilator_top->S_AXI_RDATA)
+
+  for (int k = 0; k < 12; k++)
   {
+    verilator_top->S_AXIS_TDATA = xor128(0);
     eval();
   }
-  verilator_top->S_AXI_ARVALID = 0;
-  eval();
+
+  if (DEBUG)
+  {
+    // 送信途中で止まる対策 -----------------------------
+    verilator_top->S_AXIS_TVALID = 0;
+    verilator_top->S_AXIS_TDATA = 0;
+    eval();
+    eval();
+    eval();
+    verilator_top->S_AXIS_TVALID = 1;
+    // ----------------------------------------------
+  }
+
+  for (int k = 0; k < 2; k++)
+  {
+    verilator_top->S_AXIS_TDATA = xor128(0);
+    eval();
+  }
+
+  if (DEBUG)
+  {
+    // 送信途中で止まる対策 -----------------------------
+    verilator_top->S_AXIS_TVALID = 0;
+    verilator_top->S_AXIS_TDATA = 0;
+    eval();
+    eval();
+    eval();
+    verilator_top->S_AXIS_TVALID = 1;
+    // ----------------------------------------------
+  }
+
+  for (int k = 0; k < 17; k++)
+  {
+    verilator_top->S_AXIS_TDATA = xor128(0);
+    eval();
+  }
+
+  for (int i = 0; i < RANNUM - 1; i++)
+  {
+    for (int k = 0; k < 13; k++)
+    {
+      verilator_top->S_AXIS_TDATA = xor128(0);
+      eval();
+    }
+
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      verilator_top->S_AXIS_TDATA = 0;
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      // ----------------------------------------------
+    }
+
+    for (int k = 0; k < 2; k++)
+    {
+      verilator_top->S_AXIS_TDATA = xor128(0);
+      eval();
+    }
+
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      verilator_top->S_AXIS_TDATA = 0;
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      // ----------------------------------------------
+    }
+
+    for (int k = 0; k < 17; k++)
+    {
+      verilator_top->S_AXIS_TDATA = xor128(0);
+      eval();
+    }
+  }
+
+  // 送信終了
+  verilator_top->S_AXIS_TVALID = 0;
+  verilator_top->S_AXIS_TDATA = 0;
+  // comunicate ===============================================================================================
 
   // eval();
   // eval();
@@ -353,7 +492,8 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
 
   // 送信処理
   verilator_top->S_AXIS_TVALID = 1;
-  eval();
+  // VALIDとDATAは同時に届くのでここのeval()はおかしい
+  // eval();
 
   int tmp = 0;
 
@@ -1617,6 +1757,8 @@ int main(int argc, char **argv)
   ADDRNUM = 300;
   DEBUG = 1;
   check(NGRAM, CORENUM, THREADSNUM, ADDRNUM, DIM, MAJORITY_ADDR, argc, argv, DEBUG);
+
+  xor128(1);
 
   // 単体テスト2
   ADDRNUM = 90;

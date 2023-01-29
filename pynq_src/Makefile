@@ -36,7 +36,7 @@ DESIGN_SRC = \
 ./kit/agu.sv \
 ./kit/permute.sv \
 
-VERILATOR_TB = tb_cpu.cpp
+VERILATOR_TB = tb.cpp
 
 default: $(SIM_DIR)/$(TOP)
 	./sim/$(TOP)

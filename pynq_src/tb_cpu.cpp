@@ -292,6 +292,7 @@ void check(const int THREADSNUM, const int DIM, int argc, char **argv, const int
   // verilator_top->S_AXI_ARVALID = 0;
   // eval();
 
+  // comunicate ===============================================================================================
   // RNG生成信号 (ランダムなハイパーベクトルを自動生成)
   // com <- 1;
   verilator_top->S_AXI_AWADDR = 0;
@@ -401,6 +402,7 @@ void check(const int THREADSNUM, const int DIM, int argc, char **argv, const int
   // 送信終了
   verilator_top->S_AXIS_TVALID = 0;
   verilator_top->S_AXIS_TDATA = 0;
+  // comunicate ===============================================================================================
 
   // 終了処理
   verilator_top->S_AXI_AWADDR = 0;
