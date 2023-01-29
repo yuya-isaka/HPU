@@ -240,8 +240,8 @@ int main(int argc, char const *argv[])
 		// #endif
 
 		// hv -------------------------------------------------
-		// // 結果出力
-		// hv_print(result);
+		// 結果出力
+		hv_print(result);
 
 		// Free
 		hv_free(result);

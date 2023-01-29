@@ -9,6 +9,12 @@
 
 extern int *dst;
 
+extern void hdc_com_gen(uint32_t num);
+
+extern void hdc_com_start(void);
+
+extern void hdc_com_run(void);
+
 extern void hdc_print(void);
 
 extern void hdc_setup(void);

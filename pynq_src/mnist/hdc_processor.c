@@ -192,6 +192,48 @@ void hdc_finish(void)
 	top[0x02] = 0;
 }
 
+// COM =========================================================================================
+
+union
+{
+	struct
+	{
+		uint16_t data_0;
+		uint16_t data_1;
+	};
+	uint32_t write_data;
+} conv;
+
+void hdc_com_gen(uint32_t num)
+{
+	conv.write_data = num;
+	src[SEND_NUM++] = conv.data_0;
+	src[SEND_NUM++] = conv.data_1;
+}
+
+void hdc_com_start(void)
+{
+	hdc_init(0);
+
+	// com <- 1;
+	top[0x00] = 4;
+}
+
+// DMA送信開始 & 計算開始
+void hdc_com_run(void)
+{
+	// AXI DMA 送信設定（UIO経由）
+	dma[0x00] = 1;
+	dma[0x6] = src_phys;
+	dma[0xa] = SEND_NUM * 2; // 16ビット命令の数 * 2 = バイト数
+
+	// 送信終了
+	while ((dma[0x1] & 0x1000) != 0x1000)
+		;
+
+	hdc_dma_reset();
+}
+
 // Nop =========================================================================================
 
 void hdc_nop(void)
