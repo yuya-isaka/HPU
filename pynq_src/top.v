@@ -106,6 +106,7 @@ module top
     wire        exec;
     wire        get_c;
     wire        communicate;
+    wire        get_c_tmp;
 
     get_enable get_enable
                (
@@ -122,8 +123,7 @@ module top
                    .get_ready( S_AXIS_TREADY ),
                    .get_v( get_v ),
                    .exec( exec ),
-                   .get_c( get_c ),
-                   .communicate( communicate )
+                   .get_c( get_c )
 
                );
 
@@ -270,7 +270,6 @@ module top
                      .get_d_tmp( S_AXIS_TDATA[ 15+16*i:16*i ] ),
                      .get_d_all( S_AXIS_TDATA[ 31:0 ] ),
                      .exec( exec ),
-                     .communicate( communicate ),
 
 
                      // out
@@ -311,7 +310,6 @@ module top
                      .get_d( S_AXIS_TDATA[ 15:0 ] ),
                      .get_d_all( S_AXIS_TDATA[ 31:0 ] ),
                      .exec( exec ),
-                     .communicate( communicate ),
 
 
                      // out

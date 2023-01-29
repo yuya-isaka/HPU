@@ -305,6 +305,12 @@ void check(const int THREADSNUM, const int DIM, int argc, char **argv, const int
 
   // 送信処理
   verilator_top->S_AXIS_TVALID = 1;
+  // VALIDとDATAは同時に届くのでここのeval()はおかしい
+  // eval();
+
+  conv.data_0 = 1;
+  conv.data_1 = 0;
+  verilator_top->S_AXIS_TDATA = conv.write_data;
   eval();
 
   for (int k = 0; k < 13; k++)
@@ -327,7 +333,27 @@ void check(const int THREADSNUM, const int DIM, int argc, char **argv, const int
     // ----------------------------------------------
   }
 
-  for (int k = 0; k < 19; k++)
+  for (int k = 0; k < 2; k++)
+  {
+    conv.data_0 = 1;
+    conv.data_1 = 0;
+    verilator_top->S_AXIS_TDATA = conv.write_data;
+    eval();
+  }
+
+  if (DEBUG)
+  {
+    // 送信途中で止まる対策 -----------------------------
+    verilator_top->S_AXIS_TVALID = 0;
+    verilator_top->S_AXIS_TDATA = 0;
+    eval();
+    eval();
+    eval();
+    verilator_top->S_AXIS_TVALID = 1;
+    // ----------------------------------------------
+  }
+
+  for (int k = 0; k < 17; k++)
   {
     conv.data_0 = 1;
     conv.data_1 = 0;

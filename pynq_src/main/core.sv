@@ -28,7 +28,6 @@ module core
          input wire [ 15:0 ]                get_d_tmp,
          input wire [ 31:0 ]                get_d_all,
          input wire                         exec,
-         input wire                         communicate,
 
 
          // out
@@ -683,7 +682,7 @@ module core
 
                   end
 
-                  else if ( com & communicate ) begin
+                  else if ( com & get_c ) begin
 
                       // 次元数可変
                       if ( item_a_tmp == 0 ) begin

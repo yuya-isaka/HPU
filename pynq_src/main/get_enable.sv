@@ -17,8 +17,7 @@ module get_enable
         output wire                 get_ready,
         output logic                get_v,
         output logic                exec,
-        output logic                get_c,
-        output logic                communicate
+        output logic                get_c
 
     );
 
@@ -44,34 +43,12 @@ module get_enable
               end;
 
 
-    // データ受信の次から演算を開始
-    always_ff @( posedge clk ) begin
-
-                  if ( ~com ) begin
-
-                      communicate <= 1'b0;
-
-                  end
-
-                  else begin
-
-                      communicate <= get_c_tmp;
-
-                  end
-
-              end;
-
-
-
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     // 現状、アクセラレータ側で受信を拒否することはない
     assign get_ready = 1'b1;
 
-
-    assign get_c = communicate & get_c_tmp;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -90,16 +67,14 @@ module get_enable
                 end;
 
 
-    logic       get_c_tmp;
-
     // 受信設定 com
     always_comb begin
 
-                    get_c_tmp = 1'b0;
+                    get_c = 1'b0;
 
                     if ( get_valid & get_ready & com & ~run & ~gen ) begin
 
-                        get_c_tmp = 1'b1;
+                        get_c = 1'b1;
 
                     end
 
