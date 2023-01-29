@@ -36,7 +36,7 @@ DESIGN_SRC = \
 ./kit/agu.sv \
 ./kit/permute.sv \
 
-VERILATOR_TB = tb.cpp
+VERILATOR_TB = tb_cpu.cpp
 
 default: $(SIM_DIR)/$(TOP)
 	./sim/$(TOP)
@@ -51,6 +51,14 @@ clean:
 
 format :
 	iStyle --style=kr -n -s4 --pad=paren $(DESIGN_SRC)
+
+testcpu:
+	gcc -c -O2 -o hyper_vector.o hyper_vector.c
+	gcc -c -O2 -o test.o test_cpu.c
+	gcc -O2 -o test test.o hyper_vector.o
+	rm hyper_vector.o test.o
+	./test
+	rm test
 
 test:
 	gcc -c -O2 -o hyper_vector.o hyper_vector.c
