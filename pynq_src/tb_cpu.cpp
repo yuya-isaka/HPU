@@ -308,16 +308,12 @@ void check(const int THREADSNUM, const int DIM, int argc, char **argv, const int
   // VALIDとDATAは同時に届くのでここのeval()はおかしい
   // eval();
 
-  conv.data_0 = 1;
-  conv.data_1 = 0;
-  verilator_top->S_AXIS_TDATA = conv.write_data;
+  verilator_top->S_AXIS_TDATA = 88675123;
   eval();
 
-  for (int k = 0; k < 13; k++)
+  for (int k = 0; k < 12; k++)
   {
-    conv.data_0 = 1;
-    conv.data_1 = 0;
-    verilator_top->S_AXIS_TDATA = conv.write_data;
+    verilator_top->S_AXIS_TDATA = xor128(0);
     eval();
   }
 
@@ -335,9 +331,7 @@ void check(const int THREADSNUM, const int DIM, int argc, char **argv, const int
 
   for (int k = 0; k < 2; k++)
   {
-    conv.data_0 = 1;
-    conv.data_1 = 0;
-    verilator_top->S_AXIS_TDATA = conv.write_data;
+    verilator_top->S_AXIS_TDATA = xor128(0);
     eval();
   }
 
@@ -355,9 +349,7 @@ void check(const int THREADSNUM, const int DIM, int argc, char **argv, const int
 
   for (int k = 0; k < 17; k++)
   {
-    conv.data_0 = 1;
-    conv.data_1 = 0;
-    verilator_top->S_AXIS_TDATA = conv.write_data;
+    verilator_top->S_AXIS_TDATA = xor128(0);
     eval();
   }
 
@@ -509,6 +501,8 @@ int main(int argc, char **argv)
   // 単体テスト1
   DEBUG = 0;
   check(THREADSNUM, DIM, argc, argv, DEBUG);
+
+  xor128(1);
 
   // 単体テスト2
   DEBUG = 1;
