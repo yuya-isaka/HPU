@@ -20,9 +20,8 @@ void check()
 
 	for (int i = 0; i < 5; i++)
 	{
-
 		// Bounding
-		hv_bound(item_memory[0]);
+		hv_bound(item_memory[i]);
 	}
 
 	// Bounding結果取り出し
