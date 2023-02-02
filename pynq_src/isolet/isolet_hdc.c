@@ -182,7 +182,7 @@ int main()
 			dd += 117;
 		}
 
-		hdc_last();
+		// hdc_last();
 		// START_COMPUTE = clock();
 		hdc_compute_only();
 		// END_COMPUTE = clock();

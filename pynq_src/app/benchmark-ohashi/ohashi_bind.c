@@ -133,7 +133,7 @@ int main(int argc, char const *argv[])
 	}
 
 	// ラスト命令
-	hdc_last();
+	// hdc_last();
 
 	hdc_compute_only();
 

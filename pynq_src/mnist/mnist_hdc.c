@@ -165,7 +165,7 @@ int main()
 			dd += SECOND_RAND_NUM;
 		}
 
-		hdc_last();
+		// hdc_last();
 		// START_COMPUTE = clock();
 		hdc_compute_only();
 		// END_COMPUTE = clock();
