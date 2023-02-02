@@ -7,7 +7,6 @@ module get_enable
 
         // in
         input wire                  clk,
-        input wire                  gen,
         input wire                  run,
         input wire                  com,
         input wire                  get_valid,
@@ -58,7 +57,7 @@ module get_enable
 
                     get_v = 1'b0;
 
-                    if ( get_valid & get_ready & run & ~gen & ~com ) begin
+                    if ( get_valid & get_ready & run & ~com ) begin
 
                         get_v = 1'b1;
 
@@ -72,7 +71,7 @@ module get_enable
 
                     get_c = 1'b0;
 
-                    if ( get_valid & get_ready & com & ~gen ) begin
+                    if ( get_valid & get_ready & com ) begin
 
                         get_c = 1'b1;
 

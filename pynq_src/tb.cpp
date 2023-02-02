@@ -279,54 +279,11 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
 
   //////////////////////////////////////////////////////////////////////////////// start /////////////////////////////////////////////////////////////////////////////
 
-  // // アイテムメモリの設定
-  // verilator_top->S_AXI_AWADDR = 4;
-  // verilator_top->S_AXI_WDATA = RANNUM - 1; // 1023番目をランダムな値に使う
-  // verilator_top->S_AXI_AWVALID = 1;
-  // verilator_top->S_AXI_WVALID = 1;
-  // eval();
-  // verilator_top->S_AXI_AWVALID = 0;
-  // verilator_top->S_AXI_WVALID = 0;
-  // eval();
-
-  // // RNGリセット信号
-  // // reset <- 1;
-  // verilator_top->S_AXI_AWADDR = 8;
-  // verilator_top->S_AXI_WDATA = 1;
-  // verilator_top->S_AXI_AWVALID = 1;
-  // verilator_top->S_AXI_WVALID = 1;
-  // eval();
-  // verilator_top->S_AXI_AWVALID = 0;
-  // verilator_top->S_AXI_WVALID = 0;
-  // eval();
-
-  // // RNG生成信号 (ランダムなハイパーベクトルを自動生成)
-  // // gen <- 1;
-  // verilator_top->S_AXI_AWADDR = 0;
-  // verilator_top->S_AXI_WDATA = 1;
-  // verilator_top->S_AXI_AWVALID = 1;
-  // verilator_top->S_AXI_WVALID = 1;
-  // eval();
-  // verilator_top->S_AXI_AWVALID = 0;
-  // verilator_top->S_AXI_WVALID = 0;
-  // eval();
-
-  // // RNG生成終了を待つ
-  // verilator_top->S_AXI_ARVALID = 1;
-  // eval();
-  // eval();
-  // while (0 != verilator_top->S_AXI_RDATA)
-  // {
-  //   eval();
-  // }
-  // verilator_top->S_AXI_ARVALID = 0;
-  // eval();
-
   // comunicate ===============================================================================================
   // RNG生成信号 (ランダムなハイパーベクトルを自動生成)
-  // com <- 1;
+  // com <- 2;
   verilator_top->S_AXI_AWADDR = 0;
-  verilator_top->S_AXI_WDATA = 4;
+  verilator_top->S_AXI_WDATA = 2; // 3でもいけるはず
   verilator_top->S_AXI_AWVALID = 1;
   verilator_top->S_AXI_WVALID = 1;
   eval();
@@ -434,55 +391,12 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
   verilator_top->S_AXIS_TDATA = 0;
   // comunicate ===============================================================================================
 
-  // eval();
-  // eval();
-  // eval();
-  // eval();
-  // eval();
-  // eval();
-  // eval();
-  // eval();
-  // eval();
-  // eval();
-
-  // // アイテムメモリの設定
-  // verilator_top->S_AXI_AWADDR = 4;
-  // verilator_top->S_AXI_WDATA = 294 - 1; // 1023番目をランダムな値に使う
-  // verilator_top->S_AXI_AWVALID = 1;
-  // verilator_top->S_AXI_WVALID = 1;
-  // eval();
-  // verilator_top->S_AXI_AWVALID = 0;
-  // verilator_top->S_AXI_WVALID = 0;
-  // eval();
-
-  // // RNG生成信号 (ランダムなハイパーベクトルを自動生成)
-  // // gen <- 1;
-  // verilator_top->S_AXI_AWADDR = 0;
-  // verilator_top->S_AXI_WDATA = 1;
-  // verilator_top->S_AXI_AWVALID = 1;
-  // verilator_top->S_AXI_WVALID = 1;
-  // eval();
-  // verilator_top->S_AXI_AWVALID = 0;
-  // verilator_top->S_AXI_WVALID = 0;
-  // eval();
-
-  // // RNG生成終了を待つ
-  // verilator_top->S_AXI_ARVALID = 1;
-  // eval();
-  // eval();
-  // while (0 != verilator_top->S_AXI_RDATA)
-  // {
-  //   eval();
-  // }
-  // verilator_top->S_AXI_ARVALID = 0;
-  // eval();
-
   ////////////////////////////////////////////////////////////////////////////// compute ///////////////////////////////////////////////////////////////////////////////
 
   // HDCプロセッサ起動
   // run <- 1;
   verilator_top->S_AXI_AWADDR = 0;
-  verilator_top->S_AXI_WDATA = 2;
+  verilator_top->S_AXI_WDATA = 1;
   verilator_top->S_AXI_AWVALID = 1;
   verilator_top->S_AXI_WVALID = 1;
   eval();

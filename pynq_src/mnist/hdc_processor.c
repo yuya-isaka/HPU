@@ -110,37 +110,6 @@ void hdc_setup(void)
 	}
 }
 
-// RANNUM数　アイテムメモリ生成
-void hdc_make_imem(const int RANNUM)
-{
-	// reset_flag
-	top[0x02] = 1;
-
-	// item_memory_num (乱数の数)
-	top[0x01] = RANNUM - 1;
-
-	// gen <- 1;
-	top[0x00] = 1;
-
-	// 乱数生成終了を待つ
-	while (top[0x00] & 0x1)
-		;
-}
-
-void hdc_make_imem_2(const int RANNUM)
-{
-	// item_memory_num (乱数の数)
-	top[0x01] = RANNUM - 1;
-
-	// gen <- 1;
-	// run <- 1;
-	top[0x00] = 3;
-
-	// 乱数生成終了を待つ
-	while (top[0x00] == 0x3)
-		;
-}
-
 // DMAリセット
 void hdc_dma_reset(void)
 {
@@ -161,10 +130,10 @@ void hdc_init(const int N)
 void hdc_start(void)
 {
 	// run <- 1;
-	top[0x00] = 2;
+	top[0x00] = 1;
 }
 
-// DMA送信開始 & 計算開始
+// DMA送信開始 & 計算開始 & 受信完了
 void hdc_compute(void)
 {
 	// AXI DMA 送信設定（UIO経由）
@@ -182,17 +151,44 @@ void hdc_compute(void)
 		;
 }
 
+// DMA送信開始 & 計算開始
+void hdc_compute_only(void)
+{
+	// AXI DMA 送信設定（UIO経由）
+	dma[0x00] = 1;
+	dma[0x6] = src_phys;
+	dma[0xa] = SEND_NUM * 2; // 16ビット命令の数 * 2 = バイト数
+
+	// 送信終了
+	while ((dma[0x1] & 0x1000) != 0x1000)
+		;
+}
+
 // HDCプロセッサ停止 & アイテムメモリ初期化
 void hdc_finish(void)
 {
 	// run <- 0;
 	top[0x00] = 0;
-
-	// reset_flag
-	top[0x02] = 0;
 }
 
 // COM =========================================================================================
+
+void hdc_com_start(void)
+{
+	hdc_init(0);
+
+	// com <- 1;
+	top[0x00] = 2;
+}
+
+void hdc_com_start_continue(void)
+{
+	hdc_init(0);
+
+	// com <- 2;
+	// run <- 1;
+	top[0x00] = 3;
+}
 
 union
 {
@@ -209,38 +205,6 @@ void hdc_com_gen(uint32_t num)
 	conv.write_data = num;
 	src[SEND_NUM++] = conv.data_0;
 	src[SEND_NUM++] = conv.data_1;
-}
-
-void hdc_com_start(void)
-{
-	hdc_init(0);
-
-	// com <- 1;
-	top[0x00] = 4;
-}
-
-void hdc_com_start_2(void)
-{
-	hdc_init(0);
-
-	// com <- 1;
-	// run <- 1;
-	top[0x00] = 6;
-}
-
-// DMA送信開始 & 計算開始
-void hdc_com_run(void)
-{
-	// AXI DMA 送信設定（UIO経由）
-	dma[0x00] = 1;
-	dma[0x6] = src_phys;
-	dma[0xa] = SEND_NUM * 2; // 16ビット命令の数 * 2 = バイト数
-
-	// 送信終了
-	while ((dma[0x1] & 0x1000) != 0x1000)
-		;
-
-	hdc_dma_reset();
 }
 
 // Nop =========================================================================================

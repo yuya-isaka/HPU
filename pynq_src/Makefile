@@ -31,7 +31,6 @@ DESIGN_SRC = \
 ./main/core.sv \
 ./main/central_core.sv \
 ./kit/counter.sv \
-./kit/xorshift.sv \
 ./kit/selector.sv \
 ./kit/agu.sv \
 ./kit/permute.sv \

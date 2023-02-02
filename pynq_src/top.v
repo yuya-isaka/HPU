@@ -113,7 +113,6 @@ module top
 
                    // in
                    .clk( AXIS_ACLK ),
-                   .gen( gen ),
                    .run( run ),
                    .com( com ),
                    .get_valid( S_AXIS_TVALID ),
@@ -242,8 +241,6 @@ module top
     // 各コアの演算結果
     wire [ DIM:0 ]                      core_result [ 0:CORENUM-1 ];
 
-    wire [ CORENUM-1:0 ]                finish_gen;
-
     // 各コアでエンコーディング
     generate
 
@@ -260,10 +257,7 @@ module top
                      // in
                      .clk( AXIS_ACLK ),
                      .run( run ),
-                     .gen( gen ),
                      .com( com ),
-                     .reset_item( reset_item ),
-                     .item_memory_num( item_memory_num[ 8:0 ] ),
                      .get_v( get_v ),
                      .get_c( get_c ),
                      // 16bit命令
@@ -274,7 +268,6 @@ module top
 
                      // out
                      // 1コア
-                     .finish_gen( finish_gen[ i ] ),
                      .store( store[ i ] ),
                      //  .store( store ),
                      // 1コア
@@ -300,10 +293,7 @@ module top
                      // in
                      .clk( AXIS_ACLK ),
                      .run( run ),
-                     .gen( gen ),
                      .com( com ),
-                     .reset_item( reset_item ),
-                     .item_memory_num( item_memory_num[ 8:0 ] ),
                      .get_v( get_v ),
                      .get_c( get_c ),
                      // 16bit命令
@@ -314,7 +304,6 @@ module top
 
                      // out
                      // 1コア
-                     .finish_gen( finish_gen[ 0 ] ),
                      .store( store[ 0 ] ),
                      //  .store( store ),
                      // 1コア
@@ -405,7 +394,7 @@ module top
                 // go AWW
                 state <= 4'b0011;
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
-                write_data <= S_AXI_WDATA;
+                write_data[ 1:0 ] <= S_AXI_WDATA[ 1:0 ];
 
             end
 
@@ -421,7 +410,7 @@ module top
 
                 // go W
                 state <= 4'b0010;
-                write_data <= S_AXI_WDATA;
+                write_data[ 1:0 ] <= S_AXI_WDATA[ 1:0 ];
 
             end
 
@@ -442,7 +431,7 @@ module top
 
                 // go AWW
                 state <= 4'b0011;
-                write_data <= S_AXI_WDATA;
+                write_data[ 1:0 ] <= S_AXI_WDATA[ 1:0 ];
 
             end
 
@@ -516,24 +505,12 @@ module top
 
     // アクセラレータのモード
     // run ... アクセラレータ実行モード
-    // gen ... アクセラレータ準備モード　（ランダムなハイパーベクトルをitem_memoryに格納）
+    // com ... アクセラレータ準備モード　（ランダムなハイパーベクトルをitem_memoryに格納）
 
     // run ... 書き込みモードで2を代入
-    // gen ... 書き込みモードで１を代入
+    // com ... 書き込みモードで１を代入
     reg                 com;
     reg                 run;
-    reg                 gen;
-
-    // item_memoryに格納するハイパーベクトルの数
-    // (現状の最大値は511)
-    reg [ 8:0 ]         item_memory_num;
-
-    reg                 reset_item;
-
-    // reg [ 31:0 ]        xor_x;
-    // reg [ 31:0 ]        xor_y;
-    // reg [ 31:0 ]        xor_z;
-    // reg [ 31:0 ]        xor_w;
 
     //================================================================
 
@@ -544,16 +521,7 @@ module top
         // 初期化
         if ( ~S_AXI_ARESETN ) begin
 
-            { com, run, gen } <= 3'b000;
-
-            item_memory_num <= 9'd0;
-
-            reset_item <= 1'b0;
-
-            // xor_x <= 32'd0;
-            // xor_y <= 32'd0;
-            // xor_z <= 32'd0;
-            // xor_w <= 32'd0;
+            { com, run } <= 2'b00;
 
         end
 
@@ -565,46 +533,13 @@ module top
 
                 // アドレス０
                 10'd00:
-                    { com, run, gen } <= write_data[ 2:0 ];
-
-                // アドレス４
-                10'd04:
-                    // 最大1023
-                    item_memory_num[ 8:0 ] <= write_data[ 8:0 ];
-
-                10'd08:
-                    reset_item <= write_data[ 0 ];
-
-                // // アドレス8
-                // 10'd08:
-                //     xor_x[ 31:0 ] <= write_data[ 31:0 ];
-
-                // // アドレス12
-                // 10'd12:
-                //     xor_y[ 31:0 ] <= write_data[ 31:0 ];
-
-                // // アドレス16
-                // 10'd16:
-                //     xor_z[ 31:0 ] <= write_data[ 31:0 ];
-
-                // // アドレス20
-                // 10'd20:
-                //     xor_w[ 31:0 ] <= write_data[ 31:0 ];
+                    { com, run } <= write_data[ 1:0 ];
 
                 // 上記アドレス以外は何もしない
                 default:
                     ;
 
             endcase
-
-        end
-
-        // アクセラレータ準備モード終了
-        // (item_memory_num数のハイパーベクトルを生成して終了)
-        // (現状S_AXI_ACLK, S_AXIS_ACLKが同じ周波数を用いているため問題ない)
-        else if ( gen &  ( finish_gen != 0) ) begin
-
-            gen <= 1'b0;
 
         end
 
@@ -625,27 +560,7 @@ module top
 
                 // アドレス０
                 10'h00:
-                    S_AXI_RDATA[ 2:0 ] <= { com, run, gen };
-
-                // // アドレス４
-                // 10'd04:
-                //     S_AXI_RDATA[ 8:0 ] <= item_memory_num[ 8:0 ];
-
-                // // アドレス8
-                // 10'd08:
-                //     S_AXI_RDATA[ 31:0 ] <= xor_x[ 31:0 ];
-
-                // // アドレス12
-                // 10'd12:
-                //     S_AXI_RDATA[ 31:0 ] <= xor_y[ 31:0 ];
-
-                // // アドレス16
-                // 10'd16:
-                //     S_AXI_RDATA[ 31:0 ] <= xor_z[ 31:0 ];
-
-                // // アドレス20
-                // 10'd20:
-                //     S_AXI_RDATA[ 31:0 ] <= xor_w[ 31:0 ];
+                    S_AXI_RDATA[ 1:0 ] <= { com, run };
 
                 // 上記アドレス以外は何もしない
                 default:
