@@ -67,6 +67,13 @@ test:
 	./test
 	rm test
 
+send_all:
+	sudo scp -r  ./overlay fpga@192.168.1.29:/home/fpga/
+	sudo scp -r  ./app fpga@192.168.1.29:/home/fpga/
+	sudo scp -r ./davinci fpga@192.168.1.29:/home/fpga/
+	sudo scp -r ./mnist fpga@192.168.1.29:/home/fpga/
+	sudo scp -r ./isolet fpga@192.168.1.29:/home/fpga/
+
 send_overlay:
 	sudo scp -r  ./overlay fpga@192.168.1.29:/home/fpga/
 
