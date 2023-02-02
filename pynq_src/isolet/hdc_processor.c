@@ -219,6 +219,15 @@ void hdc_com_start(void)
 	top[0x00] = 4;
 }
 
+void hdc_com_start_2(void)
+{
+	hdc_init(0);
+
+	// com <- 1;
+	// run <- 1;
+	top[0x00] = 6;
+}
+
 // DMA送信開始 & 計算開始
 void hdc_com_run(void)
 {

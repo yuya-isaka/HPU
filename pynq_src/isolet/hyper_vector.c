@@ -130,11 +130,6 @@ hv_t **hv_make_imem(const uint32_t size)
 
 	for (int i = 0; i < size; i++)
 	{
-		// isolet特別仕様
-		if (i == 510)
-		{
-			uint32_t tmp = xor128(0);
-		}
 		for (int j = 0; j < HV_NUM; j++)
 		{
 #ifdef HV64

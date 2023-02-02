@@ -48,6 +48,33 @@ char *read_file(const char *PATH, int *num)
 	return content;
 }
 
+uint32_t xor128(int reset)
+{
+	// 初期値
+	static uint32_t x = 123456789;
+	static uint32_t y = 362436069;
+	static uint32_t z = 521288629;
+	static uint32_t w = 88675123;
+
+	// リセット信号
+	if (reset)
+	{
+		x = 123456789;
+		y = 362436069;
+		z = 521288629;
+		w = 88675123;
+		return 0;
+	}
+	else
+	{
+		uint32_t t = x ^ (x << 11);
+		x = y;
+		y = z;
+		z = w;
+		return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main()
@@ -71,7 +98,24 @@ int main()
 	for (int ll = 0; ll < 10; ll++)
 	{
 		// 500
-		hdc_make_imem(FIRST_RAND_NUM);
+		// hdc_make_imem(FIRST_RAND_NUM);
+		xor128(1);
+		hdc_com_start();
+		hdc_com_gen(88675123);
+		for (int i = 0; i < 31; i++)
+		{
+			hdc_com_gen(xor128(0));
+		}
+		for (int i = 0; i < FIRST_RAND_NUM - 1; i++)
+		{
+			for (int j = 0; j < 32; j++)
+			{
+				hdc_com_gen(xor128(0));
+			}
+		}
+		hdc_com_run();
+		hdc_finish();
+
 		hdc_init(0);
 		hdc_start();
 
@@ -128,8 +172,20 @@ int main()
 		// COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 		// 284
-		hdc_make_imem_2(SECOND_RAND_NUM);
+		// hdc_make_imem_2(SECOND_RAND_NUM);
+		hdc_com_start_2();
+		for (int i = 0; i < SECOND_RAND_NUM; i++)
+		{
+			for (int j = 0; j < 32; j++)
+			{
+				hdc_com_gen(xor128(0));
+			}
+		}
+		hdc_com_run();
+
 		hdc_init(0);
+		hdc_start();
+
 		for (int dd = 0; dd < data_tmp_num;)
 		{
 			dd += FIRST_RAND_NUM;

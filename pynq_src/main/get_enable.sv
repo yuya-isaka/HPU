@@ -72,7 +72,7 @@ module get_enable
 
                     get_c = 1'b0;
 
-                    if ( get_valid & get_ready & com & ~run & ~gen ) begin
+                    if ( get_valid & get_ready & com & ~gen ) begin
 
                         get_c = 1'b1;
 

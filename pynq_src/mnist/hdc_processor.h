@@ -13,6 +13,8 @@ extern void hdc_com_gen(uint32_t num);
 
 extern void hdc_com_start(void);
 
+extern void hdc_com_start_2(void);
+
 extern void hdc_com_run(void);
 
 extern void hdc_print(void);
