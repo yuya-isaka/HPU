@@ -68,7 +68,7 @@ int main(int argc, char const *argv[])
 			hdc_com_gen(xor128(0));
 		}
 	}
-	hdc_com_run();
+	hdc_compute_only();
 	hdc_finish();
 	// hv -----------------------------
 
@@ -78,6 +78,8 @@ int main(int argc, char const *argv[])
 
 	srand(10);
 
+	// SEND_NUM初期化
+	hdc_init(0);
 	hdc_start();
 
 	/////////////////////////////////////////////////////////////////////////////
@@ -90,9 +92,6 @@ int main(int argc, char const *argv[])
 	END_COMPUTE = clock();
 	RAN_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 	/////////////////////////////////////////////////////////////////////////////
-
-	// SEND_NUM初期化
-	hdc_init(0);
 
 	uint16_t core_num = CORENUM;
 

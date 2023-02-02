@@ -103,7 +103,6 @@ int main()
 	for (int ll = 0; ll < 26; ll++)
 	{
 		// 500
-		// hdc_make_imem(FIRST_RAND_NUM);
 		xor128(1);
 		hdc_com_start();
 		hdc_com_gen(88675123);
@@ -118,7 +117,7 @@ int main()
 				hdc_com_gen(xor128(0));
 			}
 		}
-		hdc_com_run();
+		hdc_compute_only();
 		hdc_finish();
 
 		hdc_init(0);
@@ -185,13 +184,12 @@ int main()
 
 		hdc_last();
 		// START_COMPUTE = clock();
-		hdc_compute();
+		hdc_compute_only();
 		// END_COMPUTE = clock();
 		// COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 		// 127
-		// hdc_make_imem_2(SECOND_RAND_NUM);
-		hdc_com_start_2();
+		hdc_com_start_continue();
 		for (int i = 0; i < SECOND_RAND_NUM; i++)
 		{
 			for (int j = 0; j < 32; j++)
@@ -199,10 +197,10 @@ int main()
 				hdc_com_gen(xor128(0));
 			}
 		}
-		hdc_com_run();
+		hdc_compute_only();
 
-		// runだけたった状態に戻す
 		hdc_init(0);
+		// runだけたった状態に戻す
 		hdc_start();
 
 		for (int dd = 0; dd < data_tmp_num;)
@@ -348,12 +346,12 @@ int main()
 		// END_COMPUTE = clock();
 		// COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-		// // 結果確認
-		// printf("\n%d:\n", ll);
-		// for (int j = 0; j < 32; j++)
-		// {
-		// 	printf("  %u\n", dst[j]);
-		// }
+		// 結果確認
+		printf("\n%d:\n", ll);
+		for (int j = 0; j < 32; j++)
+		{
+			printf("  %u\n", dst[j]);
+		}
 
 		hdc_finish();
 

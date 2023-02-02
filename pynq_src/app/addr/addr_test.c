@@ -300,7 +300,6 @@ int main(void)
   hdc_setup();
 
   // HDCプロセッサアイテムメモリ準備
-  // hdc_make_imem(IMEM_SIZE);
   hdc_com_start();
   hdc_com_gen(88675123);
   for (int i = 0; i < 31; i++)
@@ -314,7 +313,7 @@ int main(void)
       hdc_com_gen(xor128(0));
     }
   }
-  hdc_com_run();
+  hdc_compute_only();
   hdc_finish();
 
   // テスト

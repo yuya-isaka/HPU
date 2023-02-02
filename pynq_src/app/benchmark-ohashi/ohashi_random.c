@@ -17,7 +17,6 @@ int main(int argc, char const *argv[])
 	hdc_setup();
 
 	// アイテムメモリ生成
-	// hdc_make_imem(RANNUM);
 	hdc_com_gen(88675123);
 	for (int i = 0; i < 31; i++)
 	{
@@ -30,7 +29,7 @@ int main(int argc, char const *argv[])
 			hdc_com_gen(xor128(0));
 		}
 	}
-	hdc_com_run();
+	hdc_compute_only();
 
 	hdc_finish();
 
