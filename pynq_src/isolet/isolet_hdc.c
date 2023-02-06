@@ -110,30 +110,32 @@ int main()
 	}
 	for (int i = 1; i < 10; i++)
 	{
-		// int tmp = 1024 / i;
-		// int num = tmp / 32;
-		// int num_remain = tmp % 32;
-		for (int j = 0; j < 32; j++)
+		int tmp = 1024 / i;
+		int num = tmp / 32;
+		int num_remain = tmp % 32;
+		for (int j = 0; j < num; j++)
 		{
 			Level[i][j] = ~Level[0][j];
+			printf("%d: 反転%u:%u\n", i, Level[i][j], Level[0][j]);
 		}
-		// if (num_remain != 0)
-		// {
-		// 	uint32_t mask = 2 ^ num_remain - 1;
-		// 	Level[i][num] = Level[0][num] ^ mask;
+		if (num_remain != 0)
+		{
+			uint32_t mask = 2 ^ num_remain - 1;
+			Level[i][num] = Level[0][num] ^ mask;
 
-		// 	for (int j = num + 1; j < 32; j++)
-		// 	{
-		// 		Level[i][j] = Level[0][j];
-		// 	}
-		// }
-		// else
-		// {
-		// 	for (int j = num; j < 32; j++)
-		// 	{
-		// 		Level[i][j] = Level[0][j];
-		// 	}
-		// }
+			for (int j = num + 1; j < 32; j++)
+			{
+				Level[i][j] = Level[0][j];
+			}
+		}
+		else
+		{
+			for (int j = num; j < 32; j++)
+			{
+				Level[i][j] = Level[0][j];
+				printf("%d: そのまま%u:%u\n", i, Level[i][j], Level[0][j]);
+			}
+		}
 	}
 
 	for (int ll = 0; ll < 26; ll++)

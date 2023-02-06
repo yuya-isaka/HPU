@@ -102,9 +102,9 @@ hv_t **hv_make_imem_new(const uint32_t size)
 	// 結果格納
 	hv_t **result = hv_make_array(size);
 
-	for (int i = 0; i < HV_NUM; i++)
-	{
 #ifdef HV64
+	for (int i = 0; i < 16; i++)
+	{
 		union
 		{
 			struct
@@ -124,7 +124,10 @@ hv_t **hv_make_imem_new(const uint32_t size)
 		}
 		conv.data_1 = xor128(0);
 		result[0][i] = conv.data;
+	}
 #else
+	for (int i = 0; i < 32; i++)
+	{
 		uint32_t tmp = 0;
 		if (i == 0)
 		{
@@ -135,41 +138,115 @@ hv_t **hv_make_imem_new(const uint32_t size)
 			tmp = xor128(0);
 		}
 		result[0][i] = tmp;
-#endif
 	}
+#endif
+
 	for (int i = 1; i < 10; i++)
 	{
-		// int tmp = HV_DIM / i;
-		// int num = tmp / HV_NUM;
-		// int num_remain = tmp % HV_NUM;
-		for (int j = 0; j < HV_NUM; j++)
+#ifdef HV64
+		int tmp = 1024 / i;
+		int num = tmp / 64;
+		int num_remain = tmp % 64;
+		for (int j = 0; j < num; j++)
 		{
 			result[i][j] = ~result[0][j];
+			union
+			{
+				struct
+				{
+					uint32_t data_0;
+					uint32_t data_1;
+				};
+				hv_t data;
+			} conv1;
+			union
+			{
+				struct
+				{
+					uint32_t data_0;
+					uint32_t data_1;
+				};
+				hv_t data;
+			} conv2;
+			conv1.data = result[i][j];
+			conv2.data = result[0][j];
+			printf("%d: 反転%u:%u\n", i, conv1.data_0, conv2.data_0);
+			printf("%d: 反転%u:%u\n", i, conv1.data_1, conv2.data_1);
 		}
-		// if (num_remain != 0)
-		// {
-		// 	uint32_t mask = 2 ^ num_remain - 1;
-		// 	result[i][num] = result[0][num] ^ mask;
+		if (num_remain != 0)
+		{
+			uint64_t mask = 2 ^ num_remain - 1;
+			result[i][num] = result[0][num] ^ mask;
 
-		// 	for (int j = num + 1; j < HV_NUM; j++)
-		// 	{
-		// 		result[i][j] = result[0][j];
-		// 	}
-		// }
-		// else
-		// {
-		// 	for (int j = num; j < HV_NUM; j++)
-		// 	{
-		// 		result[i][j] = result[0][j];
-		// 	}
-		// }
+			for (int j = num + 1; j < 16; j++)
+			{
+				result[i][j] = result[0][j];
+			}
+		}
+		else
+		{
+			for (int j = num; j < 16; j++)
+			{
+				union
+				{
+					struct
+					{
+						uint32_t data_0;
+						uint32_t data_1;
+					};
+					hv_t data;
+				} conv1;
+				union
+				{
+					struct
+					{
+						uint32_t data_0;
+						uint32_t data_1;
+					};
+					hv_t data;
+				} conv2;
+				result[i][j] = result[0][j];
+				conv1.data = result[i][j];
+				conv2.data = result[0][j];
+				printf("%d: そのまま%u:%u\n", i, conv1.data_0, conv2.data_0);
+				printf("%d: そのまま%u:%u\n", i, conv1.data_1, conv2.data_1);
+			}
+		}
+#else
+		int tmp = 1024 / i;
+		int num = tmp / 32;
+		int num_remain = tmp % 32;
+		for (int j = 0; j < num; j++)
+		{
+			result[i][j] = ~result[0][j];
+			// printf("反転%u:%u\n", result[i][j], result[0][j]);
+		}
+		if (num_remain != 0)
+		{
+			uint32_t mask = 2 ^ num_remain - 1;
+			result[i][num] = result[0][num] ^ mask;
+
+			for (int j = num + 1; j < 32; j++)
+			{
+				result[i][j] = result[0][j];
+			}
+		}
+		else
+		{
+			for (int j = num; j < 32; j++)
+			{
+				result[i][j] = result[0][j];
+				// printf("そのまま%u:%u\n", result[i][j], result[0][j]);
+			}
+		}
+#endif
 	}
 
 	for (int i = 10; i < size; i++)
 	{
-		for (int j = 0; j < HV_NUM; j++)
-		{
 #ifdef HV64
+		for (int j = 0; j < 16; j++)
+		{
 			union
 			{
 				struct
@@ -182,12 +259,15 @@ hv_t **hv_make_imem_new(const uint32_t size)
 			conv.data_0 = xor128(0);
 			conv.data_1 = xor128(0);
 			result[i][j] = conv.data;
+		}
 #else
+		for (int j = 0; j < 32; j++)
+		{
 			uint32_t tmp = 0;
 			tmp = xor128(0);
 			result[i][j] = tmp;
-#endif
 		}
+#endif
 	}
 	return result;
 }
