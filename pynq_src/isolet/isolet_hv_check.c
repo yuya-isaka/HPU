@@ -61,6 +61,175 @@ char *read_file(const char *PATH, int *num)
 	return content;
 }
 
+// xor128 RNG
+static uint32_t xor128(int reset)
+{
+	// 初期値
+	static uint32_t x = 123456789;
+	static uint32_t y = 362436069;
+	static uint32_t z = 521288629;
+	static uint32_t w = 88675123;
+
+	// リセット信号
+	if (reset)
+	{
+		x = 123456789;
+		y = 362436069;
+		z = 521288629;
+		w = 88675123;
+		return 0;
+	}
+	else
+	{
+		uint32_t t = x ^ (x << 11);
+		x = y;
+		y = z;
+		z = w;
+		return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+	}
+}
+
+// size個のハイパーベクトルを格納したアイテムメモリを生成
+hv_t **hv_make_imem_new(const uint32_t size, const uint32_t size_2)
+{
+	// 結果格納
+	hv_t **result = hv_make_array(size + size_2);
+
+	for (int i = 0; i < size + size_2; i++)
+	{
+		if (i <= size)
+		{
+			for (int j = 0; j < HV_NUM; j++)
+			{
+#ifdef HV64
+				union
+				{
+					struct
+					{
+						uint32_t data_0;
+						uint32_t data_1;
+					};
+					hv_t data;
+				} conv;
+				if (i == 0 && j == 0)
+				{
+					conv.data_0 = 88675123;
+				}
+				else
+				{
+					conv.data_0 = xor128(0);
+				}
+				conv.data_1 = xor128(0);
+				result[i][j] = conv.data;
+#else
+				uint32_t tmp = 0;
+				if (i == 0 && j == 0)
+				{
+					tmp = 88675123;
+				}
+				else
+				{
+					tmp = xor128(0);
+				}
+				result[i][j] = tmp;
+#endif
+			}
+		}
+		else
+		{
+			int tmp = HV_DIM / (i - size);
+			int num = tmp / ELEMENT_SIZE;
+			int num_remain = tmp % ELEMENT_SIZE;
+			printf("tmp: %d, ", tmp);
+			printf("num: %d, ", num);
+			printf("num_remain: %d, ", num_remain);
+			for (int j = 0; j < num; j++)
+			{
+				result[i][j] = ~result[size][j];
+			}
+			if (num_remain != 0)
+			{
+				uint64_t mask = (2 ^ num_remain - 1);
+				result[i][num] = result[size][num] ^ mask;
+				for (int j = num + 1; j < HV_NUM; j++)
+				{
+					result[i][j] = result[size][j];
+				}
+			}
+			else
+			{
+				for (int j = num; j < HV_NUM; j++)
+				{
+					result[i][j] = result[size][j];
+				}
+			}
+		}
+	}
+	return result;
+}
+
+// size個のハイパーベクトルを格納したアイテムメモリを生成
+hv_t **hv_make_imem_new_2(const uint32_t size, const uint32_t size_2)
+{
+	// 結果格納
+	hv_t **result = hv_make_array(size + size_2);
+
+	for (int i = 0; i < size + size_2; i++)
+	{
+		if (i <= size)
+		{
+			for (int j = 0; j < HV_NUM; j++)
+			{
+#ifdef HV64
+				union
+				{
+					struct
+					{
+						uint32_t data_0;
+						uint32_t data_1;
+					};
+					hv_t data;
+				} conv;
+				conv.data_0 = xor128(0);
+				conv.data_1 = xor128(0);
+				result[i][j] = conv.data;
+#else
+				uint32_t tmp = 0;
+				tmp = xor128(0);
+				result[i][j] = tmp;
+#endif
+			}
+		}
+		else
+		{
+			int tmp = HV_DIM / (i - size);
+			int num = tmp / ELEMENT_SIZE;
+			int num_remain = tmp % ELEMENT_SIZE;
+			for (int j = 0; j < num; j++)
+			{
+				result[i][j] = ~result[size][j];
+			}
+			if (num_remain != 0)
+			{
+				uint64_t mask = (2 ^ num_remain - 1);
+				result[i][num] = result[size][num] ^ mask;
+				for (int j = num + 1; j < HV_NUM; j++)
+				{
+					result[i][j] = result[size][j];
+				}
+			}
+			else
+			{
+				for (int j = num; j < HV_NUM; j++)
+				{
+					result[i][j] = result[size][j];
+				}
+			}
+		}
+	}
+	return result;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main(void)
@@ -70,9 +239,16 @@ int main(void)
 	clock_t START_COMPUTE;
 	clock_t END_COMPUTE;
 
+	xor128(1);
+
 	// 637個のハイパーベクトルを生成し格納
-	const uint32_t RAND_NUM = 637;
-	hv_t **item_memory = hv_make_imem(RAND_NUM);
+	const uint32_t RAND_NUM_FIRST = 500;
+	const uint32_t RAND_NUM_FIRST_REMAIN = 10;
+	hv_t **item_memory_1 = hv_make_imem_new(RAND_NUM_FIRST, RAND_NUM_FIRST_REMAIN);
+
+	const uint32_t RAND_NUM_SECOND = 117;
+	const uint32_t RAND_NUM_SECOND_REMAIN = 10;
+	hv_t **item_memory_2 = hv_make_imem_new_2(RAND_NUM_SECOND, RAND_NUM_SECOND_REMAIN);
 
 	const uint32_t ALL_TRAIN_NUM = 26;
 
@@ -112,11 +288,11 @@ int main(void)
 				hv_t *bind_result;
 				if (k < 500)
 				{
-					bind_result = hv_bind(item_memory[k], item_memory[(data_lines[addr_tmp++] - '0') + 500]);
+					bind_result = hv_bind(item_memory_1[k], item_memory_1[(data_lines[addr_tmp++] - '0') + 500]);
 				}
 				else
 				{
-					bind_result = hv_bind(item_memory[k + 10], item_memory[(data_lines[addr_tmp++] - '0') + 627]);
+					bind_result = hv_bind(item_memory_2[k - 500], item_memory_2[(data_lines[addr_tmp++] - '0') + 117]);
 				}
 
 				hv_bound(bind_result);
@@ -141,7 +317,8 @@ int main(void)
 	}
 
 	hv_free_array(result, ALL_TRAIN_NUM);
-	hv_free_array(item_memory, 637);
+	hv_free_array(item_memory_1, 510);
+	hv_free_array(item_memory_2, 127);
 
 	printf("  load時間: %lf[ms]\n", LOAD_TIME);
 

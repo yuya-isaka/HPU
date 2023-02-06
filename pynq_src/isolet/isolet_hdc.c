@@ -89,9 +89,10 @@ int main()
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// 784個のハイパーベクトルを生成し格納
-	const uint32_t RAND_NUM = 637; // 617 + 10 + 10
-	const uint32_t FIRST_RAND_NUM = 510;
+	const uint32_t RAND_NUM = 617; // 617 + 10 + 10
+	const uint32_t FIRST_RAND_NUM = 500;
 	const uint32_t SECOND_RAND_NUM = RAND_NUM - FIRST_RAND_NUM;
+	const uint32_t LEVEL_NUM = 10;
 
 	// コア数
 	const int CORENUM = 2;
@@ -115,6 +116,40 @@ int main()
 			for (int j = 0; j < 32; j++)
 			{
 				hdc_com_gen(xor128(0));
+			}
+		}
+
+		uint32_t item_memory[32] = {0};
+		for (int i = 0; i < 32; i++)
+		{
+			uint32_t tmp = xor128(0);
+			hdc_com_gen(tmp);
+			item_memory[i] = tmp;
+		}
+		for (int i = 1; i < 10; i++)
+		{
+			int tmp = 1024 / i;
+			int num = tmp / 32;
+			int num_remain = tmp % 32;
+			for (int j = 0; j < num; j++)
+			{
+				hdc_com_gen(~item_memory[j]);
+			}
+			if (num_remain != 0)
+			{
+				uint32_t mask = 2 ^ num_remain - 1;
+				hdc_com_gen(item_memory[num] ^ mask);
+				for (int j = num + 1; j < 32; j++)
+				{
+					hdc_com_gen(item_memory[j]);
+				}
+			}
+			else
+			{
+				for (int j = num; j < 32; j++)
+				{
+					hdc_com_gen(item_memory[j]);
+				}
 			}
 		}
 		hdc_compute_only();
@@ -197,6 +232,40 @@ int main()
 				hdc_com_gen(xor128(0));
 			}
 		}
+
+		for (int i = 0; i < 32; i++)
+		{
+			uint32_t tmp = xor128(0);
+			hdc_com_gen(tmp);
+			item_memory[i] = tmp;
+		}
+		for (int i = 1; i < 10; i++)
+		{
+			int tmp = 1024 / i;
+			int num = tmp / 32;
+			int num_remain = tmp % 32;
+			for (int j = 0; j < num; j++)
+			{
+				hdc_com_gen(~item_memory[j]);
+			}
+			if (num_remain != 0)
+			{
+				uint32_t mask = 2 ^ num_remain - 1;
+				hdc_com_gen(item_memory[num] ^ mask);
+				for (int j = num + 1; j < 32; j++)
+				{
+					hdc_com_gen(item_memory[j]);
+				}
+			}
+			else
+			{
+				for (int j = num; j < 32; j++)
+				{
+					hdc_com_gen(item_memory[j]);
+				}
+			}
+		}
+
 		hdc_compute_only();
 
 		hdc_init(0);
@@ -346,12 +415,12 @@ int main()
 		// END_COMPUTE = clock();
 		// COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-		// // 結果確認
-		// printf("\n%d:\n", ll);
-		// for (int j = 0; j < 32; j++)
-		// {
-		// 	printf("  %u\n", dst[j]);
-		// }
+		// 結果確認
+		printf("\n%d:\n", ll);
+		for (int j = 0; j < 32; j++)
+		{
+			printf("  %u\n", dst[j]);
+		}
 
 		hdc_finish();
 
