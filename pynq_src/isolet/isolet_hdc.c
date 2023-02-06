@@ -101,55 +101,63 @@ int main()
 
 	hdc_setup();
 
+	xor128(1);
+	uint32_t Level[10][32];
+	Level[0][0] = 88675123;
+	for (int i = 1; i < 32; i++)
+	{
+		Level[0][i] = xor128(0);
+	}
+	for (int i = 1; i < 10; i++)
+	{
+		// int tmp = 1024 / i;
+		// int num = tmp / 32;
+		// int num_remain = tmp % 32;
+		for (int j = 0; j < 32; j++)
+		{
+			Level[i][j] = ~Level[0][j];
+		}
+		// if (num_remain != 0)
+		// {
+		// 	uint32_t mask = 2 ^ num_remain - 1;
+		// 	Level[i][num] = Level[0][num] ^ mask;
+
+		// 	for (int j = num + 1; j < 32; j++)
+		// 	{
+		// 		Level[i][j] = Level[0][j];
+		// 	}
+		// }
+		// else
+		// {
+		// 	for (int j = num; j < 32; j++)
+		// 	{
+		// 		Level[i][j] = Level[0][j];
+		// 	}
+		// }
+	}
+
 	for (int ll = 0; ll < 26; ll++)
 	{
 		// 500
 		xor128(1);
-		hdc_com_start();
-		hdc_com_gen(88675123);
 		for (int i = 0; i < 31; i++)
 		{
-			hdc_com_gen(xor128(0));
+			xor128(0);
 		}
-		for (int i = 0; i < FIRST_RAND_NUM - 1; i++)
+
+		hdc_com_start();
+		for (int i = 0; i < FIRST_RAND_NUM; i++)
 		{
 			for (int j = 0; j < 32; j++)
 			{
 				hdc_com_gen(xor128(0));
 			}
 		}
-
-		uint32_t item_memory[32] = {0};
-		for (int i = 0; i < 32; i++)
+		for (int i = 0; i < 10; i++)
 		{
-			uint32_t tmp = xor128(0);
-			hdc_com_gen(tmp);
-			item_memory[i] = tmp;
-		}
-		for (int i = 1; i < 10; i++)
-		{
-			int tmp = 1024 / i;
-			int num = tmp / 32;
-			int num_remain = tmp % 32;
-			for (int j = 0; j < num; j++)
+			for (int j = 0; j < 32; j++)
 			{
-				hdc_com_gen(~item_memory[j]);
-			}
-			if (num_remain != 0)
-			{
-				uint32_t mask = 2 ^ num_remain - 1;
-				hdc_com_gen(item_memory[num] ^ mask);
-				for (int j = num + 1; j < 32; j++)
-				{
-					hdc_com_gen(item_memory[j]);
-				}
-			}
-			else
-			{
-				for (int j = num; j < 32; j++)
-				{
-					hdc_com_gen(item_memory[j]);
-				}
+				hdc_com_gen(Level[i][j]);
 			}
 		}
 		hdc_compute_only();
@@ -176,7 +184,6 @@ int main()
 				uint16_t core_num = CORENUM;
 				uint16_t addr_array[THREADS_NUM][core_num];
 
-				// 70
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
 					for (int i = 0; i < core_num; i++)
@@ -193,7 +200,6 @@ int main()
 				hdc_simd_move_thread();
 				// ------------------------------------------------------
 
-				// 70
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
 					for (int i = 0; i < core_num; i++)
@@ -232,40 +238,13 @@ int main()
 				hdc_com_gen(xor128(0));
 			}
 		}
-
-		for (int i = 0; i < 32; i++)
+		for (int i = 0; i < 10; i++)
 		{
-			uint32_t tmp = xor128(0);
-			hdc_com_gen(tmp);
-			item_memory[i] = tmp;
-		}
-		for (int i = 1; i < 10; i++)
-		{
-			int tmp = 1024 / i;
-			int num = tmp / 32;
-			int num_remain = tmp % 32;
-			for (int j = 0; j < num; j++)
+			for (int j = 0; j < 32; j++)
 			{
-				hdc_com_gen(~item_memory[j]);
-			}
-			if (num_remain != 0)
-			{
-				uint32_t mask = 2 ^ num_remain - 1;
-				hdc_com_gen(item_memory[num] ^ mask);
-				for (int j = num + 1; j < 32; j++)
-				{
-					hdc_com_gen(item_memory[j]);
-				}
-			}
-			else
-			{
-				for (int j = num; j < 32; j++)
-				{
-					hdc_com_gen(item_memory[j]);
-				}
+				hdc_com_gen(Level[i][j]);
 			}
 		}
-
 		hdc_compute_only();
 
 		hdc_init(0);
