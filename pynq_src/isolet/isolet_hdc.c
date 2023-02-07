@@ -116,11 +116,11 @@ int main()
 		for (int j = 0; j < num; j++)
 		{
 			Level[i][j] = ~Level[0][j];
-			printf("%d: 反転%u:%u\n", i, Level[i][j], Level[0][j]);
+			// printf("%d: 反転%u:%u\n", i, Level[i][j], Level[0][j]);
 		}
 		if (num_remain != 0)
 		{
-			uint32_t mask = 2 ^ num_remain - 1;
+			uint32_t mask = 1 << num_remain - 1;
 			Level[i][num] = Level[0][num] ^ mask;
 
 			for (int j = num + 1; j < 32; j++)
@@ -133,7 +133,7 @@ int main()
 			for (int j = num; j < 32; j++)
 			{
 				Level[i][j] = Level[0][j];
-				printf("%d: そのまま%u:%u\n", i, Level[i][j], Level[0][j]);
+				// printf("%d: そのまま%u:%u\n", i, Level[i][j], Level[0][j]);
 			}
 		}
 	}
