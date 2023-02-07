@@ -177,7 +177,11 @@ hv_t **hv_make_imem_new(const uint32_t size)
 
 			if (num_remain > 32)
 			{
-				uint32_t mask = 1 << 32 - 1;
+				// ↓ だめ
+				// uint32_t mask = 1 << 32 - 1;
+				// ↓ これでもいい
+				// uint32_t test_mask = -1;
+				uint32_t mask = 4294967295;
 				conv_result.data_0 = conv.data_0 ^ mask;
 				mask = 1 << (num_remain - 32) - 1;
 				conv_result.data_1 = conv.data_1 ^ mask;
@@ -327,12 +331,12 @@ int main(void)
 		//////////////////////////////////////////////////////////////////////
 	}
 
-	// for (int i = 0; i < ALL_TRAIN_NUM; i++)
-	// {
-	// 	printf("%d:\n", i);
-	// 	hv_print(result[i]);
-	// 	printf("\n");
-	// }
+	for (int i = 0; i < ALL_TRAIN_NUM; i++)
+	{
+		printf("%d:\n", i);
+		hv_print(result[i]);
+		printf("\n");
+	}
 
 	hv_free_array(result, ALL_TRAIN_NUM);
 	hv_free_array(item_memory, RAND_NUM);
