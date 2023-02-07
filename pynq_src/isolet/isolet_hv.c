@@ -194,22 +194,22 @@ hv_t **hv_make_imem_new(const uint32_t size)
 			// result[i][num] = result[0][num] ^ mask;
 		}
 
-		int tmp_num = 0;
-		for (int j = 0; j < 16; j++)
-		{
-			union
-			{
-				struct
-				{
-					uint32_t data_0;
-					uint32_t data_1;
-				};
-				hv_t data;
-			} conv;
-			conv.data = result[i][j];
-			printf("i:%d j:%d %u\n", i, tmp_num++, conv.data_0);
-			printf("i:%d j:%d %u\n", i, tmp_num++, conv.data_1);
-		}
+		// int tmp_num = 0;
+		// for (int j = 0; j < 16; j++)
+		// {
+		// 	union
+		// 	{
+		// 		struct
+		// 		{
+		// 			uint32_t data_0;
+		// 			uint32_t data_1;
+		// 		};
+		// 		hv_t data;
+		// 	} conv;
+		// 	conv.data = result[i][j];
+		// 	printf("i:%d j:%d %u\n", i, tmp_num++, conv.data_0);
+		// 	printf("i:%d j:%d %u\n", i, tmp_num++, conv.data_1);
+		// }
 #else
 		int tmp = 1024 / i;
 		int num = tmp / 32;
@@ -226,10 +226,10 @@ hv_t **hv_make_imem_new(const uint32_t size)
 			result[i][num] = result[0][num] ^ mask;
 		}
 
-		for (int j = 0; j < 32; j++)
-		{
-			printf("i:%d j:%d %u\n", i, j, result[i][j]);
-		}
+		// for (int j = 0; j < 32; j++)
+		// {
+		// 	printf("i:%d j:%d %u\n", i, j, result[i][j]);
+		// }
 #endif
 	}
 
@@ -327,12 +327,12 @@ int main(void)
 		//////////////////////////////////////////////////////////////////////
 	}
 
-	for (int i = 0; i < ALL_TRAIN_NUM; i++)
-	{
-		printf("%d:\n", i);
-		hv_print(result[i]);
-		printf("\n");
-	}
+	// for (int i = 0; i < ALL_TRAIN_NUM; i++)
+	// {
+	// 	printf("%d:\n", i);
+	// 	hv_print(result[i]);
+	// 	printf("\n");
+	// }
 
 	hv_free_array(result, ALL_TRAIN_NUM);
 	hv_free_array(item_memory, RAND_NUM);
