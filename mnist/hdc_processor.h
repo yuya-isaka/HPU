@@ -13,9 +13,7 @@ extern void hdc_print(void);
 
 extern void hdc_setup(void);
 
-extern void hdc_make_imem(const int RANNUM);
-
-extern void hdc_make_imem_2(const int RANNUM);
+extern void hdc_dma_reset(void);
 
 extern void hdc_init(const int N);
 
@@ -23,7 +21,15 @@ extern void hdc_start(void);
 
 extern void hdc_compute(void);
 
+extern void hdc_compute_only(void);
+
 extern void hdc_finish(void);
+
+extern void hdc_com_start(void);
+
+extern void hdc_com_start_continue(void);
+
+extern void hdc_com_gen(uint32_t num);
 
 extern void hdc_nop(void);
 

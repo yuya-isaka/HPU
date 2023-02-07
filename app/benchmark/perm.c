@@ -34,8 +34,6 @@ int main(int argc, char const *argv[])
 		rand_array[i] = rand() % RANNUM;
 		perm_array[i] = rand() % 1024;
 	}
-	int rand_array_num = 0;
-	int perm_array_num = 0;
 	END_COMPUTE = clock();
 	RAN_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 	/////////////////////////////////////////////////////////////////////////////
@@ -47,8 +45,8 @@ int main(int argc, char const *argv[])
 #endif
 	for (int i = 0; i < TRIAL_NUM; i++)
 	{
-		int addr = rand_array[rand_array_num++];
-		int perm_num = perm_array[perm_array_num++];
+		int addr = rand_array[i];
+		int perm_num = perm_array[i];
 		result[i] = hv_perm(item_memory[addr], perm_num);
 	}
 

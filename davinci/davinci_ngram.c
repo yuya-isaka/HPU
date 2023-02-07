@@ -135,7 +135,6 @@ int main(int argc, char const *argv[])
 		START_COMPUTE = clock();
 		char *content = read_file(TRAIN_PATH[i]);
 		END_COMPUTE = clock();
-		// struct tensor *label = load_label_file(TRAIN_LABEL);
 		LOAD_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 		// NGRAMの数
@@ -242,7 +241,7 @@ int main(int argc, char const *argv[])
 
 		// hv -------------------------------------------------
 		// 結果出力
-		// hv_print(result);
+		hv_print(result);
 
 		// Free
 		hv_free(result);
@@ -263,7 +262,7 @@ int main(int argc, char const *argv[])
 	// hv -------------------------------------------------
 
 	// printf("\n  計算時間: %lf[ms]\n", TIME);
-	printf("\n  ロード時間: %lf[ms]\n", LOAD_TIME);
+	printf("\n  ロード時間: %lf[ms]\n\n", LOAD_TIME);
 
 	// puts("\n  --------------------------------------- HDC Program END -------------------------------------");
 	return 0;

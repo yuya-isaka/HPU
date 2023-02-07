@@ -89,7 +89,7 @@ module counter
 
 
     reg signed [ W-1:0 ]      box;
-    reg signed [ 4:0 ]      box_1; // コア数可変
+    reg signed [ 2:0 ]      box_1; // コア数可変
 
     // TODO: 分けた方がいい？
     always_ff @( posedge clk ) begin
@@ -120,19 +120,19 @@ module counter
                           // コア数可変
                           box_1 <=
                                 select[ 0 ]
-                                + select[ 1 ]
-                                + select[ 2 ]
-                                + select[ 3 ]
-                                + select[ 4 ]
-                                + select[ 5 ]
-                                + select[ 6 ]
-                                + select[ 7 ]
-                                + select[ 8 ]
-                                + select[ 9 ]
-                                + select[ 10 ]
-                                + select[ 11 ]
-                                + select[ 12 ]
-                                + select[ 13 ];
+                                + select[ 1 ];
+                          // + select[ 2 ]
+                          // + select[ 3 ];
+                          // + select[ 4 ]
+                          // + select[ 5 ]
+                          // + select[ 6 ]
+                          // + select[ 7 ]
+                          // + select[ 8 ]
+                          // + select[ 9 ]
+                          // + select[ 10 ]
+                          // + select[ 11 ]
+                          // + select[ 12 ]
+                          // + select[ 13 ];
                           // + select[ 14 ];
                           // + select[ 15 ];
 

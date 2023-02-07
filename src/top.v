@@ -52,7 +52,7 @@ module top
 
         // AXI Stream Master Interface -------------------
         input wire                      M_AXIS_TREADY,
-        output wire [ 255:0 ]           M_AXIS_TDATA,
+        output wire [ 31:0 ]            M_AXIS_TDATA,
         output wire                     M_AXIS_TVALID,
         output wire [ 7:0 ]             M_AXIS_TSTRB,
         output wire                     M_AXIS_TLAST,
@@ -60,7 +60,7 @@ module top
 
 
         // AXI Stream Slave Interface --------------------
-        input wire [ 255:0 ]            S_AXIS_TDATA,
+        input wire [ 31:0 ]             S_AXIS_TDATA,
         input wire [ 7:0 ]              S_AXIS_TSTRB,
         input wire                      S_AXIS_TLAST,
         input wire                      S_AXIS_TVALID,
@@ -95,7 +95,7 @@ module top
 
     // コア数可変
     // 2コア -------------------
-    parameter CORENUM = 14;
+    parameter CORENUM = 2;
     // ------------------------
 
 
@@ -104,21 +104,25 @@ module top
 
     wire        get_v;
     wire        exec;
+    wire        get_c;
+    wire        communicate;
+    wire        get_c_tmp;
 
     get_enable get_enable
                (
 
                    // in
                    .clk( AXIS_ACLK ),
-                   .gen( gen ),
                    .run( run ),
+                   .com( com ),
                    .get_valid( S_AXIS_TVALID ),
 
 
                    // out
                    .get_ready( S_AXIS_TREADY ),
                    .get_v( get_v ),
-                   .exec( exec )
+                   .exec( exec ),
+                   .get_c( get_c )
 
                );
 
@@ -132,7 +136,7 @@ module top
     // コア数可変
     // 次元数可変
     // buffer_ctrl #( .DIM( 31 ), .CORENUM( 8 ) ) buffer_ctrl
-    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 14 ) ) buffer_ctrl
+    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 2 ) ) buffer_ctrl
                 (
 
                     // in
@@ -143,18 +147,18 @@ module top
                     // コア数可変
                     .core_result_1( core_result[ 0 ] ),
                     .core_result_2( core_result[ 1 ] ),
-                    .core_result_3( core_result[ 2 ] ),
-                    .core_result_4( core_result[ 3 ] ),
-                    .core_result_5( core_result[ 4 ] ),
-                    .core_result_6( core_result[ 5 ] ),
-                    .core_result_7( core_result[ 6 ] ),
-                    .core_result_8( core_result[ 7 ] ),
-                    .core_result_9( core_result[ 8 ] ),
-                    .core_result_10( core_result[ 9 ] ),
-                    .core_result_11( core_result[ 10 ] ),
-                    .core_result_12( core_result[ 11 ] ),
-                    .core_result_13( core_result[ 12 ] ),
-                    .core_result_14( core_result[ 13 ] ),
+                    // .core_result_3( core_result[ 2 ] ),
+                    // .core_result_4( core_result[ 3 ] ),
+                    // .core_result_5( core_result[ 4 ] ),
+                    // .core_result_6( core_result[ 5 ] ),
+                    // .core_result_7( core_result[ 6 ] ),
+                    // .core_result_8( core_result[ 7 ] ),
+                    // .core_result_9( core_result[ 8 ] ),
+                    // .core_result_10( core_result[ 9 ] ),
+                    // .core_result_11( core_result[ 10 ] ),
+                    // .core_result_12( core_result[ 11 ] ),
+                    // .core_result_13( core_result[ 12 ] ),
+                    // .core_result_14( core_result[ 13 ] ),
                     // .core_result_15( core_result[ 14 ] ),
                     // .core_result_16( core_result[ 15 ] ),
                     // .core_result_17( core_result[ 16 ] ),
@@ -177,12 +181,12 @@ module top
                     .store( store[ CORENUM-1:0 ] ),
                     .store_flag( store_flag ),
                     .stream_v( stream_v ),
-                    .stream_i( stream_i[ 1:0 ] ),
+                    .stream_i( stream_i[ 4:0 ] ),
 
 
                     // out
                     // バス幅可変
-                    .stream_d( M_AXIS_TDATA[ 255:0 ] ),
+                    .stream_d( M_AXIS_TDATA[ 31:0 ] ),
                     .sign_bit( sign_bit[ DIM:0 ] )
 
                 );
@@ -197,10 +201,10 @@ module top
     // counterの値(sign_bit)をM_AXIS_TDATAに格納するタイミングを知らせる役割
     wire                stream_v;
 
-    wire [ 1:0 ]          stream_i;
+    wire [ 4:0 ]          stream_i;
 
     // コア数可変
-    stream_ctrl #( .CORENUM( 14 ) ) stream_ctrl
+    stream_ctrl #( .CORENUM( 2 ) ) stream_ctrl
                 (
 
                     // in
@@ -216,7 +220,7 @@ module top
                     .dst_valid( M_AXIS_TVALID ),
                     .dst_last( M_AXIS_TLAST ),
                     .stream_v( stream_v ),
-                    .stream_i( stream_i[ 1:0 ] )
+                    .stream_i( stream_i[ 4:0 ] )
 
                 );
 
@@ -237,8 +241,6 @@ module top
     // 各コアの演算結果
     wire [ DIM:0 ]                      core_result [ 0:CORENUM-1 ];
 
-    wire [ CORENUM-1:0 ]                finish_gen;
-
     // 各コアでエンコーディング
     generate
 
@@ -255,19 +257,17 @@ module top
                      // in
                      .clk( AXIS_ACLK ),
                      .run( run ),
-                     .gen( gen ),
-                     .reset_item( reset_item ),
-                     .item_memory_num( item_memory_num[ 8:0 ] ),
+                     .com( com ),
                      .get_v( get_v ),
+                     .get_c( get_c ),
                      // 16bit命令
                      .get_d_tmp( S_AXIS_TDATA[ 15+16*i:16*i ] ),
-                     .get_d_1( S_AXIS_TDATA[ 15:0 ] ),
+                     .get_d_all( S_AXIS_TDATA[ 31:0 ] ),
                      .exec( exec ),
 
 
                      // out
                      // 1コア
-                     .finish_gen( finish_gen[ i ] ),
                      .store( store[ i ] ),
                      //  .store( store ),
                      // 1コア
@@ -293,18 +293,17 @@ module top
                      // in
                      .clk( AXIS_ACLK ),
                      .run( run ),
-                     .gen( gen ),
-                     .reset_item( reset_item ),
-                     .item_memory_num( item_memory_num[ 8:0 ] ),
+                     .com( com ),
                      .get_v( get_v ),
+                     .get_c( get_c ),
                      // 16bit命令
                      .get_d( S_AXIS_TDATA[ 15:0 ] ),
+                     .get_d_all( S_AXIS_TDATA[ 31:0 ] ),
                      .exec( exec ),
 
 
                      // out
                      // 1コア
-                     .finish_gen( finish_gen[ 0 ] ),
                      .store( store[ 0 ] ),
                      //  .store( store ),
                      // 1コア
@@ -395,7 +394,7 @@ module top
                 // go AWW
                 state <= 4'b0011;
                 write_addr[ 11:2 ] <= S_AXI_AWADDR[ 11:2 ];
-                write_data <= S_AXI_WDATA;
+                write_data[ 1:0 ] <= S_AXI_WDATA[ 1:0 ];
 
             end
 
@@ -411,7 +410,7 @@ module top
 
                 // go W
                 state <= 4'b0010;
-                write_data <= S_AXI_WDATA;
+                write_data[ 1:0 ] <= S_AXI_WDATA[ 1:0 ];
 
             end
 
@@ -432,7 +431,7 @@ module top
 
                 // go AWW
                 state <= 4'b0011;
-                write_data <= S_AXI_WDATA;
+                write_data[ 1:0 ] <= S_AXI_WDATA[ 1:0 ];
 
             end
 
@@ -506,23 +505,12 @@ module top
 
     // アクセラレータのモード
     // run ... アクセラレータ実行モード
-    // gen ... アクセラレータ準備モード　（ランダムなハイパーベクトルをitem_memoryに格納）
+    // com ... アクセラレータ準備モード　（ランダムなハイパーベクトルをitem_memoryに格納）
 
     // run ... 書き込みモードで2を代入
-    // gen ... 書き込みモードで１を代入
+    // com ... 書き込みモードで１を代入
+    reg                 com;
     reg                 run;
-    reg                 gen;
-
-    // item_memoryに格納するハイパーベクトルの数
-    // (現状の最大値は511)
-    reg [ 8:0 ]         item_memory_num;
-
-    reg                 reset_item;
-
-    // reg [ 31:0 ]        xor_x;
-    // reg [ 31:0 ]        xor_y;
-    // reg [ 31:0 ]        xor_z;
-    // reg [ 31:0 ]        xor_w;
 
     //================================================================
 
@@ -533,16 +521,7 @@ module top
         // 初期化
         if ( ~S_AXI_ARESETN ) begin
 
-            { run, gen } <= 2'b00;
-
-            item_memory_num <= 9'd0;
-
-            reset_item <= 1'b0;
-
-            // xor_x <= 32'd0;
-            // xor_y <= 32'd0;
-            // xor_z <= 32'd0;
-            // xor_w <= 32'd0;
+            { com, run } <= 2'b00;
 
         end
 
@@ -554,46 +533,13 @@ module top
 
                 // アドレス０
                 10'd00:
-                    { run, gen } <= write_data[ 1:0 ];
-
-                // アドレス４
-                10'd04:
-                    // 最大1023
-                    item_memory_num[ 8:0 ] <= write_data[ 8:0 ];
-
-                10'd08:
-                    reset_item <= write_data[ 0 ];
-
-                // // アドレス8
-                // 10'd08:
-                //     xor_x[ 31:0 ] <= write_data[ 31:0 ];
-
-                // // アドレス12
-                // 10'd12:
-                //     xor_y[ 31:0 ] <= write_data[ 31:0 ];
-
-                // // アドレス16
-                // 10'd16:
-                //     xor_z[ 31:0 ] <= write_data[ 31:0 ];
-
-                // // アドレス20
-                // 10'd20:
-                //     xor_w[ 31:0 ] <= write_data[ 31:0 ];
+                    { com, run } <= write_data[ 1:0 ];
 
                 // 上記アドレス以外は何もしない
                 default:
                     ;
 
             endcase
-
-        end
-
-        // アクセラレータ準備モード終了
-        // (item_memory_num数のハイパーベクトルを生成して終了)
-        // (現状S_AXI_ACLK, S_AXIS_ACLKが同じ周波数を用いているため問題ない)
-        else if ( gen &  ( finish_gen != 0) ) begin
-
-            gen <= 1'b0;
 
         end
 
@@ -614,27 +560,7 @@ module top
 
                 // アドレス０
                 10'h00:
-                    S_AXI_RDATA[ 1:0 ] <= { run, gen };
-
-                // // アドレス４
-                // 10'd04:
-                //     S_AXI_RDATA[ 8:0 ] <= item_memory_num[ 8:0 ];
-
-                // // アドレス8
-                // 10'd08:
-                //     S_AXI_RDATA[ 31:0 ] <= xor_x[ 31:0 ];
-
-                // // アドレス12
-                // 10'd12:
-                //     S_AXI_RDATA[ 31:0 ] <= xor_y[ 31:0 ];
-
-                // // アドレス16
-                // 10'd16:
-                //     S_AXI_RDATA[ 31:0 ] <= xor_z[ 31:0 ];
-
-                // // アドレス20
-                // 10'd20:
-                //     S_AXI_RDATA[ 31:0 ] <= xor_w[ 31:0 ];
+                    S_AXI_RDATA[ 1:0 ] <= { com, run };
 
                 // 上記アドレス以外は何もしない
                 default:

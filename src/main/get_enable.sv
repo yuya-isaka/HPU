@@ -7,15 +7,16 @@ module get_enable
 
         // in
         input wire                  clk,
-        input wire                  gen,
         input wire                  run,
+        input wire                  com,
         input wire                  get_valid,
 
 
         // out
         output wire                 get_ready,
         output logic                get_v,
-        output logic                exec
+        output logic                exec,
+        output logic                get_c
 
     );
 
@@ -51,14 +52,28 @@ module get_enable
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // 受信設定
+    // 受信設定 run
     always_comb begin
 
                     get_v = 1'b0;
 
-                    if ( get_valid & get_ready & run & ~gen ) begin
+                    if ( get_valid & get_ready & run & ~com ) begin
 
                         get_v = 1'b1;
+
+                    end
+
+                end;
+
+
+    // 受信設定 com
+    always_comb begin
+
+                    get_c = 1'b0;
+
+                    if ( get_valid & get_ready & com ) begin
+
+                        get_c = 1'b1;
 
                     end
 

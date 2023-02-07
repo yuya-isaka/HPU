@@ -22,7 +22,7 @@ module stream_ctrl
          output reg                             dst_valid,
          output reg                             dst_last,
          output logic                           stream_v,
-         output wire [ 1:0 ]                    stream_i
+         output wire [ 4:0 ]                    stream_i
 
      );
 
@@ -214,12 +214,12 @@ module stream_ctrl
     wire                last_stream;
 
     // 各コアで違う結果を返したい時に使うかも？
-    agu #( .W( 2 ) ) agu_stream_i
+    agu #( .W( 5 ) ) agu_stream_i
         (
 
             // in
-            .ini( 2'd0 ),
-            .fin( 2'd3 ),
+            .ini( 5'd0 ),
+            .fin( 5'd31 ),
             .start( start ),
             .clk( clk ),
             .rst( rst ),

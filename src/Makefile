@@ -31,7 +31,6 @@ DESIGN_SRC = \
 ./main/core.sv \
 ./main/central_core.sv \
 ./kit/counter.sv \
-./kit/xorshift.sv \
 ./kit/selector.sv \
 ./kit/agu.sv \
 ./kit/permute.sv \
@@ -52,6 +51,14 @@ clean:
 format :
 	iStyle --style=kr -n -s4 --pad=paren $(DESIGN_SRC)
 
+testcpu:
+	gcc -c -O2 -o hyper_vector.o hyper_vector.c
+	gcc -c -O2 -o test.o test_cpu.c
+	gcc -O2 -o test test.o hyper_vector.o
+	rm hyper_vector.o test.o
+	./test
+	rm test
+
 test:
 	gcc -c -O2 -o hyper_vector.o hyper_vector.c
 	gcc -c -O2 -o test.o test.c
@@ -59,5 +66,27 @@ test:
 	rm hyper_vector.o test.o
 	./test
 	rm test
+
+send_all:
+	sudo scp -r  ./overlay fpga@192.168.1.29:/home/fpga/
+	sudo scp -r  ./app fpga@192.168.1.29:/home/fpga/
+	sudo scp -r ./davinci fpga@192.168.1.29:/home/fpga/
+	sudo scp -r ./mnist fpga@192.168.1.29:/home/fpga/
+	sudo scp -r ./isolet fpga@192.168.1.29:/home/fpga/
+
+send_overlay:
+	sudo scp -r  ./overlay fpga@192.168.1.29:/home/fpga/
+
+send_app:
+	sudo scp -r  ./app fpga@192.168.1.29:/home/fpga/
+
+send_davinci:
+	sudo scp -r ./davinci fpga@192.168.1.29:/home/fpga/
+
+send_mnist:
+	sudo scp -r ./mnist fpga@192.168.1.29:/home/fpga/
+
+send_isolet:
+	sudo scp -r ./isolet fpga@192.168.1.29:/home/fpga/
 
 .PHONY: clean format test

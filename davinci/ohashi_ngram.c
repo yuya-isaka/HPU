@@ -9,6 +9,33 @@
 #include <time.h>
 #include "hdc_processor.h"
 
+uint32_t xor128(int reset)
+{
+	// 初期値
+	static uint32_t x = 123456789;
+	static uint32_t y = 362436069;
+	static uint32_t z = 521288629;
+	static uint32_t w = 88675123;
+
+	// リセット信号
+	if (reset)
+	{
+		x = 123456789;
+		y = 362436069;
+		z = 521288629;
+		w = 88675123;
+		return 0;
+	}
+	else
+	{
+		uint32_t t = x ^ (x << 11);
+		x = y;
+		y = z;
+		z = w;
+		return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+	}
+}
+
 int main(int argc, char const *argv[])
 {
 	// puts("\n  -------------------------------------- HDC Program start ------------------------------------\n");
@@ -28,11 +55,11 @@ int main(int argc, char const *argv[])
 	const int INSTRUCTION_NUM = 2 + ((NGRAM - 2) * 4) + 4;
 
 	// コア数
-	const int CORENUM = 14;
+	const int CORENUM = 2;
 
 	// DMA SEND_MAX
 	int SEND_MAX = 33000000;
-	const int SEND_TMP = SEND_MAX % (THREADS_NUM * 16 * INSTRUCTION_NUM) * (CORENUM * THREADS_NUM);
+	const int SEND_TMP = SEND_MAX % (THREADS_NUM * 2 * INSTRUCTION_NUM) * (CORENUM * THREADS_NUM);
 	SEND_MAX += SEND_TMP;
 
 	// 偶数の時に使うアドレス
@@ -43,11 +70,25 @@ int main(int argc, char const *argv[])
 	hdc_setup();
 
 	// アイテムメモリ生成
-	hdc_make_imem(27);
+	hdc_com_start();
+	hdc_com_gen(88675123);
+	for (int i = 0; i < 31; i++)
+	{
+		hdc_com_gen(xor128(0));
+	}
+	for (int i = 0; i < 26; i++)
+	{
+		for (int j = 0; j < 32; j++)
+		{
+			hdc_com_gen(xor128(0));
+		}
+	}
+	hdc_compute_only();
+	hdc_finish();
 	// hv -----------------------------
 
 	double LOAD_TIME = 0.0;
-	double COM_TIME = 0.0;
+	// double COM_TIME = 0.0;
 	clock_t START_COMPUTE;
 	clock_t END_COMPUTE;
 
@@ -94,7 +135,7 @@ int main(int argc, char const *argv[])
 		// 1回70この命令を、SEND_MAX / 800 回回す必要がある
 		// 800 = THREADS_NUM * 16 * INSTRUCTION_NUM
 		// 70 = CORENUM * THREADS_NUM
-		int ALL_SEND_NUM = SEND_MAX / (THREADS_NUM * 16 * INSTRUCTION_NUM) * (CORENUM * THREADS_NUM);
+		int ALL_SEND_NUM = SEND_MAX / (THREADS_NUM * 2 * INSTRUCTION_NUM) * (CORENUM * THREADS_NUM);
 		// ALL_SEND_EPOCHをLASTまで何回する必要があるか
 		const int ALL_SEND_EPOCH = LAST / ALL_SEND_NUM;
 		// ALL_SEND_EPOCHをLASTまで何回する必要があるか(あまり)
@@ -398,10 +439,10 @@ int main(int argc, char const *argv[])
 		// ラスト命令
 		hdc_last();
 
-		START_COMPUTE = clock();
+		// START_COMPUTE = clock();
 		hdc_compute();
-		END_COMPUTE = clock();
-		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
+		// END_COMPUTE = clock();
+		// COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 		// // 結果確認
 		// for (int j = 0; j < 32; j++)
@@ -413,7 +454,7 @@ int main(int argc, char const *argv[])
 		hdc_finish();
 	}
 
-	printf("\n  計算時間: %lf[ms]\n", COM_TIME);
+	// printf("\n  計算時間: %lf[ms]\n", COM_TIME);
 	printf("\n  ロード時間: %lf[ms]\n", LOAD_TIME);
 
 	// puts("\n  --------------------------------------- HDC Program end -------------------------------------\n");

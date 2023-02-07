@@ -29,7 +29,7 @@ int main(int argc, char const *argv[])
 	hdc_setup();
 
 	// アイテムメモリ生成
-	hdc_make_imem(RANNUM);
+	// hdc_make_imem(RANNUM);
 	// hv -----------------------------
 
 	// 試行回数

@@ -48,30 +48,74 @@ char *read_file(const char *PATH, int *num)
 	return content;
 }
 
+uint32_t xor128(int reset)
+{
+	// 初期値
+	static uint32_t x = 123456789;
+	static uint32_t y = 362436069;
+	static uint32_t z = 521288629;
+	static uint32_t w = 88675123;
+
+	// リセット信号
+	if (reset)
+	{
+		x = 123456789;
+		y = 362436069;
+		z = 521288629;
+		w = 88675123;
+		return 0;
+	}
+	else
+	{
+		uint32_t t = x ^ (x << 11);
+		x = y;
+		y = z;
+		z = w;
+		return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+	}
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main()
 {
 	double LOAD_TIME = 0.0;
-	double COM_TIME = 0.0;
+	// double COM_TIME = 0.0;
 	clock_t START_COMPUTE;
 	clock_t END_COMPUTE;
 
 	// 784個のハイパーベクトルを生成し格納
 	const uint32_t RAND_NUM = 784;
-	const uint32_t FIRST_RAND_NUM = 490;
+	const uint32_t FIRST_RAND_NUM = 500;
 	const uint32_t SECOND_RAND_NUM = RAND_NUM - FIRST_RAND_NUM;
 
 	// コア数
-	const int CORENUM = 14;
+	const int CORENUM = 2;
 
 	// メモリセットアップ
 	hdc_setup();
 
 	for (int ll = 0; ll < 10; ll++)
 	{
-		// 490
-		hdc_make_imem(FIRST_RAND_NUM);
+		// 500
+		// hdc_make_imem(FIRST_RAND_NUM);
+		xor128(1);
+		hdc_com_start();
+		hdc_com_gen(88675123);
+		for (int i = 0; i < 31; i++)
+		{
+			hdc_com_gen(xor128(0));
+		}
+		for (int i = 0; i < FIRST_RAND_NUM - 1; i++)
+		{
+			for (int j = 0; j < 32; j++)
+			{
+				hdc_com_gen(xor128(0));
+			}
+		}
+		hdc_compute_only();
+		hdc_finish();
+
 		hdc_init(0);
 		hdc_start();
 
@@ -87,7 +131,7 @@ int main()
 		{
 			int index_num = 0;
 
-			for (int j = 0; j < 7; j++)
+			for (int j = 0; j < 50; j++)
 			{
 				uint16_t core_num = CORENUM;
 
@@ -110,10 +154,6 @@ int main()
 					for (int i = 0; i < core_num; i++)
 					{
 						hdc_permute((data_lines[dd++] - '0'));
-					}
-					for (int i = 0; i < 2; i++)
-					{
-						hdc_nop();
 					}
 				}
 				// ------------------------------------------------------
@@ -125,21 +165,33 @@ int main()
 			dd += SECOND_RAND_NUM;
 		}
 
-		hdc_last();
-		START_COMPUTE = clock();
-		hdc_compute();
-		END_COMPUTE = clock();
-		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
+		// hdc_last();
+		// START_COMPUTE = clock();
+		hdc_compute_only();
+		// END_COMPUTE = clock();
+		// COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-		// 294
-		hdc_make_imem_2(SECOND_RAND_NUM);
+		// 284
+		hdc_com_start_continue();
+		for (int i = 0; i < SECOND_RAND_NUM; i++)
+		{
+			for (int j = 0; j < 32; j++)
+			{
+				hdc_com_gen(xor128(0));
+			}
+		}
+		hdc_compute_only();
+
 		hdc_init(0);
+		// runだけたった状態に戻す
+		hdc_start();
+
 		for (int dd = 0; dd < data_tmp_num;)
 		{
 			dd += FIRST_RAND_NUM;
 			int index_num = 0;
 
-			for (int j = 0; j < 4; j++)
+			for (int j = 0; j < 28; j++)
 			{
 				uint16_t core_num = CORENUM;
 
@@ -163,10 +215,6 @@ int main()
 					{
 						hdc_permute((data_lines[dd++] - '0'));
 					}
-					for (int i = 0; i < 2; i++)
-					{
-						hdc_nop();
-					}
 				}
 				// ------------------------------------------------------
 
@@ -175,9 +223,9 @@ int main()
 				// ------------------------------------------------------
 			}
 
-			// 残り
+			// 残り 4
 			uint16_t core_num = CORENUM;
-			uint16_t thread_num = 1;
+			uint16_t thread_num = 2;
 
 			uint16_t addr_array[thread_num][core_num];
 			for (int k = 0; k < thread_num; k++)
@@ -199,14 +247,10 @@ int main()
 				{
 					hdc_permute((data_lines[dd++] - '0'));
 				}
-				for (int i = 0; i < 2; i++)
-				{
-					hdc_nop();
-				}
 			}
 			for (int k = thread_num; k < THREADS_NUM; k++)
 			{
-				for (int i = 0; i < 16; i++)
+				for (int i = 0; i < 2; i++)
 				{
 					hdc_nop();
 				}
@@ -219,10 +263,10 @@ int main()
 		}
 
 		hdc_last();
-		START_COMPUTE = clock();
+		// START_COMPUTE = clock();
 		hdc_compute();
-		END_COMPUTE = clock();
-		COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
+		// END_COMPUTE = clock();
+		// COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
 		// // 結果確認
 		// printf("\n%d:\n", ll);
@@ -237,8 +281,8 @@ int main()
 	}
 
 	printf("  load時間: %lf[ms]\n", LOAD_TIME);
-	printf("  計算時間: %lf[ms]", COM_TIME);
+	// printf("  計算時間: %lf[ms]", COM_TIME);
 
-	printf("\n\n");
+	// printf("\n\n");
 	return 0;
 }
