@@ -150,33 +150,65 @@ hv_t **hv_make_imem_new(const uint32_t size)
 		for (int j = 0; j < num; j++)
 		{
 			result[i][j] = ~result[0][j];
-			union
-			{
-				struct
-				{
-					uint32_t data_0;
-					uint32_t data_1;
-				};
-				hv_t data;
-			} conv1;
-			union
-			{
-				struct
-				{
-					uint32_t data_0;
-					uint32_t data_1;
-				};
-				hv_t data;
-			} conv2;
-			conv1.data = result[i][j];
-			conv2.data = result[0][j];
-			printf("%d: 反転%u:%u\n", i, conv1.data_0, conv2.data_0);
-			printf("%d: 反転%u:%u\n", i, conv1.data_1, conv2.data_1);
+			// union
+			// {
+			// 	struct
+			// 	{
+			// 		uint32_t data_0;
+			// 		uint32_t data_1;
+			// 	};
+			// 	hv_t data;
+			// } conv1;
+			// union
+			// {
+			// 	struct
+			// 	{
+			// 		uint32_t data_0;
+			// 		uint32_t data_1;
+			// 	};
+			// 	hv_t data;
+			// } conv2;
+			// conv1.data = result[i][j];
+			// conv2.data = result[0][j];
+			// printf("%d: 反転%u:%u\n", i, conv1.data_0, conv2.data_0);
+			// printf("%d: 反転%u:%u\n", i, conv1.data_1, conv2.data_1);
 		}
 		if (num_remain != 0)
 		{
-			uint64_t mask = 2 ^ num_remain - 1;
-			result[i][num] = result[0][num] ^ mask;
+			union
+			{
+				struct
+				{
+					uint32_t data_0;
+					uint32_t data_1;
+				};
+				hv_t data;
+			} conv;
+			union
+			{
+				struct
+				{
+					uint32_t data_0;
+					uint32_t data_1;
+				};
+				hv_t data;
+			} conv_result;
+
+			conv.data = result[0][num];
+			if (num_remain > 32)
+			{
+				uint32_t mask = 2 ^ 32 - 1;
+				conv_result.data_0 = conv.data_0 ^ mask;
+				uint32_t maks = 2 ^ (num_remain - 32) - 1;
+				conv_result.data_1 = conv.data_1 ^ mask;
+			}
+			else
+			{
+				uint32_t mask = 2 ^ num_remain - 1;
+				conv_result.data_0 = conv.data_0 ^ mask;
+				conv_result.data_1 = conv.data_1;
+			}
+			result[i][num] = conv_result.data;
 
 			for (int j = num + 1; j < 16; j++)
 			{
@@ -187,29 +219,29 @@ hv_t **hv_make_imem_new(const uint32_t size)
 		{
 			for (int j = num; j < 16; j++)
 			{
-				union
-				{
-					struct
-					{
-						uint32_t data_0;
-						uint32_t data_1;
-					};
-					hv_t data;
-				} conv1;
-				union
-				{
-					struct
-					{
-						uint32_t data_0;
-						uint32_t data_1;
-					};
-					hv_t data;
-				} conv2;
 				result[i][j] = result[0][j];
-				conv1.data = result[i][j];
-				conv2.data = result[0][j];
-				printf("%d: そのまま%u:%u\n", i, conv1.data_0, conv2.data_0);
-				printf("%d: そのまま%u:%u\n", i, conv1.data_1, conv2.data_1);
+				// union
+				// {
+				// 	struct
+				// 	{
+				// 		uint32_t data_0;
+				// 		uint32_t data_1;
+				// 	};
+				// 	hv_t data;
+				// } conv1;
+				// union
+				// {
+				// 	struct
+				// 	{
+				// 		uint32_t data_0;
+				// 		uint32_t data_1;
+				// 	};
+				// 	hv_t data;
+				// } conv2;
+				// conv1.data = result[i][j];
+				// conv2.data = result[0][j];
+				// printf("%d: そのまま%u:%u\n", i, conv1.data_0, conv2.data_0);
+				// printf("%d: そのまま%u:%u\n", i, conv1.data_1, conv2.data_1);
 			}
 		}
 #else
