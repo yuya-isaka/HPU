@@ -108,7 +108,42 @@ int main()
 	{
 		Level[0][i] = xor128(0);
 	}
-	for (int i = 1; i < 10; i++)
+	// for (int i = 1; i < 10; i++)
+	// {
+	// 	int tmp = 1024 / i;
+	// 	int num = tmp / 32;
+	// 	int num_remain = tmp % 32;
+	// 	for (int j = 0; j < num; j++)
+	// 	{
+	// 		Level[i][j] = ~Level[0][j];
+	// 		// printf("%d: 反転%u:%u\n", i, Level[i][j], Level[0][j]);
+	// 	}
+	// 	if (num_remain != 0)
+	// 	{
+	// 		uint32_t mask = 1 << num_remain - 1;
+	// 		Level[i][num] = Level[0][num] ^ mask;
+
+	// 		for (int j = num + 1; j < 32; j++)
+	// 		{
+	// 			Level[i][j] = Level[0][j];
+	// 		}
+	// 	}
+	// 	else
+	// 	{
+	// 		for (int j = num; j < 32; j++)
+	// 		{
+	// 			Level[i][j] = Level[0][j];
+	// 			// printf("%d: そのまま%u:%u\n", i, Level[i][j], Level[0][j]);
+	// 		}
+	// 	}
+	// }
+	int tmp = 1024;
+	int num = 32;
+	for (int j = 0; j < num; j++)
+	{
+		Level[1][j] = ~Level[0][j];
+	}
+	for (int i = 2; i < 10; i++)
 	{
 		int tmp = 1024 / i;
 		int num = tmp / 32;
@@ -118,23 +153,12 @@ int main()
 			Level[i][j] = ~Level[0][j];
 			// printf("%d: 反転%u:%u\n", i, Level[i][j], Level[0][j]);
 		}
-		if (num_remain != 0)
-		{
-			uint32_t mask = 1 << num_remain - 1;
-			Level[i][num] = Level[0][num] ^ mask;
+		uint32_t mask = 1 << num_remain - 1;
+		Level[i][num] = Level[0][num] ^ mask;
 
-			for (int j = num + 1; j < 32; j++)
-			{
-				Level[i][j] = Level[0][j];
-			}
-		}
-		else
+		for (int j = num + 1; j < 32; j++)
 		{
-			for (int j = num; j < 32; j++)
-			{
-				Level[i][j] = Level[0][j];
-				// printf("%d: そのまま%u:%u\n", i, Level[i][j], Level[0][j]);
-			}
+			Level[i][j] = Level[0][j];
 		}
 	}
 
@@ -396,12 +420,12 @@ int main()
 		// END_COMPUTE = clock();
 		// COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-		// 結果確認
-		printf("\n%d:\n", ll);
-		for (int j = 0; j < 32; j++)
-		{
-			printf("  %u\n", dst[j]);
-		}
+		// // 結果確認
+		// printf("\n%d:\n", ll);
+		// for (int j = 0; j < 32; j++)
+		// {
+		// 	printf("  %u\n", dst[j]);
+		// }
 
 		hdc_finish();
 
