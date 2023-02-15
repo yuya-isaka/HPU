@@ -133,94 +133,57 @@ static struct tensor *load_image_file(const char *fn)
 	return ret;
 }
 
-static void load_image_file_2(const char *fn)
+// static void print_image(float *a)
+// {
+// 	int w = 28, h = 28, i, j;
+// 	for (j = 0; j < h; j++)
+// 	{
+// 		for (i = 0; i < w; i++)
+// 		{
+// 			printf("%s", *a == 0 ? "--" : "00");
+// 			a++;
+// 		}
+// 		printf("\n");
+// 	}
+// 	printf("\n");
+// }
+
+static void load_trainimage_file_2(struct tensor *train_image_all)
 {
-	struct tensor *ret = NULL;
-	char buf[4];
-
-	FILE *fp = fopen(fn, "rb");
-
-	fseek(fp, 0, SEEK_END);
-
-	int sz = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-
-	size_t DONE;
-	DONE = fread(buf, 1, 4, fp);
-	int t = buf2int(buf);
-
-	DONE = fread(buf, 1, 4, fp);
-	int n = buf2int(buf);
-	DONE = fread(buf, 1, 4, fp);
-	int w = buf2int(buf);
-	DONE = fread(buf, 1, 4, fp);
-	int h = buf2int(buf);
-
 	for (int ll = 0; ll < 10; ll++)
 	{
-		char PATH[12];
-		snprintf(PATH, 12, "label%d.txt", ll);
+		char PATH[16];
+		snprintf(PATH, 16, "label%d.txt", ll);
 		FILE *file;
 		file = fopen(PATH, "r");
 		char Lines[10];
 
-		char PATH_NEW[12];
-		snprintf(PATH_NEW, 12, "image%d.txt", ll);
+		char PATH_NEW[16];
+		snprintf(PATH_NEW, 16, "image%d.txt", ll);
 		FILE *file_new;
 		file_new = fopen(PATH_NEW, "w");
 
 		while (fgets(Lines, 10, file) != NULL) // 6000回ぐらい？
 		{
-			// printf("%d\n", n); // 60000
-			for (int i = 0; i < n; i++)
+			// printf("%d:%d:%d\n", ll, atoi(Lines));
+			for (int j = 0; j < 28; j++)
 			{
-				if (atoi(Lines) == i)
+				for (int k = 0; k < 28; k++)
 				{
-					for (int j = 0; j < 784; j++)
-					{
-						DONE = fread(buf, 1, 1, fp);
-						if ((int)(buf[0]) == 0)
-						{
-							fprintf(file_new, "%d", 0);
-						}
-						else
-						{
-							fprintf(file_new, "%d", 1);
-						}
-					}
+					// printf("%d", at(test_image_all, atoi(Lines), j * 28 + k));
+					fprintf(file_new, "%d", at(train_image_all, atoi(Lines), j * 28 + k));
 				}
+				// printf("\n");
 			}
 		}
 		fclose(file);
 	}
 
-	fclose(fp);
 	return;
 }
 
-static void load_testimage_file_2(const char *fn)
+static void load_testimage_file_2(struct tensor *test_image_all)
 {
-	struct tensor *ret = NULL;
-	char buf[4];
-
-	FILE *fp = fopen(fn, "rb");
-
-	fseek(fp, 0, SEEK_END);
-
-	int sz = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-
-	size_t DONE;
-	DONE = fread(buf, 1, 4, fp);
-	int t = buf2int(buf);
-
-	DONE = fread(buf, 1, 4, fp);
-	int n = buf2int(buf);
-	DONE = fread(buf, 1, 4, fp);
-	int w = buf2int(buf);
-	DONE = fread(buf, 1, 4, fp);
-	int h = buf2int(buf);
-
 	for (int ll = 0; ll < 10; ll++)
 	{
 		char PATH[16];
@@ -236,30 +199,20 @@ static void load_testimage_file_2(const char *fn)
 
 		while (fgets(Lines, 10, file) != NULL) // 6000回ぐらい？
 		{
-			// printf("%d\n", n); // 60000
-			for (int i = 0; i < n; i++)
+			// printf("%d:%d:%d\n", ll, atoi(Lines));
+			for (int j = 0; j < 28; j++)
 			{
-				if (atoi(Lines) == i)
+				for (int k = 0; k < 28; k++)
 				{
-					for (int j = 0; j < 784; j++)
-					{
-						DONE = fread(buf, 1, 1, fp);
-						if ((int)(buf[0]) == 0)
-						{
-							fprintf(file_new, "%d", 0);
-						}
-						else
-						{
-							fprintf(file_new, "%d", 1);
-						}
-					}
+					// printf("%d", at(test_image_all, atoi(Lines), j * 28 + k));
+					fprintf(file_new, "%d", at(test_image_all, atoi(Lines), j * 28 + k));
 				}
+				// printf("\n");
 			}
 		}
 		fclose(file);
 	}
 
-	fclose(fp);
 	return;
 }
 
@@ -343,16 +296,16 @@ int main()
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
 	// // mnist_image.bin生成
-	// struct tensor *image = load_image_file(TRAIN_IMAGE);
-	// struct tensor *label = load_label_file(TRAIN_LABEL);
-	struct tensor *image = load_image_file(TEST_IMAGE);
-	struct tensor *label = load_label_file(TEST_LABEL);
+	struct tensor *train_image = load_image_file(TRAIN_IMAGE);
+	struct tensor *train_label = load_label_file(TRAIN_LABEL);
+	struct tensor *test_image = load_image_file(TEST_IMAGE);
+	struct tensor *test_label = load_label_file(TEST_LABEL);
 
 	// // image0 - image10.txt生成
-	// load_image_file_2(TRAIN_IMAGE);
+	load_trainimage_file_2(train_image);
 
 	// // testimage0 - testimage10.txt生成
-	load_testimage_file_2(TEST_IMAGE);
+	load_testimage_file_2(test_image);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -412,8 +365,10 @@ int main()
 	// }
 	// printf("\nall_num: %d\n\n", all_num);
 
-	free_tensor(image);
-	free_tensor(label);
+	free_tensor(train_image);
+	free_tensor(train_label);
+	free_tensor(test_image);
+	free_tensor(test_label);
 
 	return 0;
 }
