@@ -21,7 +21,11 @@ typedef int32_t hv_int_t;
 
 extern void hv_init(void);
 
+extern void hv_init_inference(void);
+
 extern void hv_finish(void);
+
+extern void hv_finish_inference(void);
 
 extern hv_t *hv_make(void);
 
@@ -43,7 +47,13 @@ extern hv_t *hv_perm(hv_t origin[HV_NUM], const uint32_t perm_num);
 extern void hv_bound(hv_t encoded_hv[HV_NUM]);
 
 // NoBatch
+extern void hv_bound_inference(hv_t encoded_hv[HV_NUM]);
+
+// NoBatch
 extern hv_t *hv_bound_result(void);
+
+// NoBatch
+extern hv_t *hv_bound_result_inference(void);
 
 // Batch
 extern hv_t *hv_bound_batch(hv_t **, const uint32_t);

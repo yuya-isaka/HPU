@@ -77,9 +77,12 @@ uint32_t HammingDistance(uint32_t n)
 int main()
 {
 	double LOAD_TIME = 0.0;
+	double INFERENCE_TIME = 0.0;
 	double COM_TIME = 0.0;
 	clock_t START_COMPUTE;
 	clock_t END_COMPUTE;
+	clock_t INFERENCE_START_COMPUTE;
+	clock_t INFERENCE_END_COMPUTE;
 
 	// 784個のハイパーベクトルを生成し格納
 	const uint32_t RAND_NUM = 784;
@@ -128,8 +131,8 @@ int main()
 		free(data_lines);
 	}
 
+	INFERENCE_START_COMPUTE = clock();
 	int correct = 0;
-
 	for (int i = 0; i < 10; i++)
 	{
 		// printf("%d:\n", i);
@@ -146,7 +149,7 @@ int main()
 
 		for (int j = 0; j < data_tmp_num; j += 784)
 		{
-			hv_init();
+			hv_init_inference();
 			int index_num = 0;
 			int perm_num = j;
 
@@ -155,11 +158,11 @@ int main()
 				hv_t *perm_result = hv_perm(item_memory[index_num++], (data_lines[perm_num++] - '0'));
 
 				// bound
-				hv_bound(perm_result);
+				hv_bound_inference(perm_result);
 				hv_free(perm_result);
 			}
 
-			hv_t *result_tmp = hv_bound_result();
+			hv_t *result_tmp = hv_bound_result_inference();
 
 			// ここでresult_tmpとresult[0]-result[10]とのハミング距離を計測して、どこに分類されるか判定
 			int hamming[10];
@@ -191,19 +194,22 @@ int main()
 			}
 
 			hv_free(result_tmp);
-			hv_finish();
+			hv_finish_inference();
 		}
 		free(data_lines);
 	}
+	INFERENCE_END_COMPUTE = clock();
+	INFERENCE_TIME = ((double)(INFERENCE_END_COMPUTE - INFERENCE_START_COMPUTE)) / CLOCKS_PER_SEC;
 
 	// correct / 10000 = 正解率を出力
 	printf("Correct: %d\n", correct);
-	printf("Accuracy: %f\n", correct / 10000);
+	printf("Accuracy: %f\n", correct / 10000.0);
 
 	hv_free_array(result, 10);
 	hv_free_array(item_memory, RAND_NUM);
 
 	printf("  load時間: %lf[ms]\n", LOAD_TIME);
+	printf("  推論時間: %lf[ms]\n", INFERENCE_TIME);
 
 	return 0;
 }

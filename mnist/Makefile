@@ -14,9 +14,7 @@ inference:
 	gcc -fopenmp -DOPENMP -c -O2 -o hyper_vector.o hyper_vector.c
 	gcc -fopenmp -DOPENMP -c -O2 -o mnist.o mnist_hv_inference.c
 	gcc -fopenmp -DOPENMP -O2 -o mnist_bin mnist.o hyper_vector.o
-	./mnist_bin
 	rm hyper_vector.o mnist.o
-	rm mnist_bin
 
 generate:
 	gcc -DDEBUG -O2 -o mnist_bin mnist_data_generate.c
