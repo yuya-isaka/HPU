@@ -109,11 +109,13 @@ static struct tensor *load_image_file(const char *fn)
 
 	// printf("%d\n", n); // 60000
 	ret = create_tensor(n, 784);
+	// ここを工夫することで対応できる？
 	for (int i = 0; i < n; i++)
 	{
 		for (int j = 0; j < 784; j++)
 		{
 			DONE = fread(buf, 1, 1, fp);
+			// printf("%d ", (int)(buf[0]));
 			if ((int)(buf[0]) == 0)
 			{
 				ret->data[i * 784 + j] = 0;
@@ -124,6 +126,16 @@ static struct tensor *load_image_file(const char *fn)
 				ret->data[i * 784 + j] = 1;
 				// fwrite(&save_buf_one, 1, 1, file);
 			}
+			// if (-100 < (int)(buf[0]) && (int)(buf[0]) < 100 && (int)(buf[0]) != 0)
+			// {
+			// 	ret->data[i * 784 + j] = 1;
+			// 	// fwrite(&save_buf_zero, 1, 1, file);
+			// }
+			// else
+			// {
+			// 	ret->data[i * 784 + j] = 0;
+			// 	// fwrite(&save_buf_one, 1, 1, file);
+			// }
 		}
 	}
 
@@ -170,12 +182,13 @@ static void load_trainimage_file_2(struct tensor *train_image_all)
 			{
 				for (int k = 0; k < 28; k++)
 				{
-					// printf("%d", at(test_image_all, atoi(Lines), j * 28 + k));
+					// printf("%d", at(train_image_all, atoi(Lines), j * 28 + k));
 					fprintf(file_new, "%d", at(train_image_all, atoi(Lines), j * 28 + k));
 				}
 				// printf("\n");
 			}
 		}
+		// exit(1);
 		fclose(file);
 	}
 
