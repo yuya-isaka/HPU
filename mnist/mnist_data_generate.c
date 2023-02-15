@@ -20,6 +20,8 @@ __attribute__((destructor)) static void destructor()
 
 #define TRAIN_IMAGE "train-images-idx3-ubyte"
 #define TRAIN_LABEL "train-labels-idx1-ubyte"
+#define TEST_IMAGE "t10k-images-idx3-ubyte"
+#define TEST_LABEL "t10k-labels-idx1-ubyte"
 
 #define image_pos(a, b) (a->data + b * 784)
 #define at(o, a, b) o->data[a * o->cols + b]
@@ -101,7 +103,7 @@ static struct tensor *load_image_file(const char *fn)
 	DONE = fread(buf, 1, 4, fp);
 	int h = buf2int(buf);
 
-	FILE *file = fopen("mnist_image.bin", "wb");
+	// FILE *file = fopen("mnist_image.bin", "wb");
 	int save_buf_zero = 0;
 	int save_buf_one = 1;
 
@@ -115,18 +117,18 @@ static struct tensor *load_image_file(const char *fn)
 			if ((int)(buf[0]) == 0)
 			{
 				ret->data[i * 784 + j] = 0;
-				fwrite(&save_buf_zero, 1, 1, file);
+				// fwrite(&save_buf_zero, 1, 1, file);
 			}
 			else
 			{
 				ret->data[i * 784 + j] = 1;
-				fwrite(&save_buf_one, 1, 1, file);
+				// fwrite(&save_buf_one, 1, 1, file);
 			}
 		}
 	}
 
 	fclose(fp);
-	fclose(file);
+	// fclose(file);
 
 	return ret;
 }
@@ -278,9 +280,11 @@ int main()
 	// // mnist_image.bin生成
 	// struct tensor *image = load_image_file(TRAIN_IMAGE);
 	// struct tensor *label = load_label_file(TRAIN_LABEL);
+	struct tensor *image = load_image_file(TEST_IMAGE);
+	struct tensor *label = load_label_file(TEST_LABEL);
 
 	// // image0 - image10.txt生成
-	load_image_file_2(TRAIN_IMAGE);
+	// load_image_file_2(TRAIN_IMAGE);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -300,6 +304,33 @@ int main()
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
+	// // testlabel0 - testlabel10.txt生成
+	// // 0 - 10
+	for (int i = 0; i < 10; i++)
+	{
+		FILE *fp;
+		char PATH[16];
+		snprintf(PATH, 16, "testlabel%d.txt", i);
+		fp = fopen(PATH, "w");
+		for (int j = 0; j < label->rows; j++) // train:60000, test:10000
+		{
+			if (label->data[j] == i)
+			{
+				fprintf(fp, "%d\n", j);
+			}
+		}
+		fclose(fp);
+	}
+
+	// ラベル確認用
+	// printf("%d\n\n", label->rows);
+	// for (int j = 0; j < label->rows; j++)
+	// {
+	// 	printf("%d:%d \n", j, label->data[j]);
+	// }
+
+	//////////////////////////////////////////////////////////////////////////////////////////////
+
 	// // 読み込みチェック
 	// int all_num = 0;
 	// for (int i = 0; i < 10; i++)
@@ -313,8 +344,8 @@ int main()
 	// }
 	// printf("\nall_num: %d\n\n", all_num);
 
-	// free_tensor(image);
-	// free_tensor(label);
+	free_tensor(image);
+	free_tensor(label);
 
 	return 0;
 }
