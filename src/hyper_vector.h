@@ -2,7 +2,8 @@
 #define HYPER_VECTOR_h_
 
 // 次元数
-#define HV_DIM 1024
+// #define HV_DIM 1024
+#define HV_DIM 2048
 
 // ハイパーベクトル配列の数
 #define HV_NUM HV_DIM / ELEMENT_SIZE

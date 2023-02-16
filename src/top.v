@@ -79,7 +79,11 @@ module top
     // -----------------------
 
     // 1024次元 ---------------
-    parameter DIM = 1023;
+    // parameter DIM = 1023;
+    // -----------------------
+
+    // 2048次元 ---------------
+    parameter DIM = 2047;
     // -----------------------
 
 
@@ -95,7 +99,11 @@ module top
 
     // コア数可変
     // 2コア -------------------
-    parameter CORENUM = 2;
+    // parameter CORENUM = 2;
+    // ------------------------
+
+    // 1コア -------------------
+    parameter CORENUM = 1;
     // ------------------------
 
 
@@ -136,7 +144,8 @@ module top
     // コア数可変
     // 次元数可変
     // buffer_ctrl #( .DIM( 31 ), .CORENUM( 8 ) ) buffer_ctrl
-    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 2 ) ) buffer_ctrl
+    // buffer_ctrl #( .DIM( 1023 ), .CORENUM( 2 ) ) buffer_ctrl
+    buffer_ctrl #( .DIM( 2047 ), .CORENUM( 1 ) ) buffer_ctrl
                 (
 
                     // in
@@ -146,7 +155,7 @@ module top
                     // .core_result_1( core_result ),
                     // コア数可変
                     .core_result_1( core_result[ 0 ] ),
-                    .core_result_2( core_result[ 1 ] ),
+                    // .core_result_2( core_result[ 1 ] ),
                     // .core_result_3( core_result[ 2 ] ),
                     // .core_result_4( core_result[ 3 ] ),
                     // .core_result_5( core_result[ 4 ] ),
@@ -204,7 +213,7 @@ module top
     wire [ 4:0 ]          stream_i;
 
     // コア数可変
-    stream_ctrl #( .CORENUM( 2 ) ) stream_ctrl
+    stream_ctrl #( .CORENUM( 1 ) ) stream_ctrl
                 (
 
                     // in
@@ -251,7 +260,8 @@ module top
             // 次元数可変
             // スレッド数可変
             // core #( .DIM( 31 ), .THREADS( 5 ) ) core
-            core #( .DIM( 1023 ), .THREADS( 5 ), .WI( 31 ) ) core
+            // core #( .DIM( 1023 ), .THREADS( 5 ), .WI( 31 ) ) core
+            core #( .DIM( 2047 ), .THREADS( 5 ), .WI( 63 ) ) core
                  (
 
                      // in
@@ -287,7 +297,10 @@ module top
     wire                            last;
 
 
-    central_core #( .DIM( 1023 ), .THREADS( 10 ), .WI( 31 ) ) central_core
+    // 次元数可変
+    // スレッド数可変
+    // central_core #( .DIM( 1023 ), .THREADS( 10 ), .WI( 31 ) ) central_core
+    central_core #( .DIM( 2047 ), .THREADS( 5 ), .WI( 63 ) ) central_core
                  (
 
                      // in

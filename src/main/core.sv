@@ -172,7 +172,8 @@ module core
 
     // 次元数可変
     // permute #( .DIM( 31 ) ) permute
-    permute #( .DIM( 1023 ) ) permute
+    // permute #( .DIM( 1023 ) ) permute
+    permute #( .DIM( 2047 ) ) permute
             (
 
                 // in
@@ -469,193 +470,199 @@ module core
 
                           rand_num[ 31:0 ] <= get_d_all[ 31:0 ];
 
+
                       end
 
                       else if ( item_a_tmp == 1 ) begin
-
                           rand_num[ 63:32 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 2 ) begin
-
                           rand_num[ 95:64 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 3 ) begin
-
                           rand_num[ 127:96 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 4 ) begin
-
                           rand_num[ 159:128 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 5 ) begin
-
                           rand_num[ 191:160 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 6 ) begin
-
                           rand_num[ 223:192 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 7 ) begin
-
                           rand_num[ 255:224 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 8 ) begin
-
                           rand_num[ 287:256 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 9 ) begin
-
                           rand_num[ 319:288 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 10 ) begin
-
                           rand_num[ 351:320 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 11 ) begin
-
                           rand_num[ 383:352 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 12 ) begin
-
                           rand_num[ 415:384 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 13 ) begin
-
                           rand_num[ 447:416 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 14 ) begin
-
                           rand_num[ 479:448 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 15 ) begin
-
                           rand_num[ 511:480 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 16 ) begin
-
                           rand_num[ 543:512 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 17 ) begin
-
                           rand_num[ 575:544 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 18 ) begin
-
                           rand_num[ 607:576 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 19 ) begin
-
                           rand_num[ 639:608 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 20 ) begin
-
                           rand_num[ 671:640 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 21 ) begin
-
                           rand_num[ 703:672 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 22 ) begin
-
                           rand_num[ 735:704 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 23 ) begin
-
                           rand_num[ 767:736 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 24 ) begin
-
                           rand_num[ 799:768 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 25 ) begin
-
                           rand_num[ 831:800 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 26 ) begin
-
                           rand_num[ 863:832 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 27 ) begin
-
                           rand_num[ 895:864 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 28 ) begin
-
                           rand_num[ 927:896 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 29 ) begin
-
                           rand_num[ 959:928 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 30 ) begin
-
                           rand_num[ 991:960 ] <= get_d_all[ 31:0 ];
-
                       end
-
                       else if ( item_a_tmp == 31 ) begin
-
                           rand_num[ 1023:992 ] <= get_d_all[ 31:0 ];
-
                       end
+                      else if ( item_a_tmp == 32 ) begin
+                          rand_num[ 1055:1024 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 33 ) begin
+                          rand_num[ 1087:1056 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 34 ) begin
+                          rand_num[ 1119:1088 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 35 ) begin
+                          rand_num[ 1151:1120 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 36 ) begin
+                          rand_num[ 1183:1152 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 37 ) begin
+                          rand_num[ 1215:1184 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 38 ) begin
+                          rand_num[ 1247:1216 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 39 ) begin
+                          rand_num[ 1279:1248 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 40 ) begin
+                          rand_num[ 1311:1280 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 41 ) begin
+                          rand_num[ 1343:1312 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 42 ) begin
+                          rand_num[ 1375:1344 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 43 ) begin
+                          rand_num[ 1407:1376 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 44 ) begin
+                          rand_num[ 1439:1408 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 45 ) begin
+                          rand_num[ 1471:1440 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 46 ) begin
+                          rand_num[ 1503:1472 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 47 ) begin
+                          rand_num[ 1535:1504 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 48 ) begin
+                          rand_num[ 1567:1536 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 49 ) begin
+                          rand_num[ 1599:1568 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 50 ) begin
+                          rand_num[ 1631:1600 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 51 ) begin
+                          rand_num[ 1663:1632 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 52 ) begin
+                          rand_num[ 1695:1664 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 53 ) begin
+                          rand_num[ 1727:1696 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 54 ) begin
+                          rand_num[ 1759:1728 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 55 ) begin
+                          rand_num[ 1791:1760 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 56 ) begin
+                          rand_num[ 1823:1792 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 57 ) begin
+                          rand_num[ 1855:1824 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 58 ) begin
+                          rand_num[ 1887:1856 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 59 ) begin
+                          rand_num[ 1919:1888 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 60 ) begin
+                          rand_num[ 1951:1920 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 61 ) begin
+                          rand_num[ 1983:1952 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 62 ) begin
+                          rand_num[ 2015:1984 ] <= get_d_all[ 31:0 ];
+                      end
+                      else if ( item_a_tmp == 63 ) begin
+                          rand_num[ 2047:2016 ] <= get_d_all[ 31:0 ];
+                      end
+
 
                   end
 

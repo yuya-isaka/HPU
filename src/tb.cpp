@@ -1593,6 +1593,17 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       eval();
     }
   }
+  else if (DIM == 64)
+  {
+    for (int i = 0; i < (64 / BUS); i++)
+    {
+      for (int j = 0; j < BUS; j++)
+      {
+        printf("  %u\n", verilator_top->M_AXIS_TDATA);
+      }
+      eval();
+    }
+  }
   // 1024bit出力
   else
   {
@@ -1646,7 +1657,8 @@ int main(int argc, char **argv)
   const int NGRAM = 3;
 
   // コア数可変
-  const int CORENUM = 2;
+  // const int CORENUM = 2;
+  const int CORENUM = 1;
 
   // スレッド数可変
   const int THREADSNUM = 5;
@@ -1656,7 +1668,8 @@ int main(int argc, char **argv)
 
   // 次元数可変
   // const int DIM = 32 / 32;
-  const int DIM = 1024 / 32;
+  // const int DIM = 1024 / 32;
+  const int DIM = 2048 / 32;
 
   // テスト
   // const int SIMULATION_COUNT = 100;

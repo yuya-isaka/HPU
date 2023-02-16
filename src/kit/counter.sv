@@ -119,8 +119,8 @@ module counter
 
                           // コア数可変
                           box_1 <=
-                                select[ 0 ]
-                                + select[ 1 ];
+                                select[ 0 ];
+                          // + select[ 1 ];
                           // + select[ 2 ]
                           // + select[ 3 ];
                           // + select[ 4 ]
