@@ -287,7 +287,7 @@ module top
     wire                            last;
 
 
-    central_core #( .DIM( 1023 ), .THREADS( 10 ), .WI( 31 ) ) central_core
+    central_core #( .DIM( 1023 ), .THREADS( 5 ), .WI( 31 ) ) central_core
                  (
 
                      // in
