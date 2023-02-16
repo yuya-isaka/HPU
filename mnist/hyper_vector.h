@@ -3,6 +3,9 @@
 
 // 次元数
 #define HV_DIM 1024
+// #define HV_DIM 2048
+// #define HV_DIM 4096
+// #define HV_DIM 8192
 
 // ハイパーベクトル配列の数
 #define HV_NUM HV_DIM / ELEMENT_SIZE

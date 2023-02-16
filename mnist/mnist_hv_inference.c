@@ -169,6 +169,9 @@ int main()
 			for (int k = 0; k < 10; k++)
 			{
 				hamming[k] = 0;
+				// for (int l = 0; l < 64; l++)
+				// for (int l = 0; l < 128; l++)
+				// for (int l = 0; l < 256; l++)
 				for (int l = 0; l < 32; l++)
 				{
 					hamming[k] += HammingDistance(result[k][l] ^ result_tmp[l]);
