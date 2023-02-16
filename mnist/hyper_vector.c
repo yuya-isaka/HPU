@@ -11,11 +11,12 @@
 #include <arm_neon.h>
 #endif
 
+static hv_int_t *hv_bound_buff_inference;
+
 // OpenMP
 #ifdef OPENMP
 #include <omp.h>
 static hv_int_t **hv_bound_buff;
-static hv_int_t *hv_bound_buff_inference;
 #else
 static hv_int_t *hv_bound_buff;
 #endif

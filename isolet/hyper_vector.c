@@ -11,6 +11,8 @@
 #include <arm_neon.h>
 #endif
 
+static hv_int_t *hv_bound_buff_inference;
+
 // OpenMP
 #ifdef OPENMP
 #include <omp.h>
@@ -33,6 +35,12 @@ void hv_init(void)
 #endif
 }
 
+// hv_bound_buff初期化
+void hv_init_inference(void)
+{
+	hv_bound_buff_inference = (hv_int_t *)calloc(HV_DIM, sizeof(hv_int_t));
+}
+
 // hv_bound_buff解放
 void hv_finish(void)
 {
@@ -43,6 +51,12 @@ void hv_finish(void)
 	}
 #endif
 	free(hv_bound_buff);
+}
+
+// hv_bound_buff解放
+void hv_finish_inference(void)
+{
+	free(hv_bound_buff_inference);
 }
 
 // hv_t * HV_NUM ハイパーベクトル配列生成
@@ -372,6 +386,25 @@ void hv_bound(hv_t encoded_hv[HV_NUM])
 	}
 }
 
+// Bounding (NoBatch)
+void hv_bound_inference(hv_t encoded_hv[HV_NUM])
+{
+	uint32_t index_assign = HV_NUM - 1;
+	for (int i = 0; i < HV_NUM; i++)
+	{
+		hv_t hv = encoded_hv[i];
+		hv_t mask = (hv_t)1;
+		for (uint32_t j = 0; j < ELEMENT_SIZE; j++)
+		{
+			uint32_t index = index_assign * ELEMENT_SIZE + j;
+
+			hv_bound_buff_inference[index] += (mask & hv ? -1 : 1);
+			mask <<= 1;
+		}
+		index_assign--;
+	}
+}
+
 // Bounding結果取り出し
 hv_t *hv_bound_result(void)
 {
@@ -408,6 +441,26 @@ hv_t *hv_bound_result(void)
 #ifdef OPENMP
 	free(hv_bound_buff_result);
 #endif
+
+	return bound_hv;
+}
+
+hv_t *hv_bound_result_inference(void)
+{
+	hv_t *bound_hv = hv_make();
+	hv_t mask = (hv_t)1 << (ELEMENT_SIZE - 1);
+	uint32_t index_assign = HV_NUM - 1;
+	for (uint32_t i = 0; i < HV_NUM; i++)
+	{
+		hv_t hv = 0;
+		for (uint32_t j = 0; j < ELEMENT_SIZE; j++)
+		{
+			uint32_t index = i * ELEMENT_SIZE + j;
+			hv_t sign_bit = (hv_bound_buff_inference[index] & mask ? 1 : 0);
+			hv += (sign_bit << j);
+		}
+		bound_hv[index_assign--] = hv;
+	}
 
 	return bound_hv;
 }
