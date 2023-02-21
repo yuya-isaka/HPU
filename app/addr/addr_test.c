@@ -27,7 +27,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
   // 偶数処理
   if (EVEN)
   {
-    uint16_t addr_array[1][1] = {{MAJORITY_ADDR}};
+    uint16_t addr_array[1] = {{MAJORITY_ADDR}};
     hdc_load_thread(1, 1, addr_array);
 
     hdc_store_thread(1, 1);
