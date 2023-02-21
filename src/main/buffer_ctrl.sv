@@ -17,25 +17,8 @@ module buffer_ctrl
          // in
          input wire                             clk,
          input wire                             rst,
-         // コア数可変
-         input wire [ DIM:0 ]                   core_result_1,
-         input wire [ DIM:0 ]                   core_result_2,
-         //  input wire [ DIM:0 ]                   core_result_3,
-         //  input wire [ DIM:0 ]                   core_result_4,
-         //  input wire [ DIM:0 ]                   core_result_5,
-         //  input wire [ DIM:0 ]                   core_result_6,
-         //  input wire [ DIM:0 ]                   core_result_7,
-         //  input wire [ DIM:0 ]                   core_result_8,
-         //  input wire [ DIM:0 ]                   core_result_9,
-         //  input wire [ DIM:0 ]                   core_result_10,
-         //  input wire [ DIM:0 ]                   core_result_11,
-         //  input wire [ DIM:0 ]                   core_result_12,
-         //  input wire [ DIM:0 ]                   core_result_13,
-         //  input wire [ DIM:0 ]                   core_result_14,
-         //  input wire [ DIM:0 ]                   core_result_15,
-         //  input wire [ DIM:0 ]                   core_result_16,
-         input wire [ CORENUM-1:0 ]             store,
-         input wire                             store_flag,
+         input wire [ DIM:0 ]                   core_result,
+         input wire                             store,
          input wire                             stream_v,
          input wire [ 4:0 ]                     stream_i,
 
@@ -62,58 +45,15 @@ module buffer_ctrl
 
         for ( j = 0; j < DIM + 1; j = j + 1 ) begin
 
-            // コア数可変
             // 計算数可変 (現状最大でACPポートがカバーできるのは１GBなので、30bitあれば十分)
-
-            counter #( .W( 26 ), .CORENUM( 2 ) ) counter
+            counter #( .W( 26 ), .CORENUM( 1 ) ) counter
                     (
 
                         // in
                         .clk( clk ),
                         .rst( rst ),
-                        // 1コア
-                        // .store( store ),
-                        .store( store[ CORENUM-1:0 ] ),
-                        .store_flag( store_flag ),
-                        // コア数可変
-                        // この順番で渡す必要がある
-                        .core_result(
-                            {
-                                // core_result_32[ j ],
-                                // core_result_31[ j ],
-                                // core_result_30[ j ],
-                                // core_result_29[ j ],
-                                // core_result_28[ j ],
-                                // core_result_27[ j ],
-                                // core_result_26[ j ],
-                                // core_result_25[ j ],
-                                // core_result_24[ j ],
-                                // core_result_23[ j ],
-                                // core_result_22[ j ],
-                                // core_result_21[ j ],
-                                // core_result_20[ j ],
-                                // core_result_19[ j ],
-                                // core_result_18[ j ],
-                                // core_result_17[ j ],
-                                // core_result_16[ j ],
-                                // core_result_15[ j ],
-                                // core_result_14[ j ],
-                                // core_result_13[ j ],
-                                // core_result_12[ j ],
-                                // core_result_11[ j ],
-                                // core_result_10[ j ],
-                                // core_result_9[ j ],
-                                // core_result_8[ j ],
-                                // core_result_7[ j ],
-                                // core_result_6[ j ],
-                                // core_result_5[ j ],
-                                // core_result_4[ j ],
-                                // core_result_3[ j ],
-                                core_result_2[ j ],
-                                core_result_1[ j ]
-                            }
-                        ),
-
+                        .store( store ),
+                        .core_result( core_result[ j ] ),
 
                         // out
                         .sign_bit( sign_bit[ j ] )

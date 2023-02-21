@@ -27,11 +27,11 @@ module stream_ctrl
      );
 
 
-    //// last -> last_n -> last_nn ->  stream_ok_keep (stream_ok保持) -> dst_valid (stream_active引き金)
-    ////                               start (stream_ok_keep引き金)       dst_last (stream_active & last_stream引き金)
-    ////                               stream_active (sream_ok引き金)
-    ////                               stream_v (stream_active引き金)
-    ////                               last_stream (start引き金)
+    //// last -> last_n ->  stream_ok_keep (stream_ok保持) -> dst_valid (stream_active引き金)
+    ////                    start (stream_ok_keep引き金)       dst_last (stream_active & last_stream引き金)
+    ////                    stream_active (sream_ok引き金)
+    ////                    stream_v (stream_active引き金)
+    ////                    last_stream (start引き金)
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,21 +40,18 @@ module stream_ctrl
     // ラスト命令 (9命令) が実行された時、同時に他のコアでstore命令が実行されていることを考慮
     // sign_bitが更新されるまで3サイクル待つ
     reg         last_n;
-    reg         last_nn;
 
     always_ff @( posedge clk ) begin
 
                   if ( rst ) begin
 
                       last_n <= 0;
-                      last_nn <= 0;
 
                   end
 
                   else begin
 
                       last_n <= last;
-                      last_nn <= last_n;
 
                   end
 
@@ -82,7 +79,7 @@ module stream_ctrl
 
                   end
 
-                  else if ( last_nn ) begin
+                  else if ( last_n ) begin
 
                       last_keep <= 1'b1;
 
@@ -94,14 +91,14 @@ module stream_ctrl
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // 引き金: last_nn か last_keep
+    // 引き金: last_n か last_keep
     logic       stream_ok;
 
     always_comb begin
 
                     stream_ok = 1'b0;
 
-                    if ( ( last_nn | last_keep) & dst_ready ) begin
+                    if ( ( last_n | last_keep) & dst_ready ) begin
 
                         stream_ok = 1'b1;
 

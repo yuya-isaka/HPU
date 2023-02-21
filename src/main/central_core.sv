@@ -8,7 +8,7 @@ module central_core
          // ハイパーベクトルの次元数
          parameter DIM = 1023,
 
-         parameter THREADS = 10,
+         parameter THREADS = 5,
 
          parameter WI = 31
 

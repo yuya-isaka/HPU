@@ -1019,7 +1019,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       for (int k = 0; k < THREADSNUM; k++)
       {
         tmp = 0;
-        conv.data_0 = assemble("simd_move", 0);
+        conv.data_0 = assemble("move", 0);
         conv.data_1 = 0;
         verilator_top->S_AXIS_TDATA = conv.write_data;
         tmp++;
@@ -1127,7 +1127,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       for (int k = 0; k < THREADSNUM; k++)
       {
         tmp = 0;
-        conv.data_0 = assemble("simd_permute", 1);
+        conv.data_0 = assemble("permute", 1);
         conv.data_1 = 0;
         verilator_top->S_AXIS_TDATA = conv.write_data;
         tmp++;
@@ -1188,7 +1188,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       for (int k = 0; k < THREADSNUM; k++)
       {
         tmp = 0;
-        conv.data_0 = assemble("simd_pxor", 0);
+        conv.data_0 = assemble("pxor", 0);
         conv.data_1 = 0;
         verilator_top->S_AXIS_TDATA = conv.write_data;
         tmp++;
@@ -1249,7 +1249,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       for (int k = 0; k < THREADSNUM; k++)
       {
         tmp = 0;
-        conv.data_0 = assemble("simd_move", 0);
+        conv.data_0 = assemble("move", 0);
         conv.data_1 = 0;
         verilator_top->S_AXIS_TDATA = conv.write_data;
         tmp++;
@@ -1357,7 +1357,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       for (int k = 0; k < THREADSNUM; k++)
       {
         tmp = 0;
-        conv.data_0 = assemble("simd_permute", 2);
+        conv.data_0 = assemble("permute", 2);
         conv.data_1 = 0;
         verilator_top->S_AXIS_TDATA = conv.write_data;
         tmp++;
@@ -1418,7 +1418,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       for (int k = 0; k < THREADSNUM; k++)
       {
         tmp = 0;
-        conv.data_0 = assemble("simd_pxor", 0);
+        conv.data_0 = assemble("pxor", 0);
         conv.data_1 = 0;
         verilator_top->S_AXIS_TDATA = conv.write_data;
         tmp++;
@@ -1482,7 +1482,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         for (int k = 0; k < THREADSNUM; k++)
         {
           tmp = 0;
-          conv.data_0 = assemble("simd_store", 0);
+          conv.data_0 = assemble("store", 0);
           conv.data_1 = 0;
           verilator_top->S_AXIS_TDATA = conv.write_data;
           tmp++;
@@ -1545,7 +1545,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
         for (int k = 0; k < THREADSNUM; k++)
         {
           tmp = 0;
-          conv.data_0 = assemble("simd_store", 0);
+          conv.data_0 = assemble("store", 0);
           conv.data_1 = 0;
           verilator_top->S_AXIS_TDATA = conv.write_data;
           tmp++;
@@ -1646,7 +1646,7 @@ int main(int argc, char **argv)
   const int NGRAM = 3;
 
   // コア数可変
-  const int CORENUM = 2;
+  const int CORENUM = 1;
 
   // スレッド数可変
   const int THREADSNUM = 5;

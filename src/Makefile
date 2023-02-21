@@ -28,12 +28,12 @@ DESIGN_SRC = \
 ./main/get_enable.sv \
 ./main/stream_ctrl.sv \
 ./main/buffer_ctrl.sv \
-./main/core.sv \
 ./main/central_core.sv \
 ./kit/counter.sv \
 ./kit/selector.sv \
 ./kit/agu.sv \
 ./kit/permute.sv \
+# ./main/core.sv \
 
 VERILATOR_TB = tb.cpp
 

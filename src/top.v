@@ -82,20 +82,8 @@ module top
     parameter DIM = 1023;
     // -----------------------
 
-
-    // 次元数可変
-    // 32次元 -----------------
-    // parameter WI = 0;
-    // -----------------------
-
-    // 1024次元 ---------------
-    // parameter WI = 31;
-    // -----------------------
-
-
-    // コア数可変
-    // 2コア -------------------
-    parameter CORENUM = 2;
+    // 1コア -------------------
+    parameter CORENUM = 1;
     // ------------------------
 
 
@@ -136,50 +124,14 @@ module top
     // コア数可変
     // 次元数可変
     // buffer_ctrl #( .DIM( 31 ), .CORENUM( 8 ) ) buffer_ctrl
-    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 2 ) ) buffer_ctrl
+    buffer_ctrl #( .DIM( 1023 ), .CORENUM( 1 ) ) buffer_ctrl
                 (
 
                     // in
                     .clk( AXIS_ACLK ),
                     .rst( ~run ),
-                    // 1コア
-                    // .core_result_1( core_result ),
-                    // コア数可変
-                    .core_result_1( core_result[ 0 ] ),
-                    .core_result_2( core_result[ 1 ] ),
-                    // .core_result_3( core_result[ 2 ] ),
-                    // .core_result_4( core_result[ 3 ] ),
-                    // .core_result_5( core_result[ 4 ] ),
-                    // .core_result_6( core_result[ 5 ] ),
-                    // .core_result_7( core_result[ 6 ] ),
-                    // .core_result_8( core_result[ 7 ] ),
-                    // .core_result_9( core_result[ 8 ] ),
-                    // .core_result_10( core_result[ 9 ] ),
-                    // .core_result_11( core_result[ 10 ] ),
-                    // .core_result_12( core_result[ 11 ] ),
-                    // .core_result_13( core_result[ 12 ] ),
-                    // .core_result_14( core_result[ 13 ] ),
-                    // .core_result_15( core_result[ 14 ] ),
-                    // .core_result_16( core_result[ 15 ] ),
-                    // .core_result_17( core_result[ 16 ] ),
-                    // .core_result_18( core_result[ 17 ] ),
-                    // .core_result_19( core_result[ 18 ] ),
-                    // .core_result_20( core_result[ 19 ] ),
-                    // .core_result_21( core_result[ 20 ] ),
-                    // .core_result_22( core_result[ 21 ] ),
-                    // .core_result_23( core_result[ 22 ] ),
-                    // .core_result_24( core_result[ 23 ] ),
-                    // .core_result_25( core_result[ 24 ] ),
-                    // .core_result_26( core_result[ 25 ] ),
-                    // .core_result_27( core_result[ 26 ] ),
-                    // .core_result_28( core_result[ 27 ] ),
-                    // .core_result_29( core_result[ 28 ] ),
-                    // .core_result_30( core_result[ 29 ] ),
-                    // .core_result_31( core_result[ 30 ] ),
-                    // .core_result_32( core_result[ 31 ] ),
-                    // 1コア
-                    .store( store[ CORENUM-1:0 ] ),
-                    .store_flag( store_flag ),
+                    .core_result( core_result ),
+                    .store( store ),
                     .stream_v( stream_v ),
                     .stream_i( stream_i[ 4:0 ] ),
 
@@ -203,18 +155,15 @@ module top
 
     wire [ 4:0 ]          stream_i;
 
-    // コア数可変
-    stream_ctrl #( .CORENUM( 2 ) ) stream_ctrl
+
+    stream_ctrl #( .CORENUM( 1 ) ) stream_ctrl
                 (
 
                     // in
                     .clk( AXIS_ACLK ),
                     .rst( ~run ),
-                    // 1コア
                     .last( last ),
-                    // .last( last ),
                     .dst_ready( M_AXIS_TREADY ),
-
 
                     // out
                     .dst_valid( M_AXIS_TVALID ),
@@ -229,55 +178,10 @@ module top
 
 
     // 各コアのストア信号
-    wire [ CORENUM-1:0 ]            store;
-    wire                            store_flag;
-
-    assign store_flag = ( store != 0 ) ? 1'b1 : 1'b0;
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    wire                            store;
 
     // 各コアの演算結果
-    wire [ DIM:0 ]                      core_result [ 0:CORENUM-1 ];
-
-    // 各コアでエンコーディング
-    generate
-
-        genvar      i;
-
-        for ( i = 1; i < CORENUM; i = i + 1 ) begin
-
-            // 次元数可変
-            // スレッド数可変
-            // core #( .DIM( 31 ), .THREADS( 5 ) ) core
-            core #( .DIM( 1023 ), .THREADS( 5 ), .WI( 31 ) ) core
-                 (
-
-                     // in
-                     .clk( AXIS_ACLK ),
-                     .run( run ),
-                     .com( com ),
-                     .get_v( get_v ),
-                     .get_c( get_c ),
-                     // 16bit命令
-                     .get_d_tmp( S_AXIS_TDATA[ 15+16*i:16*i ] ),
-                     .get_d_all( S_AXIS_TDATA[ 31:0 ] ),
-                     .exec( exec ),
-
-
-                     // out
-                     // 1コア
-                     .store( store[ i ] ),
-                     //  .store( store ),
-                     // 1コア
-                     .core_result( core_result[ i ] )
-                     //  .core_result( core_result ),
-                 );
-
-        end
-
-    endgenerate
+    wire [ DIM:0 ]                  core_result;
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -296,22 +200,14 @@ module top
                      .com( com ),
                      .get_v( get_v ),
                      .get_c( get_c ),
-                     // 16bit命令
                      .get_d( S_AXIS_TDATA[ 15:0 ] ),
                      .get_d_all( S_AXIS_TDATA[ 31:0 ] ),
                      .exec( exec ),
 
-
                      // out
-                     // 1コア
-                     .store( store[ 0 ] ),
-                     //  .store( store ),
-                     // 1コア
-                     .core_result( core_result[ 0 ] ),
-                     //  .core_result( core_result ),
-                     // 1コア
+                     .store( store ),
+                     .core_result( core_result ),
                      .last( last )
-                     //  .last( last)
 
                  );
 
