@@ -44,6 +44,7 @@ int main(int argc, char const *argv[])
 	for (int i = 0; i < TRIAL_NUM; i++)
 	{
 		int addr = rand_array[i];
+		// printf("%d\n", addr);
 		hv_bound(item_memory[addr]);
 	}
 

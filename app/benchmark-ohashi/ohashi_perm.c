@@ -44,15 +44,9 @@ int main(int argc, char const *argv[])
 {
 	const int RANNUM = 512;
 
-	// コア数
-	const int CORENUM = 2;
-
 	// hv -----------------------------
 	// メモリセットアップ
 	hdc_setup();
-
-	// アイテムメモリ生成
-	// hdc_make_imem(RANNUM);
 
 	// COM
 	hdc_com_start();
@@ -95,29 +89,24 @@ int main(int argc, char const *argv[])
 	RAN_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 	/////////////////////////////////////////////////////////////////////////////
 
-	uint16_t core_num = CORENUM;
+	uint16_t addr_array[THREADS_NUM];
 
-	uint16_t addr_array[THREADS_NUM][core_num];
-
-	for (int ll = 0; ll < TRIAL_NUM; ll += 10)
+	for (int ll = 0; ll < TRIAL_NUM; ll += THREADS_NUM)
 	{
 		int rand_array_num = ll;
 		int perm_array_num = ll;
 
 		for (int k = 0; k < THREADS_NUM; k++)
 		{
-			for (int i = 0; i < core_num; i++)
-			{
-				addr_array[k][i] = rand_array[rand_array_num++];
-			}
+			addr_array[k] = rand_array[rand_array_num++];
 		}
 
 		// load ---------------------------------------------
-		hdc_load_thread(THREADS_NUM, core_num, addr_array);
+		hdc_load_thread(THREADS_NUM, addr_array);
 		// ------------------------------------------------------
 
 		// perm ---------------------------------------------
-		hdc_simd_permute_thread(perm_array[perm_array_num]);
+		hdc_permute_thread(THREADS_NUM, perm_array[perm_array_num]);
 		// ------------------------------------------------------
 	}
 

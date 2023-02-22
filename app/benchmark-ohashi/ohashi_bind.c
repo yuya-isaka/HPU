@@ -44,15 +44,9 @@ int main(int argc, char const *argv[])
 {
 	const int RANNUM = 512;
 
-	// コア数
-	const int CORENUM = 2;
-
 	// hv -----------------------------
 	// メモリセットアップ
 	hdc_setup();
-
-	// アイテムメモリ生成
-	// hdc_make_imem(RANNUM);
 
 	// COM
 	hdc_com_start();
@@ -95,40 +89,35 @@ int main(int argc, char const *argv[])
 	RAN_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 	/////////////////////////////////////////////////////////////////////////////
 
-	uint16_t core_num = CORENUM;
+	uint16_t addr_array1[THREADS_NUM];
+	uint16_t addr_array2[THREADS_NUM];
 
-	uint16_t addr_array1[THREADS_NUM][core_num];
-	uint16_t addr_array2[THREADS_NUM][core_num];
-
-	for (int ll = 0; ll < TRIAL_NUM; ll += 10)
+	for (int ll = 0; ll < TRIAL_NUM; ll += THREADS_NUM)
 	{
 		int tmp = ll;
 
 		// アドレス
 		for (int k = 0; k < THREADS_NUM; k++)
 		{
-			for (int i = 0; i < core_num; i++)
-			{
-				addr_array1[k][i] = rand_array_1[tmp];
-				addr_array2[k][i] = rand_array_2[tmp];
-				tmp++;
-			}
+			addr_array1[k] = rand_array_1[tmp];
+			addr_array2[k] = rand_array_2[tmp];
+			tmp++;
 		}
 
 		// load ---------------------------------------------
-		hdc_load_thread(THREADS_NUM, core_num, addr_array1);
+		hdc_load_thread(THREADS_NUM, addr_array1);
 		// ------------------------------------------------------
 
 		// move ---------------------------------------------
-		hdc_simd_move_thread();
+		hdc_move_thread(THREADS_NUM);
 		// ------------------------------------------------------
 
 		// load ---------------------------------------------
-		hdc_load_thread(THREADS_NUM, core_num, addr_array2);
+		hdc_load_thread(THREADS_NUM, addr_array2);
 		// ------------------------------------------------------
 
 		// xor ---------------------------------------------
-		hdc_simd_xor_thread();
+		hdc_xor_thread(THREADS_NUM);
 		// ------------------------------------------------------
 	}
 
