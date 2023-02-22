@@ -93,18 +93,16 @@ int main()
 	const uint32_t FIRST_RAND_NUM = 500;
 	const uint32_t SECOND_RAND_NUM = RAND_NUM - FIRST_RAND_NUM;
 	const uint32_t LEVEL_NUM = 10;
-
-	// コア数
-	const int CORENUM = 2;
+	const uint32_t DIM = 32;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	hdc_setup();
 
 	xor128(1);
-	uint32_t Level[10][32];
+	uint32_t Level[LEVEL_NUM][DIM];
 	Level[0][0] = 88675123;
-	for (int i = 1; i < 32; i++)
+	for (int i = 1; i < DIM; i++)
 	{
 		Level[0][i] = xor128(0);
 	}
@@ -137,17 +135,15 @@ int main()
 	// 		}
 	// 	}
 	// }
-	int tmp = 1024;
-	int num = 32;
-	for (int j = 0; j < num; j++)
+	for (int j = 0; j < DIM; j++)
 	{
 		Level[1][j] = ~Level[0][j];
 	}
-	for (int i = 2; i < 10; i++)
+	for (int i = 2; i < LEVEL_NUM; i++)
 	{
 		int tmp = 1024 / i;
-		int num = tmp / 32;
-		int num_remain = tmp % 32;
+		int num = tmp / DIM;
+		int num_remain = tmp % DIM;
 		for (int j = 0; j < num; j++)
 		{
 			Level[i][j] = ~Level[0][j];
@@ -156,7 +152,7 @@ int main()
 		uint32_t mask = 1 << num_remain - 1;
 		Level[i][num] = Level[0][num] ^ mask;
 
-		for (int j = num + 1; j < 32; j++)
+		for (int j = num + 1; j < DIM; j++)
 		{
 			Level[i][j] = Level[0][j];
 		}
@@ -165,30 +161,38 @@ int main()
 	for (int ll = 0; ll < 26; ll++)
 	{
 		// 500
+
+		// 最初はLevelの生成に使用しているからなし
 		xor128(1);
-		for (int i = 0; i < 31; i++)
+		for (int i = 0; i < DIM - 1; i++)
 		{
 			xor128(0);
 		}
 
 		hdc_com_start();
+
+		// ID送信
 		for (int i = 0; i < FIRST_RAND_NUM; i++)
 		{
-			for (int j = 0; j < 32; j++)
+			for (int j = 0; j < DIM; j++)
 			{
 				hdc_com_gen(xor128(0));
 			}
 		}
-		for (int i = 0; i < 10; i++)
+		// Level送信
+		for (int i = 0; i < LEVEL_NUM; i++)
 		{
-			for (int j = 0; j < 32; j++)
+			for (int j = 0; j < DIM; j++)
 			{
 				hdc_com_gen(Level[i][j]);
 			}
 		}
+
+		// 計算だけする（結果返さない）
 		hdc_compute_only();
 		hdc_finish();
 
+		// 計算を再度開始
 		hdc_init(0);
 		hdc_start();
 
@@ -205,48 +209,41 @@ int main()
 		{
 			int index_tmp = 0;
 
-			for (int j = 0; j < 50; j++)
+			for (int j = 0; j < FIRST_RAND_NUM / THREADS_NUM; j++)
 			{
-				uint16_t core_num = CORENUM;
-				uint16_t addr_array[THREADS_NUM][core_num];
+				uint16_t addr_array[THREADS_NUM];
 
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					for (int i = 0; i < core_num; i++)
-					{
-						addr_array[k][i] = index_tmp++;
-					}
+					addr_array[k] = index_tmp++;
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, core_num, addr_array);
+				hdc_load_thread(THREADS_NUM, addr_array);
 				// ------------------------------------------------------
 
 				// move --------------------------------------------
-				hdc_simd_move_thread();
+				hdc_move_thread(THREADS_NUM);
 				// ------------------------------------------------------
 
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					for (int i = 0; i < core_num; i++)
-					{
-						addr_array[k][i] = (data_lines[dd++] - '0') + 500;
-					}
+					addr_array[k] = (data_lines[dd++] - '0') + FIRST_RAND_NUM;
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, core_num, addr_array);
+				hdc_load_thread(THREADS_NUM, addr_array);
 				// ------------------------------------------------------
 
 				// bind ----------------------------------------------
-				hdc_simd_xor_thread();
+				hdc_xor_thread(THREADS_NUM);
 				// ------------------------------------------------------
 
 				// store ---------------------------------------------
-				hdc_simd_store_thread();
+				hdc_store_thread(THREADS_NUM);
 				// ------------------------------------------------------
 			}
-			dd += 117;
+			dd += SECOND_RAND_NUM;
 		}
 
 		// hdc_last();
@@ -257,16 +254,18 @@ int main()
 
 		// 127
 		hdc_com_start_continue();
+		// ID送信
 		for (int i = 0; i < SECOND_RAND_NUM; i++)
 		{
-			for (int j = 0; j < 32; j++)
+			for (int j = 0; j < DIM; j++)
 			{
 				hdc_com_gen(xor128(0));
 			}
 		}
-		for (int i = 0; i < 10; i++)
+		// Level送信
+		for (int i = 0; i < LEVEL_NUM; i++)
 		{
-			for (int j = 0; j < 32; j++)
+			for (int j = 0; j < DIM; j++)
 			{
 				hdc_com_gen(Level[i][j]);
 			}
@@ -279,138 +278,82 @@ int main()
 
 		for (int dd = 0; dd < data_tmp_num;)
 		{
-			dd += 500;
+			dd += FIRST_RAND_NUM;
 			int index_tmp = 0;
 
-			for (int j = 0; j < 11; j++)
+			// 125
+			for (int j = 0; j < 115 / THREADS_NUM; j++)
 			{
-				uint16_t core_num = CORENUM;
-				uint16_t addr_array[THREADS_NUM][core_num];
+				uint16_t addr_array[THREADS_NUM];
 
 				// 70
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					for (int i = 0; i < core_num; i++)
-					{
-						addr_array[k][i] = index_tmp++;
-					}
+					addr_array[k] = index_tmp++;
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, core_num, addr_array);
+				hdc_load_thread(THREADS_NUM, addr_array);
 				// ------------------------------------------------------
 
 				// move --------------------------------------------
-				hdc_simd_move_thread();
+				hdc_move_thread(THREADS_NUM);
 				// ------------------------------------------------------
 
 				// 70
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					for (int i = 0; i < core_num; i++)
-					{
-						addr_array[k][i] = (data_lines[dd++] - '0') + 117;
-					}
+					addr_array[k] = (data_lines[dd++] - '0') + SECOND_RAND_NUM;
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, core_num, addr_array);
+				hdc_load_thread(THREADS_NUM, addr_array);
 				// ------------------------------------------------------
 
 				// bind ----------------------------------------------
-				hdc_simd_xor_thread();
+				hdc_xor_thread(THREADS_NUM);
 				// ------------------------------------------------------
 
 				// store ---------------------------------------------
-				hdc_simd_store_thread();
+				hdc_store_thread(THREADS_NUM);
 				// ------------------------------------------------------
 			}
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-			// 残り
-			uint16_t core_num = CORENUM;
-			uint16_t thread_num = 3;
-			uint16_t addr_array[THREADS_NUM][core_num];
+			// 2
+			uint16_t thread_num = 2;
+			uint16_t addr_array[thread_num];
 
 			for (int k = 0; k < thread_num; k++)
 			{
-				for (int i = 0; i < core_num; i++)
-				{
-					addr_array[k][i] = index_tmp++;
-				}
+				addr_array[k] = index_tmp++;
 			}
 
 			// load ---------------------------------------------
-			hdc_load_thread(thread_num, core_num, addr_array);
+			hdc_load_thread(thread_num, addr_array);
 			// ------------------------------------------------------
 
 			// move --------------------------------------------
-			hdc_move_thread(thread_num, core_num);
+			hdc_move_thread(thread_num);
 			// ------------------------------------------------------
 
 			// 70
 			for (int k = 0; k < thread_num; k++)
 			{
-				for (int i = 0; i < core_num; i++)
-				{
-					addr_array[k][i] = (data_lines[dd++] - '0') + 117;
-				}
+				addr_array[k] = (data_lines[dd++] - '0') + SECOND_RAND_NUM;
 			}
 
 			// load ---------------------------------------------
-			hdc_load_thread(thread_num, core_num, addr_array);
+			hdc_load_thread(thread_num, addr_array);
 			// ------------------------------------------------------
 
 			// bind ----------------------------------------------
-			hdc_xor_thread(thread_num, core_num);
+			hdc_xor_thread(thread_num);
 			// ------------------------------------------------------
 
 			// store ---------------------------------------------
-			hdc_store_thread(thread_num, core_num);
-			// ------------------------------------------------------
-
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-			// 残り
-			core_num = 1;
-			thread_num = 1;
-
-			for (int k = 0; k < thread_num; k++)
-			{
-				for (int i = 0; i < core_num; i++)
-				{
-					addr_array[k][i] = index_tmp++;
-				}
-			}
-
-			// load ---------------------------------------------
-			hdc_load_thread(thread_num, core_num, addr_array);
-			// ------------------------------------------------------
-
-			// move --------------------------------------------
-			hdc_move_thread(thread_num, core_num);
-			// ------------------------------------------------------
-
-			// 70
-			for (int k = 0; k < thread_num; k++)
-			{
-				for (int i = 0; i < core_num; i++)
-				{
-					addr_array[k][i] = (data_lines[dd++] - '0') + 117;
-				}
-			}
-
-			// load ---------------------------------------------
-			hdc_load_thread(thread_num, core_num, addr_array);
-			// ------------------------------------------------------
-
-			// bind ----------------------------------------------
-			hdc_xor_thread(thread_num, core_num);
-			// ------------------------------------------------------
-
-			// store ---------------------------------------------
-			hdc_store_thread(thread_num, core_num);
+			hdc_store_thread(thread_num);
 			// ------------------------------------------------------
 		}
 
