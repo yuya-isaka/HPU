@@ -385,11 +385,11 @@ int main(int argc, char const *argv[])
 		// END_COMPUTE = clock();
 		// COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-		// 結果確認
-		for (int j = 0; j < 32; j++)
-		{
-			printf("  %u\n", dst[j]);
-		}
+		// // 結果確認
+		// for (int j = 0; j < 32; j++)
+		// {
+		// 	printf("  %u\n", dst[j]);
+		// }
 
 		// 終了処理
 		hdc_finish();
