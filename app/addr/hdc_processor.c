@@ -139,7 +139,7 @@ void hdc_compute(void)
 	// AXI DMA 送信設定（UIO経由）
 	dma[0x00] = 1;
 	dma[0x6] = src_phys;
-	dma[0xa] = SEND_NUM * 2; // 16ビット命令の数 * 2 = バイト数
+	dma[0xa] = SEND_NUM * 4; // 32ビット命令の数がSEND_NUMなので、バイト数は * 4する
 
 	// AXI DMA 受信設定 (UIO経由)
 	dma[0xc] = 1;
@@ -157,7 +157,7 @@ void hdc_compute_only(void)
 	// AXI DMA 送信設定（UIO経由）
 	dma[0x00] = 1;
 	dma[0x6] = src_phys;
-	dma[0xa] = SEND_NUM * 2; // 16ビット命令の数 * 2 = バイト数
+	dma[0xa] = SEND_NUM * 4;
 
 	// 送信終了
 	while ((dma[0x1] & 0x1000) != 0x1000)
