@@ -27,7 +27,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
   // 偶数処理
   if (EVEN)
   {
-    uint16_t addr_array[1][1] = {{MAJORITY_ADDR}};
+    uint16_t addr_array[1] = {{MAJORITY_ADDR}};
     hdc_load_thread(1, 1, addr_array);
 
     hdc_store_thread(1, 1);
@@ -37,89 +37,12 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
   for (int j = 0; j < LAST; j += NGRAM * CORENUM * THREADS_NUM)
   {
     uint16_t core_num = CORENUM;
-    uint16_t addr_array[THREADS_NUM][core_num];
+    uint16_t addr_array[THREADS_NUM];
 
     // アドレス
     for (uint16_t k = 0; k < THREADS_NUM; k++)
     {
-      for (uint16_t i = 0; i < core_num; i++)
-      {
-        addr_array[k][i] = NGRAM * i + j + (NGRAM * core_num * k);
-      }
-    }
-
-    // load ---------------------------------------------
-    hdc_load_thread(THREADS_NUM, core_num, addr_array);
-    // ------------------------------------------------------
-
-    // move ---------------------------------------------
-    hdc_simd_move_thread();
-    // ------------------------------------------------------
-
-    // アドレス
-    for (int k = 0; k < THREADS_NUM; k++)
-    {
-      for (int i = 0; i < core_num; i++)
-      {
-        addr_array[k][i]++;
-      }
-    }
-
-    // load ---------------------------------------------
-    hdc_load_thread(THREADS_NUM, core_num, addr_array);
-    // ------------------------------------------------------
-
-    // permute ---------------------------------------------
-    hdc_simd_permute_thread(1);
-    // ------------------------------------------------------
-
-    // pxor ---------------------------------------------
-    hdc_simd_pxor_thread();
-    // ------------------------------------------------------
-
-    // move ---------------------------------------------
-    hdc_simd_move_thread();
-    // ------------------------------------------------------
-
-    // アドレス
-    for (int k = 0; k < THREADS_NUM; k++)
-    {
-      for (int i = 0; i < core_num; i++)
-      {
-        addr_array[k][i]++;
-      }
-    }
-
-    // load ---------------------------------------------
-    hdc_load_thread(THREADS_NUM, core_num, addr_array);
-    // ------------------------------------------------------
-
-    // permute ---------------------------------------------
-    hdc_simd_permute_thread(2);
-    // ------------------------------------------------------
-
-    // pxor ---------------------------------------------
-    hdc_simd_pxor_thread();
-    // ------------------------------------------------------
-
-    // store ---------------------------------------------
-    hdc_simd_store_thread();
-    // ------------------------------------------------------
-  }
-
-  // 余り
-  if (REMAINDAR != 0)
-  {
-    uint16_t core_num = REMAINDAR_CORENUM;
-    uint16_t addr_array[THREADS_NUM][core_num];
-
-    // アドレス
-    for (int k = 0; k < THREADS_NUM; k++)
-    {
-      for (int i = 0; i < core_num; i++)
-      {
-        addr_array[k][i] = NGRAM * i + LAST + (NGRAM * core_num * k);
-      }
+      addr_array[k] = NGRAM + j + (NGRAM * core_num * k);
     }
 
     // load ---------------------------------------------
@@ -133,10 +56,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
     // アドレス
     for (int k = 0; k < THREADS_NUM; k++)
     {
-      for (int i = 0; i < core_num; i++)
-      {
-        addr_array[k][i]++;
-      }
+      addr_array[k]++;
     }
 
     // load ---------------------------------------------
@@ -158,10 +78,72 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
     // アドレス
     for (int k = 0; k < THREADS_NUM; k++)
     {
-      for (int i = 0; i < core_num; i++)
-      {
-        addr_array[k][i]++;
-      }
+      addr_array[k]++;
+    }
+
+    // load ---------------------------------------------
+    hdc_load_thread(THREADS_NUM, core_num, addr_array);
+    // ------------------------------------------------------
+
+    // permute ---------------------------------------------
+    hdc_permute_thread(THREADS_NUM, core_num, 2);
+    // ------------------------------------------------------
+
+    // pxor ---------------------------------------------
+    hdc_pxor_thread(THREADS_NUM, core_num);
+    // ------------------------------------------------------
+
+    // store ---------------------------------------------
+    hdc_store_thread(THREADS_NUM, core_num);
+    // ------------------------------------------------------
+  }
+
+  // 余り
+  if (REMAINDAR != 0)
+  {
+    uint16_t core_num = REMAINDAR_CORENUM;
+    uint16_t addr_array[THREADS_NUM];
+
+    // アドレス
+    for (int k = 0; k < THREADS_NUM; k++)
+    {
+      addr_array[k] = NGRAM + LAST + (NGRAM * core_num * k);
+    }
+
+    // load ---------------------------------------------
+    hdc_load_thread(THREADS_NUM, core_num, addr_array);
+    // ------------------------------------------------------
+
+    // move ---------------------------------------------
+    hdc_move_thread(THREADS_NUM, core_num);
+    // ------------------------------------------------------
+
+    // アドレス
+    for (int k = 0; k < THREADS_NUM; k++)
+    {
+      addr_array[k]++;
+    }
+
+    // load ---------------------------------------------
+    hdc_load_thread(THREADS_NUM, core_num, addr_array);
+    // ------------------------------------------------------
+
+    // permute ---------------------------------------------
+    hdc_permute_thread(THREADS_NUM, core_num, 1);
+    // ------------------------------------------------------
+
+    // pxor ---------------------------------------------
+    hdc_pxor_thread(THREADS_NUM, core_num);
+    // ------------------------------------------------------
+
+    // move ---------------------------------------------
+    hdc_move_thread(THREADS_NUM, core_num);
+    // ------------------------------------------------------
+
+    // アドレス
+    for (int k = 0; k < THREADS_NUM; k++)
+    {
+      addr_array[k]++;
     }
 
     // load ---------------------------------------------
@@ -293,7 +275,7 @@ int main(void)
 
   const int IMEM_SIZE = 512;
   const int NGRAM = 3;
-  const int CORENUM_MAX = 2;
+  const int CORENUM_MAX = 1;
   const int MAJORITY_ADDR = IMEM_SIZE - 1;
 
   // HDCプロセッサメモリ準備
