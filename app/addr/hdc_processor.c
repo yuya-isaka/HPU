@@ -216,7 +216,7 @@ void hdc_nop(void)
 
 // Load =========================================================================================
 
-void hdc_load_thread(uint16_t thread_num, uint16_t core_num, uint16_t addr_array[thread_num])
+void hdc_load_thread(uint16_t thread_num, uint16_t addr_array[thread_num])
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -232,7 +232,7 @@ void hdc_load_thread(uint16_t thread_num, uint16_t core_num, uint16_t addr_array
 
 // Store =========================================================================================
 
-void hdc_store_thread(uint16_t thread_num, uint16_t core_num)
+void hdc_store_thread(uint16_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -248,7 +248,7 @@ void hdc_store_thread(uint16_t thread_num, uint16_t core_num)
 
 // pstore =========================================================================================
 
-void hdc_pstore_thread(uint16_t thread_num, uint16_t core_num)
+void hdc_pstore_thread(uint16_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -264,7 +264,7 @@ void hdc_pstore_thread(uint16_t thread_num, uint16_t core_num)
 
 // move =========================================================================================
 
-void hdc_move_thread(uint16_t thread_num, uint16_t core_num)
+void hdc_move_thread(uint16_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -280,7 +280,7 @@ void hdc_move_thread(uint16_t thread_num, uint16_t core_num)
 
 // pmove =========================================================================================
 
-void hdc_pmove_thread(uint16_t thread_num, uint16_t core_num)
+void hdc_pmove_thread(uint16_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -301,7 +301,7 @@ void hdc_permute(uint16_t permute_num)
 	src[SEND_NUM++] = 34816 | permute_num;
 }
 
-void hdc_permute_thread(uint16_t thread_num, uint16_t core_num, uint16_t permute_num)
+void hdc_permute_thread(uint16_t thread_num, uint16_t permute_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -317,7 +317,7 @@ void hdc_permute_thread(uint16_t thread_num, uint16_t core_num, uint16_t permute
 
 // xor =========================================================================================
 
-void hdc_xor_thread(uint16_t thread_num, uint16_t core_num)
+void hdc_xor_thread(uint16_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -333,7 +333,7 @@ void hdc_xor_thread(uint16_t thread_num, uint16_t core_num)
 
 // pxor =========================================================================================
 
-void hdc_pxor_thread(uint16_t thread_num, uint16_t core_num)
+void hdc_pxor_thread(uint16_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
