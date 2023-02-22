@@ -88,31 +88,33 @@ int main()
 	const uint32_t RAND_NUM = 784;
 	const uint32_t FIRST_RAND_NUM = 500;
 	const uint32_t SECOND_RAND_NUM = RAND_NUM - FIRST_RAND_NUM;
-
-	// コア数
-	const int CORENUM = 2;
+	const uint32_t DIM = 32;
 
 	// メモリセットアップ
 	hdc_setup();
 
+	// 10文字学習
 	for (int ll = 0; ll < 10; ll++)
 	{
 		// 500
 		// hdc_make_imem(FIRST_RAND_NUM);
 		xor128(1);
 		hdc_com_start();
+
+		// 超次元ベクトルの送信 -------------------------------
 		hdc_com_gen(88675123);
-		for (int i = 0; i < 31; i++)
+		for (int i = 0; i < DIM - 1; i++)
 		{
 			hdc_com_gen(xor128(0));
 		}
 		for (int i = 0; i < FIRST_RAND_NUM - 1; i++)
 		{
-			for (int j = 0; j < 32; j++)
+			for (int j = 0; j < DIM; j++)
 			{
 				hdc_com_gen(xor128(0));
 			}
 		}
+		// ---------------------------------------------------
 		hdc_compute_only();
 		hdc_finish();
 
@@ -131,35 +133,28 @@ int main()
 		{
 			int index_num = 0;
 
-			for (int j = 0; j < 50; j++)
+			// 500
+			for (int j = 0; j < 500 / THREADS_NUM; j++)
 			{
-				uint16_t core_num = CORENUM;
-
-				uint16_t addr_array[THREADS_NUM][core_num];
+				uint16_t addr_array[THREADS_NUM];
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					for (int i = 0; i < core_num; i++)
-					{
-						addr_array[k][i] = index_num++;
-					}
+					addr_array[k] = index_num++;
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, core_num, addr_array);
+				hdc_load_thread(THREADS_NUM, addr_array);
 				// ------------------------------------------------------
 
 				// permute ---------------------------------------------
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					for (int i = 0; i < core_num; i++)
-					{
-						hdc_permute((data_lines[dd++] - '0'));
-					}
+					hdc_permute((data_lines[dd++] - '0'));
 				}
 				// ------------------------------------------------------
 
 				// store ---------------------------------------------
-				hdc_simd_pstore_thread();
+				hdc_pstore_thread(THREADS_NUM);
 				// ------------------------------------------------------
 			}
 			dd += SECOND_RAND_NUM;
@@ -173,13 +168,17 @@ int main()
 
 		// 284
 		hdc_com_start_continue();
+
+		// 超次元ベクトルの送信 -------------------------------
 		for (int i = 0; i < SECOND_RAND_NUM; i++)
 		{
-			for (int j = 0; j < 32; j++)
+			for (int j = 0; j < DIM; j++)
 			{
 				hdc_com_gen(xor128(0));
 			}
 		}
+		// -------------------------------------------------
+
 		hdc_compute_only();
 
 		hdc_init(0);
@@ -191,74 +190,57 @@ int main()
 			dd += FIRST_RAND_NUM;
 			int index_num = 0;
 
-			for (int j = 0; j < 28; j++)
+			// 280
+			for (int j = 0; j < 280 / THREADS_NUM; j++)
 			{
-				uint16_t core_num = CORENUM;
-
-				uint16_t addr_array[THREADS_NUM][core_num];
+				uint16_t addr_array[THREADS_NUM];
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					for (int i = 0; i < core_num; i++)
-					{
-						addr_array[k][i] = index_num++;
-					}
+					addr_array[k] = index_num++;
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, core_num, addr_array);
+				hdc_load_thread(THREADS_NUM, addr_array);
 				// ------------------------------------------------------
 
 				// permute ---------------------------------------------
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					for (int i = 0; i < core_num; i++)
-					{
-						hdc_permute((data_lines[dd++] - '0'));
-					}
+					hdc_permute((data_lines[dd++] - '0'));
 				}
 				// ------------------------------------------------------
 
 				// store ---------------------------------------------
-				hdc_simd_pstore_thread();
+				hdc_pstore_thread(THREADS_NUM);
 				// ------------------------------------------------------
 			}
 
 			// 残り 4
-			uint16_t core_num = CORENUM;
-			uint16_t thread_num = 2;
+			uint16_t thread_num = 4;
 
-			uint16_t addr_array[thread_num][core_num];
+			uint16_t addr_array[thread_num];
 			for (int k = 0; k < thread_num; k++)
 			{
-				for (int i = 0; i < core_num; i++)
-				{
-					addr_array[k][i] = index_num++;
-				}
+				addr_array[k] = index_num++;
 			}
 
 			// load ---------------------------------------------
-			hdc_load_thread(thread_num, core_num, addr_array);
+			hdc_load_thread(thread_num, addr_array);
 			// ------------------------------------------------------
 
 			// permute ---------------------------------------------
 			for (int k = 0; k < thread_num; k++)
 			{
-				for (int i = 0; i < core_num; i++)
-				{
-					hdc_permute((data_lines[dd++] - '0'));
-				}
+				hdc_permute((data_lines[dd++] - '0'));
 			}
 			for (int k = thread_num; k < THREADS_NUM; k++)
 			{
-				for (int i = 0; i < 2; i++)
-				{
-					hdc_nop();
-				}
+				hdc_nop();
 			}
 			// ------------------------------------------------------
 
 			// pstore ---------------------------------------------
-			hdc_pstore_thread(thread_num, core_num);
+			hdc_pstore_thread(thread_num);
 			// ------------------------------------------------------
 		}
 
