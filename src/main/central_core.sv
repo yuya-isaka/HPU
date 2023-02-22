@@ -67,58 +67,6 @@ module central_core
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // マルチスレッド実行
-    reg signed [ 3:0 ]          thread_count;
-
-    always_ff @( posedge clk ) begin
-
-                  if ( ~run ) begin
-
-                      // -1初期化
-                      thread_count <= $signed( 1'b1 );
-
-                  end
-
-                  // データ受信時実行
-                  else if ( get_v ) begin
-
-                      // スレッド数可変
-                      if ( thread_count == 4'd4 ) begin
-
-                          thread_count <= 0;
-
-                      end
-
-                      else begin
-
-                          thread_count <= thread_count + 4'd1;
-
-                      end
-
-                  end
-
-              end;
-
-
-    logic [ 3:0 ] thread_count_zure;
-
-    always_comb begin
-
-                    thread_count_zure = thread_count + 4'd1;
-
-                    // スレッド数可変
-                    if ( thread_count == 4'd4 ) begin
-
-                        thread_count_zure = 0;
-
-                    end
-
-                end;
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
     // 命令
     reg [ 15:0 ]                inst;
 
@@ -182,21 +130,15 @@ module central_core
     // reg_0はその度にロードされるから保持しなくていい
 
 
-    // レジスタ１
-    (* ram_style = "block" *)
-    reg [ DIM:0 ]           reg_1_threads [ THREADS-1:0 ];
-
     reg [ DIM:0 ]         reg_1;
 
     always_ff @( posedge clk ) begin
 
                   if ( exec & ~inst[ 15 ] & inst[ 11 ] ) begin
 
-                      reg_1_threads[ thread_count ] <= reg_2_tmp;
+                      reg_1 <= reg_2_tmp;
 
                   end
-
-                  reg_1 <= reg_1_threads[ thread_count_zure ];
 
               end;
 
@@ -244,20 +186,15 @@ module central_core
 
 
 
-    (* ram_style = "block" *)
-    reg [ DIM:0 ]           reg_2_threads [ THREADS-1:0 ];
-
     reg [ DIM:0 ]           reg_2;
 
     always_ff @( posedge clk ) begin
 
                   if ( exec & inst[ 13 ] ) begin
 
-                      reg_2_threads[ thread_count ] <= reg_for_inst_13;
+                      reg_2 <= reg_for_inst_13;
 
                   end
-
-                  reg_2 <= reg_2_threads[ thread_count_zure ];
 
               end;
 

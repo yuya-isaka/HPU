@@ -1649,7 +1649,7 @@ int main(int argc, char **argv)
   const int CORENUM = 1;
 
   // スレッド数可変
-  const int THREADSNUM = 5;
+  const int THREADSNUM = 1;
 
   // 偶数処理
   const int MAJORITY_ADDR = RANNUM - 1;
