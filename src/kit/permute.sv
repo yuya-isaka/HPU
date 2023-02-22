@@ -19,7 +19,7 @@ module permute
 
 
          // out
-         output wire [ DIM:0 ]          result
+         output reg [ DIM:0 ]          result
 
      );
 
@@ -210,7 +210,16 @@ module permute
 
 
     // スレッド数可変
-    assign result = stage4;
+    // assign result = stage4;
+
+    always_ff @( posedge clk) begin
+
+
+                  if ( exec) begin
+                      result <= stage4;
+                  end
+
+              end;
 
 
 endmodule
