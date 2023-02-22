@@ -6,7 +6,6 @@
 #include <iostream>
 
 const int RANNUM = 512;
-// const int RANNUM = 1024;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -16,17 +15,6 @@ vluint64_t sim_end = sim_start + 3000000;
 
 VerilatedVcdC *tfp;
 Vtop *verilator_top;
-
-// Verilatorの代入が32bitごと
-union
-{
-  struct
-  {
-    uint16_t data_0;
-    uint16_t data_1;
-  };
-  uint32_t write_data;
-} conv;
 
 // 1クロック進みながら２回評価　（立ち下がり、立ち上がり）
 void eval()
@@ -84,136 +72,120 @@ uint32_t xor128(int reset)
 }
 
 // 簡易アセンブラ
-uint16_t assemble(const char inst_str[], uint16_t addr)
+uint32_t assemble(const char inst_str[], uint32_t addr)
 {
-  if (strcmp(inst_str, "load") == 0 || strcmp(inst_str, "permute") == 0 || strcmp(inst_str, "simd_permute") == 0)
+  uint32_t inst = 0;
+  uint32_t result = 0;
+
+  if (strcmp(inst_str, "load.1") == 0)
   {
-    uint16_t result = 0;
-    uint16_t inst = 0;
+    inst = 2147487744;
+    result = inst | addr;
+  }
 
-    // load
-    if (strcmp(inst_str, "load") == 0)
-    {
-      inst = 40960;
-      result = inst | addr;
-    }
+  else if (strcmp(inst_str, "xor.121") == 0)
+  {
+    result = 2147491840;
+  }
 
-    else if (strcmp(inst_str, "permute") == 0)
-    {
-      inst = 34816;
-      result = inst | addr;
-    }
+  else if (strcmp(inst_str, "xor.p21") == 0)
+  {
+    result = 2147500032;
+  }
 
-    else if (strcmp(inst_str, "simd_permute") == 0)
-    {
-      inst = 34816 + 1024;
-      result = inst | addr;
-    }
+  else if (strcmp(inst_str, "xor.p11") == 0)
+  {
+    result = 2147516416;
+  }
 
-    return result;
+  else if (strcmp(inst_str, "move.21") == 0)
+  {
+    result = 2147549184;
+  }
+
+  else if (strcmp(inst_str, "move.p1") == 0)
+  {
+    result = 2147614720;
+  }
+
+  else if (strcmp(inst_str, "load.2") == 0)
+  {
+    inst = 1073745920;
+    result = inst | addr;
+  }
+
+  else if (strcmp(inst_str, "xor.122") == 0)
+  {
+    result = 1073750016;
+  }
+
+  else if (strcmp(inst_str, "xor.p22") == 0)
+  {
+    result = 1073758208;
+  }
+
+  else if (strcmp(inst_str, "xor.p12") == 0)
+  {
+    result = 1073774592;
+  }
+
+  else if (strcmp(inst_str, "move.12") == 0)
+  {
+    result = 1073807360;
+  }
+
+  else if (strcmp(inst_str, "move.p2") == 0)
+  {
+    result = 1073872896;
+  }
+
+  else if (strcmp(inst_str, "permute.2") == 0)
+  {
+    inst = 536875008;
+    result = inst | addr;
+  }
+
+  else if (strcmp(inst_str, "permute.1") == 0)
+  {
+    inst = 536870912;
+    result = inst | addr;
+  }
+
+  else if (strcmp(inst_str, "store.2") == 0)
+  {
+    result = 268439552;
+  }
+
+  else if (strcmp(inst_str, "store.1") == 0)
+  {
+    result = 268443648;
+  }
+
+  else if (strcmp(inst_str, "store.p") == 0)
+  {
+    result = 268451840;
+  }
+
+  else if (strcmp(inst_str, "last") == 0)
+  {
+    result = 268468224;
+  }
+
+  else if (strcmp(inst_str, "nop") == 0)
+  {
+    result = 0;
   }
 
   else
   {
-    uint16_t inst = 0;
-
-    // xor
-    if (strcmp(inst_str, "xor") == 0)
-    {
-      inst = 8192;
-    }
-
-    else if (strcmp(inst_str, "simd_xor") == 0)
-    {
-      inst = 8192 + 1024;
-    }
-
-    // pxor
-    else if (strcmp(inst_str, "pxor") == 0)
-    {
-      inst = 24576;
-    }
-
-    else if (strcmp(inst_str, "simd_pxor") == 0)
-    {
-      inst = 24576 + 1024;
-    }
-
-    // store
-    else if (strcmp(inst_str, "store") == 0)
-    {
-      inst = 4096;
-    }
-
-    else if (strcmp(inst_str, "simd_store") == 0)
-    {
-      inst = 4096 + 1024;
-    }
-
-    // pstore
-    else if (strcmp(inst_str, "pstore") == 0)
-    {
-      inst = 20480;
-    }
-
-    else if (strcmp(inst_str, "simd_pstore") == 0)
-    {
-      inst = 20480 + 1024;
-    }
-
-    // move
-    else if (strcmp(inst_str, "move") == 0)
-    {
-      inst = 2048;
-    }
-
-    else if (strcmp(inst_str, "simd_move") == 0)
-    {
-      inst = 2048 + 1024;
-    }
-
-    // pmove
-    else if (strcmp(inst_str, "pmove") == 0)
-    {
-      inst = 18432;
-    }
-
-    else if (strcmp(inst_str, "simd_pmove") == 0)
-    {
-      inst = 18432 + 1024;
-    }
-
-    // last
-    else if (strcmp(inst_str, "last") == 0)
-    {
-      inst = 256;
-    }
-
-    // nop
-    else if (strcmp(inst_str, "nop") == 0)
-    {
-      inst = 0;
-    }
-
-    else
-    {
-      printf("error");
-    }
-
-    return inst;
+    printf("error");
   }
+
+  return result;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//    NGRAM   = 1 ~
-//    CORENUM = 1 - 14
-//    ADDRNUM = NGRAMの倍数 (shifter_newを使ったテストをしているから。また、LASTが０のままになりtb.cppでは止まる。test.cppでは動くけどNGRAMの倍数以外は同じ値が出る)
-//    DIM     = 32 or 1024
-//    MAJORITY_ADDR = 偶数処理
-//    argc    ... Verilatorに必要
-//    **argv  ... Verilatorに必要
-//    DEBUG   = DMA中断するか否か
 void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int ADDRNUM, const int DIM, const int MAJORITY_ADDR, int argc, char **argv, const int DEBUG)
 {
 
@@ -409,8 +381,6 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
   // VALIDとDATAは同時に届くのでここのeval()はおかしい
   // eval();
 
-  int tmp = 0;
-
   // 偶数処理
   if (EVEN)
   {
@@ -419,15 +389,8 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       if (k == 0)
       {
         // load
-        uint16_t addr = MAJORITY_ADDR;
-        conv.data_0 = assemble("load", addr);
-        conv.data_1 = 0;
-        verilator_top->S_AXIS_TDATA = conv.write_data;
-        tmp++;
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
+        uint32_t addr = MAJORITY_ADDR;
+        verilator_top->S_AXIS_TDATA = assemble("load.2", addr);
       }
       else
       {
@@ -444,15 +407,7 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
       if (k == 0)
       {
         // store
-        tmp = 0;
-        conv.data_0 = assemble("store", 0);
-        conv.data_1 = 0;
-        verilator_top->S_AXIS_TDATA = conv.write_data;
-        tmp++;
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
+        verilator_top->S_AXIS_TDATA = assemble("store.2", 0);
       }
       else
       {
@@ -467,1094 +422,178 @@ void check(const int NGRAM, const int CORENUM, const int THREADSNUM, const int A
 
   for (int j = 0; j < ADDRNUM; j += NGRAM * CORENUM * THREADSNUM)
   {
-    // 余り処理
-    if (REMAINDAR != 0 && j == LAST)
+    // load
+    for (int k = 0; k < THREADSNUM; k++)
     {
+      uint32_t addr = j + (NGRAM * CORENUM * k);
+      verilator_top->S_AXIS_TDATA = assemble("load.1", addr);
+      eval();
+    }
 
-      // load
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        for (int i = 0; i < REMAINDAR_CORENUM; i++)
-        {
-          uint16_t addr = NGRAM * i + j + (NGRAM * REMAINDAR_CORENUM * k);
-          if (i % 2 == 0)
-          {
-            conv.data_0 = assemble("load", addr);
-            conv.data_1 = 0;
-          }
-          else
-          {
-            conv.data_1 = assemble("load", addr);
-            verilator_top->S_AXIS_TDATA = conv.write_data;
-            tmp++;
-          }
-        }
-        // 奇数のとき最後の代入ができていない
-        if (REMAINDAR_CORENUM % 2 != 0)
-        {
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-        }
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      // move
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        for (int i = 0; i < REMAINDAR_CORENUM; i++)
-        {
-          if (i % 2 == 0)
-          {
-            conv.data_0 = assemble("move", 0);
-            conv.data_1 = 0;
-          }
-          else
-          {
-            conv.data_1 = assemble("move", 0);
-            verilator_top->S_AXIS_TDATA = conv.write_data;
-            tmp++;
-          }
-        }
-        // 奇数のとき最後の代入ができていない
-        if (REMAINDAR_CORENUM % 2 != 0)
-        {
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-        }
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      // load
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        for (int i = 0; i < REMAINDAR_CORENUM; i++)
-        {
-          uint16_t addr = NGRAM * i + 1 + j + (NGRAM * REMAINDAR_CORENUM * k);
-          if (i % 2 == 0)
-          {
-            conv.data_0 = assemble("load", addr);
-            conv.data_1 = 0;
-          }
-          else
-          {
-            conv.data_1 = assemble("load", addr);
-            verilator_top->S_AXIS_TDATA = conv.write_data;
-            tmp++;
-          }
-        }
-        // 奇数のとき最後の代入ができていない
-        if (REMAINDAR_CORENUM % 2 != 0)
-        {
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-        }
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      // Permutation
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        for (int i = 0; i < REMAINDAR_CORENUM; i++)
-        {
-          if (i % 2 == 0)
-          {
-            conv.data_0 = assemble("permute", 1);
-            conv.data_1 = 0;
-          }
-          else
-          {
-            conv.data_1 = assemble("permute", 1);
-            verilator_top->S_AXIS_TDATA = conv.write_data;
-            tmp++;
-          }
-        }
-        // 奇数のとき最後の代入ができていない
-        if (REMAINDAR_CORENUM % 2 != 0)
-        {
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-        }
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      // xor
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        for (int i = 0; i < REMAINDAR_CORENUM; i++)
-        {
-          if (i % 2 == 0)
-          {
-            conv.data_0 = assemble("pxor", 0);
-            conv.data_1 = 0;
-          }
-          else
-          {
-            conv.data_1 = assemble("pxor", 0);
-            verilator_top->S_AXIS_TDATA = conv.write_data;
-            tmp++;
-          }
-        }
-        // 奇数のとき最後の代入ができていない
-        if (REMAINDAR_CORENUM % 2 != 0)
-        {
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-        }
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      // move
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        for (int i = 0; i < REMAINDAR_CORENUM; i++)
-        {
-          if (i % 2 == 0)
-          {
-            conv.data_0 = assemble("move", 0);
-            conv.data_1 = 0;
-          }
-          else
-          {
-            conv.data_1 = assemble("move", 0);
-            verilator_top->S_AXIS_TDATA = conv.write_data;
-            tmp++;
-          }
-        }
-        // 奇数のとき最後の代入ができていない
-        if (REMAINDAR_CORENUM % 2 != 0)
-        {
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-        }
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      // load
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        for (int i = 0; i < REMAINDAR_CORENUM; i++)
-        {
-          uint16_t addr = NGRAM * i + 2 + j + (NGRAM * REMAINDAR_CORENUM * k);
-          if (i % 2 == 0)
-          {
-            conv.data_0 = assemble("load", addr);
-            conv.data_1 = 0;
-          }
-          else
-          {
-            conv.data_1 = assemble("load", addr);
-            verilator_top->S_AXIS_TDATA = conv.write_data;
-            tmp++;
-          }
-        }
-        // 奇数のとき最後の代入ができていない
-        if (REMAINDAR_CORENUM % 2 != 0)
-        {
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-        }
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      // Permutation
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        for (int i = 0; i < REMAINDAR_CORENUM; i++)
-        {
-          if (i % 2 == 0)
-          {
-            conv.data_0 = assemble("permute", 2);
-            conv.data_1 = 0;
-          }
-          else
-          {
-            conv.data_1 = assemble("permute", 2);
-            verilator_top->S_AXIS_TDATA = conv.write_data;
-            tmp++;
-          }
-        }
-        // 奇数のとき最後の代入ができていない
-        if (REMAINDAR_CORENUM % 2 != 0)
-        {
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-        }
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      // xor
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        for (int i = 0; i < REMAINDAR_CORENUM; i++)
-        {
-          if (i % 2 == 0)
-          {
-            conv.data_0 = assemble("pxor", 0);
-            conv.data_1 = 0;
-          }
-          else
-          {
-            conv.data_1 = assemble("pxor", 0);
-            verilator_top->S_AXIS_TDATA = conv.write_data;
-            tmp++;
-          }
-        }
-        // 奇数のとき最後の代入ができていない
-        if (REMAINDAR_CORENUM % 2 != 0)
-        {
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-        }
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      // store
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        for (int i = 0; i < REMAINDAR_CORENUM; i++)
-        {
-          if (i % 2 == 0)
-          {
-            conv.data_0 = assemble("store", 0);
-            conv.data_1 = 0;
-          }
-          else
-          {
-            conv.data_1 = assemble("store", 0);
-            verilator_top->S_AXIS_TDATA = conv.write_data;
-            tmp++;
-          }
-        }
-        // 奇数のとき最後の代入ができていない
-        if (REMAINDAR_CORENUM % 2 != 0)
-        {
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-        }
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      // last
-      tmp = 0;
-      for (int i = 0; i < 1; i++)
-      {
-        conv.data_0 = assemble("last", 0);
-        conv.data_1 = 0;
-        verilator_top->S_AXIS_TDATA = conv.write_data;
-        tmp++;
-      }
-      // 残り埋める
-      for (int i = tmp; i < BUS; i++)
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < BUS; i++)
       {
         verilator_top->S_AXIS_TDATA = 0;
       }
       eval();
-    } //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      // ----------------------------------------------
+    }
+
+    // load
+    for (int k = 0; k < THREADSNUM; k++)
+    {
+      uint32_t addr = 1 + j + (NGRAM * CORENUM * k);
+      verilator_top->S_AXIS_TDATA = assemble("load.2", addr);
+      eval();
+    }
+
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < BUS; i++)
+      {
+        verilator_top->S_AXIS_TDATA = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      // ----------------------------------------------
+    }
+
+    for (int k = 0; k < THREADSNUM; k++)
+    {
+      verilator_top->S_AXIS_TDATA = assemble("permute.2", 1);
+      eval();
+    }
+
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < BUS; i++)
+      {
+        verilator_top->S_AXIS_TDATA = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      // ----------------------------------------------
+    }
+
+    for (int k = 0; k < THREADSNUM; k++)
+    {
+      verilator_top->S_AXIS_TDATA = assemble("xor.p11", 0);
+      eval();
+    }
+
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < BUS; i++)
+      {
+        verilator_top->S_AXIS_TDATA = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      // ----------------------------------------------
+    }
+
+    // load
+    for (int k = 0; k < THREADSNUM; k++)
+    {
+      uint32_t addr = 2 + j + (NGRAM * CORENUM * k);
+      verilator_top->S_AXIS_TDATA = assemble("load.2", addr);
+      eval();
+    }
+
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < BUS; i++)
+      {
+        verilator_top->S_AXIS_TDATA = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      // ----------------------------------------------
+    }
+
+    for (int k = 0; k < THREADSNUM; k++)
+    {
+      verilator_top->S_AXIS_TDATA = assemble("permute.2", 2);
+      eval();
+    }
+
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < BUS; i++)
+      {
+        verilator_top->S_AXIS_TDATA = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      // ----------------------------------------------
+    }
+
+    for (int k = 0; k < THREADSNUM; k++)
+    {
+      verilator_top->S_AXIS_TDATA = assemble("xor.p11", 0);
+      eval();
+    }
+
+    if (DEBUG)
+    {
+      // 送信途中で止まる対策 -----------------------------
+      verilator_top->S_AXIS_TVALID = 0;
+      for (int i = 0; i < BUS; i++)
+      {
+        verilator_top->S_AXIS_TDATA = 0;
+      }
+      eval();
+      eval();
+      eval();
+      verilator_top->S_AXIS_TVALID = 1;
+      // ----------------------------------------------
+    }
+
+    // ラスト処理
+    if (j == LAST)
+    {
+      for (int k = 0; k < THREADSNUM; k++)
+      {
+        verilator_top->S_AXIS_TDATA = assemble("store.1", 0);
+        eval();
+      }
+
+      // last
+      verilator_top->S_AXIS_TDATA = assemble("last", 0);
+      eval();
+    }
     else
     {
-      // load
       for (int k = 0; k < THREADSNUM; k++)
       {
-        tmp = 0;
-        for (int i = 0; i < CORENUM; i++)
-        {
-          uint16_t addr = NGRAM * i + j + (NGRAM * CORENUM * k);
-          if (i % 2 == 0)
-          {
-            conv.data_0 = assemble("load", addr);
-            conv.data_1 = 0;
-          }
-          else
-          {
-            conv.data_1 = assemble("load", addr);
-            verilator_top->S_AXIS_TDATA = conv.write_data;
-            tmp++;
-          }
-        }
-        // 奇数のとき最後の代入ができていない
-        if (CORENUM % 2 != 0)
-        {
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-        }
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
+        verilator_top->S_AXIS_TDATA = assemble("store.1", 0);
         eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      //   // move
-      // for (int k = 0; k < THREADSNUM; k++)
-      // {
-      //   tmp = 0;
-      //   for (int i = 0; i < CORENUM; i++)
-      //   {
-      //     if (i % 2 == 0)
-      //     {
-      //       conv.data_0 = assemble("move", 0);
-      //       conv.data_1 = 0;
-      //     }
-      //     else
-      //     {
-      //       conv.data_1 = assemble("move", 0);
-      //       verilator_top->S_AXIS_TDATA = conv.write_data;
-      //       tmp++;
-      //     }
-      //   }
-      //   // 奇数のとき最後の代入ができていない
-      //   if (CORENUM % 2 != 0)
-      //   {
-      //     verilator_top->S_AXIS_TDATA = conv.write_data;
-      //     tmp++;
-      //   }
-      //   for (int i = tmp; i < BUS; i++)
-      //   {
-      //     verilator_top->S_AXIS_TDATA = 0;
-      //   }
-      //   eval();
-      // }
-
-      // simd_move
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        conv.data_0 = assemble("move", 0);
-        conv.data_1 = 0;
-        verilator_top->S_AXIS_TDATA = conv.write_data;
-        tmp++;
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      // load
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        for (int i = 0; i < CORENUM; i++)
-        {
-          uint16_t addr = NGRAM * i + 1 + j + (NGRAM * CORENUM * k);
-          if (i % 2 == 0)
-          {
-            conv.data_0 = assemble("load", addr);
-            conv.data_1 = 0;
-          }
-          else
-          {
-            conv.data_1 = assemble("load", addr);
-            verilator_top->S_AXIS_TDATA = conv.write_data;
-            tmp++;
-          }
-        }
-        // 奇数のとき最後の代入ができていない
-        if (CORENUM % 2 != 0)
-        {
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-        }
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      //   // Permutation
-      // for (int k = 0; k < THREADSNUM; k++)
-      // {
-      //   tmp = 0;
-      //   for (int i = 0; i < CORENUM; i++)
-      //   {
-      //     if (i % 2 == 0)
-      //     {
-      //       conv.data_0 = assemble("permute", 1);
-      //       conv.data_1 = 0;
-      //     }
-      //     else
-      //     {
-      //       conv.data_1 = assemble("permute", 1);
-      //       verilator_top->S_AXIS_TDATA = conv.write_data;
-      //       tmp++;
-      //     }
-      //   }
-      //   // 奇数のとき最後の代入ができていない
-      //   if (CORENUM % 2 != 0)
-      //   {
-      //     verilator_top->S_AXIS_TDATA = conv.write_data;
-      //     tmp++;
-      //   }
-      //   for (int i = tmp; i < BUS; i++)
-      //   {
-      //     verilator_top->S_AXIS_TDATA = 0;
-      //   }
-      //   eval();
-      // }
-
-      // Simd_Permutation
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        conv.data_0 = assemble("permute", 1);
-        conv.data_1 = 0;
-        verilator_top->S_AXIS_TDATA = conv.write_data;
-        tmp++;
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      //   // xor
-      // for (int k = 0; k < THREADSNUM; k++)
-      // {
-      //   tmp = 0;
-      //   for (int i = 0; i < CORENUM; i++)
-      //   {
-      //     if (i % 2 == 0)
-      //     {
-      //       conv.data_0 = assemble("pxor", 0);
-      //       conv.data_1 = 0;
-      //     }
-      //     else
-      //     {
-      //       conv.data_1 = assemble("pxor", 0);
-      //       verilator_top->S_AXIS_TDATA = conv.write_data;
-      //       tmp++;
-      //     }
-      //   }
-      //   // 奇数のとき最後の代入ができていない
-      //   if (CORENUM % 2 != 0)
-      //   {
-      //     verilator_top->S_AXIS_TDATA = conv.write_data;
-      //     tmp++;
-      //   }
-      //   for (int i = tmp; i < BUS; i++)
-      //   {
-      //     verilator_top->S_AXIS_TDATA = 0;
-      //   }
-      //   eval();
-      // }
-
-      // Simd_Xor
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        conv.data_0 = assemble("pxor", 0);
-        conv.data_1 = 0;
-        verilator_top->S_AXIS_TDATA = conv.write_data;
-        tmp++;
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      //   // move
-      // for (int k = 0; k < THREADSNUM; k++)
-      // {
-      //   tmp = 0;
-      //   for (int i = 0; i < CORENUM; i++)
-      //   {
-      //     if (i % 2 == 0)
-      //     {
-      //       conv.data_0 = assemble("move", 0);
-      //       conv.data_1 = 0;
-      //     }
-      //     else
-      //     {
-      //       conv.data_1 = assemble("move", 0);
-      //       verilator_top->S_AXIS_TDATA = conv.write_data;
-      //       tmp++;
-      //     }
-      //   }
-      //   // 奇数のとき最後の代入ができていない
-      //   if (CORENUM % 2 != 0)
-      //   {
-      //     verilator_top->S_AXIS_TDATA = conv.write_data;
-      //     tmp++;
-      //   }
-      //   for (int i = tmp; i < BUS; i++)
-      //   {
-      //     verilator_top->S_AXIS_TDATA = 0;
-      //   }
-      //   eval();
-      // }
-
-      // Simd_Move
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        conv.data_0 = assemble("move", 0);
-        conv.data_1 = 0;
-        verilator_top->S_AXIS_TDATA = conv.write_data;
-        tmp++;
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      // load
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        for (int i = 0; i < CORENUM; i++)
-        {
-          uint16_t addr = NGRAM * i + 2 + j + (NGRAM * CORENUM * k);
-          if (i % 2 == 0)
-          {
-            conv.data_0 = assemble("load", addr);
-            conv.data_1 = 0;
-          }
-          else
-          {
-            conv.data_1 = assemble("load", addr);
-            verilator_top->S_AXIS_TDATA = conv.write_data;
-            tmp++;
-          }
-        }
-        // 奇数のとき最後の代入ができていない
-        if (CORENUM % 2 != 0)
-        {
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-        }
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      //   // Permutation
-      // for (int k = 0; k < THREADSNUM; k++)
-      // {
-      //   tmp = 0;
-      //   for (int i = 0; i < CORENUM; i++)
-      //   {
-      //     if (i % 2 == 0)
-      //     {
-      //       conv.data_0 = assemble("permute", 2);
-      //       conv.data_1 = 0;
-      //     }
-      //     else
-      //     {
-      //       conv.data_1 = assemble("permute", 2);
-      //       verilator_top->S_AXIS_TDATA = conv.write_data;
-      //       tmp++;
-      //     }
-      //   }
-      //   // 奇数のとき最後の代入ができていない
-      //   if (CORENUM % 2 != 0)
-      //   {
-      //     verilator_top->S_AXIS_TDATA = conv.write_data;
-      //     tmp++;
-      //   }
-      //   for (int i = tmp; i < BUS; i++)
-      //   {
-      //     verilator_top->S_AXIS_TDATA = 0;
-      //   }
-      //   eval();
-      // }
-
-      // Simd_Permutation
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        conv.data_0 = assemble("permute", 2);
-        conv.data_1 = 0;
-        verilator_top->S_AXIS_TDATA = conv.write_data;
-        tmp++;
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      //   // xor
-      // for (int k = 0; k < THREADSNUM; k++)
-      // {
-      //   tmp = 0;
-      //   for (int i = 0; i < CORENUM; i++)
-      //   {
-      //     if (i % 2 == 0)
-      //     {
-      //       conv.data_0 = assemble("pxor", 0);
-      //       conv.data_1 = 0;
-      //     }
-      //     else
-      //     {
-      //       conv.data_1 = assemble("pxor", 0);
-      //       verilator_top->S_AXIS_TDATA = conv.write_data;
-      //       tmp++;
-      //     }
-      //   }
-      //   // 奇数のとき最後の代入ができていない
-      //   if (CORENUM % 2 != 0)
-      //   {
-      //     verilator_top->S_AXIS_TDATA = conv.write_data;
-      //     tmp++;
-      //   }
-      //   for (int i = tmp; i < BUS; i++)
-      //   {
-      //     verilator_top->S_AXIS_TDATA = 0;
-      //   }
-      //   eval();
-      // }
-
-      // Simd_xor
-      for (int k = 0; k < THREADSNUM; k++)
-      {
-        tmp = 0;
-        conv.data_0 = assemble("pxor", 0);
-        conv.data_1 = 0;
-        verilator_top->S_AXIS_TDATA = conv.write_data;
-        tmp++;
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-
-      if (DEBUG)
-      {
-        // 送信途中で止まる対策 -----------------------------
-        verilator_top->S_AXIS_TVALID = 0;
-        for (int i = 0; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-        eval();
-        eval();
-        verilator_top->S_AXIS_TVALID = 1;
-        // ----------------------------------------------
-      }
-
-      // ラスト処理
-      if (j == LAST)
-      {
-        //   // store
-        // for (int k = 0; k < THREADSNUM; k++)
-        // {
-        //   tmp = 0;
-        //   for (int i = 0; i < CORENUM; i++)
-        //   {
-        //     if (i % 2 == 0)
-        //     {
-        //       conv.data_0 = assemble("store", 0);
-        //       conv.data_1 = 0;
-        //     }
-        //     else
-        //     {
-        //       conv.data_1 = assemble("store", 0);
-        //       verilator_top->S_AXIS_TDATA = conv.write_data;
-        //       tmp++;
-        //     }
-        //   }
-        //   // 奇数のとき最後の代入ができていない
-        //   if (CORENUM % 2 != 0)
-        //   {
-        //     verilator_top->S_AXIS_TDATA = conv.write_data;
-        //     tmp++;
-        //   }
-        //   for (int i = tmp; i < BUS; i++)
-        //   {
-        //     verilator_top->S_AXIS_TDATA = 0;
-        //   }
-        //   eval();
-        // }
-
-        // simd_store
-        for (int k = 0; k < THREADSNUM; k++)
-        {
-          tmp = 0;
-          conv.data_0 = assemble("store", 0);
-          conv.data_1 = 0;
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-          for (int i = tmp; i < BUS; i++)
-          {
-            verilator_top->S_AXIS_TDATA = 0;
-          }
-          eval();
-        }
-
-        // last
-        tmp = 0;
-        for (int i = 0; i < 1; i++)
-        {
-          conv.data_0 = assemble("last", 0);
-          conv.data_1 = 0;
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-        }
-        for (int i = tmp; i < BUS; i++)
-        {
-          verilator_top->S_AXIS_TDATA = 0;
-        }
-        eval();
-      }
-      else
-      {
-        //   // store
-        // for (int k = 0; k < THREADSNUM; k++)
-        // {
-        //   tmp = 0;
-        //   for (int i = 0; i < CORENUM; i++)
-        //   {
-        //     if (i % 2 == 0)
-        //     {
-        //       conv.data_0 = assemble("store", 0);
-        //       conv.data_1 = 0;
-        //     }
-        //     else
-        //     {
-        //       conv.data_1 = assemble("store", 0);
-        //       verilator_top->S_AXIS_TDATA = conv.write_data;
-        //       tmp++;
-        //     }
-        //   }
-        //   // 奇数のとき最後の代入ができていない
-        //   if (CORENUM % 2 != 0)
-        //   {
-        //     verilator_top->S_AXIS_TDATA = conv.write_data;
-        //     tmp++;
-        //   }
-        //   for (int i = tmp; i < BUS; i++)
-        //   {
-        //     verilator_top->S_AXIS_TDATA = 0;
-        //   }
-        //   eval();
-        // }
-
-        // simd_store
-        for (int k = 0; k < THREADSNUM; k++)
-        {
-          tmp = 0;
-          conv.data_0 = assemble("store", 0);
-          conv.data_1 = 0;
-          verilator_top->S_AXIS_TDATA = conv.write_data;
-          tmp++;
-          for (int i = tmp; i < BUS; i++)
-          {
-            verilator_top->S_AXIS_TDATA = 0;
-          }
-          eval();
-        }
       }
     }
   }

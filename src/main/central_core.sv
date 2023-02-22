@@ -22,7 +22,6 @@ module central_core
          input wire                         get_v,
          input wire                         get_c,
          // 16bit命令
-         input wire [ 15:0 ]                get_d,
          input wire [ 31:0 ]                get_d_all,
          input wire                         exec,
 
@@ -59,7 +58,7 @@ module central_core
                   // 読み出し
                   // 常に垂れ流しで読み出しでOK
                   // (必要ない場合は使わない)
-                  reg_0 <= item_memory[ get_d[ 8:0 ] ];
+                  reg_0 <= item_memory[ get_d_all[ 8:0 ] ];
 
               end;
 
@@ -120,7 +119,7 @@ module central_core
 
 
     // 命令
-    reg [ 15:0 ]                inst;
+    reg [ 31:0 ]                inst;
 
     always_ff @( posedge clk ) begin
 
@@ -134,7 +133,7 @@ module central_core
                   // データ受信時実行
                   else if ( get_v ) begin
 
-                      inst <= get_d[ 15:0 ];
+                      inst <= get_d_all[ 31:0 ];
 
                   end
 
@@ -154,6 +153,25 @@ module central_core
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+    logic [ DIM:0 ]         permute_reg_data;
+
+    always_comb begin
+
+                    if ( inst[ 12 ] ) begin
+
+                        permute_reg_data = reg_2;
+
+                    end
+
+                    else begin
+
+                        permute_reg_data = reg_1;
+
+                    end
+
+                end;
+
+
     wire [ DIM:0 ]          permute_reg_result;
 
     // 次元数可変
@@ -165,7 +183,7 @@ module central_core
                 // in
                 .clk( clk ),
                 .exec( exec ),
-                .data( reg_2[ DIM:0 ] ),
+                .data( permute_reg_data[ DIM:0 ] ),
                 .permute_num( inst[ 9:0 ] ),
 
 
@@ -182,6 +200,53 @@ module central_core
     // reg_0はその度にロードされるから保持しなくていい
 
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    logic [ DIM:0 ]         reg_to_reg1;
+
+    always_comb begin
+
+                    if ( inst[ 12 ] ) begin
+
+                        reg_to_reg1 = reg_0;
+
+                    end
+
+                    else if ( inst[ 13 ] ) begin
+
+                        reg_to_reg1 = reg_1 ^ reg_2;
+
+                    end
+
+                    else if ( inst[ 14 ] ) begin
+
+                        reg_to_reg1 = permute_reg_result ^ reg_2;
+
+                    end
+
+                    else if ( inst[ 15 ] ) begin
+
+                        reg_to_reg1 = permute_reg_result ^ reg_1;
+
+                    end
+
+                    else if ( inst[ 16 ] ) begin
+
+                        reg_to_reg1 = reg_2;
+
+                    end
+
+                    // else if ( inst[ 17 ] ) begin
+                    else begin
+
+                        reg_to_reg1 = permute_reg_result;
+
+                    end
+
+                end;
+
+
     // レジスタ１
     (* ram_style = "block" *)
     reg [ DIM:0 ]           reg_1_threads [ THREADS-1:0 ];
@@ -190,9 +255,9 @@ module central_core
 
     always_ff @( posedge clk ) begin
 
-                  if ( exec & ~inst[ 15 ] & inst[ 11 ] ) begin
+                  if ( exec & inst[ 31] ) begin
 
-                      reg_1_threads[ thread_count ] <= reg_2_tmp;
+                      reg_1_threads[ thread_count ] <= reg_to_reg1;
 
                   end
 
@@ -204,39 +269,44 @@ module central_core
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    logic [ DIM:0 ]         reg_2_tmp;
+    logic [ DIM:0 ]         reg_to_reg2;
 
     always_comb begin
 
-                    if ( inst[ 14 ] ) begin
+                    if ( inst[ 12 ] ) begin
 
-                        reg_2_tmp = permute_reg_result;
+                        reg_to_reg2 = reg_0;
 
                     end
 
+                    else if ( inst[ 13 ] ) begin
+
+                        reg_to_reg2 = reg_1 ^ reg_2;
+
+                    end
+
+                    else if ( inst[ 14 ] ) begin
+
+                        reg_to_reg2 = permute_reg_result ^ reg_2;
+
+                    end
+
+                    else if ( inst[ 15 ] ) begin
+
+                        reg_to_reg2 = permute_reg_result ^ reg_1;
+
+                    end
+
+                    else if ( inst[ 16 ] ) begin
+
+                        reg_to_reg2 = reg_1;
+
+                    end
+
+                    // else if ( inst[ 17 ] ) begin
                     else begin
 
-                        reg_2_tmp = reg_2;
-
-                    end
-
-                end;
-
-
-
-    logic [ DIM:0 ]         reg_for_inst_13;
-
-    always_comb begin
-
-                    if ( inst[ 15 ] ) begin
-
-                        reg_for_inst_13 = reg_0;
-
-                    end
-
-                    else begin
-
-                        reg_for_inst_13 = reg_1 ^ reg_2_tmp;
+                        reg_to_reg2 = permute_reg_result;
 
                     end
 
@@ -251,9 +321,9 @@ module central_core
 
     always_ff @( posedge clk ) begin
 
-                  if ( exec & inst[ 13 ] ) begin
+                  if ( exec & inst[ 30 ] ) begin
 
-                      reg_2_threads[ thread_count ] <= reg_for_inst_13;
+                      reg_2_threads[ thread_count ] <= reg_to_reg2;
 
                   end
 
@@ -284,45 +354,48 @@ module central_core
                   // 187MHzはexec->reg2がボトルネックだった
                   else if ( exec ) begin
 
-                      // アドレス必要
-                      if ( inst[ 15 ] ) begin
-
-                          buff <= 0;
-                          store <= 0;
-                          last <= 0;
-
-                      end
-
-                      // アドレスいらん
-                      else begin
+                      if ( inst[ 28 ] ) begin
 
                           // store
                           if ( inst[ 12 ] ) begin
 
-                              buff <= reg_2_tmp;
+                              buff <= reg_2;
+                              store <= 1;
+                              last <= 0;
+
+                          end
+
+                          else if ( inst[ 13 ] ) begin
+
+                              buff <= reg_1;
+                              store <= 1;
+                              last <= 0;
+
+                          end
+
+                          else if ( inst[ 14 ] ) begin
+
+                              buff <= permute_reg_result;
                               store <= 1;
                               last <= 0;
 
                           end
 
                           // last
-                          else if ( inst[ 8 ] ) begin
+                          else if ( inst[ 15 ] ) begin
 
                               last <= 1;
                               buff <= 0;
                               store <= 0;
 
                           end
+                      end
 
-                          // nop (すべて0のはず)
-                          // (reg1やreg2の値は保持)
-                          else begin
+                      else begin
 
-                              buff <= 0;
-                              store <= 0;
-                              last <= 0;
-
-                          end
+                          buff <= 0;
+                          store <= 0;
+                          last <= 0;
 
                       end
 

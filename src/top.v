@@ -200,7 +200,6 @@ module top
                      .com( com ),
                      .get_v( get_v ),
                      .get_c( get_c ),
-                     .get_d( S_AXIS_TDATA[ 15:0 ] ),
                      .get_d_all( S_AXIS_TDATA[ 31:0 ] ),
                      .exec( exec ),
 
