@@ -209,14 +209,12 @@ module permute
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // スレッド数可変
-    // assign result = stage4;
+    always_ff @( posedge clk ) begin
 
-    always_ff @( posedge clk) begin
+                  if ( exec ) begin
 
-
-                  if ( exec) begin
                       result <= stage4;
+
                   end
 
               end;
