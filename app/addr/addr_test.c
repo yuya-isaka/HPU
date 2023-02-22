@@ -26,30 +26,26 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR, const in
   // 偶数処理
   if (EVEN)
   {
-    uint16_t addr_array[1] = {MAJORITY_ADDR};
-    hdc_load_thread(1, addr_array);
+    uint32_t addr_array[1] = {MAJORITY_ADDR};
+    hdc_load_1(1, addr_array);
 
-    hdc_store_thread(1);
+    hdc_store_1(1);
   }
 
   // LASTまで繰り返す
   for (int j = 0; j < LAST; j += NGRAM * THREADS_NUM)
   {
 
-    uint16_t addr_array[THREADS_NUM];
+    uint32_t addr_array[THREADS_NUM];
 
     // アドレス
-    for (uint16_t k = 0; k < THREADS_NUM; k++)
+    for (uint32_t k = 0; k < THREADS_NUM; k++)
     {
       addr_array[k] = j + (NGRAM * k);
     }
 
     // load ---------------------------------------------
-    hdc_load_thread(THREADS_NUM, addr_array);
-    // ------------------------------------------------------
-
-    // move ---------------------------------------------
-    hdc_move_thread(THREADS_NUM);
+    hdc_load_1(THREADS_NUM, addr_array);
     // ------------------------------------------------------
 
     // アドレス
@@ -59,19 +55,15 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR, const in
     }
 
     // load ---------------------------------------------
-    hdc_load_thread(THREADS_NUM, addr_array);
+    hdc_load_2(THREADS_NUM, addr_array);
     // ------------------------------------------------------
 
     // permute ---------------------------------------------
-    hdc_permute_thread(THREADS_NUM, 1);
+    hdc_permute_2(THREADS_NUM, 1);
     // ------------------------------------------------------
 
     // pxor ---------------------------------------------
-    hdc_pxor_thread(THREADS_NUM);
-    // ------------------------------------------------------
-
-    // move ---------------------------------------------
-    hdc_move_thread(THREADS_NUM);
+    hdc_xor_p11(THREADS_NUM);
     // ------------------------------------------------------
 
     // アドレス
@@ -81,26 +73,26 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR, const in
     }
 
     // load ---------------------------------------------
-    hdc_load_thread(THREADS_NUM, addr_array);
+    hdc_load_2(THREADS_NUM, addr_array);
     // ------------------------------------------------------
 
     // permute ---------------------------------------------
-    hdc_permute_thread(THREADS_NUM, 2);
+    hdc_permute_2(THREADS_NUM, 2);
     // ------------------------------------------------------
 
     // pxor ---------------------------------------------
-    hdc_pxor_thread(THREADS_NUM);
+    hdc_xor_p11(THREADS_NUM);
     // ------------------------------------------------------
 
     // store ---------------------------------------------
-    hdc_store_thread(THREADS_NUM);
+    hdc_store_1(THREADS_NUM);
     // ------------------------------------------------------
   }
 
   // 余り
   if (REMAINDAR != 0)
   {
-    uint16_t addr_array[THREADS_NUM];
+    uint32_t addr_array[THREADS_NUM];
 
     // アドレス
     for (int k = 0; k < THREADS_NUM; k++)
@@ -109,11 +101,7 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR, const in
     }
 
     // load ---------------------------------------------
-    hdc_load_thread(THREADS_NUM, addr_array);
-    // ------------------------------------------------------
-
-    // move ---------------------------------------------
-    hdc_move_thread(THREADS_NUM);
+    hdc_load_1(THREADS_NUM, addr_array);
     // ------------------------------------------------------
 
     // アドレス
@@ -123,19 +111,15 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR, const in
     }
 
     // load ---------------------------------------------
-    hdc_load_thread(THREADS_NUM, addr_array);
+    hdc_load_2(THREADS_NUM, addr_array);
     // ------------------------------------------------------
 
     // permute ---------------------------------------------
-    hdc_permute_thread(THREADS_NUM, 1);
+    hdc_permute_2(THREADS_NUM, 1);
     // ------------------------------------------------------
 
     // pxor ---------------------------------------------
-    hdc_pxor_thread(THREADS_NUM);
-    // ------------------------------------------------------
-
-    // move ---------------------------------------------
-    hdc_move_thread(THREADS_NUM);
+    hdc_xor_p11(THREADS_NUM);
     // ------------------------------------------------------
 
     // アドレス
@@ -145,19 +129,19 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR, const in
     }
 
     // load ---------------------------------------------
-    hdc_load_thread(THREADS_NUM, addr_array);
+    hdc_load_2(THREADS_NUM, addr_array);
     // ------------------------------------------------------
 
     // permute ---------------------------------------------
-    hdc_permute_thread(THREADS_NUM, 2);
+    hdc_permute_2(THREADS_NUM, 2);
     // ------------------------------------------------------
 
     // pxor ---------------------------------------------
-    hdc_pxor_thread(THREADS_NUM);
+    hdc_xor_p11(THREADS_NUM);
     // ------------------------------------------------------
 
     // store ---------------------------------------------
-    hdc_store_thread(THREADS_NUM);
+    hdc_store_1(THREADS_NUM);
     // ------------------------------------------------------
   }
 
