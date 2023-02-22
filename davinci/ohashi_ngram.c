@@ -54,12 +54,9 @@ int main(int argc, char const *argv[])
 	// 命令数
 	const int INSTRUCTION_NUM = 2 + ((NGRAM - 2) * 4) + 4;
 
-	// コア数
-	const int CORENUM = 2;
-
 	// DMA SEND_MAX
 	int SEND_MAX = 33000000;
-	const int SEND_TMP = SEND_MAX % (THREADS_NUM * 2 * INSTRUCTION_NUM) * (CORENUM * THREADS_NUM);
+	const int SEND_TMP = SEND_MAX % (THREADS_NUM * 2 * INSTRUCTION_NUM) * THREADS_NUM;
 	SEND_MAX += SEND_TMP;
 
 	// 偶数の時に使うアドレス
@@ -123,19 +120,15 @@ int main(int argc, char const *argv[])
 		// NGRAMの数
 		const int ALL_NGRAM = num - NGRAM + 1;
 
-		const int EPOCH = ALL_NGRAM / (CORENUM * THREADS_NUM);
+		const int EPOCH = ALL_NGRAM / THREADS_NUM;
 
-		const int REMAINDAR = ALL_NGRAM % (CORENUM * THREADS_NUM);
-		const int REMAINDAR_CORENUM = REMAINDAR / THREADS_NUM;
+		const int REMAINDAR = ALL_NGRAM % THREADS_NUM;
 
-		const int LAST = EPOCH * CORENUM * THREADS_NUM;
+		const int LAST = EPOCH * THREADS_NUM;
 		const int EVEN = ALL_NGRAM % 2 == 0;
 
 		// SEND_MAXまで何個の命令を処理できるか
-		// 1回70この命令を、SEND_MAX / 800 回回す必要がある
-		// 800 = THREADS_NUM * 16 * INSTRUCTION_NUM
-		// 70 = CORENUM * THREADS_NUM
-		int ALL_SEND_NUM = SEND_MAX / (THREADS_NUM * 2 * INSTRUCTION_NUM) * (CORENUM * THREADS_NUM);
+		int ALL_SEND_NUM = SEND_MAX / (THREADS_NUM * 2 * INSTRUCTION_NUM) * THREADS_NUM;
 		// ALL_SEND_EPOCHをLASTまで何回する必要があるか
 		const int ALL_SEND_EPOCH = LAST / ALL_SEND_NUM;
 		// ALL_SEND_EPOCHをLASTまで何回する必要があるか(あまり)
@@ -151,30 +144,25 @@ int main(int argc, char const *argv[])
 		for (int ll = 0; ll < ALL_SEND_EPOCH; ll += 1)
 		{
 			// SEND_NUM繰り返す
-			for (int j = 0; j < ALL_SEND_NUM; j += CORENUM * THREADS_NUM)
+			for (int j = 0; j < ALL_SEND_NUM; j += THREADS_NUM)
 			{
-				uint16_t core_num = CORENUM;
 
-				uint16_t addr_array[THREADS_NUM][core_num];
+				uint16_t addr_array[THREADS_NUM];
 
 				// アドレス
 				int nn = ll * ALL_SEND_NUM + j;
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					for (int i = 0; i < core_num; i++)
-					{
-						addr_array[k][i] = content[nn] - 97;
-						nn++;
-					}
+					addr_array[k] = content[nn] - 97;
+					nn++;
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, core_num, addr_array);
+				hdc_load_thread(THREADS_NUM, addr_array);
 				// ------------------------------------------------------
 
 				// move ---------------------------------------------
-				// hdc_move_thread(THREADS_NUM, core_num);
-				hdc_simd_move_thread();
+				hdc_move_thread(THREADS_NUM);
 				// ------------------------------------------------------
 
 				for (int kk = 1; kk < (NGRAM - 2) + 1; kk++)
@@ -183,30 +171,24 @@ int main(int argc, char const *argv[])
 					nn = ll * ALL_SEND_NUM + j + kk;
 					for (int k = 0; k < THREADS_NUM; k++)
 					{
-						for (int i = 0; i < core_num; i++)
-						{
-							addr_array[k][i] = content[nn] - 97;
-							nn++;
-						}
+						addr_array[k] = content[nn] - 97;
+						nn++;
 					}
 
 					// load ---------------------------------------------
-					hdc_load_thread(THREADS_NUM, core_num, addr_array);
+					hdc_load_thread(THREADS_NUM, addr_array);
 					// ------------------------------------------------------
 
 					// permute ---------------------------------------------
-					// hdc_permute_thread(THREADS_NUM, core_num, 1);
-					hdc_simd_permute_thread(kk);
+					hdc_permute_thread(THREADS_NUM, kk);
 					// ------------------------------------------------------
 
 					// pxor ---------------------------------------------
-					// hdc_pxor_thread(THREADS_NUM, core_num);
-					hdc_simd_pxor_thread();
+					hdc_pxor_thread(THREADS_NUM);
 					// ------------------------------------------------------
 
 					// move ---------------------------------------------
-					// hdc_move_thread(THREADS_NUM, core_num);
-					hdc_simd_move_thread();
+					hdc_move_thread(THREADS_NUM);
 					// ------------------------------------------------------
 				}
 
@@ -214,30 +196,23 @@ int main(int argc, char const *argv[])
 				nn = ll * ALL_SEND_NUM + j + (NGRAM - 1);
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					for (int i = 0; i < core_num; i++)
-					{
-						addr_array[k][i] = content[nn] - 97;
-						nn++;
-					}
+					addr_array[k] = content[nn++] - 97;
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, core_num, addr_array);
+				hdc_load_thread(THREADS_NUM, addr_array);
 				// ------------------------------------------------------
 
 				// permute ---------------------------------------------
-				// hdc_permute_thread(THREADS_NUM, core_num, 3);
-				hdc_simd_permute_thread(NGRAM - 1);
+				hdc_permute_thread(THREADS_NUM, NGRAM - 1);
 				// ------------------------------------------------------
 
 				// pxor ---------------------------------------------
-				// hdc_pxor_thread(THREADS_NUM, core_num);
-				hdc_simd_pxor_thread();
+				hdc_pxor_thread(THREADS_NUM);
 				// ------------------------------------------------------
 
 				// store ---------------------------------------------
-				// hdc_store_thread(THREADS_NUM, core_num);
-				hdc_simd_store_thread();
+				hdc_store_thread(THREADS_NUM);
 				// ------------------------------------------------------
 			}
 			// hdc_last();
@@ -251,30 +226,24 @@ int main(int argc, char const *argv[])
 		}
 
 		// SEND_NUMエポックのあまり
-		for (int j = 0; j < ALL_SEND_REMAIN; j += CORENUM * THREADS_NUM)
+		for (int j = 0; j < ALL_SEND_REMAIN; j += THREADS_NUM)
 		{
-			uint16_t core_num = CORENUM;
 
-			uint16_t addr_array[THREADS_NUM][core_num];
+			uint16_t addr_array[THREADS_NUM];
 
 			// アドレス
 			int nn = ALL_SEND_EPOCH * ALL_SEND_NUM + j;
 			for (int k = 0; k < THREADS_NUM; k++)
 			{
-				for (int i = 0; i < core_num; i++)
-				{
-					addr_array[k][i] = content[nn] - 97;
-					nn++;
-				}
+				addr_array[k] = content[nn++] - 97;
 			}
 
 			// load ---------------------------------------------
-			hdc_load_thread(THREADS_NUM, core_num, addr_array);
+			hdc_load_thread(THREADS_NUM, addr_array);
 			// ------------------------------------------------------
 
 			// move ---------------------------------------------
-			// hdc_move_thread(THREADS_NUM, core_num);
-			hdc_simd_move_thread();
+			hdc_move_thread(THREADS_NUM);
 			// ------------------------------------------------------
 
 			for (int kk = 1; kk < (NGRAM - 2) + 1; kk++)
@@ -283,30 +252,23 @@ int main(int argc, char const *argv[])
 				nn = ALL_SEND_EPOCH * ALL_SEND_NUM + j + kk;
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					for (int i = 0; i < core_num; i++)
-					{
-						addr_array[k][i] = content[nn] - 97;
-						nn++;
-					}
+					addr_array[k] = content[nn++] - 97;
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, core_num, addr_array);
+				hdc_load_thread(THREADS_NUM, addr_array);
 				// ------------------------------------------------------
 
 				// permute ---------------------------------------------
-				// hdc_permute_thread(THREADS_NUM, core_num, 1);
-				hdc_simd_permute_thread(kk);
+				hdc_permute_thread(THREADS_NUM, kk);
 				// ------------------------------------------------------
 
 				// pxor ---------------------------------------------
-				// hdc_pxor_thread(THREADS_NUM, core_num);
-				hdc_simd_pxor_thread();
+				hdc_pxor_thread(THREADS_NUM);
 				// ------------------------------------------------------
 
 				// move ---------------------------------------------
-				// hdc_move_thread(THREADS_NUM, core_num);
-				hdc_simd_move_thread();
+				hdc_move_thread(THREADS_NUM);
 				// ------------------------------------------------------
 			}
 
@@ -314,57 +276,44 @@ int main(int argc, char const *argv[])
 			nn = ALL_SEND_EPOCH * ALL_SEND_NUM + j + (NGRAM - 1);
 			for (int k = 0; k < THREADS_NUM; k++)
 			{
-				for (int i = 0; i < core_num; i++)
-				{
-					addr_array[k][i] = content[nn] - 97;
-					nn++;
-				}
+				addr_array[k] = content[nn++] - 97;
 			}
 
 			// load ---------------------------------------------
-			hdc_load_thread(THREADS_NUM, core_num, addr_array);
+			hdc_load_thread(THREADS_NUM, addr_array);
 			// ------------------------------------------------------
 
 			// permute ---------------------------------------------
-			// hdc_permute_thread(THREADS_NUM, core_num, 3);
-			hdc_simd_permute_thread(NGRAM - 1);
+			hdc_permute_thread(THREADS_NUM, NGRAM - 1);
 			// ------------------------------------------------------
 
 			// pxor ---------------------------------------------
-			// hdc_pxor_thread(THREADS_NUM, core_num);
-			hdc_simd_pxor_thread();
+			hdc_pxor_thread(THREADS_NUM);
 			// ------------------------------------------------------
 
 			// store ---------------------------------------------
-			// hdc_store_thread(THREADS_NUM, core_num);
-			hdc_simd_store_thread();
+			hdc_store_thread(THREADS_NUM);
 			// ------------------------------------------------------
 		}
 
 		// 最後の余り
 		if (REMAINDAR != 0)
 		{
-			uint16_t core_num = REMAINDAR_CORENUM;
-
-			uint16_t addr_array[THREADS_NUM][core_num];
+			uint16_t addr_array[THREADS_NUM];
 
 			// アドレス
 			int nn = LAST;
 			for (int k = 0; k < THREADS_NUM; k++)
 			{
-				for (int i = 0; i < core_num; i++)
-				{
-					addr_array[k][i] = content[nn] - 97;
-					nn++;
-				}
+				addr_array[k] = content[nn++] - 97;
 			}
 
 			// load ---------------------------------------------
-			hdc_load_thread(THREADS_NUM, core_num, addr_array);
+			hdc_load_thread(THREADS_NUM, addr_array);
 			// ------------------------------------------------------
 
 			// move ---------------------------------------------
-			hdc_move_thread(THREADS_NUM, core_num);
+			hdc_move_thread(THREADS_NUM);
 			// ------------------------------------------------------
 
 			for (int kk = 1; kk < (NGRAM - 2) + 1; kk++)
@@ -373,27 +322,23 @@ int main(int argc, char const *argv[])
 				nn = LAST + kk;
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					for (int i = 0; i < core_num; i++)
-					{
-						addr_array[k][i] = content[nn] - 97;
-						nn++;
-					}
+					addr_array[k] = content[nn++] - 97;
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, core_num, addr_array);
+				hdc_load_thread(THREADS_NUM, addr_array);
 				// ------------------------------------------------------
 
 				// permute ---------------------------------------------
-				hdc_permute_thread(THREADS_NUM, core_num, kk);
+				hdc_permute_thread(THREADS_NUM, kk);
 				// ------------------------------------------------------
 
 				// pxor ---------------------------------------------
-				hdc_pxor_thread(THREADS_NUM, core_num);
+				hdc_pxor_thread(THREADS_NUM);
 				// ------------------------------------------------------
 
 				// store ---------------------------------------------
-				hdc_move_thread(THREADS_NUM, core_num);
+				hdc_move_thread(THREADS_NUM);
 				// ------------------------------------------------------
 			}
 
@@ -401,37 +346,33 @@ int main(int argc, char const *argv[])
 			nn = LAST + (NGRAM - 1);
 			for (int k = 0; k < THREADS_NUM; k++)
 			{
-				for (int i = 0; i < core_num; i++)
-				{
-					addr_array[k][i] = content[nn] - 97;
-					nn++;
-				}
+				addr_array[k] = content[nn++] - 97;
 			}
 
 			// load ---------------------------------------------
-			hdc_load_thread(THREADS_NUM, core_num, addr_array);
+			hdc_load_thread(THREADS_NUM, addr_array);
 			// ------------------------------------------------------
 
 			// permute ---------------------------------------------
-			hdc_permute_thread(THREADS_NUM, core_num, NGRAM - 1);
+			hdc_permute_thread(THREADS_NUM, NGRAM - 1);
 			// ------------------------------------------------------
 
 			// pxor ---------------------------------------------
-			hdc_pxor_thread(THREADS_NUM, core_num);
+			hdc_pxor_thread(THREADS_NUM);
 			// ------------------------------------------------------
 
 			// store ---------------------------------------------
-			hdc_store_thread(THREADS_NUM, core_num);
+			hdc_store_thread(THREADS_NUM);
 			// ------------------------------------------------------
 		}
 
 		// 偶数処理
 		if (EVEN)
 		{
-			uint16_t addr_array[1][1] = {{MAJORITY_ADDR}};
-			hdc_load_thread(1, 1, addr_array);
+			uint16_t addr_array[1] = {MAJORITY_ADDR};
+			hdc_load_thread(1, addr_array);
 
-			hdc_store_thread(1, 1);
+			hdc_store_thread(1);
 		}
 
 		// hdc_print();
@@ -444,11 +385,11 @@ int main(int argc, char const *argv[])
 		// END_COMPUTE = clock();
 		// COM_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 
-		// // 結果確認
-		// for (int j = 0; j < 32; j++)
-		// {
-		// 	printf("  %u\n", dst[j]);
-		// }
+		// 結果確認
+		for (int j = 0; j < 32; j++)
+		{
+			printf("  %u\n", dst[j]);
+		}
 
 		// 終了処理
 		hdc_finish();
