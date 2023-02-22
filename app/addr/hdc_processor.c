@@ -211,7 +211,8 @@ void hdc_com_gen(uint32_t num)
 
 void hdc_nop(void)
 {
-	src[SEND_NUM++] = 0;
+	src[SEND_NUM] = 0;
+	SEND_NUM += 2;
 }
 
 // Load =========================================================================================
@@ -298,7 +299,8 @@ void hdc_pmove_thread(uint16_t thread_num)
 
 void hdc_permute(uint16_t permute_num)
 {
-	src[SEND_NUM++] = 34816 | permute_num;
+	src[SEND_NUM] = 34816 | permute_num;
+	SEND_NUM += 2;
 }
 
 void hdc_permute_thread(uint16_t thread_num, uint16_t permute_num)
