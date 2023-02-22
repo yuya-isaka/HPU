@@ -27,7 +27,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
   // 偶数処理
   if (EVEN)
   {
-    uint16_t addr_array[1] = {{MAJORITY_ADDR}};
+    uint16_t addr_array[1] = {MAJORITY_ADDR};
     hdc_load_thread(1, 1, addr_array);
 
     hdc_store_thread(1, 1);
@@ -38,11 +38,13 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
   {
     uint16_t core_num = CORENUM;
     uint16_t addr_array[THREADS_NUM];
+    // printf("\n");
 
     // アドレス
     for (uint16_t k = 0; k < THREADS_NUM; k++)
     {
-      addr_array[k] = NGRAM + j + (NGRAM * core_num * k);
+      addr_array[k] = j + (NGRAM * core_num * k);
+      // printf("%d : ", addr_array[k]);
     }
 
     // load ---------------------------------------------
@@ -57,6 +59,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
     for (int k = 0; k < THREADS_NUM; k++)
     {
       addr_array[k]++;
+      // printf("%d : ", addr_array[k]);
     }
 
     // load ---------------------------------------------
@@ -79,6 +82,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
     for (int k = 0; k < THREADS_NUM; k++)
     {
       addr_array[k]++;
+      // printf("%d : ", addr_array[k]);
     }
 
     // load ---------------------------------------------
