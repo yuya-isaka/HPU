@@ -13,7 +13,6 @@
 void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR, const int IMEM_SIZE)
 {
   const int EPOCH = (ADDRNUM / NGRAM) / THREADS_NUM;
-  const int REMAINDAR = (ADDRNUM / NGRAM) % THREADS_NUM;
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
   const int LAST = EPOCH * NGRAM * THREADS_NUM;
 
@@ -27,9 +26,9 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR, const in
   if (EVEN)
   {
     uint32_t addr_array[1] = {MAJORITY_ADDR};
-    hdc_load_1(1, addr_array);
+    hdc_load_1_thread(1, addr_array);
 
-    hdc_store_1(1);
+    hdc_bound_1_thread(1);
   }
 
   // LASTまで繰り返す
@@ -45,7 +44,7 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR, const in
     }
 
     // load ---------------------------------------------
-    hdc_load_1(THREADS_NUM, addr_array);
+    hdc_load_1(addr_array);
     // ------------------------------------------------------
 
     // アドレス
@@ -55,15 +54,15 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR, const in
     }
 
     // load ---------------------------------------------
-    hdc_load_2(THREADS_NUM, addr_array);
+    hdc_load_2(addr_array);
     // ------------------------------------------------------
 
     // permute ---------------------------------------------
-    hdc_permute_2(THREADS_NUM, 1);
+    hdc_permute_2(1);
     // ------------------------------------------------------
 
-    // pxor ---------------------------------------------
-    hdc_xor_p11(THREADS_NUM);
+    // bind ---------------------------------------------
+    hdc_bind_p11();
     // ------------------------------------------------------
 
     // アドレス
@@ -73,75 +72,19 @@ void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR, const in
     }
 
     // load ---------------------------------------------
-    hdc_load_2(THREADS_NUM, addr_array);
+    hdc_load_2(addr_array);
     // ------------------------------------------------------
 
     // permute ---------------------------------------------
-    hdc_permute_2(THREADS_NUM, 2);
+    hdc_permute_2(2);
     // ------------------------------------------------------
 
-    // pxor ---------------------------------------------
-    hdc_xor_p11(THREADS_NUM);
+    // bind ---------------------------------------------
+    hdc_bind_p11();
     // ------------------------------------------------------
 
     // store ---------------------------------------------
-    hdc_store_1(THREADS_NUM);
-    // ------------------------------------------------------
-  }
-
-  // 余り
-  if (REMAINDAR != 0)
-  {
-    uint32_t addr_array[THREADS_NUM];
-
-    // アドレス
-    for (int k = 0; k < THREADS_NUM; k++)
-    {
-      addr_array[k] = NGRAM + LAST + (NGRAM * k);
-    }
-
-    // load ---------------------------------------------
-    hdc_load_1(THREADS_NUM, addr_array);
-    // ------------------------------------------------------
-
-    // アドレス
-    for (int k = 0; k < THREADS_NUM; k++)
-    {
-      addr_array[k]++;
-    }
-
-    // load ---------------------------------------------
-    hdc_load_2(THREADS_NUM, addr_array);
-    // ------------------------------------------------------
-
-    // permute ---------------------------------------------
-    hdc_permute_2(THREADS_NUM, 1);
-    // ------------------------------------------------------
-
-    // pxor ---------------------------------------------
-    hdc_xor_p11(THREADS_NUM);
-    // ------------------------------------------------------
-
-    // アドレス
-    for (int k = 0; k < THREADS_NUM; k++)
-    {
-      addr_array[k]++;
-    }
-
-    // load ---------------------------------------------
-    hdc_load_2(THREADS_NUM, addr_array);
-    // ------------------------------------------------------
-
-    // permute ---------------------------------------------
-    hdc_permute_2(THREADS_NUM, 2);
-    // ------------------------------------------------------
-
-    // pxor ---------------------------------------------
-    hdc_xor_p11(THREADS_NUM);
-    // ------------------------------------------------------
-
-    // store ---------------------------------------------
-    hdc_store_1(THREADS_NUM);
+    hdc_bound_1();
     // ------------------------------------------------------
   }
 

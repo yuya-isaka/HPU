@@ -204,7 +204,16 @@ void hdc_nop(void)
 
 // load.1 =========================================================================================
 
-void hdc_load_1(uint32_t thread_num, uint32_t addr_array[thread_num])
+void hdc_load_1(uint32_t addr_array[THREADS_NUM])
+{
+	src[SEND_NUM++] = 2147487744 | addr_array[0];
+	src[SEND_NUM++] = 2147487744 | addr_array[1];
+	src[SEND_NUM++] = 2147487744 | addr_array[2];
+	src[SEND_NUM++] = 2147487744 | addr_array[3];
+	src[SEND_NUM++] = 2147487744 | addr_array[4];
+}
+
+void hdc_load_1_thread(uint32_t thread_num, uint32_t addr_array[thread_num])
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -218,7 +227,16 @@ void hdc_load_1(uint32_t thread_num, uint32_t addr_array[thread_num])
 
 // xor.121 =========================================================================================
 
-void hdc_xor_121(uint32_t thread_num)
+void hdc_bind_121(void)
+{
+	src[SEND_NUM++] = 2147491840;
+	src[SEND_NUM++] = 2147491840;
+	src[SEND_NUM++] = 2147491840;
+	src[SEND_NUM++] = 2147491840;
+	src[SEND_NUM++] = 2147491840;
+}
+
+void hdc_bind_121_thread(uint32_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -232,7 +250,16 @@ void hdc_xor_121(uint32_t thread_num)
 
 // xor.p21 =========================================================================================
 
-void hdc_xor_p21(uint32_t thread_num)
+void hdc_bind_p21(void)
+{
+	src[SEND_NUM++] = 2147500032;
+	src[SEND_NUM++] = 2147500032;
+	src[SEND_NUM++] = 2147500032;
+	src[SEND_NUM++] = 2147500032;
+	src[SEND_NUM++] = 2147500032;
+}
+
+void hdc_bind_p21_thread(uint32_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -246,7 +273,16 @@ void hdc_xor_p21(uint32_t thread_num)
 
 // xor.p11 =========================================================================================
 
-void hdc_xor_p11(uint32_t thread_num)
+void hdc_bind_p11(void)
+{
+	src[SEND_NUM++] = 2147516416;
+	src[SEND_NUM++] = 2147516416;
+	src[SEND_NUM++] = 2147516416;
+	src[SEND_NUM++] = 2147516416;
+	src[SEND_NUM++] = 2147516416;
+}
+
+void hdc_bind_p11_thread(uint32_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -260,7 +296,16 @@ void hdc_xor_p11(uint32_t thread_num)
 
 // move.21 =========================================================================================
 
-void hdc_move_21(uint32_t thread_num)
+void hdc_move_21(void)
+{
+	src[SEND_NUM++] = 2147549184;
+	src[SEND_NUM++] = 2147549184;
+	src[SEND_NUM++] = 2147549184;
+	src[SEND_NUM++] = 2147549184;
+	src[SEND_NUM++] = 2147549184;
+}
+
+void hdc_move_21_thread(uint32_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -274,7 +319,16 @@ void hdc_move_21(uint32_t thread_num)
 
 // move.p1 =========================================================================================
 
-void hdc_move_p1(uint32_t thread_num)
+void hdc_move_p1(void)
+{
+	src[SEND_NUM++] = 2147614720;
+	src[SEND_NUM++] = 2147614720;
+	src[SEND_NUM++] = 2147614720;
+	src[SEND_NUM++] = 2147614720;
+	src[SEND_NUM++] = 2147614720;
+}
+
+void hdc_move_p1_thread(uint32_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -288,7 +342,16 @@ void hdc_move_p1(uint32_t thread_num)
 
 // load.2 =========================================================================================
 
-void hdc_load_2(uint32_t thread_num, uint32_t addr_array[thread_num])
+void hdc_load_2(uint32_t addr_array[THREADS_NUM])
+{
+	src[SEND_NUM++] = 1073745920 | addr_array[0];
+	src[SEND_NUM++] = 1073745920 | addr_array[1];
+	src[SEND_NUM++] = 1073745920 | addr_array[2];
+	src[SEND_NUM++] = 1073745920 | addr_array[3];
+	src[SEND_NUM++] = 1073745920 | addr_array[4];
+}
+
+void hdc_load_2_thread(uint32_t thread_num, uint32_t addr_array[thread_num])
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -302,7 +365,16 @@ void hdc_load_2(uint32_t thread_num, uint32_t addr_array[thread_num])
 
 // xor.122 =========================================================================================
 
-void hdc_xor_122(uint32_t thread_num)
+void hdc_bind_122(void)
+{
+	src[SEND_NUM++] = 1073750016;
+	src[SEND_NUM++] = 1073750016;
+	src[SEND_NUM++] = 1073750016;
+	src[SEND_NUM++] = 1073750016;
+	src[SEND_NUM++] = 1073750016;
+}
+
+void hdc_bind_122_thread(uint32_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -316,7 +388,16 @@ void hdc_xor_122(uint32_t thread_num)
 
 // xor.p22 =========================================================================================
 
-void hdc_xor_p22(uint32_t thread_num)
+void hdc_bind_p22(void)
+{
+	src[SEND_NUM++] = 1073758208;
+	src[SEND_NUM++] = 1073758208;
+	src[SEND_NUM++] = 1073758208;
+	src[SEND_NUM++] = 1073758208;
+	src[SEND_NUM++] = 1073758208;
+}
+
+void hdc_bind_p22_thread(uint32_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -330,7 +411,16 @@ void hdc_xor_p22(uint32_t thread_num)
 
 // xor.p12 =========================================================================================
 
-void hdc_xor_p12(uint32_t thread_num)
+void hdc_bind_p12(void)
+{
+	src[SEND_NUM++] = 1073774592;
+	src[SEND_NUM++] = 1073774592;
+	src[SEND_NUM++] = 1073774592;
+	src[SEND_NUM++] = 1073774592;
+	src[SEND_NUM++] = 1073774592;
+}
+
+void hdc_bind_p12_thread(uint32_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -344,7 +434,16 @@ void hdc_xor_p12(uint32_t thread_num)
 
 // move.12 =========================================================================================
 
-void hdc_move_12(uint32_t thread_num)
+void hdc_move_12(void)
+{
+	src[SEND_NUM++] = 1073807360;
+	src[SEND_NUM++] = 1073807360;
+	src[SEND_NUM++] = 1073807360;
+	src[SEND_NUM++] = 1073807360;
+	src[SEND_NUM++] = 1073807360;
+}
+
+void hdc_move_12_thread(uint32_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -358,7 +457,16 @@ void hdc_move_12(uint32_t thread_num)
 
 // move.p2 =========================================================================================
 
-void hdc_move_p2(uint32_t thread_num)
+void hdc_move_p2(void)
+{
+	src[SEND_NUM++] = 1073872896;
+	src[SEND_NUM++] = 1073872896;
+	src[SEND_NUM++] = 1073872896;
+	src[SEND_NUM++] = 1073872896;
+	src[SEND_NUM++] = 1073872896;
+}
+
+void hdc_move_p2_thread(uint32_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -372,7 +480,16 @@ void hdc_move_p2(uint32_t thread_num)
 
 // permute_2 =========================================================================================
 
-void hdc_permute_2(uint32_t thread_num, uint32_t permute_num)
+void hdc_permute_2(uint32_t permute_num)
+{
+	src[SEND_NUM++] = 536875008 | permute_num;
+	src[SEND_NUM++] = 536875008 | permute_num;
+	src[SEND_NUM++] = 536875008 | permute_num;
+	src[SEND_NUM++] = 536875008 | permute_num;
+	src[SEND_NUM++] = 536875008 | permute_num;
+}
+
+void hdc_permute_2_thread(uint32_t thread_num, uint32_t permute_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -386,7 +503,16 @@ void hdc_permute_2(uint32_t thread_num, uint32_t permute_num)
 
 // permute_1 =========================================================================================
 
-void hdc_permute_1(uint32_t thread_num, uint32_t permute_num)
+void hdc_permute_1(uint32_t permute_num)
+{
+	src[SEND_NUM++] = 536870912 | permute_num;
+	src[SEND_NUM++] = 536870912 | permute_num;
+	src[SEND_NUM++] = 536870912 | permute_num;
+	src[SEND_NUM++] = 536870912 | permute_num;
+	src[SEND_NUM++] = 536870912 | permute_num;
+}
+
+void hdc_permute_1_thread(uint32_t thread_num, uint32_t permute_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -412,9 +538,18 @@ void hdc_permute_1_unit(uint32_t permute_num)
 	src[SEND_NUM++] = 536870912 | permute_num;
 }
 
-// store.2 =========================================================================================
+// bound.2 =========================================================================================
 
-void hdc_store_2(uint32_t thread_num)
+void hdc_bound_2(void)
+{
+	src[SEND_NUM++] = 268439552;
+	src[SEND_NUM++] = 268439552;
+	src[SEND_NUM++] = 268439552;
+	src[SEND_NUM++] = 268439552;
+	src[SEND_NUM++] = 268439552;
+}
+
+void hdc_bound_2_thread(uint32_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -426,9 +561,18 @@ void hdc_store_2(uint32_t thread_num)
 	}
 }
 
-// store.1 =========================================================================================
+// bound.1 =========================================================================================
 
-void hdc_store_1(uint32_t thread_num)
+void hdc_bound_1(void)
+{
+	src[SEND_NUM++] = 268443648;
+	src[SEND_NUM++] = 268443648;
+	src[SEND_NUM++] = 268443648;
+	src[SEND_NUM++] = 268443648;
+	src[SEND_NUM++] = 268443648;
+}
+
+void hdc_bound_1_thread(uint32_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
@@ -440,9 +584,18 @@ void hdc_store_1(uint32_t thread_num)
 	}
 }
 
-// store.p =========================================================================================
+// bound.p =========================================================================================
 
-void hdc_store_p(uint32_t thread_num)
+void hdc_bound_p(void)
+{
+	src[SEND_NUM++] = 268451840;
+	src[SEND_NUM++] = 268451840;
+	src[SEND_NUM++] = 268451840;
+	src[SEND_NUM++] = 268451840;
+	src[SEND_NUM++] = 268451840;
+}
+
+void hdc_bound_p_thread(uint32_t thread_num)
 {
 	for (int k = 0; k < thread_num; k++)
 	{
