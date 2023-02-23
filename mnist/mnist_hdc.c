@@ -133,28 +133,28 @@ int main()
 		{
 			int index_num = 0;
 
-			// 500
-			for (int j = 0; j < 500 / THREADS_NUM; j++)
+			// FIRST_RAND_NUM / THREADS_NUM
+			for (int j = 0; j < 100; j++)
 			{
-				uint16_t addr_array[THREADS_NUM];
+				uint32_t addr_array[THREADS_NUM];
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
 					addr_array[k] = index_num++;
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, addr_array);
+				hdc_load_1(addr_array);
 				// ------------------------------------------------------
 
 				// permute ---------------------------------------------
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					hdc_permute((data_lines[dd++] - '0'));
+					hdc_permute_1_unit((data_lines[dd++] - '0'));
 				}
 				// ------------------------------------------------------
 
-				// store ---------------------------------------------
-				hdc_pstore_thread(THREADS_NUM);
+				// bound ---------------------------------------------
+				hdc_bound_p();
 				// ------------------------------------------------------
 			}
 			dd += SECOND_RAND_NUM;
@@ -190,48 +190,48 @@ int main()
 			dd += FIRST_RAND_NUM;
 			int index_num = 0;
 
-			// 280
-			for (int j = 0; j < 280 / THREADS_NUM; j++)
+			// SECOND_RAND_NUM / THREADS_NUM
+			for (int j = 0; j < 56; j++)
 			{
-				uint16_t addr_array[THREADS_NUM];
+				uint32_t addr_array[THREADS_NUM];
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
 					addr_array[k] = index_num++;
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, addr_array);
+				hdc_load_1(addr_array);
 				// ------------------------------------------------------
 
 				// permute ---------------------------------------------
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
-					hdc_permute((data_lines[dd++] - '0'));
+					hdc_permute_1_unit((data_lines[dd++] - '0'));
 				}
 				// ------------------------------------------------------
 
-				// store ---------------------------------------------
-				hdc_pstore_thread(THREADS_NUM);
+				// bound ---------------------------------------------
+				hdc_bound_p();
 				// ------------------------------------------------------
 			}
 
 			// 残り 4
-			uint16_t thread_num = 4;
+			uint32_t thread_num = 4;
 
-			uint16_t addr_array[thread_num];
+			uint32_t addr_array[thread_num];
 			for (int k = 0; k < thread_num; k++)
 			{
 				addr_array[k] = index_num++;
 			}
 
 			// load ---------------------------------------------
-			hdc_load_thread(thread_num, addr_array);
+			hdc_load_1_thread(thread_num, addr_array);
 			// ------------------------------------------------------
 
 			// permute ---------------------------------------------
 			for (int k = 0; k < thread_num; k++)
 			{
-				hdc_permute((data_lines[dd++] - '0'));
+				hdc_permute_1_unit((data_lines[dd++] - '0'));
 			}
 			for (int k = thread_num; k < THREADS_NUM; k++)
 			{
@@ -239,8 +239,8 @@ int main()
 			}
 			// ------------------------------------------------------
 
-			// pstore ---------------------------------------------
-			hdc_pstore_thread(thread_num);
+			// bound ---------------------------------------------
+			hdc_bound_p_thread(thread_num);
 			// ------------------------------------------------------
 		}
 
