@@ -209,9 +209,10 @@ int main()
 		{
 			int index_tmp = 0;
 
-			for (int j = 0; j < FIRST_RAND_NUM / THREADS_NUM; j++)
+			// FIRST_RAND_NUM / THREADS_NUM
+			for (int j = 0; j < 100; j++)
 			{
-				uint16_t addr_array[THREADS_NUM];
+				uint32_t addr_array[THREADS_NUM];
 
 				for (int k = 0; k < THREADS_NUM; k++)
 				{
@@ -219,11 +220,7 @@ int main()
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, addr_array);
-				// ------------------------------------------------------
-
-				// move --------------------------------------------
-				hdc_move_thread(THREADS_NUM);
+				hdc_load_1(addr_array);
 				// ------------------------------------------------------
 
 				for (int k = 0; k < THREADS_NUM; k++)
@@ -232,15 +229,15 @@ int main()
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, addr_array);
+				hdc_load_2(addr_array);
 				// ------------------------------------------------------
 
 				// bind ----------------------------------------------
-				hdc_xor_thread(THREADS_NUM);
+				hdc_bind_121();
 				// ------------------------------------------------------
 
-				// store ---------------------------------------------
-				hdc_store_thread(THREADS_NUM);
+				// bound ---------------------------------------------
+				hdc_bound_1();
 				// ------------------------------------------------------
 			}
 			dd += SECOND_RAND_NUM;
@@ -281,10 +278,10 @@ int main()
 			dd += FIRST_RAND_NUM;
 			int index_tmp = 0;
 
-			// 125
-			for (int j = 0; j < 115 / THREADS_NUM; j++)
+			// 115 / THREADS_NUM
+			for (int j = 0; j < 23; j++)
 			{
-				uint16_t addr_array[THREADS_NUM];
+				uint32_t addr_array[THREADS_NUM];
 
 				// 70
 				for (int k = 0; k < THREADS_NUM; k++)
@@ -293,11 +290,7 @@ int main()
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, addr_array);
-				// ------------------------------------------------------
-
-				// move --------------------------------------------
-				hdc_move_thread(THREADS_NUM);
+				hdc_load_1(addr_array);
 				// ------------------------------------------------------
 
 				// 70
@@ -307,23 +300,23 @@ int main()
 				}
 
 				// load ---------------------------------------------
-				hdc_load_thread(THREADS_NUM, addr_array);
+				hdc_load_2(addr_array);
 				// ------------------------------------------------------
 
 				// bind ----------------------------------------------
-				hdc_xor_thread(THREADS_NUM);
+				hdc_bind_121();
 				// ------------------------------------------------------
 
-				// store ---------------------------------------------
-				hdc_store_thread(THREADS_NUM);
+				// bound ---------------------------------------------
+				hdc_bound_1();
 				// ------------------------------------------------------
 			}
 
 			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 			// 2
-			uint16_t thread_num = 2;
-			uint16_t addr_array[thread_num];
+			uint32_t thread_num = 2;
+			uint32_t addr_array[thread_num];
 
 			for (int k = 0; k < thread_num; k++)
 			{
@@ -331,11 +324,7 @@ int main()
 			}
 
 			// load ---------------------------------------------
-			hdc_load_thread(thread_num, addr_array);
-			// ------------------------------------------------------
-
-			// move --------------------------------------------
-			hdc_move_thread(thread_num);
+			hdc_load_1_thread(thread_num, addr_array);
 			// ------------------------------------------------------
 
 			// 70
@@ -345,15 +334,15 @@ int main()
 			}
 
 			// load ---------------------------------------------
-			hdc_load_thread(thread_num, addr_array);
+			hdc_load_2_thread(thread_num, addr_array);
 			// ------------------------------------------------------
 
 			// bind ----------------------------------------------
-			hdc_xor_thread(thread_num);
+			hdc_bind_121_thread(thread_num);
 			// ------------------------------------------------------
 
-			// store ---------------------------------------------
-			hdc_store_thread(thread_num);
+			// bound ---------------------------------------------
+			hdc_bound_1_thread(thread_num);
 			// ------------------------------------------------------
 		}
 
