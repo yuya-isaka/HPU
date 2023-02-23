@@ -101,11 +101,11 @@ int main(int argc, char const *argv[])
 		}
 
 		// load ---------------------------------------------
-		hdc_load_thread(THREADS_NUM, addr_array);
+		hdc_load_1(THREADS_NUM, addr_array);
 		// ------------------------------------------------------
 
-		// store ---------------------------------------------
-		hdc_store_thread(THREADS_NUM);
+		// bound ---------------------------------------------
+		hdc_bound_1(THREADS_NUM);
 		// ------------------------------------------------------
 	}
 

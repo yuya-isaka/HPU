@@ -102,11 +102,11 @@ int main(int argc, char const *argv[])
 		}
 
 		// load ---------------------------------------------
-		hdc_load_thread(THREADS_NUM, addr_array);
+		hdc_load_1(THREADS_NUM, addr_array);
 		// ------------------------------------------------------
 
 		// perm ---------------------------------------------
-		hdc_permute_thread(THREADS_NUM, perm_array[perm_array_num]);
+		hdc_permute_1(THREADS_NUM, perm_array[perm_array_num]);
 		// ------------------------------------------------------
 	}
 
