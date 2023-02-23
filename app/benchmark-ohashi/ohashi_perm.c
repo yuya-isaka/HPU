@@ -1,7 +1,7 @@
 // include
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h> // uint16_t
+#include <stdint.h> // uint32_t
 #include <string.h>
 #include <fcntl.h>	  // open
 #include <unistd.h>	  // read
@@ -89,7 +89,7 @@ int main(int argc, char const *argv[])
 	RAN_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 	/////////////////////////////////////////////////////////////////////////////
 
-	uint16_t addr_array[THREADS_NUM];
+	uint32_t addr_array[THREADS_NUM];
 
 	for (int ll = 0; ll < TRIAL_NUM; ll += THREADS_NUM)
 	{
@@ -102,11 +102,11 @@ int main(int argc, char const *argv[])
 		}
 
 		// load ---------------------------------------------
-		hdc_load_1(THREADS_NUM, addr_array);
+		hdc_load_1(addr_array);
 		// ------------------------------------------------------
 
 		// perm ---------------------------------------------
-		hdc_permute_1(THREADS_NUM, perm_array[perm_array_num]);
+		hdc_permute_1(perm_array[perm_array_num]);
 		// ------------------------------------------------------
 	}
 

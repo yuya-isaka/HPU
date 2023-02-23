@@ -1,7 +1,7 @@
 // include
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h> // uint16_t
+#include <stdint.h> // uint32_t
 #include <string.h>
 #include <fcntl.h>	  // open
 #include <unistd.h>	  // read
@@ -88,7 +88,7 @@ int main(int argc, char const *argv[])
 	/////////////////////////////////////////////////////////////////////////////
 
 	int rand_array_num = 0;
-	uint16_t addr_array[THREADS_NUM];
+	uint32_t addr_array[THREADS_NUM];
 
 	for (int ll = 0; ll < TRIAL_NUM; ll += THREADS_NUM)
 	{
@@ -101,11 +101,11 @@ int main(int argc, char const *argv[])
 		}
 
 		// load ---------------------------------------------
-		hdc_load_1(THREADS_NUM, addr_array);
+		hdc_load_1(addr_array);
 		// ------------------------------------------------------
 
 		// bound ---------------------------------------------
-		hdc_bound_1(THREADS_NUM);
+		hdc_bound_1();
 		// ------------------------------------------------------
 	}
 
@@ -114,10 +114,11 @@ int main(int argc, char const *argv[])
 
 	hdc_compute();
 
-	for (int i = 0; i < 32; i++)
-	{
-		printf("  %u\n", dst[i]);
-	}
+	// // デバッグ
+	// for (int i = 0; i < 32; i++)
+	// {
+	// 	printf("  %u\n", dst[i]);
+	// }
 
 	hdc_finish();
 
