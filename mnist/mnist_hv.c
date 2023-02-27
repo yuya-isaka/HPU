@@ -118,12 +118,12 @@ int main()
 		free(data_lines);
 	}
 
-	// for (int i = 0; i < 10; i++)
-	// {
-	// 	printf("%d:\n", i);
-	// 	hv_print(result[i]);
-	// 	printf("\n");
-	// }
+	for (int i = 0; i < 10; i++)
+	{
+		printf("%d:\n", i);
+		hv_print(result[i]);
+		printf("\n");
+	}
 
 	hv_free_array(result, 10);
 	hv_free_array(item_memory, RAND_NUM);

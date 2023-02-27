@@ -8,7 +8,7 @@ module central_core
          // ハイパーベクトルの次元数
          parameter DIM = 1023,
 
-         parameter THREADS = 10,
+         parameter THREADS = 5,
 
          parameter WI = 31
 
@@ -18,17 +18,15 @@ module central_core
          // in
          input wire                         clk,
          input wire                         run,
-         input wire                         gen,
-         input wire                         reset_item,
-         input wire [ 8:0 ]                 item_memory_num,
+         input wire                         com,
          input wire                         get_v,
+         input wire                         get_c,
          // 16bit命令
-         input wire [ 15:0 ]                get_d,
+         input wire [ 31:0 ]                get_d_all,
          input wire                         exec,
 
 
          // out
-         output logic                       finish_gen,
          output reg                         store,
          output logic [ DIM:0 ]             core_result,
          output reg                         last
@@ -60,7 +58,7 @@ module central_core
                   // 読み出し
                   // 常に垂れ流しで読み出しでOK
                   // (必要ない場合は使わない)
-                  reg_0 <= item_memory[ get_d[ 8:0 ] ];
+                  reg_0 <= item_memory[ get_d_all[ 8:0 ] ];
 
               end;
 
@@ -121,7 +119,7 @@ module central_core
 
 
     // 命令
-    reg [ 15:0 ]                inst;
+    reg [ 31:0 ]                inst;
 
     always_ff @( posedge clk ) begin
 
@@ -135,7 +133,7 @@ module central_core
                   // データ受信時実行
                   else if ( get_v ) begin
 
-                      inst <= get_d[ 15:0 ];
+                      inst <= get_d_all[ 31:0 ];
 
                   end
 
@@ -155,6 +153,25 @@ module central_core
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+    logic [ DIM:0 ]         permute_reg_data;
+
+    always_comb begin
+
+                    if ( inst[ 12 ] ) begin
+
+                        permute_reg_data = reg_2;
+
+                    end
+
+                    else begin
+
+                        permute_reg_data = reg_1;
+
+                    end
+
+                end;
+
+
     wire [ DIM:0 ]          permute_reg_result;
 
     // 次元数可変
@@ -166,7 +183,7 @@ module central_core
                 // in
                 .clk( clk ),
                 .exec( exec ),
-                .data( reg_2[ DIM:0 ] ),
+                .data( permute_reg_data[ DIM:0 ] ),
                 .permute_num( inst[ 9:0 ] ),
 
 
@@ -183,6 +200,53 @@ module central_core
     // reg_0はその度にロードされるから保持しなくていい
 
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    logic [ DIM:0 ]         reg_to_reg1;
+
+    always_comb begin
+
+                    if ( inst[ 12 ] ) begin
+
+                        reg_to_reg1 = reg_0;
+
+                    end
+
+                    else if ( inst[ 13 ] ) begin
+
+                        reg_to_reg1 = reg_1 ^ reg_2;
+
+                    end
+
+                    else if ( inst[ 14 ] ) begin
+
+                        reg_to_reg1 = permute_reg_result ^ reg_2;
+
+                    end
+
+                    else if ( inst[ 15 ] ) begin
+
+                        reg_to_reg1 = permute_reg_result ^ reg_1;
+
+                    end
+
+                    else if ( inst[ 16 ] ) begin
+
+                        reg_to_reg1 = reg_2;
+
+                    end
+
+                    // else if ( inst[ 17 ] ) begin
+                    else begin
+
+                        reg_to_reg1 = permute_reg_result;
+
+                    end
+
+                end;
+
+
     // レジスタ１
     (* ram_style = "block" *)
     reg [ DIM:0 ]           reg_1_threads [ THREADS-1:0 ];
@@ -191,9 +255,9 @@ module central_core
 
     always_ff @( posedge clk ) begin
 
-                  if ( exec & ~inst[ 15 ] & inst[ 11 ] ) begin
+                  if ( exec & inst[ 31] ) begin
 
-                      reg_1_threads[ thread_count ] <= reg_2_tmp;
+                      reg_1_threads[ thread_count ] <= reg_to_reg1;
 
                   end
 
@@ -205,39 +269,44 @@ module central_core
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    logic [ DIM:0 ]         reg_2_tmp;
+    logic [ DIM:0 ]         reg_to_reg2;
 
     always_comb begin
 
-                    if ( inst[ 14 ] ) begin
+                    if ( inst[ 12 ] ) begin
 
-                        reg_2_tmp = permute_reg_result;
+                        reg_to_reg2 = reg_0;
 
                     end
 
+                    else if ( inst[ 13 ] ) begin
+
+                        reg_to_reg2 = reg_1 ^ reg_2;
+
+                    end
+
+                    else if ( inst[ 14 ] ) begin
+
+                        reg_to_reg2 = permute_reg_result ^ reg_2;
+
+                    end
+
+                    else if ( inst[ 15 ] ) begin
+
+                        reg_to_reg2 = permute_reg_result ^ reg_1;
+
+                    end
+
+                    else if ( inst[ 16 ] ) begin
+
+                        reg_to_reg2 = reg_1;
+
+                    end
+
+                    // else if ( inst[ 17 ] ) begin
                     else begin
 
-                        reg_2_tmp = reg_2;
-
-                    end
-
-                end;
-
-
-
-    logic [ DIM:0 ]         reg_for_inst_13;
-
-    always_comb begin
-
-                    if ( inst[ 15 ] ) begin
-
-                        reg_for_inst_13 = reg_0;
-
-                    end
-
-                    else begin
-
-                        reg_for_inst_13 = reg_1 ^ reg_2_tmp;
+                        reg_to_reg2 = permute_reg_result;
 
                     end
 
@@ -252,9 +321,9 @@ module central_core
 
     always_ff @( posedge clk ) begin
 
-                  if ( exec & inst[ 13 ] ) begin
+                  if ( exec & inst[ 30 ] ) begin
 
-                      reg_2_threads[ thread_count ] <= reg_for_inst_13;
+                      reg_2_threads[ thread_count ] <= reg_to_reg2;
 
                   end
 
@@ -285,45 +354,48 @@ module central_core
                   // 187MHzはexec->reg2がボトルネックだった
                   else if ( exec ) begin
 
-                      // アドレス必要
-                      if ( inst[ 15 ] ) begin
-
-                          buff <= 0;
-                          store <= 0;
-                          last <= 0;
-
-                      end
-
-                      // アドレスいらん
-                      else begin
+                      if ( inst[ 28 ] ) begin
 
                           // store
                           if ( inst[ 12 ] ) begin
 
-                              buff <= reg_2_tmp;
+                              buff <= reg_2;
+                              store <= 1;
+                              last <= 0;
+
+                          end
+
+                          else if ( inst[ 13 ] ) begin
+
+                              buff <= reg_1;
+                              store <= 1;
+                              last <= 0;
+
+                          end
+
+                          else if ( inst[ 14 ] ) begin
+
+                              buff <= permute_reg_result;
                               store <= 1;
                               last <= 0;
 
                           end
 
                           // last
-                          else if ( inst[ 8 ] ) begin
+                          else if ( inst[ 15 ] ) begin
 
                               last <= 1;
                               buff <= 0;
                               store <= 0;
 
                           end
+                      end
 
-                          // nop (すべて0のはず)
-                          // (reg1やreg2の値は保持)
-                          else begin
+                      else begin
 
-                              buff <= 0;
-                              store <= 0;
-                              last <= 0;
-
-                          end
+                          buff <= 0;
+                          store <= 0;
+                          last <= 0;
 
                       end
 
@@ -378,7 +450,7 @@ module central_core
 
     always_ff @( posedge clk ) begin
 
-                  if ( ~gen ) begin
+                  if ( ~com ) begin
 
                       update_item <= 0;
 
@@ -406,7 +478,7 @@ module central_core
 
     always_ff @( posedge clk ) begin
 
-                  if ( ~gen ) begin
+                  if ( ~com ) begin
 
                       item_a <= 0;
 
@@ -424,26 +496,6 @@ module central_core
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    // xorshiftモジュールから生成される32bitのランダム値
-    wire [ 31:0 ]         rand_num_tmp;
-
-    xorshift prng
-             (
-
-                 // in
-                 .clk( clk ),
-                 .gen( gen ),
-                 .reset_item( reset_item ),
-
-                 // out
-                 .rand_num( rand_num_tmp[ 31:0 ] )
-
-             );
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
     // 32bitのランダム値の生成数
     // (1024bitのハイパーベクトルが生成される場合、32個生成）
     // (現状最大で32個なので、5bit幅)
@@ -451,13 +503,13 @@ module central_core
 
     always_ff @( posedge clk ) begin
 
-                  if ( ~gen ) begin
+                  if ( ~com ) begin
 
                       item_a_tmp <= 0;
 
                   end
 
-                  else begin
+                  else if ( get_c ) begin
 
                       if ( item_a_tmp == WI ) begin
 
@@ -477,218 +529,215 @@ module central_core
 
 
 
-    // xorshiftから生成されたランダム値(rand_num_tmp)の格納先
     // (ハイパーベクトル次元数が1024なら、31回別々に格納する)
     reg [ DIM:0 ]       rand_num;
 
     always_ff @( posedge clk ) begin
 
-                  if ( ~gen ) begin
+                  if ( ~com ) begin
 
                       rand_num <= 0;
 
                   end
 
-                  // 次元数可変
-                  else if ( item_a_tmp == 0 ) begin
+                  else if ( com & get_c ) begin
 
-                      rand_num[ 31:0 ] <= rand_num_tmp;
+                      // 次元数可変
+                      if ( item_a_tmp == 0 ) begin
 
-                  end
+                          rand_num[ 31:0 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 1 ) begin
+                      end
 
-                      rand_num[ 63:32 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 1 ) begin
 
-                  end
+                          rand_num[ 63:32 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 2 ) begin
+                      end
 
-                      rand_num[ 95:64 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 2 ) begin
 
-                  end
+                          rand_num[ 95:64 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 3 ) begin
+                      end
 
-                      rand_num[ 127:96 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 3 ) begin
 
-                  end
+                          rand_num[ 127:96 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 4 ) begin
+                      end
 
-                      rand_num[ 159:128 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 4 ) begin
 
-                  end
+                          rand_num[ 159:128 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 5 ) begin
+                      end
 
-                      rand_num[ 191:160 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 5 ) begin
 
-                  end
+                          rand_num[ 191:160 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 6 ) begin
+                      end
 
-                      rand_num[ 223:192 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 6 ) begin
 
-                  end
+                          rand_num[ 223:192 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 7 ) begin
+                      end
 
-                      rand_num[ 255:224 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 7 ) begin
 
-                  end
+                          rand_num[ 255:224 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 8 ) begin
+                      end
 
-                      rand_num[ 287:256 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 8 ) begin
 
-                  end
+                          rand_num[ 287:256 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 9 ) begin
+                      end
 
-                      rand_num[ 319:288 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 9 ) begin
 
-                  end
+                          rand_num[ 319:288 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 10 ) begin
+                      end
 
-                      rand_num[ 351:320 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 10 ) begin
 
-                  end
+                          rand_num[ 351:320 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 11 ) begin
+                      end
 
-                      rand_num[ 383:352 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 11 ) begin
 
-                  end
+                          rand_num[ 383:352 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 12 ) begin
+                      end
 
-                      rand_num[ 415:384 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 12 ) begin
 
-                  end
+                          rand_num[ 415:384 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 13 ) begin
+                      end
 
-                      rand_num[ 447:416 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 13 ) begin
 
-                  end
+                          rand_num[ 447:416 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 14 ) begin
+                      end
 
-                      rand_num[ 479:448 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 14 ) begin
 
-                  end
+                          rand_num[ 479:448 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 15 ) begin
+                      end
 
-                      rand_num[ 511:480 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 15 ) begin
 
-                  end
+                          rand_num[ 511:480 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 16 ) begin
+                      end
 
-                      rand_num[ 543:512 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 16 ) begin
 
-                  end
+                          rand_num[ 543:512 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 17 ) begin
+                      end
 
-                      rand_num[ 575:544 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 17 ) begin
 
-                  end
+                          rand_num[ 575:544 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 18 ) begin
+                      end
 
-                      rand_num[ 607:576 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 18 ) begin
 
-                  end
+                          rand_num[ 607:576 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 19 ) begin
+                      end
 
-                      rand_num[ 639:608 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 19 ) begin
 
-                  end
+                          rand_num[ 639:608 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 20 ) begin
+                      end
 
-                      rand_num[ 671:640 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 20 ) begin
 
-                  end
+                          rand_num[ 671:640 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 21 ) begin
+                      end
 
-                      rand_num[ 703:672 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 21 ) begin
 
-                  end
+                          rand_num[ 703:672 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 22 ) begin
+                      end
 
-                      rand_num[ 735:704 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 22 ) begin
 
-                  end
+                          rand_num[ 735:704 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 23 ) begin
+                      end
 
-                      rand_num[ 767:736 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 23 ) begin
 
-                  end
+                          rand_num[ 767:736 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 24 ) begin
+                      end
 
-                      rand_num[ 799:768 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 24 ) begin
 
-                  end
+                          rand_num[ 799:768 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 25 ) begin
+                      end
 
-                      rand_num[ 831:800 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 25 ) begin
 
-                  end
+                          rand_num[ 831:800 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 26 ) begin
+                      end
 
-                      rand_num[ 863:832 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 26 ) begin
 
-                  end
+                          rand_num[ 863:832 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 27 ) begin
+                      end
 
-                      rand_num[ 895:864 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 27 ) begin
 
-                  end
+                          rand_num[ 895:864 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 28 ) begin
+                      end
 
-                      rand_num[ 927:896 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 28 ) begin
 
-                  end
+                          rand_num[ 927:896 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 29 ) begin
+                      end
 
-                      rand_num[ 959:928 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 29 ) begin
 
-                  end
+                          rand_num[ 959:928 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 30 ) begin
+                      end
 
-                      rand_num[ 991:960 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 30 ) begin
 
-                  end
+                          rand_num[ 991:960 ] <= get_d_all[ 31:0 ];
 
-                  else if ( item_a_tmp == 31 ) begin
+                      end
 
-                      rand_num[ 1023:992 ] <= rand_num_tmp;
+                      else if ( item_a_tmp == 31 ) begin
+
+                          rand_num[ 1023:992 ] <= get_d_all[ 31:0 ];
+
+                      end
 
                   end
 
               end;
-
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    assign finish_gen = ( item_a == item_memory_num & update_item) ? 1'b1 : 1'b0;
 
 
 endmodule

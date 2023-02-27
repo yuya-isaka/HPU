@@ -10,13 +10,11 @@
 #include "hdc_processor.h"
 
 // Check関数
-void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJORITY_ADDR, const int IMEM_SIZE)
+void check(const int NGRAM, const int ADDRNUM, const int MAJORITY_ADDR, const int IMEM_SIZE)
 {
-  const int EPOCH = (ADDRNUM / NGRAM) / (CORENUM * THREADS_NUM);
-  const int REMAINDAR = (ADDRNUM / NGRAM) % (CORENUM * THREADS_NUM);
-  const int REMAINDAR_CORENUM = REMAINDAR / THREADS_NUM;
+  const int EPOCH = (ADDRNUM / NGRAM) / THREADS_NUM;
   const int EVEN = ((ADDRNUM / NGRAM) % 2) == 0;
-  const int LAST = EPOCH * NGRAM * CORENUM * THREADS_NUM;
+  const int LAST = EPOCH * NGRAM * THREADS_NUM;
 
   // SEND_NUM初期化 & DMAリセット
   hdc_init(0);
@@ -27,157 +25,66 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
   // 偶数処理
   if (EVEN)
   {
-    uint16_t addr_array[1][1] = {{MAJORITY_ADDR}};
-    hdc_load_thread(1, 1, addr_array);
+    uint32_t addr_array[1] = {MAJORITY_ADDR};
+    hdc_load_1_thread(1, addr_array);
 
-    hdc_store_thread(1, 1);
+    hdc_bound_1_thread(1);
   }
 
   // LASTまで繰り返す
-  for (int j = 0; j < LAST; j += NGRAM * CORENUM * THREADS_NUM)
+  for (int j = 0; j < LAST; j += NGRAM * THREADS_NUM)
   {
-    uint16_t core_num = CORENUM;
-    uint16_t addr_array[THREADS_NUM][core_num];
+
+    uint32_t addr_array[THREADS_NUM];
 
     // アドレス
-    for (uint16_t k = 0; k < THREADS_NUM; k++)
+    for (uint32_t k = 0; k < THREADS_NUM; k++)
     {
-      for (uint16_t i = 0; i < core_num; i++)
-      {
-        addr_array[k][i] = NGRAM * i + j + (NGRAM * core_num * k);
-      }
+      addr_array[k] = j + (NGRAM * k);
     }
 
     // load ---------------------------------------------
-    hdc_load_thread(THREADS_NUM, core_num, addr_array);
-    // ------------------------------------------------------
-
-    // move ---------------------------------------------
-    hdc_simd_move_thread();
+    hdc_load_1(addr_array);
     // ------------------------------------------------------
 
     // アドレス
     for (int k = 0; k < THREADS_NUM; k++)
     {
-      for (int i = 0; i < core_num; i++)
-      {
-        addr_array[k][i]++;
-      }
+      addr_array[k]++;
     }
 
     // load ---------------------------------------------
-    hdc_load_thread(THREADS_NUM, core_num, addr_array);
+    hdc_load_2(addr_array);
     // ------------------------------------------------------
 
     // permute ---------------------------------------------
-    hdc_simd_permute_thread(1);
+    hdc_permute_2(1);
     // ------------------------------------------------------
 
-    // pxor ---------------------------------------------
-    hdc_simd_pxor_thread();
-    // ------------------------------------------------------
-
-    // move ---------------------------------------------
-    hdc_simd_move_thread();
+    // bind ---------------------------------------------
+    hdc_bind_p11();
     // ------------------------------------------------------
 
     // アドレス
     for (int k = 0; k < THREADS_NUM; k++)
     {
-      for (int i = 0; i < core_num; i++)
-      {
-        addr_array[k][i]++;
-      }
+      addr_array[k]++;
     }
 
     // load ---------------------------------------------
-    hdc_load_thread(THREADS_NUM, core_num, addr_array);
+    hdc_load_2(addr_array);
     // ------------------------------------------------------
 
     // permute ---------------------------------------------
-    hdc_simd_permute_thread(2);
+    hdc_permute_2(2);
     // ------------------------------------------------------
 
-    // pxor ---------------------------------------------
-    hdc_simd_pxor_thread();
+    // bind ---------------------------------------------
+    hdc_bind_p11();
     // ------------------------------------------------------
 
     // store ---------------------------------------------
-    hdc_simd_store_thread();
-    // ------------------------------------------------------
-  }
-
-  // 余り
-  if (REMAINDAR != 0)
-  {
-    uint16_t core_num = REMAINDAR_CORENUM;
-    uint16_t addr_array[THREADS_NUM][core_num];
-
-    // アドレス
-    for (int k = 0; k < THREADS_NUM; k++)
-    {
-      for (int i = 0; i < core_num; i++)
-      {
-        addr_array[k][i] = NGRAM * i + LAST + (NGRAM * core_num * k);
-      }
-    }
-
-    // load ---------------------------------------------
-    hdc_load_thread(THREADS_NUM, core_num, addr_array);
-    // ------------------------------------------------------
-
-    // move ---------------------------------------------
-    hdc_move_thread(THREADS_NUM, core_num);
-    // ------------------------------------------------------
-
-    // アドレス
-    for (int k = 0; k < THREADS_NUM; k++)
-    {
-      for (int i = 0; i < core_num; i++)
-      {
-        addr_array[k][i]++;
-      }
-    }
-
-    // load ---------------------------------------------
-    hdc_load_thread(THREADS_NUM, core_num, addr_array);
-    // ------------------------------------------------------
-
-    // permute ---------------------------------------------
-    hdc_permute_thread(THREADS_NUM, core_num, 1);
-    // ------------------------------------------------------
-
-    // pxor ---------------------------------------------
-    hdc_pxor_thread(THREADS_NUM, core_num);
-    // ------------------------------------------------------
-
-    // move ---------------------------------------------
-    hdc_move_thread(THREADS_NUM, core_num);
-    // ------------------------------------------------------
-
-    // アドレス
-    for (int k = 0; k < THREADS_NUM; k++)
-    {
-      for (int i = 0; i < core_num; i++)
-      {
-        addr_array[k][i]++;
-      }
-    }
-
-    // load ---------------------------------------------
-    hdc_load_thread(THREADS_NUM, core_num, addr_array);
-    // ------------------------------------------------------
-
-    // permute ---------------------------------------------
-    hdc_permute_thread(THREADS_NUM, core_num, 2);
-    // ------------------------------------------------------
-
-    // pxor ---------------------------------------------
-    hdc_pxor_thread(THREADS_NUM, core_num);
-    // ------------------------------------------------------
-
-    // store ---------------------------------------------
-    hdc_store_thread(THREADS_NUM, core_num);
+    hdc_bound_1();
     // ------------------------------------------------------
   }
 
@@ -247,7 +154,7 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
     if (result[i] != dst[i])
     {
       printf("\n  Error %u %u\n", result[i], dst[i]);
-      printf("  CORENUM=%d  ADDRNUM=%d\n\n", CORENUM, ADDRNUM);
+      printf("  ADDRNUM=%d\n\n", ADDRNUM);
     }
   }
 
@@ -260,20 +167,60 @@ void check(const int NGRAM, const int CORENUM, const int ADDRNUM, const int MAJO
   return;
 }
 
+uint32_t xor128(int reset)
+{
+  // 初期値
+  static uint32_t x = 123456789;
+  static uint32_t y = 362436069;
+  static uint32_t z = 521288629;
+  static uint32_t w = 88675123;
+
+  // リセット信号
+  if (reset)
+  {
+    x = 123456789;
+    y = 362436069;
+    z = 521288629;
+    w = 88675123;
+    return 0;
+  }
+  else
+  {
+    uint32_t t = x ^ (x << 11);
+    x = y;
+    y = z;
+    z = w;
+    return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+  }
+}
+
 int main(void)
 {
   printf("\n ------------------------------ 開始 -------------------------------- \n\n");
 
   const int IMEM_SIZE = 512;
   const int NGRAM = 3;
-  const int CORENUM_MAX = 14;
   const int MAJORITY_ADDR = IMEM_SIZE - 1;
 
   // HDCプロセッサメモリ準備
   hdc_setup();
 
   // HDCプロセッサアイテムメモリ準備
-  hdc_make_imem(IMEM_SIZE);
+  hdc_com_start();
+  hdc_com_gen(88675123);
+  for (int i = 0; i < 31; i++)
+  {
+    hdc_com_gen(xor128(0));
+  }
+  for (int i = 0; i < 511; i++)
+  {
+    for (int j = 0; j < 32; j++)
+    {
+      hdc_com_gen(xor128(0));
+    }
+  }
+  hdc_compute_only();
+  hdc_finish();
 
   // テスト
   for (int j = 0; j < 100; j++)
@@ -281,13 +228,13 @@ int main(void)
     for (int i = (NGRAM * THREADS_NUM); i <= IMEM_SIZE; i += (NGRAM * THREADS_NUM))
     {
       int ADDRNUM = i;
-      check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR, IMEM_SIZE);
+      check(NGRAM, ADDRNUM, MAJORITY_ADDR, IMEM_SIZE);
     }
   }
 
   // // 単体テスト
   // int ADDRNUM = 30;
-  // check(NGRAM, CORENUM_MAX, ADDRNUM, MAJORITY_ADDR, IMEM_SIZE);
+  // check(NGRAM, ADDRNUM, MAJORITY_ADDR, IMEM_SIZE);
 
   printf("\nOK!\n");
   printf("\n ------------------------------ 終了 -------------------------------- \n\n");

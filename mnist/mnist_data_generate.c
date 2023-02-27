@@ -20,6 +20,8 @@ __attribute__((destructor)) static void destructor()
 
 #define TRAIN_IMAGE "train-images-idx3-ubyte"
 #define TRAIN_LABEL "train-labels-idx1-ubyte"
+#define TEST_IMAGE "t10k-images-idx3-ubyte"
+#define TEST_LABEL "t10k-labels-idx1-ubyte"
 
 #define image_pos(a, b) (a->data + b * 784)
 #define at(o, a, b) o->data[a * o->cols + b]
@@ -101,98 +103,129 @@ static struct tensor *load_image_file(const char *fn)
 	DONE = fread(buf, 1, 4, fp);
 	int h = buf2int(buf);
 
-	FILE *file = fopen("mnist_image.bin", "wb");
+	// FILE *file = fopen("mnist_image.bin", "wb");
 	int save_buf_zero = 0;
 	int save_buf_one = 1;
 
 	// printf("%d\n", n); // 60000
 	ret = create_tensor(n, 784);
+	// ここを工夫することで対応できる？
 	for (int i = 0; i < n; i++)
 	{
 		for (int j = 0; j < 784; j++)
 		{
 			DONE = fread(buf, 1, 1, fp);
+			// printf("%d ", (int)(buf[0]));
 			if ((int)(buf[0]) == 0)
 			{
 				ret->data[i * 784 + j] = 0;
-				fwrite(&save_buf_zero, 1, 1, file);
+				// fwrite(&save_buf_zero, 1, 1, file);
 			}
 			else
 			{
 				ret->data[i * 784 + j] = 1;
-				fwrite(&save_buf_one, 1, 1, file);
+				// fwrite(&save_buf_one, 1, 1, file);
 			}
+			// if (-100 < (int)(buf[0]) && (int)(buf[0]) < 100 && (int)(buf[0]) != 0)
+			// {
+			// 	ret->data[i * 784 + j] = 1;
+			// 	// fwrite(&save_buf_zero, 1, 1, file);
+			// }
+			// else
+			// {
+			// 	ret->data[i * 784 + j] = 0;
+			// 	// fwrite(&save_buf_one, 1, 1, file);
+			// }
 		}
 	}
 
 	fclose(fp);
-	fclose(file);
+	// fclose(file);
 
 	return ret;
 }
 
-static void load_image_file_2(const char *fn)
+// static void print_image(float *a)
+// {
+// 	int w = 28, h = 28, i, j;
+// 	for (j = 0; j < h; j++)
+// 	{
+// 		for (i = 0; i < w; i++)
+// 		{
+// 			printf("%s", *a == 0 ? "--" : "00");
+// 			a++;
+// 		}
+// 		printf("\n");
+// 	}
+// 	printf("\n");
+// }
+
+static void load_trainimage_file_2(struct tensor *train_image_all)
 {
-	struct tensor *ret = NULL;
-	char buf[4];
-
-	FILE *fp = fopen(fn, "rb");
-
-	fseek(fp, 0, SEEK_END);
-
-	int sz = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-
-	size_t DONE;
-	DONE = fread(buf, 1, 4, fp);
-	int t = buf2int(buf);
-
-	DONE = fread(buf, 1, 4, fp);
-	int n = buf2int(buf);
-	DONE = fread(buf, 1, 4, fp);
-	int w = buf2int(buf);
-	DONE = fread(buf, 1, 4, fp);
-	int h = buf2int(buf);
-
 	for (int ll = 0; ll < 10; ll++)
 	{
-		char PATH[12];
-		snprintf(PATH, 12, "label%d.txt", ll);
+		char PATH[16];
+		snprintf(PATH, 16, "label%d.txt", ll);
 		FILE *file;
 		file = fopen(PATH, "r");
 		char Lines[10];
 
-		char PATH_NEW[12];
-		snprintf(PATH_NEW, 12, "image%d.txt", ll);
+		char PATH_NEW[16];
+		snprintf(PATH_NEW, 16, "image%d.txt", ll);
 		FILE *file_new;
 		file_new = fopen(PATH_NEW, "w");
 
 		while (fgets(Lines, 10, file) != NULL) // 6000回ぐらい？
 		{
-			// printf("%d\n", n); // 60000
-			for (int i = 0; i < n; i++)
+			// printf("%d:%d:%d\n", ll, atoi(Lines));
+			for (int j = 0; j < 28; j++)
 			{
-				if (atoi(Lines) == i)
+				for (int k = 0; k < 28; k++)
 				{
-					for (int j = 0; j < 784; j++)
-					{
-						DONE = fread(buf, 1, 1, fp);
-						if ((int)(buf[0]) == 0)
-						{
-							fprintf(file_new, "%d", 0);
-						}
-						else
-						{
-							fprintf(file_new, "%d", 1);
-						}
-					}
+					// printf("%d", at(train_image_all, atoi(Lines), j * 28 + k));
+					fprintf(file_new, "%d", at(train_image_all, atoi(Lines), j * 28 + k));
 				}
+				// printf("\n");
+			}
+		}
+		// exit(1);
+		fclose(file);
+	}
+
+	return;
+}
+
+static void load_testimage_file_2(struct tensor *test_image_all)
+{
+	for (int ll = 0; ll < 10; ll++)
+	{
+		char PATH[16];
+		snprintf(PATH, 16, "testlabel%d.txt", ll);
+		FILE *file;
+		file = fopen(PATH, "r");
+		char Lines[10];
+
+		char PATH_NEW[16];
+		snprintf(PATH_NEW, 16, "testimage%d.txt", ll);
+		FILE *file_new;
+		file_new = fopen(PATH_NEW, "w");
+
+		while (fgets(Lines, 10, file) != NULL) // 6000回ぐらい？
+		{
+			// printf("%d:%d:%d\n", ll, atoi(Lines));
+			for (int j = 0; j < 28; j++)
+			{
+				for (int k = 0; k < 28; k++)
+				{
+					// printf("%d", at(test_image_all, atoi(Lines), j * 28 + k));
+					fprintf(file_new, "%d", at(test_image_all, atoi(Lines), j * 28 + k));
+				}
+				// printf("\n");
 			}
 		}
 		fclose(file);
 	}
 
-	fclose(fp);
 	return;
 }
 
@@ -276,11 +309,16 @@ int main()
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
 	// // mnist_image.bin生成
-	// struct tensor *image = load_image_file(TRAIN_IMAGE);
-	// struct tensor *label = load_label_file(TRAIN_LABEL);
+	struct tensor *train_image = load_image_file(TRAIN_IMAGE);
+	struct tensor *train_label = load_label_file(TRAIN_LABEL);
+	struct tensor *test_image = load_image_file(TEST_IMAGE);
+	struct tensor *test_label = load_label_file(TEST_LABEL);
 
 	// // image0 - image10.txt生成
-	load_image_file_2(TRAIN_IMAGE);
+	load_trainimage_file_2(train_image);
+
+	// // testimage0 - testimage10.txt生成
+	load_testimage_file_2(test_image);
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -300,6 +338,33 @@ int main()
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
+	// // testlabel0 - testlabel10.txt生成
+	// // 0 - 10
+	// for (int i = 0; i < 10; i++)
+	// {
+	// 	FILE *fp;
+	// 	char PATH[16];
+	// 	snprintf(PATH, 16, "testlabel%d.txt", i);
+	// 	fp = fopen(PATH, "w");
+	// 	for (int j = 0; j < label->rows; j++) // train:60000, test:10000
+	// 	{
+	// 		if (label->data[j] == i)
+	// 		{
+	// 			fprintf(fp, "%d\n", j);
+	// 		}
+	// 	}
+	// 	fclose(fp);
+	// }
+
+	// // ラベル確認用
+	// printf("%d\n\n", label->rows);
+	// for (int j = 0; j < label->rows; j++)
+	// {
+	// 	printf("%d:%d \n", j, label->data[j]);
+	// }
+
+	//////////////////////////////////////////////////////////////////////////////////////////////
+
 	// // 読み込みチェック
 	// int all_num = 0;
 	// for (int i = 0; i < 10; i++)
@@ -313,8 +378,10 @@ int main()
 	// }
 	// printf("\nall_num: %d\n\n", all_num);
 
-	// free_tensor(image);
-	// free_tensor(label);
+	free_tensor(train_image);
+	free_tensor(train_label);
+	free_tensor(test_image);
+	free_tensor(test_label);
 
 	return 0;
 }

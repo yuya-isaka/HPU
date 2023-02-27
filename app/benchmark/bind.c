@@ -32,7 +32,6 @@ int main(int argc, char const *argv[])
 	{
 		rand_array[i] = rand() % RANNUM;
 	}
-	int rand_array_num = 0;
 	END_COMPUTE = clock();
 	RAN_TIME += ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
 	/////////////////////////////////////////////////////////////////////////////
@@ -42,10 +41,10 @@ int main(int argc, char const *argv[])
 #ifdef OPENMP
 #pragma omp parallel for
 #endif
-	for (int i = 0; i < TRIAL_NUM; i++)
+	for (int i = 0; i < TRIAL_NUM * 2; i += 2)
 	{
-		int addr1 = rand_array[rand_array_num++];
-		int addr2 = rand_array[rand_array_num++];
+		int addr1 = rand_array[i];
+		int addr2 = rand_array[i + 1];
 		result[i] = hv_bind(item_memory[addr1], item_memory[addr2]);
 	}
 

@@ -9,6 +9,33 @@
 #include <time.h>
 #include "hdc_processor.h"
 
+uint32_t xor128(int reset)
+{
+	// 初期値
+	static uint32_t x = 123456789;
+	static uint32_t y = 362436069;
+	static uint32_t z = 521288629;
+	static uint32_t w = 88675123;
+
+	// リセット信号
+	if (reset)
+	{
+		x = 123456789;
+		y = 362436069;
+		z = 521288629;
+		w = 88675123;
+		return 0;
+	}
+	else
+	{
+		uint32_t t = x ^ (x << 11);
+		x = y;
+		y = z;
+		z = w;
+		return w = (w ^ (w >> 19)) ^ (t ^ (t >> 8));
+	}
+}
+
 int main(int argc, char const *argv[])
 {
 	const int RANNUM = 512;
@@ -16,15 +43,22 @@ int main(int argc, char const *argv[])
 	// メモリセットアップ
 	hdc_setup();
 
-	clock_t START_COMPUTE = clock();
 	// アイテムメモリ生成
-	hdc_make_imem(RANNUM);
-	clock_t END_COMPUTE = clock();
-	double COM_TIME = ((double)(END_COMPUTE - START_COMPUTE)) / CLOCKS_PER_SEC;
+	hdc_com_gen(88675123);
+	for (int i = 0; i < 31; i++)
+	{
+		hdc_com_gen(xor128(0));
+	}
+	for (int i = 0; i < 511; i++)
+	{
+		for (int j = 0; j < 32; j++)
+		{
+			hdc_com_gen(xor128(0));
+		}
+	}
+	hdc_compute_only();
 
 	hdc_finish();
-
-	printf("\n  計算時間: %lf[s]\n", COM_TIME);
 
 	return 0;
 }
