@@ -12,11 +12,19 @@ This project has been selected for [2022 IPA Mito Project](https://www.ipa.go.jp
 
 - The figure on the left shows the comparison of computation time (in seconds) for the three main operations of HDC (Bind, Permutation, and Bound) when executed on HPU and M1 Max. 10 cores are used in M1 Max, which uses its own library. Note that the unit of the vertical axis is seconds, and the time to generate random test data for the program is omitted.
 
-- The figure on the right shows a comparison of the computation time (in seconds) when training three different recognition tasks using HDC was executed with HPU and with M1 Max. From left to right: "language recognition," "speech recognition," and "image recognition. 10 cores are used on M1 Max, which uses its own library. The unit of the vertical axis is seconds, and the time to read training data from a file is omitted.
+- The figure on the right shows a comparison of the computation time (in seconds) when training three different recognition tasks using HDC was executed with HPU and with M1 Max. From left to right: "language recognition" "speech recognition" and "image recognition (MNIST)". 10 cores are used on M1 Max, which uses its own library. The unit of the vertical axis is seconds, and the time to read training data from a file is omitted.
 
 <div align="center">
 <img src="docs/bench.png" width="300">  <img src="docs/app.png" width="291">
 </div>
+
+## HPU Energy-Delay Product (EDP)
+
+| Environment  | language | speech | image (MNIST)
+|-------------------------------|----------|----------|--------
+| HPU          | 0.2  | 0.3   | 28.5
+| M1 Max           | 35.1   | 113.8    | 15343.1
+| Cortex-A9  | 1525.0   | 2519.3    | 383887.1
 
 ## HPU Architecture
 
