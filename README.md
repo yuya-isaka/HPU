@@ -39,9 +39,9 @@ The HPU consists of "control registers," "DMA unit," "HD core," and "Bound unit,
 
 ## Details
 
-WORK IN PROGRESS
+<ins>**WORK IN PROGRESS**</ins>
 
 
-We will gradually add more explanations on how to use HPU and the codes. Please be patient.
+#### We will gradually add more explanations on how to use HPU and the codes. Please be patient.
 
-If you find HPU helpful, please give us a star!
+#### If you find HPU helpful, please give us a star!
