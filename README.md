@@ -37,7 +37,7 @@ The HPU consists of "control registers," "DMA unit," "HD core," and "Bound unit,
 <img src="docs/hpu_arch.png" width="550">  <img src="docs/hdcore_arch.png" width="450">
 </div>
 
-## 🐌　Details
+## 🕷 Details
 
 <ins>**WORK IN PROGRESS**</ins>
 
