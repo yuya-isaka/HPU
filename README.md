@@ -1,4 +1,4 @@
-# 🌟HPU🌟 (Hyperdimensional Processing Unit)
+# 🌟　HPU　(Hyperdimensional Processing Unit)
 
 HPU is a programmable accelerator that enhance "Hyperdimensional Computing (HDC)" performance by cooperating with CPU to execute operations at high speed and low power consumption.
 
