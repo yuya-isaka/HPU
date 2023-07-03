@@ -41,7 +41,16 @@ The HPU consists of "control registers," "DMA unit," "HD core," and "Bound unit,
 
 <ins>**WORK IN PROGRESS**</ins>
 
+We will gradually add more explanations on how to use HPU and the codes. Please be patient.
 
-#### We will gradually add more explanations on how to use HPU and the codes. Please be patient.
+If you're interested in the HPU I've developed, I would be grateful if you could give it a star. It encourages me to keep developing it!
 
-#### If you're interested in the HPU I've developed, I would be grateful if you could give it a star. It encourages me to keep developing it!
+## 🐜 Upcoming HPU Announcement
+
+We are excited to announce that our team is actively working on the development of a groundbreaking new platform, distinct from the architecture in this repository. The novel HPU platform aims to extend the capabilities of Coarse-Grained Reconfigurable Array (CGRA).
+
+As the platform is still under active development, it is not available for public access at this time. However, we will be releasing it as progress continues and it reaches a more refined state.
+
+Stay tuned for more updates on this promising development!
+
+Thank you for your interest and support.
