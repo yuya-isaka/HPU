@@ -4,7 +4,7 @@ HPU is a programmable accelerator that enhance "Hyperdimensional Computing (HDC)
 
 ## 🐞 Overview
 
-HDC is an efficient technique for performing various cognitive tasks by mapping data to hyperdimensional vectors consisting of thousands to tens of thousands of dimensions. However, the main operations of HDC - Bind, Permutation, and Bound - require several cycles in the computing unit, making it inefficient to perform HDC on a CPU platform. To address this, we propose the Hyperdimensional Processing Unit (HPU), a programmable accelerator specialized for HDC. By cooperating with the CPU, HDC can execute various tasks at high speed and with low power consumption. Our accelerator enables support for any HDC encoding method by allowing the selection of three operations per cycle. Evaluation experiments with the ARM-v7 processor (Cortex-A9) show that HDC operations can be accelerated by a maximum of 169 times, and our accelerator can improve the energy-delay product up to 13,469 times in the training of handwritten character recognition task (MNIST). (The data in the README is based on the "pynq branch" code.)
+HDC is an efficient technique for performing various cognitive tasks by mapping data to hyperdimensional vectors consisting of thousands to tens of thousands of dimensions. However, the main operations of HDC - Bind, Permutation, and Bound - require several cycles in the computing unit, making it inefficient to perform HDC on a CPU platform. To address this, we propose the Hyperdimensional Processing Unit (HPU), a programmable accelerator specialized for HDC. By cooperating with the CPU, HDC can execute various tasks at high speed and with low power consumption. Our accelerator enables support for any HDC encoding method by allowing the selection of three operations per cycle. Evaluation experiments with the ARM-v7 processor (Cortex-A9) show that HDC operations can be accelerated by a maximum of 169 times, and this accelerator can improve the energy-delay product up to 13,469 times in the training of handwritten character recognition task (MNIST). (The data in the README is based on the "pynq branch" code.)
 
 This project has been selected for [2022 IPA Mito Project](https://www.ipa.go.jp/jinzai/mitou/it/2022/gaiyou_tk-4.html).
 
@@ -41,16 +41,17 @@ The HPU consists of "control registers," "DMA unit," "HD core," and "Bound unit,
 
 <ins>**WORK IN PROGRESS**</ins>
 
-We will gradually add more explanations on how to use HPU and the codes. Please be patient.
+I am currently expanding the documentation and providing more comprehensive instructions on the use of the HPU and its associated codes.
 
-If you're interested in the HPU I've developed, I would be grateful if you could give it a star. It encourages me to keep developing it!
+If you find value in the HPU that I've developed, your star would mean a lot to me. Each star is a source of encouragement, motivating me to continue developing this project!
 
 ## 🐜 Upcoming HPU Announcement
 
-We are excited to announce that our team is actively working on the development of a groundbreaking new platform, distinct from the architecture in this repository. The novel HPU platform aims to extend the capabilities of Coarse-Grained Reconfigurable Array (CGRA).
+I am excited to announce that I am in the process of developing an innovative new platform, one that stands apart from the architecture of this repository.
+The focus of this novel HPU platform is to extend the functionality of the Coarse-Grained Reconfigurable Array (CGRA).
 
-As the platform is still under active development, it is not available for public access at this time. However, we will be releasing it as progress continues and it reaches a more refined state.
+The platform, still in its developmental stages, is not currently available for public access. However, rest assured that it will be released as it continues to progress towards a more refined state.
 
-Stay tuned for more updates on this promising development!
+Stay tuned for more exciting updates on this promising development!
 
-Thank you for your interest and support.
+Thank you for your interest and ongoing support.
