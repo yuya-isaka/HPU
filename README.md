@@ -47,11 +47,5 @@ If you find value in the HPU that I've developed, your star would mean a lot to 
 
 ## 🐜 Upcoming HPU Announcement
 
-I am excited to announce that I am in the process of developing an innovative new platform, one that stands apart from the architecture of this repository.
-The focus of this novel HPU platform is to extend the functionality of the Coarse-Grained Reconfigurable Array (CGRA).
-
-The platform, still in its developmental stages, is not currently available for public access. However, rest assured that it will be released as it continues to progress towards a more refined state.
-
-Stay tuned for more exciting updates on this promising development!
-
-Thank you for your interest and ongoing support.
+I am developing a new platform that has a different architecture from this repository. 
+The new HDC platform under development is an extension based on a Coarse-Grained Reconfigurable Array (CGRA).
