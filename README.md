@@ -2,9 +2,9 @@
 
 HPU is a programmable accelerator that enhances "Hyperdimensional Computing (HDC)" performance by cooperating with CPU to execute operations at high speed and low power consumption.
 
-## Reference (DATE2024)
+## Reference (DATE 2024)
 
-We would greatly appreciate it if you could kindly acknowledge our tool in your research by referencing the following publications. Also, it was presented at the DATE2024 international conference.
+We would greatly appreciate it if you could kindly acknowledge our tool in your research by referencing the following publications. Also, it was presented at the DATE 2024 international conference.
 ````
 @inproceedings{IsakaSIS2024Date,
    title={EcoFlex-HDP: High-Speed and Low-Power and Programmable Hyperdimensional-Computing Platform with CPU Co-processing},
