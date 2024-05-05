@@ -2,18 +2,6 @@
 
 HPU is a programmable accelerator that enhances "Hyperdimensional Computing (HDC)" performance by cooperating with CPU to execute operations at high speed and low power consumption.
 
-## Reference (DATE 2024)
-
-We would greatly appreciate it if you could kindly acknowledge our tool in your research by referencing the following publications. Also, it was presented at the DATE 2024 international conference.
-````
-@inproceedings{IsakaSIS2024Date,
-   title={EcoFlex-HDP: High-Speed and Low-Power and Programmable Hyperdimensional-Computing Platform with CPU Co-processing},
-   author={Yuya Isaka and Nau Sakaguchi and Michiko Inoue and Michihiro Shintani},
-   booktitle={Proceedings of the Conference on Design, Automation \& Test in Europe (DATE)},
-   year={2024}
-}
-````
-
 ## 🐞 Overview
 
 HDC is an efficient technique for performing various cognitive tasks by mapping data to hyperdimensional vectors consisting of thousands to tens of thousands of dimensions. However, the primary operations of HDC - Bind, Permutation, and Bound - require several cycles in the computing unit, making it inefficient to perform HDC on a CPU platform. To address this, we propose the Hyperdimensional Processing Unit (HPU), a programmable accelerator specialized for HDC. By cooperating with the CPU, HDC can execute various tasks quickly and with low power consumption. Our accelerator enables support for any HDC encoding method by allowing the selection of three operations per cycle. Evaluation experiments with the ARM-v7 processor (Cortex-A9) show that HDC operations can be accelerated by a maximum of 169 times, and this accelerator can improve the energy-delay product up to 13,469 times in the training of handwritten character recognition task (MNIST). (The data in the README is based on the "pynq branch" code.)
@@ -61,3 +49,15 @@ Think the HPU is cool? Go ahead and give it a star~!
 
 Working on something new that's a bit different from what's in this repo. 
 The upcoming HDC platform I'm building is an expansion that's based on Coarse-Grained Reconfigurable Array (CGRA).
+
+## Reference (DATE 2024)
+
+We would greatly appreciate it if you could kindly acknowledge our tool in your research by referencing the following publications. Also, it was presented at the DATE 2024 international conference.
+````
+@inproceedings{IsakaSIS2024Date,
+   title={EcoFlex-HDP: High-Speed and Low-Power and Programmable Hyperdimensional-Computing Platform with CPU Co-processing},
+   author={Yuya Isaka and Nau Sakaguchi and Michiko Inoue and Michihiro Shintani},
+   booktitle={Proceedings of the Conference on Design, Automation \& Test in Europe (DATE)},
+   year={2024}
+}
+````
