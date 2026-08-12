@@ -1,3 +1,5 @@
+
+
 # HPU (Hyperdimensional Processing Unit)
 
 HPU is a programmable accelerator that enhances "Hyperdimensional Computing (HDC)" performance by cooperating with CPU to execute operations at high speed and low power consumption.
@@ -41,7 +43,7 @@ The HPU consists of "control registers," "DMA unit," "HD core," and "Bound unit,
 
 <ins>**WORK IN PROGRESS**</ins>
 
-I am currently working on documenting how to use the HPU and its associated code.
+I am currently working on documenting how to use the HPU and its associated code. In the meantime, usage examples are available in `app/addr/addr_test.c` for HPU driver interaction and `app/benchmark/bind_bound.c` for standard hyperdimensional computing routines.
 
 Think the HPU is cool? Go ahead and give it a star~!
 
